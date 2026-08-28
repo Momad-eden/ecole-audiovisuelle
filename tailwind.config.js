@@ -30,9 +30,11 @@ export default {
             },
 
             fontFamily: {
-
                 sans: ['Inter', ...defaultTheme.fontFamily.sans],
-
+                serif: ['"Playfair Display"', ...defaultTheme.fontFamily.serif],
+                display: ['Syne', 'Inter', ...defaultTheme.fontFamily.sans],
+                cormorant: ['"Cormorant Garamond"', ...defaultTheme.fontFamily.serif],
+                cinzel: ['Cinzel', ...defaultTheme.fontFamily.serif],
             },
 
             boxShadow: {

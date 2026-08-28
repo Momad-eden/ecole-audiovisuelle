@@ -16,13 +16,13 @@ use App\Http\Controllers\Admin\PartnerController;
 use App\Http\Controllers\Admin\SettingController;
 use App\Http\Controllers\Admin\UserController;
 
-// Controller Public
+// Controllers Public
+use App\Http\Controllers\Public\HomeController as PublicHomeController;
+use App\Http\Controllers\Public\AboutController as PublicAboutController;
+use App\Http\Controllers\Public\CourseController as PublicCourseController;
+use App\Http\Controllers\Public\GalleryController as PublicGalleryController;
+use App\Http\Controllers\Public\NewsController as PublicNewsController;
 use App\Http\Controllers\Public\AdmissionController as PublicAdmissionController;
-
-// Models
-use App\Models\Course;
-use App\Models\Gallery;
-use App\Models\News;
 
 
 /*
@@ -31,67 +31,22 @@ use App\Models\News;
 |--------------------------------------------------------------------------
 */
 
+// Accueil
+Route::get('/', PublicHomeController::class)->name('public.home');
 
-/*
-|--------------------------------------------------------------------------
-| Accueil
-|--------------------------------------------------------------------------
-*/
+// L'école (À propos)
+Route::get('/ecole', [PublicAboutController::class, 'index'])->name('public.about');
 
-Route::get('/', function () {
+// Catalogue des Formations & Fiche détaillée
+Route::get('/formations', [PublicCourseController::class, 'index'])->name('public.courses.index');
+Route::get('/formations/{course:slug}', [PublicCourseController::class, 'show'])->name('public.courses.show');
 
-    $courses = Course::where('is_active', true)
-        ->latest()
-        ->get();
+// Galerie Médias
+Route::get('/galerie', [PublicGalleryController::class, 'index'])->name('public.gallery.index');
 
-    $galleries = Gallery::where('is_active', true)
-        ->latest()
-        ->take(6)
-        ->get();
-
-    $news = News::where('is_published', true)
-        ->where(function ($query) {
-
-            $query
-                ->whereNull('published_at')
-                ->orWhere('published_at', '<=', now());
-        })
-        ->latest('published_at')
-        ->take(3)
-        ->get();
-
-    return view(
-        'public.home',
-        compact(
-            'courses',
-            'galleries',
-            'news'
-        )
-    );
-})->name('public.home');
-
-
-/*
-|--------------------------------------------------------------------------
-| Détail d'une formation
-|--------------------------------------------------------------------------
-*/
-
-Route::get(
-    '/formations/{course:slug}',
-    function (Course $course) {
-
-        abort_unless(
-            $course->is_active,
-            404
-        );
-
-        return view(
-            'public.formation-show',
-            compact('course')
-        );
-    }
-)->name('public.courses.show');
+// Journal & Actualités
+Route::get('/actualites', [PublicNewsController::class, 'index'])->name('public.news.index');
+Route::get('/actualites/{news:slug}', [PublicNewsController::class, 'show'])->name('public.news.show');
 
 
 /*
@@ -112,12 +67,14 @@ Route::get(
 */
 
 Route::get(
-    '/candidater',
+    '/admission',
     [
         PublicAdmissionController::class,
         'create'
     ]
 )->name('public.admissions.create');
+
+Route::redirect('/candidater', '/admission', 301);
 
 
 /*
@@ -127,7 +84,7 @@ Route::get(
 */
 
 Route::post(
-    '/candidater',
+    '/admission',
     [
         PublicAdmissionController::class,
         'store'
@@ -142,7 +99,7 @@ Route::post(
 */
 
 Route::get(
-    '/candidater/succes',
+    '/admission/succes',
     [
         PublicAdmissionController::class,
         'success'

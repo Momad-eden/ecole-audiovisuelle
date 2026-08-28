@@ -3,67 +3,47 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
+use App\Http\Requests\Admin\StoreGalleryRequest;
+use App\Http\Requests\Admin\UpdateGalleryRequest;
 use App\Models\Gallery;
-use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Storage;
+use App\Services\FileUploadService;
+use Illuminate\Http\RedirectResponse;
+use Illuminate\View\View;
 
 class GalleryController extends Controller
 {
-    public function index()
+    public function __construct(
+        protected FileUploadService $fileUploadService
+    ) {}
+
+    public function index(): View
     {
         $galleries = Gallery::latest()->paginate(12);
 
         return view('admin.galleries.index', compact('galleries'));
     }
 
-    public function create()
+    public function create(): View
     {
         return view('admin.galleries.create');
     }
 
-    public function store(Request $request)
+    public function store(StoreGalleryRequest $request): RedirectResponse
     {
-        $rules = [
-            'title' => 'required|string|max:255',
-            'type' => 'required|in:image,video',
-            'description' => 'nullable|string',
-            'is_active' => 'boolean',
-        ];
-
-        if ($request->type === 'image') {
-            $rules['file'] = 'required|image|mimes:jpg,jpeg,png,webp|max:10240';
-        }
-
-        if ($request->type === 'video') {
-            $rules['youtube_url'] = [
-                'required',
-                'url',
-                'regex:/^(https?:\/\/)?(www\.)?(youtube\.com|youtu\.be)\//i',
-            ];
-        }
-
-        $validated = $request->validate($rules);
+        $validated = $request->validated();
 
         $data = [
-            'title' => $validated['title'],
-            'type' => $validated['type'],
+            'title'       => $validated['title'],
+            'type'        => $validated['type'],
             'description' => $validated['description'] ?? null,
-            'is_active' => $request->has('is_active'),
+            'is_active'   => $request->boolean('is_active'),
         ];
 
-        if ($request->type === 'image') {
-
-            $data['file_path'] = $request
-                ->file('file')
-                ->store('gallery', 'public');
-
+        if ($request->input('type') === 'image' && $request->hasFile('file')) {
+            $data['file_path'] = $this->fileUploadService->upload($request->file('file'), 'gallery');
             $data['youtube_url'] = null;
-        }
-
-        if ($request->type === 'video') {
-
+        } elseif ($request->input('type') === 'video') {
             $data['file_path'] = null;
-
             $data['youtube_url'] = $validated['youtube_url'];
         }
 
@@ -74,80 +54,40 @@ class GalleryController extends Controller
             ->with('success', 'Média ajouté à la galerie.');
     }
 
-    public function show(Gallery $gallery)
+    public function show(Gallery $gallery): View
     {
         return view('admin.galleries.show', compact('gallery'));
     }
 
-    public function edit(Gallery $gallery)
+    public function edit(Gallery $gallery): View
     {
         return view('admin.galleries.edit', compact('gallery'));
     }
 
-    public function update(Request $request, Gallery $gallery)
+    public function update(UpdateGalleryRequest $request, Gallery $gallery): RedirectResponse
     {
-        $rules = [
-            'title' => 'required|string|max:255',
-            'type' => 'required|in:image,video',
-            'description' => 'nullable|string',
-            'is_active' => 'boolean',
-        ];
-
-        if ($request->type === 'image') {
-            $rules['file'] = 'nullable|image|mimes:jpg,jpeg,png,webp|max:10240';
-        }
-
-        if ($request->type === 'video') {
-            $rules['youtube_url'] = [
-                'required',
-                'url',
-                'regex:/^(https?:\/\/)?(www\.)?(youtube\.com|youtu\.be)\//i',
-            ];
-        }
-
-        $validated = $request->validate($rules);
+        $validated = $request->validated();
 
         $data = [
-            'title' => $validated['title'],
-            'type' => $validated['type'],
+            'title'       => $validated['title'],
+            'type'        => $validated['type'],
             'description' => $validated['description'] ?? null,
-            'is_active' => $request->has('is_active'),
+            'is_active'   => $request->boolean('is_active'),
         ];
 
-        /*
-        |--------------------------------------------------------------------------
-        | IMAGE
-        |--------------------------------------------------------------------------
-        */
-
-        if ($request->type === 'image') {
-
+        if ($request->input('type') === 'image') {
             $data['youtube_url'] = null;
-
             if ($request->hasFile('file')) {
-
-                if ($gallery->file_path) {
-                    Storage::disk('public')->delete($gallery->file_path);
-                }
-
-                $data['file_path'] = $request
-                    ->file('file')
-                    ->store('gallery', 'public');
+                $data['file_path'] = $this->fileUploadService->replace(
+                    $request->file('file'),
+                    $gallery->file_path,
+                    'gallery'
+                );
             }
-        }
-
-        /*
-        |--------------------------------------------------------------------------
-        | VIDEO YOUTUBE
-        |--------------------------------------------------------------------------
-        */
-
-        if ($request->type === 'video') {
-
+        } elseif ($request->input('type') === 'video') {
             if ($gallery->file_path) {
-                Storage::disk('public')->delete($gallery->file_path);
+                $this->fileUploadService->delete($gallery->file_path);
             }
-
             $data['file_path'] = null;
             $data['youtube_url'] = $validated['youtube_url'];
         }
@@ -159,10 +99,10 @@ class GalleryController extends Controller
             ->with('success', 'Média modifié avec succès.');
     }
 
-    public function destroy(Gallery $gallery)
+    public function destroy(Gallery $gallery): RedirectResponse
     {
         if ($gallery->file_path) {
-            Storage::disk('public')->delete($gallery->file_path);
+            $this->fileUploadService->delete($gallery->file_path);
         }
 
         $gallery->delete();

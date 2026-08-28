@@ -3,26 +3,27 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
+use App\Http\Requests\Admin\StoreCourseRequest;
+use App\Http\Requests\Admin\UpdateCourseRequest;
 use App\Models\Course;
+use App\Services\FileUploadService;
+use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
+use Illuminate\View\View;
 
 class CourseController extends Controller
 {
-    /**
-     * Liste des formations.
-     */
-    public function index(Request $request)
+    public function __construct(
+        protected FileUploadService $fileUploadService
+    ) {}
+
+    public function index(Request $request): View
     {
         $query = Course::query();
 
         if ($request->filled('search')) {
-            $query->where(
-                'title',
-                'like',
-                '%' . $request->search . '%'
-            );
+            $query->where('title', 'like', '%' . $request->search . '%');
         }
 
         $courses = $query
@@ -31,343 +32,112 @@ class CourseController extends Controller
             ->withQueryString();
 
         $totalCourses = Course::count();
-
-        $activeCourses = Course::where(
-            'is_active',
-            true
-        )->count();
-
-        $inactiveCourses = Course::where(
-            'is_active',
-            false
-        )->count();
-
+        $activeCourses = Course::where('is_active', true)->count();
+        $inactiveCourses = Course::where('is_active', false)->count();
         $averagePrice = Course::avg('price') ?? 0;
 
-        return view(
-            'admin.courses.index',
-            compact(
-                'courses',
-                'totalCourses',
-                'activeCourses',
-                'inactiveCourses',
-                'averagePrice'
-            )
-        );
+        return view('admin.courses.index', compact(
+            'courses',
+            'totalCourses',
+            'activeCourses',
+            'inactiveCourses',
+            'averagePrice'
+        ));
     }
 
-
-    /**
-     * Formulaire de création.
-     */
-    public function create()
+    public function create(): View
     {
         return view('admin.courses.create');
     }
 
-
-    /**
-     * Enregistrer une nouvelle formation.
-     */
-    public function store(Request $request)
+    public function store(StoreCourseRequest $request): RedirectResponse
     {
-        $validated = $request->validate([
+        $validated = $request->validated();
 
-            'title' => [
-                'required',
-                'string',
-                'max:255',
-            ],
-
-            'description' => [
-                'nullable',
-                'string',
-            ],
-
-            'duration' => [
-                'nullable',
-                'string',
-                'max:100',
-            ],
-
-            'price' => [
-                'nullable',
-                'numeric',
-                'min:0',
-            ],
-
-            'image' => [
-                'nullable',
-                'image',
-                'mimes:jpg,jpeg,png,webp',
-                'max:5120',
-            ],
-
-            'is_active' => [
-                'nullable',
-                'boolean',
-            ],
-
-        ]);
-
-
-        /*
-        |--------------------------------------------------------------------------
-        | Slug
-        |--------------------------------------------------------------------------
-        */
-
-        $slug = Str::slug(
-            $validated['title']
-        );
-
-        $originalSlug = $slug;
-        $counter = 1;
-
-        while (
-            Course::where('slug', $slug)->exists()
-        ) {
-            $slug = $originalSlug . '-' . $counter;
-            $counter++;
-        }
-
-
-        /*
-        |--------------------------------------------------------------------------
-        | Image
-        |--------------------------------------------------------------------------
-        */
+        $slug = $this->generateUniqueSlug($validated['title']);
 
         $imagePath = null;
-
         if ($request->hasFile('image')) {
-
-            $imagePath = $request
-                ->file('image')
-                ->store('formations', 'public');
+            $imagePath = $this->fileUploadService->upload($request->file('image'), 'formations');
         }
-
-
-        /*
-        |--------------------------------------------------------------------------
-        | Création
-        |--------------------------------------------------------------------------
-        */
 
         Course::create([
-
-            'title' => $validated['title'],
-
-            'slug' => $slug,
-
-            'description' =>
-                $validated['description'] ?? null,
-
-            'duration' =>
-                $validated['duration'] ?? null,
-
-            'price' =>
-                $validated['price'] ?? 0,
-
-            'image' => $imagePath,
-
-            'is_active' =>
-                $request->boolean('is_active'),
-
+            'title'       => $validated['title'],
+            'slug'        => $slug,
+            'description' => $validated['description'] ?? null,
+            'duration'    => $validated['duration'] ?? null,
+            'price'       => $validated['price'] ?? 0,
+            'image'       => $imagePath,
+            'is_active'   => $request->boolean('is_active'),
         ]);
-
 
         return redirect()
             ->route('courses.index')
-            ->with(
-                'success',
-                'Formation créée avec succès.'
-            );
+            ->with('success', 'Formation créée avec succès.');
     }
 
-
-    /**
-     * Formulaire de modification.
-     */
-    public function edit(Course $course)
+    public function edit(Course $course): View
     {
-        return view(
-            'admin.courses.edit',
-            compact('course')
-        );
+        return view('admin.courses.edit', compact('course'));
     }
 
+    public function update(UpdateCourseRequest $request, Course $course): RedirectResponse
+    {
+        $validated = $request->validated();
 
-    /**
-     * Modifier une formation.
-     */
-    public function update(
-        Request $request,
-        Course $course
-    ) {
-        $validated = $request->validate([
+        $slug = $this->generateUniqueSlug($validated['title'], $course->id);
 
-            'title' => [
-                'required',
-                'string',
-                'max:255',
-            ],
-
-            'description' => [
-                'nullable',
-                'string',
-            ],
-
-            'duration' => [
-                'nullable',
-                'string',
-                'max:100',
-            ],
-
-            'price' => [
-                'nullable',
-                'numeric',
-                'min:0',
-            ],
-
-            'image' => [
-                'nullable',
-                'image',
-                'mimes:jpg,jpeg,png,webp',
-                'max:5120',
-            ],
-
-            'is_active' => [
-                'nullable',
-                'boolean',
-            ],
-
-        ]);
-
-
-        /*
-        |--------------------------------------------------------------------------
-        | Slug
-        |--------------------------------------------------------------------------
-        */
-
-        $slug = Str::slug(
-            $validated['title']
-        );
-
-        $originalSlug = $slug;
-        $counter = 1;
-
-        while (
-            Course::where('slug', $slug)
-                ->where('id', '!=', $course->id)
-                ->exists()
-        ) {
-            $slug = $originalSlug . '-' . $counter;
-            $counter++;
-        }
-
-
-        /*
-        |--------------------------------------------------------------------------
-        | Données à mettre à jour
-        |--------------------------------------------------------------------------
-        */
-
-        $data = [
-
-            'title' => $validated['title'],
-
-            'slug' => $slug,
-
-            'description' =>
-                $validated['description'] ?? null,
-
-            'duration' =>
-                $validated['duration'] ?? null,
-
-            'price' =>
-                $validated['price'] ?? 0,
-
-            'is_active' =>
-                $request->boolean('is_active'),
-
-        ];
-
-
-        /*
-        |--------------------------------------------------------------------------
-        | Nouvelle image
-        |--------------------------------------------------------------------------
-        */
-
+        $imagePath = $course->image;
         if ($request->hasFile('image')) {
-
-            // Supprimer l'ancienne image
-            if (
-                $course->image &&
-                Storage::disk('public')
-                    ->exists($course->image)
-            ) {
-                Storage::disk('public')
-                    ->delete($course->image);
-            }
-
-
-            // Enregistrer la nouvelle
-            $data['image'] = $request
-                ->file('image')
-                ->store('formations', 'public');
+            $imagePath = $this->fileUploadService->replace(
+                $request->file('image'),
+                $course->image,
+                'formations'
+            );
         }
 
-
-        /*
-        |--------------------------------------------------------------------------
-        | Mise à jour
-        |--------------------------------------------------------------------------
-        */
-
-        $course->update($data);
-
+        $course->update([
+            'title'       => $validated['title'],
+            'slug'        => $slug,
+            'description' => $validated['description'] ?? null,
+            'duration'    => $validated['duration'] ?? null,
+            'price'       => $validated['price'] ?? 0,
+            'image'       => $imagePath,
+            'is_active'   => $request->boolean('is_active'),
+        ]);
 
         return redirect()
             ->route('courses.index')
-            ->with(
-                'success',
-                'Formation modifiée avec succès.'
-            );
+            ->with('success', 'Formation modifiée avec succès.');
     }
 
-
-    /**
-     * Supprimer une formation.
-     */
-    public function destroy(Course $course)
+    public function destroy(Course $course): RedirectResponse
     {
-        /*
-        |--------------------------------------------------------------------------
-        | Supprimer l'image associée
-        |--------------------------------------------------------------------------
-        */
-
-        if (
-            $course->image &&
-            Storage::disk('public')
-                ->exists($course->image)
-        ) {
-            Storage::disk('public')
-                ->delete($course->image);
+        if ($course->image) {
+            $this->fileUploadService->delete($course->image);
         }
-
 
         $course->delete();
 
-
         return redirect()
             ->route('courses.index')
-            ->with(
-                'success',
-                'Formation supprimée avec succès.'
-            );
+            ->with('success', 'Formation supprimée avec succès.');
+    }
+
+    /**
+     * Génère un slug unique pour une formation.
+     */
+    protected function generateUniqueSlug(string $title, ?int $ignoreId = null): string
+    {
+        $slug = Str::slug($title);
+        $originalSlug = $slug;
+        $counter = 1;
+
+        while (Course::where('slug', $slug)->when($ignoreId, fn($q) => $q->where('id', '!=', $ignoreId))->exists()) {
+            $slug = $originalSlug . '-' . $counter;
+            $counter++;
+        }
+
+        return $slug;
     }
 }

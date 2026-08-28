@@ -3,45 +3,43 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
+use App\Http\Requests\Admin\StoreNewsRequest;
+use App\Http\Requests\Admin\UpdateNewsRequest;
 use App\Models\News;
-use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Storage;
+use App\Services\FileUploadService;
+use Illuminate\Http\RedirectResponse;
 use Illuminate\Support\Str;
+use Illuminate\View\View;
 
 class NewsController extends Controller
 {
-    public function index()
+    public function __construct(
+        protected FileUploadService $fileUploadService
+    ) {}
+
+    public function index(): View
     {
         $news = News::latest()->paginate(10);
 
         return view('admin.news.index', compact('news'));
     }
 
-    public function create()
+    public function create(): View
     {
         return view('admin.news.create');
     }
 
-    public function store(Request $request)
+    public function store(StoreNewsRequest $request): RedirectResponse
     {
-        $validated = $request->validate([
-            'title' => 'required|string|max:255',
-            'excerpt' => 'nullable|string|max:500',
-            'content' => 'required|string',
-            'image' => 'nullable|image|mimes:jpg,jpeg,png,webp|max:10240',
-            'is_published' => 'boolean',
-            'published_at' => 'nullable|date',
-        ]);
+        $validated = $request->validated();
 
         $validated['slug'] = Str::slug($validated['title']);
 
         if ($request->hasFile('image')) {
-            $validated['image'] = $request
-                ->file('image')
-                ->store('news', 'public');
+            $validated['image'] = $this->fileUploadService->upload($request->file('image'), 'news');
         }
 
-        $validated['is_published'] = $request->has('is_published');
+        $validated['is_published'] = $request->boolean('is_published');
 
         if ($validated['is_published'] && empty($validated['published_at'])) {
             $validated['published_at'] = now();
@@ -54,41 +52,31 @@ class NewsController extends Controller
             ->with('success', 'Actualité créée avec succès.');
     }
 
-    public function show(News $news)
+    public function show(News $news): View
     {
         return view('admin.news.show', compact('news'));
     }
 
-    public function edit(News $news)
+    public function edit(News $news): View
     {
         return view('admin.news.edit', compact('news'));
     }
 
-    public function update(Request $request, News $news)
+    public function update(UpdateNewsRequest $request, News $news): RedirectResponse
     {
-        $validated = $request->validate([
-            'title' => 'required|string|max:255',
-            'excerpt' => 'nullable|string|max:500',
-            'content' => 'required|string',
-            'image' => 'nullable|image|mimes:jpg,jpeg,png,webp|max:10240',
-            'is_published' => 'boolean',
-            'published_at' => 'nullable|date',
-        ]);
+        $validated = $request->validated();
 
         $validated['slug'] = Str::slug($validated['title']);
 
         if ($request->hasFile('image')) {
-
-            if ($news->image) {
-                Storage::disk('public')->delete($news->image);
-            }
-
-            $validated['image'] = $request
-                ->file('image')
-                ->store('news', 'public');
+            $validated['image'] = $this->fileUploadService->replace(
+                $request->file('image'),
+                $news->image,
+                'news'
+            );
         }
 
-        $validated['is_published'] = $request->has('is_published');
+        $validated['is_published'] = $request->boolean('is_published');
 
         if ($validated['is_published'] && empty($validated['published_at'])) {
             $validated['published_at'] = now();
@@ -105,10 +93,10 @@ class NewsController extends Controller
             ->with('success', 'Actualité modifiée avec succès.');
     }
 
-    public function destroy(News $news)
+    public function destroy(News $news): RedirectResponse
     {
         if ($news->image) {
-            Storage::disk('public')->delete($news->image);
+            $this->fileUploadService->delete($news->image);
         }
 
         $news->delete();

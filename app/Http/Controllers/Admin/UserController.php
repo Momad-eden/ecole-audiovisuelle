@@ -2,67 +2,39 @@
 
 namespace App\Http\Controllers\Admin;
 
+use App\Enums\UserRole;
 use App\Http\Controllers\Controller;
+use App\Http\Requests\Admin\StoreUserRequest;
+use App\Http\Requests\Admin\UpdateUserRequest;
 use App\Models\User;
-use Illuminate\Http\Request;
+use Illuminate\Http\RedirectResponse;
 use Illuminate\Support\Facades\Hash;
-use Illuminate\Validation\Rule;
+use Illuminate\View\View;
 
 class UserController extends Controller
 {
-    public function index()
+    public function index(): View
     {
         $users = User::latest()->paginate(10);
 
         return view('admin.users.index', compact('users'));
     }
 
-    public function create()
+    public function create(): View
     {
-        $roles = [
-            'directeur' => 'Directeur',
-            'gestionnaire' => 'Gestionnaire',
-            'secretaire' => 'Secrétaire',
-            'communication' => 'Communication',
-        ];
+        $roles = UserRole::options();
 
         return view('admin.users.create', compact('roles'));
     }
 
-    public function store(Request $request)
+    public function store(StoreUserRequest $request): RedirectResponse
     {
-        $validated = $request->validate([
-            'name' => ['required', 'string', 'max:255'],
-
-            'email' => [
-                'required',
-                'email',
-                'max:255',
-                'unique:users,email',
-            ],
-
-            'role' => [
-                'required',
-                Rule::in([
-                    'directeur',
-                    'gestionnaire',
-                    'secretaire',
-                    'communication',
-                ]),
-            ],
-
-            'password' => [
-                'required',
-                'string',
-                'min:8',
-                'confirmed',
-            ],
-        ]);
+        $validated = $request->validated();
 
         User::create([
-            'name' => $validated['name'],
-            'email' => $validated['email'],
-            'role' => $validated['role'],
+            'name'     => $validated['name'],
+            'email'    => $validated['email'],
+            'role'     => $validated['role'],
             'password' => Hash::make($validated['password']),
         ]);
 
@@ -71,52 +43,21 @@ class UserController extends Controller
             ->with('success', 'Utilisateur créé avec succès.');
     }
 
-    public function show(User $user)
+    public function show(User $user): View
     {
         return view('admin.users.show', compact('user'));
     }
 
-    public function edit(User $user)
+    public function edit(User $user): View
     {
-        $roles = [
-            'directeur' => 'Directeur',
-            'gestionnaire' => 'Gestionnaire',
-            'secretaire' => 'Secrétaire',
-            'communication' => 'Communication',
-        ];
+        $roles = UserRole::options();
 
         return view('admin.users.edit', compact('user', 'roles'));
     }
 
-    public function update(Request $request, User $user)
+    public function update(UpdateUserRequest $request, User $user): RedirectResponse
     {
-        $validated = $request->validate([
-            'name' => ['required', 'string', 'max:255'],
-
-            'email' => [
-                'required',
-                'email',
-                'max:255',
-                Rule::unique('users', 'email')->ignore($user->id),
-            ],
-
-            'role' => [
-                'required',
-                Rule::in([
-                    'directeur',
-                    'gestionnaire',
-                    'secretaire',
-                    'communication',
-                ]),
-            ],
-
-            'password' => [
-                'nullable',
-                'string',
-                'min:8',
-                'confirmed',
-            ],
-        ]);
+        $validated = $request->validated();
 
         $user->name = $validated['name'];
         $user->email = $validated['email'];
@@ -133,7 +74,7 @@ class UserController extends Controller
             ->with('success', 'Utilisateur modifié avec succès.');
     }
 
-    public function destroy(User $user)
+    public function destroy(User $user): RedirectResponse
     {
         // Empêcher le directeur de supprimer son propre compte
         if ($user->id === auth()->id()) {

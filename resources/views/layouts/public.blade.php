@@ -47,7 +47,7 @@
 
 
         {{-- CONTENU --}}
-        <main class="flex-1 pt-[76px]">
+        <main class="flex-1 pt-[64px] md:pt-[104px]">
 
             @yield('content')
 

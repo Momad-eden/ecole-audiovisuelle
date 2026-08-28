@@ -38,10 +38,17 @@
                     href="{{ url('/') }}"
                     class="inline-flex items-center group">
 
-                    <img
-                        src="{{ asset('images/logo.png') }}"
-                        alt="EMSI — École de Formation Audiovisuelle"
-                        class="h-14 w-auto object-contain">
+                    @if(isset($siteSettings) && $siteSettings?->logo)
+                        <img
+                            src="{{ asset('storage/' . $siteSettings->logo) }}"
+                            alt="{{ $siteSettings->school_name ?? 'EMSI — École des Métiers du Son et de l\'Image' }}"
+                            class="h-16 md:h-20 w-auto object-contain transition-transform duration-300 group-hover:scale-105 filter drop-shadow-[0_4px_20px_rgba(245,184,0,0.15)]">
+                    @else
+                        <img
+                            src="{{ asset('images/logo.png') }}"
+                            alt="EMSI — École des Métiers du Son et de l'Image"
+                            class="h-16 md:h-20 w-auto object-contain transition-transform duration-300 group-hover:scale-105 filter drop-shadow-[0_4px_20px_rgba(245,184,0,0.15)]">
+                    @endif
 
                 </a>
 
@@ -59,9 +66,7 @@
 
             text-white/45
         ">
-                    École de formation audiovisuelle
-                    au cœur du Grand Théâtre National
-                    Doudou Ndiaye Rose.
+                    École des Métiers du Son et de l'Image au cœur du Grand Théâtre National Doudou Ndiaye Rose.
                 </p>
 
 
@@ -121,71 +126,37 @@
                     ">
 
                     <a
-                        href="{{ url('/') }}"
-                        class="
-                            text-sm
-                            text-white/55
-
-                            hover:text-white
-
-                            transition
-                        ">
+                        href="{{ route('public.home') }}"
+                        class="text-sm text-white/55 hover:text-[#F5B800] transition"
+                    >
                         Accueil
                     </a>
 
-
                     <a
-                        href="{{ url('/#ecole') }}"
-                        class="
-                            text-sm
-                            text-white/55
-
-                            hover:text-white
-
-                            transition
-                        ">
+                        href="{{ route('public.about') }}"
+                        class="text-sm text-white/55 hover:text-[#F5B800] transition"
+                    >
                         L'école
                     </a>
 
-
                     <a
-                        href="{{ url('/#formations') }}"
-                        class="
-                            text-sm
-                            text-white/55
-
-                            hover:text-white
-
-                            transition
-                        ">
+                        href="{{ route('public.courses.index') }}"
+                        class="text-sm text-white/55 hover:text-[#F5B800] transition"
+                    >
                         Formations
                     </a>
 
-
                     <a
-                        href="{{ url('/#galerie') }}"
-                        class="
-                            text-sm
-                            text-white/55
-
-                            hover:text-white
-
-                            transition
-                        ">
+                        href="{{ route('public.gallery.index') }}"
+                        class="text-sm text-white/55 hover:text-[#F5B800] transition"
+                    >
                         Galerie
                     </a>
 
-
                     <a
-                        href="{{ url('/#actualites') }}"
-                        class="
-                            text-sm
-                            text-white/55
-
-                            hover:text-white
-
-                            transition
-                        ">
+                        href="{{ route('public.news.index') }}"
+                        class="text-sm text-white/55 hover:text-[#F5B800] transition"
+                    >
                         Actualités
                     </a>
 
@@ -242,16 +213,53 @@
                             " />
 
                         <span>
-                            Grand Théâtre National<br>
-                            Doudou Ndiaye Rose<br>
-                            Dakar, Sénégal
+                            {{ $siteSettings?->address ?? 'Grand Théâtre National Doudou Ndiaye Rose, Dakar, Sénégal' }}
                         </span>
 
                     </div>
 
+                    @if($siteSettings?->phone)
+                        <div class="flex items-center gap-3">
+                            <x-lucide-phone class="w-4 h-4 flex-shrink-0 text-white/25" />
+                            <a href="tel:{{ $siteSettings->phone }}" class="hover:text-white transition">
+                                {{ $siteSettings->phone }}
+                            </a>
+                        </div>
+                    @endif
 
-                    {{-- À compléter lorsque les informations
-                         seront gérées depuis l'administration --}}
+                    @if($siteSettings?->email)
+                        <div class="flex items-center gap-3">
+                            <x-lucide-mail class="w-4 h-4 flex-shrink-0 text-white/25" />
+                            <a href="mailto:{{ $siteSettings->email }}" class="hover:text-white transition">
+                                {{ $siteSettings->email }}
+                            </a>
+                        </div>
+                    @endif
+
+                    @if($siteSettings?->facebook || $siteSettings?->instagram || $siteSettings?->youtube || $siteSettings?->whatsapp)
+                        <div class="mt-2 pt-3 border-t border-white/10 flex items-center gap-3">
+                            @if($siteSettings?->facebook)
+                                <a href="{{ $siteSettings->facebook }}" target="_blank" rel="noopener noreferrer" class="text-white/40 hover:text-[#F5B800] transition" aria-label="Facebook">
+                                    <x-lucide-facebook class="w-4 h-4" />
+                                </a>
+                            @endif
+                            @if($siteSettings?->instagram)
+                                <a href="{{ $siteSettings->instagram }}" target="_blank" rel="noopener noreferrer" class="text-white/40 hover:text-[#F5B800] transition" aria-label="Instagram">
+                                    <x-lucide-instagram class="w-4 h-4" />
+                                </a>
+                            @endif
+                            @if($siteSettings?->youtube)
+                                <a href="{{ $siteSettings->youtube }}" target="_blank" rel="noopener noreferrer" class="text-white/40 hover:text-[#F5B800] transition" aria-label="YouTube">
+                                    <x-lucide-youtube class="w-4 h-4" />
+                                </a>
+                            @endif
+                            @if($siteSettings?->whatsapp)
+                                <a href="https://wa.me/{{ preg_replace('/[^0-9]/', '', $siteSettings->whatsapp) }}" target="_blank" rel="noopener noreferrer" class="text-white/40 hover:text-[#F5B800] transition" aria-label="WhatsApp">
+                                    <x-lucide-message-circle class="w-4 h-4" />
+                                </a>
+                            @endif
+                        </div>
+                    @endif
 
                 </div>
 

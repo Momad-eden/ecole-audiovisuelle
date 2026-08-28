@@ -349,7 +349,7 @@
                         "
                     >
 
-                        Candidater à cette formation
+                        Admission à cette formation
 
                         <x-lucide-arrow-up-right class="w-4 h-4" />
 

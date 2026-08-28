@@ -69,18 +69,18 @@
     >
 
         <h3
-            class="text-2xl md:text-4xl font-medium tracking-tight"
+            class="text-2xl md:text-3xl font-serif font-medium tracking-tight group-hover:text-[#C15C03] transition-colors"
         >
-
-            {{ $article->title }}
-
+            <a href="{{ route('public.news.show', $article) }}">
+                {{ $article->title }}
+            </a>
         </h3>
 
 
         @if($article->excerpt)
 
             <p
-                class="mt-4 max-w-xl text-black/50 leading-relaxed"
+                class="mt-3 max-w-xl text-black/60 leading-relaxed text-sm"
             >
 
                 {{ $article->excerpt }}
@@ -90,12 +90,12 @@
         @elseif($article->content)
 
             <p
-                class="mt-4 max-w-xl text-black/50 leading-relaxed"
+                class="mt-3 max-w-xl text-black/60 leading-relaxed text-sm"
             >
 
                 {{ \Illuminate\Support\Str::limit(
                     strip_tags($article->content),
-                    180
+                    160
                 ) }}
 
             </p>
@@ -113,24 +113,20 @@
         class="md:col-span-2 md:text-right flex md:block items-center justify-between"
     >
 
-        <span class="text-sm text-black/40">
-
+        <span class="text-xs text-black/40 uppercase tracking-wider font-semibold">
             Article
-
         </span>
 
 
-        <span
-            class="inline-flex items-center gap-2 text-sm group-hover:gap-3 transition-all"
-        >
-
-            Lire
-
-            <x-lucide-arrow-up-right
-                class="w-4 h-4"
-            />
-
-        </span>
+        <div class="mt-4">
+            <a
+                href="{{ route('public.news.show', $article) }}"
+                class="inline-flex items-center gap-1.5 text-xs font-bold text-black group-hover:text-[#C15C03] transition-all"
+            >
+                <span>Lire l'article</span>
+                <x-lucide-arrow-up-right class="w-4 h-4" />
+            </a>
+        </div>
 
     </div>
 

@@ -2,27 +2,34 @@
 
 namespace App\Http\Controllers\Admin;
 
-use Illuminate\Support\Facades\Storage;
-use Illuminate\Support\Str;
-
 use App\Http\Controllers\Controller;
-use App\Models\Student;
+use App\Http\Requests\Admin\StoreStudentRequest;
+use App\Http\Requests\Admin\UpdateStudentRequest;
 use App\Models\Course;
+use App\Models\Student;
+use App\Services\FileUploadService;
+use App\Services\StudentNumberService;
+use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Illuminate\View\View;
 
 class StudentController extends Controller
 {
-    public function index(Request $request)
+    public function __construct(
+        protected StudentNumberService $studentNumberService,
+        protected FileUploadService $fileUploadService
+    ) {}
+
+    public function index(Request $request): View
     {
         $query = Student::with('course');
 
         if ($request->filled('search')) {
-
-            $query->where(function ($q) use ($request) {
-
-                $q->where('first_name', 'like', "%{$request->search}%")
-                    ->orWhere('last_name', 'like', "%{$request->search}%")
-                    ->orWhere('student_number', 'like', "%{$request->search}%");
+            $search = $request->search;
+            $query->where(function ($q) use ($search) {
+                $q->where('first_name', 'like', "%{$search}%")
+                    ->orWhere('last_name', 'like', "%{$search}%")
+                    ->orWhere('student_number', 'like', "%{$search}%");
             });
         }
 
@@ -34,50 +41,21 @@ class StudentController extends Controller
         return view('admin.students.index', compact('students'));
     }
 
-    public function create()
+    public function create(): View
     {
         $courses = Course::orderBy('title')->get();
 
         return view('admin.students.create', compact('courses'));
     }
 
-    public function store(Request $request)
+    public function store(StoreStudentRequest $request): RedirectResponse
     {
-        $validated = $request->validate([
-            'photo'             => 'nullable|image|mimes:jpg,jpeg,png|max:2048',
-            'first_name'        => 'required|string|max:255',
-            'last_name'         => 'required|string|max:255',
-            'gender'            => 'required|in:Homme,Femme',
-            'birth_date'        => 'nullable|date',
-            'birth_place'       => 'nullable|string|max:255',
-            'nationality'       => 'required|string|max:100',
-            'phone'             => 'nullable|string|max:30',
-            'email'             => 'nullable|email|max:255',
-            'address'           => 'nullable|string',
-            'course_id'         => 'required|exists:courses,id',
-            'registration_date' => 'required|date',
-            'status'            => 'required',
-            'notes'             => 'nullable|string',
-        ]);
+        $validated = $request->validated();
 
-        // Génération du matricule
-        $year = date('Y');
+        $validated['student_number'] = $this->studentNumberService->generate();
 
-        $lastStudent = Student::latest('id')->first();
-
-        $nextNumber = $lastStudent
-            ? ((int) substr($lastStudent->student_number, -4)) + 1
-            : 1;
-
-        $validated['student_number'] =
-            'EMSI-' . $year . '-' . str_pad($nextNumber, 4, '0', STR_PAD_LEFT);
-
-        // Upload de la photo
         if ($request->hasFile('photo')) {
-
-            $validated['photo'] = $request
-                ->file('photo')
-                ->store('students', 'public');
+            $validated['photo'] = $this->fileUploadService->upload($request->file('photo'), 'students');
         }
 
         Student::create($validated);
@@ -87,63 +65,31 @@ class StudentController extends Controller
             ->with('success', 'Étudiant ajouté avec succès.');
     }
 
-    public function show(Student $student)
+    public function show(Student $student): View
     {
-        $student->load('course');
+        $student->load(['course', 'payments']);
 
         return view('admin.students.show', compact('student'));
     }
 
-    public function edit(Student $student)
+    public function edit(Student $student): View
     {
         $courses = Course::orderBy('title')->get();
 
         return view('admin.students.edit', compact('student', 'courses'));
     }
 
-    public function update(Request $request, Student $student)
+    public function update(UpdateStudentRequest $request, Student $student): RedirectResponse
     {
-        $validated = $request->validate([
-            'photo'             => 'nullable|image|mimes:jpg,jpeg,png|max:2048',
-            'first_name'        => 'required|string|max:255',
-            'last_name'         => 'required|string|max:255',
-            'gender'            => 'required|in:Homme,Femme',
-            'birth_date'        => 'nullable|date',
-            'birth_place'       => 'nullable|string|max:255',
-            'nationality'       => 'required|string|max:100',
-            'phone'             => 'nullable|string|max:30',
-            'email'             => 'nullable|email|max:255',
-            'address'           => 'nullable|string',
-            'course_id'         => 'required|exists:courses,id',
-            'registration_date' => 'required|date',
-            'status'            => 'required|in:Inscrit,Diplômé,Suspendu,Abandonné',
-            'notes'             => 'nullable|string',
-        ]);
-
-        /*
-    |--------------------------------------------------------------------------
-    | Nouvelle photo
-    |--------------------------------------------------------------------------
-    */
+        $validated = $request->validated();
 
         if ($request->hasFile('photo')) {
-
-            // Supprimer l'ancienne photo
-            if ($student->photo) {
-                Storage::disk('public')->delete($student->photo);
-            }
-
-            // Enregistrer la nouvelle photo
-            $validated['photo'] = $request
-                ->file('photo')
-                ->store('students', 'public');
+            $validated['photo'] = $this->fileUploadService->replace(
+                $request->file('photo'),
+                $student->photo,
+                'students'
+            );
         }
-
-        /*
-    |--------------------------------------------------------------------------
-    | Mise à jour
-    |--------------------------------------------------------------------------
-    */
 
         $student->update($validated);
 
@@ -152,14 +98,12 @@ class StudentController extends Controller
             ->with('success', 'Étudiant modifié avec succès.');
     }
 
-    public function destroy(Student $student)
+    public function destroy(Student $student): RedirectResponse
     {
-        // Supprimer la photo associée
         if ($student->photo) {
-            Storage::disk('public')->delete($student->photo);
+            $this->fileUploadService->delete($student->photo);
         }
 
-        // Supprimer l'étudiant
         $student->delete();
 
         return redirect()

@@ -38,38 +38,39 @@
 
         <div class="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden">
 
-            <div class="aspect-video bg-gray-100 overflow-hidden">
+            <div class="relative aspect-video bg-gray-900 overflow-hidden group">
 
-                @if($gallery->type === 'image')
-
-                <img
-                    src="{{ asset('storage/' . $gallery->file_path) }}"
-                    alt="{{ $gallery->title }}"
-                    class="w-full h-full object-cover">
-
+                @if($gallery->image_url)
+                    <img
+                        src="{{ $gallery->image_url }}"
+                        alt="{{ $gallery->title }}"
+                        class="w-full h-full object-cover group-hover:scale-105 transition duration-300">
                 @else
-
-                @php
-                preg_match(
-                '/(?:youtube\.com\/watch\?v=|youtu\.be\/)([^&\?\/]+)/',
-                $gallery->youtube_url,
-                $matches
-                );
-
-                $youtubeId = $matches[1] ?? null;
-                @endphp
-
-                @if($youtubeId)
-
-                <iframe
-                    src="https://www.youtube.com/embed/{{ $youtubeId }}"
-                    class="w-full h-full"
-                    frameborder="0"
-                    allowfullscreen>
-                </iframe>
-
+                    <div class="w-full h-full flex items-center justify-center bg-gray-100 text-gray-400">
+                        <x-lucide-image class="w-10 h-10" />
+                    </div>
                 @endif
 
+                <div class="absolute top-3 left-3">
+                    @if($gallery->type === 'video')
+                        <span class="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-semibold bg-black/70 text-amber-400 backdrop-blur-sm border border-amber-400/30">
+                            <x-lucide-video class="w-3 h-3" />
+                            Vidéo
+                        </span>
+                    @else
+                        <span class="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-semibold bg-black/70 text-white backdrop-blur-sm border border-white/20">
+                            <x-lucide-camera class="w-3 h-3" />
+                            Photo
+                        </span>
+                    @endif
+                </div>
+
+                @if($gallery->type === 'video')
+                    <div class="absolute inset-0 flex items-center justify-center bg-black/30">
+                        <div class="w-10 h-10 rounded-full bg-[#F5B800] text-black flex items-center justify-center shadow-lg pl-0.5">
+                            <x-lucide-play class="w-5 h-5 fill-current" />
+                        </div>
+                    </div>
                 @endif
 
             </div>

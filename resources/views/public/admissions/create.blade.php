@@ -1,6 +1,6 @@
 @extends('layouts.public')
 
-@section('title', 'Candidater — EMSI')
+@section('title', 'Admission — EMSI')
 
 @section('description')
 Déposez votre candidature pour rejoindre l'EMSI,

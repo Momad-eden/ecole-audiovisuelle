@@ -3,16 +3,16 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
+use App\Http\Requests\Admin\StorePaymentRequest;
+use App\Http\Requests\Admin\UpdatePaymentRequest;
 use App\Models\Payment;
 use App\Models\Student;
-use Illuminate\Http\Request;
+use Illuminate\Http\RedirectResponse;
+use Illuminate\View\View;
 
 class PaymentController extends Controller
 {
-    /**
-     * Liste des paiements.
-     */
-    public function index()
+    public function index(): View
     {
         $payments = Payment::with(['student.course'])
             ->latest('payment_date')
@@ -20,20 +20,11 @@ class PaymentController extends Controller
 
         $totalAmount = Payment::sum('amount');
 
-        $todayAmount = Payment::whereDate(
-            'payment_date',
-            today()
-        )->sum('amount');
+        $todayAmount = Payment::whereDate('payment_date', today())->sum('amount');
 
-        $monthAmount = Payment::whereMonth(
-            'payment_date',
-            now()->month
-        )
-        ->whereYear(
-            'payment_date',
-            now()->year
-        )
-        ->sum('amount');
+        $monthAmount = Payment::whereMonth('payment_date', now()->month)
+            ->whereYear('payment_date', now()->year)
+            ->sum('amount');
 
         return view('admin.payments.index', compact(
             'payments',
@@ -43,10 +34,7 @@ class PaymentController extends Controller
         ));
     }
 
-    /**
-     * Formulaire de création.
-     */
-    public function create()
+    public function create(): View
     {
         $students = Student::with('course')
             ->orderBy('last_name')
@@ -56,78 +44,42 @@ class PaymentController extends Controller
         return view('admin.payments.create', compact('students'));
     }
 
-    /**
-     * Enregistrer un paiement.
-     */
-    public function store(Request $request)
+    public function store(StorePaymentRequest $request): RedirectResponse
     {
-        $validated = $request->validate([
-            'student_id' => 'required|exists:students,id',
-            'amount' => 'required|numeric|min:1',
-            'payment_method' => 'required|in:cash,wave,orange_money,bank,other',
-            'reference' => 'nullable|string|max:255',
-            'payment_date' => 'required|date',
-            'notes' => 'nullable|string',
-        ]);
-
-        Payment::create($validated);
+        Payment::create($request->validated());
 
         return redirect()
             ->route('payments.index')
             ->with('success', 'Paiement enregistré avec succès.');
     }
 
-    /**
-     * Afficher un paiement.
-     */
-    public function show(Payment $payment)
+    public function show(Payment $payment): View
     {
         $payment->load('student.course');
 
         return view('admin.payments.show', compact('payment'));
     }
 
-    /**
-     * Formulaire de modification.
-     */
-    public function edit(Payment $payment)
+    public function edit(Payment $payment): View
     {
         $students = Student::with('course')
             ->orderBy('last_name')
             ->orderBy('first_name')
             ->get();
 
-        return view('admin.payments.edit', compact(
-            'payment',
-            'students'
-        ));
+        return view('admin.payments.edit', compact('payment', 'students'));
     }
 
-    /**
-     * Modifier un paiement.
-     */
-    public function update(Request $request, Payment $payment)
+    public function update(UpdatePaymentRequest $request, Payment $payment): RedirectResponse
     {
-        $validated = $request->validate([
-            'student_id' => 'required|exists:students,id',
-            'amount' => 'required|numeric|min:1',
-            'payment_method' => 'required|in:cash,wave,orange_money,bank,other',
-            'reference' => 'nullable|string|max:255',
-            'payment_date' => 'required|date',
-            'notes' => 'nullable|string',
-        ]);
-
-        $payment->update($validated);
+        $payment->update($request->validated());
 
         return redirect()
             ->route('payments.show', $payment)
             ->with('success', 'Paiement modifié avec succès.');
     }
 
-    /**
-     * Supprimer un paiement.
-     */
-    public function destroy(Payment $payment)
+    public function destroy(Payment $payment): RedirectResponse
     {
         $payment->delete();
 
