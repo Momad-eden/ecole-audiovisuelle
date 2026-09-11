@@ -20,6 +20,9 @@ class Setting extends Model
         'facebook',
         'instagram',
         'youtube',
+        'tiktok',
+        'linkedin',
+        'twitter',
         'whatsapp',
     ];
 }

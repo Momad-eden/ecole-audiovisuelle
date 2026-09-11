@@ -23,6 +23,8 @@ use App\Http\Controllers\Public\CourseController as PublicCourseController;
 use App\Http\Controllers\Public\GalleryController as PublicGalleryController;
 use App\Http\Controllers\Public\NewsController as PublicNewsController;
 use App\Http\Controllers\Public\AdmissionController as PublicAdmissionController;
+use App\Http\Controllers\Public\ProjectController as PublicProjectController;
+use App\Http\Controllers\Public\VaeController as PublicVaeController;
 
 
 /*
@@ -33,6 +35,12 @@ use App\Http\Controllers\Public\AdmissionController as PublicAdmissionController
 
 // Accueil
 Route::get('/', PublicHomeController::class)->name('public.home');
+
+// Le Projet (EMSI & Grand Théâtre)
+Route::get('/projet', [PublicProjectController::class, 'index'])->name('public.project');
+
+// Dispositif VAE
+Route::get('/vae', [PublicVaeController::class, 'index'])->name('public.vae');
 
 // L'école (À propos)
 Route::get('/ecole', [PublicAboutController::class, 'index'])->name('public.about');
@@ -226,9 +234,24 @@ Route::middleware(['auth'])->group(function () {
 
         /*
         |--------------------------------------------------------------------------
-        | Paiements
+        | Caisse & Comptabilité (Paiements & Dépenses)
         |--------------------------------------------------------------------------
         */
+
+        Route::get(
+            '/payments/{payment}/receipt',
+            [PaymentController::class, 'receipt']
+        )->name('payments.receipt');
+
+        Route::get(
+            '/comptabilite',
+            [PaymentController::class, 'accounting']
+        )->name('accounting.index');
+
+        Route::get(
+            '/comptabilite/export',
+            [PaymentController::class, 'export']
+        )->name('accounting.export');
 
         Route::resource(
             'payments',

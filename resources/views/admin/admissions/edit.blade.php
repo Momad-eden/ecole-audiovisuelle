@@ -570,40 +570,60 @@
             subtitle="Formation choisie par le candidat"
         >
 
-            <div>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
 
-                <label
-                    for="course_id"
-                    class="block text-sm font-medium text-gray-700 mb-2"
-                >
-                    Formation
+                <div>
+                    <label
+                        for="course_id"
+                        class="block text-sm font-medium text-gray-700 mb-2"
+                    >
+                        Formation
+                        <span class="text-red-500">*</span>
+                    </label>
 
-                    <span class="text-red-500">*</span>
-                </label>
-
-                <select
-                    id="course_id"
-                    name="course_id"
-                    required
-                    class="w-full rounded-xl border-gray-300 focus:border-primary focus:ring-primary"
-                >
-
-                    <option value="">
-                        Sélectionner une formation
-                    </option>
-
-                    @foreach($courses as $course)
-
-                        <option
-                            value="{{ $course->id }}"
-                            @selected(old('course_id', $admission->course_id) == $course->id)
-                        >
-                            {{ $course->title }}
+                    <select
+                        id="course_id"
+                        name="course_id"
+                        required
+                        class="w-full rounded-xl border-gray-300 focus:border-primary focus:ring-primary"
+                    >
+                        <option value="">
+                            Sélectionner une formation
                         </option>
 
-                    @endforeach
+                        @foreach($courses as $course)
+                            <option
+                                value="{{ $course->id }}"
+                                @selected(old('course_id', $admission->course_id) == $course->id)
+                            >
+                                {{ $course->title }}
+                            </option>
+                        @endforeach
+                    </select>
+                </div>
 
-                </select>
+                <div>
+                    <label
+                        for="volet"
+                        class="block text-sm font-medium text-gray-700 mb-2"
+                    >
+                        Volet du Projet Officiel
+                    </label>
+
+                    <select
+                        id="volet"
+                        name="volet"
+                        class="w-full rounded-xl border-gray-300 focus:border-primary focus:ring-primary"
+                    >
+                        <option value="">Sélectionner le volet (Optionnel)</option>
+                        <option value="Volet 1 — 3 mois intensif (Perfectionnement)" @selected(old('volet', $admission->volet) === 'Volet 1 — 3 mois intensif (Perfectionnement)')>
+                            Volet 1 — 3 mois intensif (Perfectionnement & Festivals)
+                        </option>
+                        <option value="Volet 2 — 9 mois (BTS d'État par la VAE)" @selected(old('volet', $admission->volet) === "Volet 2 — 9 mois (BTS d'État par la VAE)")>
+                            Volet 2 — 9 mois (Certification BTS d'État par la VAE)
+                        </option>
+                    </select>
+                </div>
 
             </div>
 

@@ -437,6 +437,14 @@
                     {{ $admission->course?->title ?? '—' }}
                 </p>
 
+                @if($admission->volet)
+                    <div class="mt-2">
+                        <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold bg-amber-100 text-amber-900">
+                            {{ $admission->volet }}
+                        </span>
+                    </div>
+                @endif
+
             </div>
 
 
@@ -629,40 +637,67 @@
 
 
     {{-- =====================================================
-         ÉTUDIANT LIÉ
+         ÉTUDIANT LIÉ & SITUATION COMPTABLE
     ====================================================== --}}
 
-    @if($admission->student_id)
+    @if($admission->student_id && $admission->student)
 
     <x-ui.card
-        title="Étudiant inscrit"
-        subtitle="Cette candidature est liée à une fiche étudiant">
+        title="Étudiant inscrit & Situation Scolarité"
+        subtitle="Cette candidature a été convertie en dossier étudiant actif">
 
-        <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-5">
-
+        <div class="flex flex-col md:flex-row md:items-center justify-between gap-5 pb-5 border-b border-gray-100">
             <div>
-
-                <p class="font-semibold text-gray-900">
-                    Inscription effectuée
+                <p class="font-bold text-gray-900 text-lg flex items-center gap-2.5">
+                    <span>{{ $admission->student->full_name }}</span>
+                    <span class="font-mono text-xs px-2.5 py-0.5 rounded-full bg-primary/10 text-primary font-bold border border-primary/20">
+                        {{ $admission->student->student_number }}
+                    </span>
                 </p>
-
-                <p class="text-sm text-gray-500 mt-1">
-                    Le candidat possède maintenant une fiche étudiant.
+                <p class="text-xs text-gray-500 mt-1">
+                    Formation : <strong class="text-gray-800">{{ $admission->student->course?->title ?? 'Formation générale' }}</strong>
                 </p>
-
             </div>
 
+            <div class="flex flex-wrap items-center gap-2.5">
+                <a
+                    href="{{ route('payments.create', ['student_id' => $admission->student_id, 'type' => 'inflow', 'category' => 'scolarite']) }}"
+                    class="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs uppercase tracking-wider transition shadow-sm"
+                >
+                    <x-lucide-landmark class="w-4 h-4" />
+                    <span>Encaisser un versement</span>
+                </a>
 
-            <a
-                href="{{ route('students.show', $admission->student_id) }}"
-                class="inline-flex items-center gap-2 px-5 py-3 rounded-xl bg-green-600 text-white font-semibold hover:bg-green-700 transition">
+                <a
+                    href="{{ route('students.show', $admission->student_id) }}"
+                    class="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl bg-primary text-white font-semibold text-xs hover:opacity-90 transition"
+                >
+                    <x-lucide-user-check class="w-4 h-4" />
+                    <span>Voir la fiche étudiant</span>
+                </a>
+            </div>
+        </div>
 
-                <x-lucide-user-check class="w-5 h-5" />
-
-                Voir la fiche étudiant
-
-            </a>
-
+        {{-- Situation financière rapide --}}
+        <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 pt-4 text-xs">
+            <div class="p-3.5 rounded-xl bg-gray-50 border border-gray-100">
+                <span class="text-gray-400 block uppercase tracking-wider font-semibold">Total Scolarité</span>
+                <span class="font-mono font-bold text-gray-900 text-base mt-1 block">
+                    {{ number_format((float) ($admission->student->course?->price ?? 0), 0, ',', ' ') }} FCFA
+                </span>
+            </div>
+            <div class="p-3.5 rounded-xl bg-emerald-50/70 border border-emerald-100">
+                <span class="text-emerald-700 block uppercase tracking-wider font-semibold">Total Versé</span>
+                <span class="font-mono font-bold text-emerald-800 text-base mt-1 block">
+                    {{ number_format($admission->student->total_paid, 0, ',', ' ') }} FCFA
+                </span>
+            </div>
+            <div class="p-3.5 rounded-xl bg-amber-50/70 border border-amber-100">
+                <span class="text-amber-800 block uppercase tracking-wider font-semibold">Reste à payer</span>
+                <span class="font-mono font-bold text-amber-900 text-base mt-1 block">
+                    {{ number_format($admission->student->remaining_due, 0, ',', ' ') }} FCFA
+                </span>
+            </div>
         </div>
 
     </x-ui.card>

@@ -38,6 +38,7 @@ class PublicAdmissionTest extends TestCase
             'last_diploma'    => 'Baccalauréat',
             'graduation_year' => 2022,
             'course_id'       => $course->id,
+            'volet'           => 'Volet 1 — Perfectionnement intensif (3 mois)',
             'message'         => 'Passionné par le montage vidéo et la réalisation.',
         ];
 
@@ -52,6 +53,7 @@ class PublicAdmissionTest extends TestCase
             'gender'     => 'M',
             'status'     => 'pending',
             'course_id'  => $course->id,
+            'volet'      => 'Volet 1 — Perfectionnement intensif (3 mois)',
         ]);
     }
 

@@ -22,23 +22,56 @@ class StudentController extends Controller
 
     public function index(Request $request): View
     {
-        $query = Student::with('course');
+        $query = Student::with(['course', 'payments']);
 
         if ($request->filled('search')) {
             $search = $request->search;
             $query->where(function ($q) use ($search) {
                 $q->where('first_name', 'like', "%{$search}%")
                     ->orWhere('last_name', 'like', "%{$search}%")
-                    ->orWhere('student_number', 'like', "%{$search}%");
+                    ->orWhere('student_number', 'like', "%{$search}%")
+                    ->orWhere('email', 'like', "%{$search}%")
+                    ->orWhere('phone', 'like', "%{$search}%");
             });
         }
 
-        $students = $query
-            ->latest()
-            ->paginate(15)
-            ->withQueryString();
+        if ($request->filled('course_id') && $request->course_id !== 'all') {
+            $query->where('course_id', $request->course_id);
+        }
 
-        return view('admin.students.index', compact('students'));
+        if ($request->filled('status') && $request->status !== 'all') {
+            $query->where('status', $request->status);
+        }
+
+        $allStudents = $query->latest()->get();
+
+        if ($request->filled('payment_status') && in_array($request->payment_status, ['paid', 'partial', 'unpaid'])) {
+            $desiredStatus = $request->payment_status;
+            $allStudents = $allStudents->filter(fn($student) => $student->payment_status === $desiredStatus);
+        }
+
+        $page = (int) $request->input('page', 1);
+        $perPage = 15;
+        $students = new \Illuminate\Pagination\LengthAwarePaginator(
+            $allStudents->forPage($page, $perPage)->values(),
+            $allStudents->count(),
+            $perPage,
+            $page,
+            ['path' => $request->url(), 'query' => $request->query()]
+        );
+
+        $courses = Course::orderBy('title')->get();
+
+        $allForStats = Student::with(['course', 'payments'])->get();
+        $stats = [
+            'total'    => $allForStats->count(),
+            'active'   => $allForStats->where('status', 'Inscrit')->count(),
+            'paid'     => $allForStats->filter(fn($s) => $s->payment_status === 'paid')->count(),
+            'partial'  => $allForStats->filter(fn($s) => $s->payment_status === 'partial')->count(),
+            'unpaid'   => $allForStats->filter(fn($s) => $s->payment_status === 'unpaid')->count(),
+        ];
+
+        return view('admin.students.index', compact('students', 'courses', 'stats'));
     }
 
     public function create(): View
@@ -67,7 +100,7 @@ class StudentController extends Controller
 
     public function show(Student $student): View
     {
-        $student->load(['course', 'payments']);
+        $student->load(['course', 'payments.creator', 'admission']);
 
         return view('admin.students.show', compact('student'));
     }

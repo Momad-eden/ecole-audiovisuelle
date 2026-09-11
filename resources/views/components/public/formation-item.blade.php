@@ -97,7 +97,7 @@
 
                 <div class="flex items-center gap-1.5 text-[#F5B800]">
                     <x-lucide-check-circle-2 class="w-3.5 h-3.5" />
-                    <span class="text-[11px] font-semibold uppercase tracking-wider">80% Pratique</span>
+                    <span class="text-[11px] font-semibold uppercase tracking-wider">90% Pratique</span>
                 </div>
             </div>
 

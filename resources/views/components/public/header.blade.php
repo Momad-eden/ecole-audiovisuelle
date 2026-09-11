@@ -189,13 +189,24 @@
                     @endif
                 </a>
 
-                {{-- L'École --}}
+                {{-- Le Projet Officiel --}}
                 <a
-                    href="{{ route('public.about') }}"
-                    class="relative px-3.5 py-2 rounded-full text-[13px] font-medium transition-all duration-200 {{ request()->routeIs('public.about') ? 'text-[#F5B800] font-bold bg-white/[0.05]' : 'text-white/70 hover:text-white hover:bg-white/[0.04]' }}"
+                    href="{{ route('public.project') }}"
+                    class="relative px-3.5 py-2 rounded-full text-[13px] font-medium transition-all duration-200 {{ request()->routeIs('public.project') ? 'text-[#F5B800] font-bold bg-white/[0.05]' : 'text-white/70 hover:text-white hover:bg-white/[0.04]' }}"
                 >
-                    <span>L'école</span>
-                    @if(request()->routeIs('public.about'))
+                    <span>Le Projet</span>
+                    @if(request()->routeIs('public.project'))
+                        <span class="absolute bottom-1 left-1/2 -translate-x-1/2 w-1 h-1 rounded-full bg-[#F5B800]"></span>
+                    @endif
+                </a>
+
+                {{-- Dispositif VAE --}}
+                <a
+                    href="{{ route('public.vae') }}"
+                    class="relative px-3.5 py-2 rounded-full text-[13px] font-medium transition-all duration-200 {{ request()->routeIs('public.vae') ? 'text-[#F5B800] font-bold bg-white/[0.05]' : 'text-white/70 hover:text-white hover:bg-white/[0.04]' }}"
+                >
+                    <span>VAE</span>
+                    @if(request()->routeIs('public.vae'))
                         <span class="absolute bottom-1 left-1/2 -translate-x-1/2 w-1 h-1 rounded-full bg-[#F5B800]"></span>
                     @endif
                 </a>
@@ -249,11 +260,11 @@
                                                     Cursus & Formations
                                                 </p>
                                                 <p class="text-xs text-gray-300 mt-0.5">
-                                                    Programmes de l'école audiovisuelle
+                                                    5 filières d'excellence technique
                                                 </p>
                                             </div>
                                             <span class="px-2.5 py-1 rounded-full bg-[#F5B800]/15 border border-[#F5B800]/30 text-[11px] text-[#F5B800] font-bold">
-                                                80% Pratique
+                                                90% Pratique
                                             </span>
                                         </div>
 
@@ -269,12 +280,14 @@
                                                             <div class="w-9 h-9 rounded-xl bg-[#22222a] border border-white/15 flex items-center justify-center text-[#F5B800] group-hover/item:bg-[#F5B800] group-hover/item:text-black transition-colors shrink-0">
                                                                 @if(str_contains(strtolower($course->title . $course->category), 'son') || str_contains(strtolower($course->title . $course->category), 'audio'))
                                                                     <x-lucide-mic class="w-4 h-4" />
-                                                                @elseif(str_contains(strtolower($course->title . $course->category), 'montage') || str_contains(strtolower($course->title . $course->category), 'post'))
-                                                                    <x-lucide-sliders class="w-4 h-4" />
-                                                                @elseif(str_contains(strtolower($course->title . $course->category), 'photo') || str_contains(strtolower($course->title . $course->category), 'image') || str_contains(strtolower($course->title . $course->category), 'caméra'))
-                                                                    <x-lucide-camera class="w-4 h-4" />
+                                                                @elseif(str_contains(strtolower($course->title . $course->category), 'lumière') || str_contains(strtolower($course->title . $course->category), 'eclairage'))
+                                                                    <x-lucide-sun class="w-4 h-4" />
+                                                                @elseif(str_contains(strtolower($course->title . $course->category), 'régie') || str_contains(strtolower($course->title . $course->category), 'spectacle'))
+                                                                    <x-lucide-layers class="w-4 h-4" />
+                                                                @elseif(str_contains(strtolower($course->title . $course->category), 'infographie') || str_contains(strtolower($course->title . $course->category), 'motion') || str_contains(strtolower($course->title . $course->category), 'création'))
+                                                                    <x-lucide-palette class="w-4 h-4" />
                                                                 @else
-                                                                    <x-lucide-clapperboard class="w-4 h-4" />
+                                                                    <x-lucide-video class="w-4 h-4" />
                                                                 @endif
                                                             </div>
                                                             <div>
@@ -295,13 +308,12 @@
                                                     </a>
                                                 @endforeach
                                             @else
-                                                {{-- Si aucune formation en BDD, présentation sobre du catalogue officiel sans inventer de fausses filières --}}
                                                 <div class="p-4 rounded-2xl bg-[#1a1a20] border border-white/10 space-y-2">
                                                     <p class="text-xs font-semibold text-white">
                                                         Catalogue officiel des Formations
                                                     </p>
                                                     <p class="text-xs text-gray-300 leading-relaxed">
-                                                        Retrouvez l'ensemble des cursus diplômants et certifiants de l'EMSI sur la page dédiée aux formations.
+                                                        Retrouvez l'ensemble des cursus du projet intégré EMSI & Grand Théâtre National.
                                                     </p>
                                                     <div class="pt-2">
                                                         <a
@@ -335,7 +347,7 @@
 
                                     <div>
                                         <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-[#F5B800]/20 border border-[#F5B800]/40 text-[#F5B800] text-[10px] font-bold uppercase tracking-wider mb-3">
-                                            Rentrée 2024–2025
+                                            Projet Officiel 2026–2027
                                         </div>
 
                                         <h4 class="font-serif text-sm font-bold text-white leading-snug">
@@ -343,22 +355,22 @@
                                         </h4>
 
                                         <p class="text-xs text-gray-300 mt-2 leading-relaxed">
-                                            Formation intensive aux métiers du cinéma et de l'audiovisuel au cœur de Dakar.
+                                            Programme intégré de perfectionnement intensif et de certification BTS par la VAE.
                                         </p>
 
                                         {{-- Points forts --}}
                                         <div class="mt-4 space-y-2.5 text-xs text-gray-200 font-medium">
                                             <div class="flex items-center gap-2.5">
                                                 <x-lucide-check class="w-4 h-4 text-[#F5B800] shrink-0" />
-                                                <span>Plateaux de tournage cinéma 4K/6K</span>
+                                                <span>100 Jeunes formés & certifiés</span>
                                             </div>
                                             <div class="flex items-center gap-2.5">
                                                 <x-lucide-check class="w-4 h-4 text-[#F5B800] shrink-0" />
-                                                <span>Diplômes & Certifications reconnus</span>
+                                                <span>Équipements scéniques & broadcast réels</span>
                                             </div>
                                             <div class="flex items-center gap-2.5">
                                                 <x-lucide-check class="w-4 h-4 text-[#F5B800] shrink-0" />
-                                                <span>Intervenants professionnels en activité</span>
+                                                <span>Validation des Acquis (Niveau BTS)</span>
                                             </div>
                                         </div>
                                     </div>
@@ -380,6 +392,17 @@
                         </div>
                     </div>
                 </div>
+
+                {{-- L'École --}}
+                <a
+                    href="{{ route('public.about') }}"
+                    class="relative px-3.5 py-2 rounded-full text-[13px] font-medium transition-all duration-200 {{ request()->routeIs('public.about') ? 'text-[#F5B800] font-bold bg-white/[0.05]' : 'text-white/70 hover:text-white hover:bg-white/[0.04]' }}"
+                >
+                    <span>L'école</span>
+                    @if(request()->routeIs('public.about'))
+                        <span class="absolute bottom-1 left-1/2 -translate-x-1/2 w-1 h-1 rounded-full bg-[#F5B800]"></span>
+                    @endif
+                </a>
 
                 {{-- Galerie --}}
                 <a
@@ -508,20 +531,33 @@
                 <x-lucide-arrow-up-right class="w-4 h-4 text-white/30" />
             </a>
 
-            {{-- 02. L'École --}}
+            {{-- 02. Le Projet --}}
             <a
-                href="{{ route('public.about') }}"
+                href="{{ route('public.project') }}"
                 @click="mobileMenuOpen = false"
-                class="flex items-center justify-between py-3.5 border-b border-white/[0.06] text-base font-semibold transition {{ request()->routeIs('public.about') ? 'text-[#F5B800]' : 'text-white/90 hover:text-white' }}"
+                class="flex items-center justify-between py-3.5 border-b border-white/[0.06] text-base font-semibold transition {{ request()->routeIs('public.project') ? 'text-[#F5B800]' : 'text-white/90 hover:text-white' }}"
             >
                 <div class="flex items-center gap-3.5">
                     <span class="text-[10px] font-mono tracking-widest text-[#F5B800]/60">02</span>
-                    <span>L'école</span>
+                    <span>Le Projet</span>
                 </div>
                 <x-lucide-arrow-up-right class="w-4 h-4 text-white/30" />
             </a>
 
-            {{-- 03. Formations (Accordéon) --}}
+            {{-- 03. Dispositif VAE --}}
+            <a
+                href="{{ route('public.vae') }}"
+                @click="mobileMenuOpen = false"
+                class="flex items-center justify-between py-3.5 border-b border-white/[0.06] text-base font-semibold transition {{ request()->routeIs('public.vae') ? 'text-[#F5B800]' : 'text-white/90 hover:text-white' }}"
+            >
+                <div class="flex items-center gap-3.5">
+                    <span class="text-[10px] font-mono tracking-widest text-[#F5B800]/60">03</span>
+                    <span>Dispositif VAE (BTS)</span>
+                </div>
+                <x-lucide-arrow-up-right class="w-4 h-4 text-white/30" />
+            </a>
+
+            {{-- 04. Formations (Accordéon) --}}
             <div class="border-b border-white/[0.06] py-3.5">
                 <div class="flex items-center justify-between">
                     <a
@@ -529,7 +565,7 @@
                         @click="mobileMenuOpen = false"
                         class="flex items-center gap-3.5 text-base font-semibold {{ request()->routeIs('public.courses.*') ? 'text-[#F5B800]' : 'text-white/90 hover:text-white' }}"
                     >
-                        <span class="text-[10px] font-mono tracking-widest text-[#F5B800]/60">03</span>
+                        <span class="text-[10px] font-mono tracking-widest text-[#F5B800]/60">04</span>
                         <span>Formations</span>
                     </a>
 
@@ -573,27 +609,40 @@
                 </div>
             </div>
 
-            {{-- 04. Galerie --}}
+            {{-- 05. L'École --}}
+            <a
+                href="{{ route('public.about') }}"
+                @click="mobileMenuOpen = false"
+                class="flex items-center justify-between py-3.5 border-b border-white/[0.06] text-base font-semibold transition {{ request()->routeIs('public.about') ? 'text-[#F5B800]' : 'text-white/90 hover:text-white' }}"
+            >
+                <div class="flex items-center gap-3.5">
+                    <span class="text-[10px] font-mono tracking-widest text-[#F5B800]/60">05</span>
+                    <span>L'école</span>
+                </div>
+                <x-lucide-arrow-up-right class="w-4 h-4 text-white/30" />
+            </a>
+
+            {{-- 06. Galerie --}}
             <a
                 href="{{ route('public.gallery.index') }}"
                 @click="mobileMenuOpen = false"
                 class="flex items-center justify-between py-3.5 border-b border-white/[0.06] text-base font-semibold transition {{ request()->routeIs('public.gallery.*') ? 'text-[#F5B800]' : 'text-white/90 hover:text-white' }}"
             >
                 <div class="flex items-center gap-3.5">
-                    <span class="text-[10px] font-mono tracking-widest text-[#F5B800]/60">04</span>
+                    <span class="text-[10px] font-mono tracking-widest text-[#F5B800]/60">06</span>
                     <span>Galerie & Réalisations</span>
                 </div>
                 <x-lucide-arrow-up-right class="w-4 h-4 text-white/30" />
             </a>
 
-            {{-- 05. Actualités --}}
+            {{-- 07. Actualités --}}
             <a
                 href="{{ route('public.news.index') }}"
                 @click="mobileMenuOpen = false"
                 class="flex items-center justify-between py-3.5 border-b border-white/[0.06] text-base font-semibold transition {{ request()->routeIs('public.news.*') ? 'text-[#F5B800]' : 'text-white/90 hover:text-white' }}"
             >
                 <div class="flex items-center gap-3.5">
-                    <span class="text-[10px] font-mono tracking-widest text-[#F5B800]/60">05</span>
+                    <span class="text-[10px] font-mono tracking-widest text-[#F5B800]/60">07</span>
                     <span>Actualités & Journal</span>
                 </div>
                 <x-lucide-arrow-up-right class="w-4 h-4 text-white/30" />

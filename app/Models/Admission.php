@@ -29,6 +29,7 @@ class Admission extends Model
 
         // Candidature
         'course_id',
+        'volet',
         'student_id',
         'status',
         'message',

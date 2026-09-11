@@ -20,13 +20,38 @@ class AdmissionController extends Controller
     ) {}
 
     /**
-     * Liste des demandes d'admission.
+     * Liste des demandes d'admission avec filtres de recherche.
      */
-    public function index(): View
+    public function index(\Illuminate\Http\Request $request): View
     {
-        $admissions = Admission::with('course')
+        $query = Admission::with('course');
+
+        if ($request->filled('search')) {
+            $search = $request->input('search');
+            $query->where(function ($q) use ($search) {
+                $q->where('first_name', 'like', "%{$search}%")
+                    ->orWhere('last_name', 'like', "%{$search}%")
+                    ->orWhere('email', 'like', "%{$search}%")
+                    ->orWhere('phone', 'like', "%{$search}%");
+            });
+        }
+
+        if ($request->filled('course_id') && $request->course_id !== 'all') {
+            $query->where('course_id', $request->course_id);
+        }
+
+        if ($request->filled('status') && $request->status !== 'all') {
+            $query->where('status', $request->status);
+        }
+
+        if ($request->filled('volet') && $request->volet !== 'all') {
+            $query->where('volet', $request->volet);
+        }
+
+        $admissions = $query
             ->latest()
-            ->paginate(15);
+            ->paginate(15)
+            ->withQueryString();
 
         $statistics = [
             'total'    => Admission::count(),
@@ -35,7 +60,9 @@ class AdmissionController extends Controller
             'rejected' => Admission::where('status', AdmissionStatus::REJECTED->value)->count(),
         ];
 
-        return view('admin.admissions.index', compact('admissions', 'statistics'));
+        $courses = Course::orderBy('title')->get();
+
+        return view('admin.admissions.index', compact('admissions', 'statistics', 'courses'));
     }
 
     /**

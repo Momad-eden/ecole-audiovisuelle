@@ -113,19 +113,37 @@
         </a>
 
 
-        {{-- Paiements --}}
+        {{-- Caisse --}}
 
         <a
             href="{{ route('payments.index') }}"
             class="{{ request()->routeIs('payments.*')
-                ? 'bg-primary text-white'
+                ? 'bg-primary text-white font-medium shadow-md shadow-primary/20'
                 : 'text-white/70 hover:bg-white/10 hover:text-white' }}
                 flex items-center gap-3 rounded-xl px-4 py-3 transition">
 
-            <x-lucide-wallet class="w-5 h-5 flex-shrink-0" />
+            <x-lucide-landmark class="w-5 h-5 flex-shrink-0" />
 
             <span>
-                Paiements
+                Caisse
+            </span>
+
+        </a>
+
+
+        {{-- Comptabilité --}}
+
+        <a
+            href="{{ route('accounting.index') }}"
+            class="{{ request()->routeIs('accounting.*')
+                ? 'bg-primary text-white font-medium shadow-md shadow-primary/20'
+                : 'text-white/70 hover:bg-white/10 hover:text-white' }}
+                flex items-center gap-3 rounded-xl px-4 py-3 transition">
+
+            <x-lucide-calculator class="w-5 h-5 flex-shrink-0" />
+
+            <span>
+                Comptabilité
             </span>
 
         </a>
@@ -282,19 +300,37 @@
         </a>
 
 
-        {{-- Paiements --}}
+        {{-- Caisse --}}
 
         <a
             href="{{ route('payments.index') }}"
             class="{{ request()->routeIs('payments.*')
-                ? 'bg-primary text-white'
+                ? 'bg-primary text-white font-medium'
                 : 'text-white/70 hover:bg-white/10 hover:text-white' }}
                 flex items-center gap-3 rounded-xl px-4 py-3 transition">
 
-            <x-lucide-wallet class="w-5 h-5 flex-shrink-0" />
+            <x-lucide-landmark class="w-5 h-5 flex-shrink-0" />
 
             <span>
-                Paiements
+                Caisse
+            </span>
+
+        </a>
+
+
+        {{-- Comptabilité --}}
+
+        <a
+            href="{{ route('accounting.index') }}"
+            class="{{ request()->routeIs('accounting.*')
+                ? 'bg-primary text-white font-medium'
+                : 'text-white/70 hover:bg-white/10 hover:text-white' }}
+                flex items-center gap-3 rounded-xl px-4 py-3 transition">
+
+            <x-lucide-calculator class="w-5 h-5 flex-shrink-0" />
+
+            <span>
+                Comptabilité
             </span>
 
         </a>

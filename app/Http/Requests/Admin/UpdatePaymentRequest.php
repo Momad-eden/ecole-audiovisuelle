@@ -3,6 +3,7 @@
 namespace App\Http\Requests\Admin;
 
 use App\Enums\PaymentMethod;
+use App\Enums\TransactionCategory;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rule;
 
@@ -16,7 +17,10 @@ class UpdatePaymentRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'student_id'     => ['required', 'exists:students,id'],
+            'type'           => ['required', 'in:inflow,outflow'],
+            'category'       => ['nullable', 'string', Rule::in(TransactionCategory::values())],
+            'title'          => ['nullable', 'string', 'max:255'],
+            'student_id'     => ['nullable', 'exists:students,id'],
             'amount'         => ['required', 'numeric', 'min:1'],
             'payment_method' => ['required', Rule::in(PaymentMethod::values())],
             'reference'      => ['nullable', 'string', 'max:255'],

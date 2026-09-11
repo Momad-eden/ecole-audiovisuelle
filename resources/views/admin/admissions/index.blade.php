@@ -163,6 +163,100 @@
 
 
     {{-- =====================================================
+         FILTRES & RECHERCHE
+    ====================================================== --}}
+    <div class="rounded-2xl border border-gray-100 bg-white p-5 shadow-sm">
+        <form method="GET" action="{{ route('admissions.index') }}" class="space-y-4">
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+
+                {{-- Recherche textuelle --}}
+                <div>
+                    <label class="block text-xs font-semibold uppercase tracking-wider text-gray-500 mb-1.5">Recherche</label>
+                    <div class="relative">
+                        <x-lucide-search class="w-4 h-4 text-gray-400 absolute left-3.5 top-1/2 -translate-y-1/2 pointer-events-none" />
+                        <input
+                            type="text"
+                            name="search"
+                            value="{{ request('search') }}"
+                            placeholder="Nom, prénom, email, tél..."
+                            class="w-full pl-9 pr-4 py-2 rounded-xl border border-gray-200 focus:border-primary focus:ring-1 focus:ring-primary text-xs outline-none"
+                        >
+                    </div>
+                </div>
+
+                {{-- Filtre par Formation --}}
+                <div>
+                    <label class="block text-xs font-semibold uppercase tracking-wider text-gray-500 mb-1.5">Filière / Formation</label>
+                    <select
+                        name="course_id"
+                        class="w-full px-3 py-2 text-xs rounded-xl border border-gray-200 focus:border-primary outline-none"
+                    >
+                        <option value="all">Toutes les formations</option>
+                        @foreach($courses as $course)
+                            <option value="{{ $course->id }}" @selected(request('course_id') == $course->id)>
+                                {{ $course->title }}
+                            </option>
+                        @endforeach
+                    </select>
+                </div>
+
+                {{-- Filtre par Statut --}}
+                <div>
+                    <label class="block text-xs font-semibold uppercase tracking-wider text-gray-500 mb-1.5">Statut candidature</label>
+                    <select
+                        name="status"
+                        class="w-full px-3 py-2 text-xs rounded-xl border border-gray-200 focus:border-primary outline-none"
+                    >
+                        <option value="all">Tous les statuts</option>
+                        <option value="pending" @selected(request('status') === 'pending')>⏳ En attente</option>
+                        <option value="approved" @selected(request('status') === 'approved')>🟢 Acceptée</option>
+                        <option value="rejected" @selected(request('status') === 'rejected')>🔴 Refusée</option>
+                    </select>
+                </div>
+
+                {{-- Filtre par Volet --}}
+                <div>
+                    <label class="block text-xs font-semibold uppercase tracking-wider text-gray-500 mb-1.5">Dispositif / Volet</label>
+                    <select
+                        name="volet"
+                        class="w-full px-3 py-2 text-xs rounded-xl border border-gray-200 focus:border-primary outline-none"
+                    >
+                        <option value="all">Tous les volets</option>
+                        <option value="Volet 1 - Formations Pratiques" @selected(request('volet') === 'Volet 1 - Formations Pratiques')>Volet 1 — Formations Pratiques</option>
+                        <option value="Volet 2 - Validation des Acquis de l'Expérience (VAE)" @selected(request('volet') === "Volet 2 - Validation des Acquis de l'Expérience (VAE)")>Volet 2 — Dispositif VAE</option>
+                    </select>
+                </div>
+
+            </div>
+
+            <div class="flex items-center justify-between pt-2 border-t border-gray-100">
+                <span class="text-xs font-semibold text-gray-500">
+                    {{ $admissions->total() }} candidature(s) trouvée(s)
+                </span>
+
+                <div class="flex items-center gap-2">
+                    @if(request()->hasAny(['search', 'course_id', 'status', 'volet']))
+                        <a
+                            href="{{ route('admissions.index') }}"
+                            class="px-3.5 py-1.5 rounded-lg bg-gray-100 hover:bg-gray-200 text-gray-600 text-xs font-semibold transition"
+                        >
+                            Réinitialiser
+                        </a>
+                    @endif
+                    <button
+                        type="submit"
+                        class="inline-flex items-center gap-1.5 px-4 py-1.5 rounded-lg bg-primary hover:bg-primary/90 text-white text-xs font-bold transition shadow-sm"
+                    >
+                        <x-lucide-filter class="w-3.5 h-3.5" />
+                        <span>Filtrer</span>
+                    </button>
+                </div>
+            </div>
+        </form>
+    </div>
+
+
+    {{-- =====================================================
          LISTE DES ADMISSIONS
     ====================================================== --}}
 
@@ -262,12 +356,22 @@
 
 
                             {{-- =====================================
-                                 FORMATION
+                                 FORMATION & VOLET
                             ====================================== --}}
 
                             <td class="p-4 text-gray-700">
 
-                                {{ $admission->course?->title ?? '—' }}
+                                <div class="font-medium text-gray-900">
+                                    {{ $admission->course?->title ?? '—' }}
+                                </div>
+
+                                @if($admission->volet)
+                                    <div class="mt-1">
+                                        <span class="inline-flex items-center px-2 py-0.5 rounded text-[10.5px] font-semibold bg-amber-50 text-amber-900 border border-amber-200/70">
+                                            {{ $admission->volet }}
+                                        </span>
+                                    </div>
+                                @endif
 
                             </td>
 

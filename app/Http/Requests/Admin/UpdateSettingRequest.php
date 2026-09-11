@@ -24,6 +24,9 @@ class UpdateSettingRequest extends FormRequest
             'facebook'    => ['nullable', 'url', 'max:255'],
             'instagram'   => ['nullable', 'url', 'max:255'],
             'youtube'     => ['nullable', 'url', 'max:255'],
+            'tiktok'      => ['nullable', 'url', 'max:255'],
+            'linkedin'    => ['nullable', 'url', 'max:255'],
+            'twitter'     => ['nullable', 'url', 'max:255'],
             'whatsapp'    => ['nullable', 'string', 'max:50'],
         ];
     }

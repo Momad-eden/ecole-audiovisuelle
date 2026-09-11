@@ -2,7 +2,7 @@
 
 
 @section('title')
-EMSI — École de Formation Audiovisuelle
+EMSI - École de Formation Audiovisuelle
 @endsection
 
 
@@ -15,146 +15,163 @@ EMSI — École de Formation Audiovisuelle au cœur du Grand Théâtre National 
 
 
 {{-- =========================================================
-     HERO
-======================================================={{-- =========================================================
      HERO — L'IMAGE EST UN LANGAGE
 ========================================================= --}}
-
 <section
     id="hero"
-    class="relative min-h-screen overflow-hidden bg-[#070709] text-white flex flex-col justify-between"
+    class="relative min-h-[92vh] lg:min-h-screen overflow-hidden bg-[#070709] text-white flex flex-col justify-between"
 >
 
     {{-- =====================================================
          1. ATMOSPHÈRE CINÉMATIQUE & LUEURS STUDIO
     ====================================================== --}}
-    <div class="absolute inset-0 pointer-events-none z-0">
+    <div class="absolute inset-0 pointer-events-none z-0 overflow-hidden">
 
         {{-- Lueur ambrée principale --}}
-        <div class="absolute right-[20%] top-[15%] w-[600px] h-[600px] rounded-full bg-[#F5B800]/12 blur-[150px]"></div>
+        <div class="absolute right-[15%] top-[10%] w-[550px] lg:w-[700px] h-[550px] lg:h-[700px] rounded-full bg-[#F5B800]/14 blur-[140px] lg:blur-[180px]"></div>
 
-        {{-- Lueur violette studio profonde --}}
-        <div class="absolute left-[10%] top-[35%] w-[650px] h-[650px] rounded-full bg-[#320080]/30 blur-[160px]"></div>
+        {{-- Lueur violette studio profonde (EMSI Brand) --}}
+        <div class="absolute left-[5%] top-[30%] w-[500px] lg:w-[680px] h-[500px] lg:h-[680px] rounded-full bg-[#310181]/35 blur-[150px] lg:blur-[190px]"></div>
 
-        {{-- Dégradés de profondeur et vignettage --}}
-        <div class="absolute inset-x-0 bottom-0 h-[45%] bg-gradient-to-t from-[#070709] via-[#070709]/80 to-transparent"></div>
-        <div class="absolute inset-y-0 left-0 w-[50%] bg-gradient-to-r from-[#070709]/95 via-[#070709]/60 to-transparent"></div>
-        <div class="absolute inset-x-0 top-0 h-40 bg-gradient-to-b from-[#070709]/90 to-transparent"></div>
+        {{-- Lueur d'appoint chaude au sol --}}
+        <div class="absolute left-[40%] bottom-[5%] w-[450px] h-[300px] rounded-full bg-[#C15C03]/15 blur-[120px]"></div>
+
+        {{-- Dégradés de profondeur, contraste et vignettage cinéma --}}
+        <div class="absolute inset-x-0 bottom-0 h-[40%] bg-gradient-to-t from-[#070709] via-[#070709]/80 to-transparent"></div>
+        <div class="absolute inset-y-0 left-0 w-[60%] bg-gradient-to-r from-[#070709]/95 via-[#070709]/60 to-transparent"></div>
+        <div class="absolute inset-x-0 top-0 h-36 bg-gradient-to-b from-[#070709]/90 via-[#070709]/40 to-transparent"></div>
+
+        {{-- Grille géométrique subtile (texture studio) --}}
+        <div class="absolute inset-0 opacity-[0.03] bg-[radial-gradient(#ffffff_1px,transparent_1px)] [background-size:24px_24px]"></div>
 
     </div>
 
 
     {{-- =====================================================
-         2. IMAGE DE FOND DU CAMPUS (GRAND THÉÂTRE)
+         2. IMAGE DE FOND DU CAMPUS (GRAND THÉÂTRE NATIONAL)
     ====================================================== --}}
     <div class="absolute inset-0 pointer-events-none z-0">
         <img
             src="{{ asset('images/hero.jpg') }}"
-            alt="Grand Théâtre National Doudou Ndiaye Rose - Dakar"
-            class="w-full h-full object-cover opacity-[0.28] filter brightness-90 contrast-110"
+            alt="Grand Théâtre National Doudou Ndiaye Coumba Rose - Dakar"
+            class="w-full h-full object-cover opacity-[0.22] filter brightness-90 contrast-115 scale-105 transition-transform duration-1000 ease-out"
         >
-        <div class="absolute inset-0 bg-gradient-to-r from-[#070709]/98 via-[#070709]/75 to-[#070709]/45"></div>
-        <div class="absolute inset-0 bg-gradient-to-t from-[#070709] via-transparent to-[#070709]/60"></div>
+        <div class="absolute inset-0 bg-gradient-to-r from-[#070709]/98 via-[#070709]/80 to-[#070709]/50"></div>
+        <div class="absolute inset-0 bg-gradient-to-t from-[#070709] via-transparent to-[#070709]/70"></div>
     </div>
 
 
     {{-- =====================================================
          3. CONTENU PRINCIPAL
     ====================================================== --}}
-    <div class="relative z-10 max-w-[1600px] mx-auto w-full px-6 lg:px-12 pt-20 sm:pt-28 lg:pt-36 pb-12 flex-1 flex flex-col justify-between">
+    <div class="relative z-10 max-w-[1600px] mx-auto w-full px-5 sm:px-8 lg:px-12 pt-24 sm:pt-28 lg:pt-36 pb-8 lg:pb-12 flex-1 flex flex-col justify-between">
 
-        {{-- Barre supérieure d'informations --}}
-        <div class="flex flex-wrap items-center justify-between gap-4">
+        {{-- Barre supérieure d'informations & statut officiel --}}
+        <div class="flex flex-wrap items-center justify-between gap-3 sm:gap-4">
 
-            {{-- Badge Inscription Ouverte --}}
-            <div class="inline-flex items-center gap-2.5 px-4 py-1.5 rounded-full bg-white/[0.05] border border-white/15 backdrop-blur-xl shadow-lg">
+            {{-- Badge Inscription Ouverte & Volets --}}
+            <div class="inline-flex items-center gap-2.5 px-3.5 py-1.5 rounded-full bg-white/[0.05] border border-white/15 backdrop-blur-xl shadow-lg">
                 <span class="relative flex h-2 w-2">
                     <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-[#F5B800] opacity-75"></span>
                     <span class="relative inline-flex rounded-full h-2 w-2 bg-[#F5B800]"></span>
                 </span>
-                <span class="text-xs uppercase tracking-[0.2em] font-bold text-[#F5B800]">
-                    Inscriptions Session {{ date('Y') }}-{{ date('Y') + 1 }}
+                <span class="text-[11px] sm:text-xs uppercase tracking-[0.18em] font-bold text-[#F5B800]">
+                    Inscriptions Ouvertes • Session {{ date('Y') }}-{{ date('Y') + 1 }}
                 </span>
             </div>
 
-            {{-- Localisation d'exception --}}
-            <div class="hidden sm:flex items-center gap-2.5 px-4 py-1.5 rounded-full bg-white/[0.03] border border-white/10 backdrop-blur-md text-xs uppercase tracking-[0.2em] text-white/60 font-medium">
+            {{-- Localisation d'exception & Alliance GTN --}}
+            <div class="hidden sm:flex items-center gap-2.5 px-4 py-1.5 rounded-full bg-white/[0.04] border border-white/10 backdrop-blur-md text-[11px] sm:text-xs uppercase tracking-[0.18em] text-white/75 font-medium">
                 <x-lucide-map-pin class="w-3.5 h-3.5 text-[#F5B800]" />
                 <span>Grand Théâtre National</span>
-                <span class="text-white/20">•</span>
-                <span class="text-white/80 font-semibold">Dakar, Sénégal</span>
+                <span class="text-white/25">•</span>
+                <span class="text-white font-semibold">Dakar, Sénégal</span>
             </div>
 
         </div>
 
 
-        {{-- Zone Principale : Typographie & Composition 3D --}}
-        <div class="my-auto py-6 sm:py-8 lg:py-12 grid lg:grid-cols-[1fr_1.1fr] items-center gap-8 lg:gap-16">
+        {{-- Zone Principale : Typographie & Composition 3D Interactive --}}
+        <div class="my-auto py-6 sm:py-8 lg:py-10 grid lg:grid-cols-[1.05fr_1.15fr] items-center gap-10 lg:gap-14">
 
-            {{-- GAUCHE : Typographie & Valeur Ajoutée --}}
-            <div class="relative z-20 max-w-[700px]">
+            {{-- GAUCHE : Typographie, Vision & CTA --}}
+            <div class="relative z-20 max-w-[720px]">
 
-                {{-- Tagline de l'école --}}
-                <div class="inline-flex items-center gap-3 mb-6">
-                    <span class="w-8 h-0.5 bg-gradient-to-r from-[#F5B800] to-transparent rounded-full"></span>
-                    <span class="text-xs uppercase tracking-[0.28em] font-bold text-[#F5B800]">
-                        École des Métiers du Son et de l'Image
+                {{-- Tagline & Co-portage officiel --}}
+                <div class="inline-flex items-center gap-3 mb-5">
+                    <span class="w-7 h-0.5 bg-gradient-to-r from-[#F5B800] to-transparent rounded-full"></span>
+                    <span class="text-[11px] sm:text-xs uppercase tracking-[0.24em] font-bold text-[#F5B800]">
+                        EMSI × Grand Théâtre National de Dakar
                     </span>
                 </div>
 
                 {{-- Grand Titre Manifeste --}}
-                <h1 class="font-sans font-extrabold text-[clamp(3.2rem,6.4vw,6.6rem)] leading-[1.02] tracking-tight text-white">
-                    <span class="block">L'image</span>
-                    <span class="block text-transparent bg-clip-text bg-gradient-to-r from-[#F5B800] via-[#FFD043] to-[#E59800]">
+                <h1 class="font-sans font-extrabold text-[clamp(2.8rem,5.8vw,5.6rem)] leading-[1.03] tracking-tight text-white">
+                    <span class="block text-white">L'image</span>
+                    <span class="block text-transparent bg-clip-text bg-gradient-to-r from-[#F5B800] via-[#FFD043] to-[#E59800] filter drop-shadow-[0_4px_24px_rgba(245,184,0,0.25)]">
                         est un
                     </span>
-                    <span class="block">langage.</span>
+                    <span class="block text-white">langage.</span>
                 </h1>
 
-                {{-- Paragraphe d'impact --}}
-                <p class="mt-8 text-base sm:text-lg leading-relaxed text-white/70 font-light max-w-xl">
-                    Former la nouvelle génération de <span class="text-white font-medium">cinéastes, directeurs photo, monteurs et ingénieurs du son</span> au cœur du prestigieux Grand Théâtre National Doudou Ndiaye Rose à Dakar.
+                {{-- Paragraphe d'impact clair et professionnel --}}
+                <p class="mt-6 sm:mt-7 text-base sm:text-lg leading-relaxed text-white/75 font-light max-w-xl">
+                    L'école d'excellence pour former et certifier l'élite technique du <strong class="text-white font-semibold">son, de la lumière, de la vidéo broadcast, de la régie générale et de la création numérique</strong>. 90% d'immersion pratique en conditions réelles et certification <strong class="text-[#F5B800] font-semibold">BTS d'État par la VAE</strong>.
                 </p>
 
                 {{-- Groupe CTA Principal --}}
-                <div class="flex flex-wrap items-center gap-4 mt-10">
+                <div class="flex flex-wrap items-center gap-3.5 sm:gap-4 mt-8 sm:mt-10">
 
+                    {{-- Bouton Principal Découvrir le Projet --}}
                     <a
-                        href="#formations"
-                        class="group inline-flex items-center gap-3.5 px-8 py-4 rounded-full bg-[#F5B800] hover:bg-white text-black font-bold text-sm uppercase tracking-wider transition-all duration-300 shadow-[0_10px_30px_rgba(245,184,0,0.35)] hover:shadow-[0_15px_40px_rgba(255,255,255,0.4)]"
+                        href="{{ route('public.project') }}"
+                        class="group inline-flex items-center gap-3 px-7 sm:px-8 py-3.5 sm:py-4 rounded-full bg-[#F5B800] hover:bg-white text-black font-bold text-xs sm:text-sm uppercase tracking-wider transition-all duration-300 shadow-[0_10px_30px_rgba(245,184,0,0.35)] hover:shadow-[0_15px_40px_rgba(255,255,255,0.4)]"
                     >
-                        <span>Découvrir les formations</span>
+                        <span>Découvrir le projet officiel</span>
                         <span class="flex items-center justify-center w-6 h-6 rounded-full bg-black text-white group-hover:bg-[#F5B800] group-hover:text-black transition">
                             <x-lucide-arrow-up-right class="w-3.5 h-3.5" />
                         </span>
                     </a>
 
+                    {{-- Bouton Candidater --}}
                     <a
                         href="{{ route('public.admissions.create') }}"
-                        class="inline-flex items-center gap-2.5 px-7 py-4 rounded-full bg-white/[0.05] hover:bg-white/[0.12] border border-white/20 hover:border-white/40 text-white font-semibold text-sm transition-all duration-300 backdrop-blur-md"
+                        class="inline-flex items-center gap-2.5 px-6 sm:px-7 py-3.5 sm:py-4 rounded-full bg-white/[0.06] hover:bg-white/[0.14] border border-white/20 hover:border-white/40 text-white font-semibold text-xs sm:text-sm transition-all duration-300 backdrop-blur-md shadow-lg"
                     >
-                        <span>Déposer ma candidature</span>
-                        <x-lucide-arrow-right class="w-4 h-4 text-white/60" />
+                        <span>Candidater en ligne</span>
+                        <x-lucide-arrow-right class="w-4 h-4 text-white/70" />
+                    </a>
+
+                    {{-- Lien direct VAE --}}
+                    <a
+                        href="{{ route('public.vae') }}"
+                        class="inline-flex items-center gap-1.5 text-xs text-white/60 hover:text-[#F5B800] transition py-2 font-medium"
+                    >
+                        <x-lucide-award class="w-3.5 h-3.5 text-[#F5B800]" />
+                        <span>Tout savoir sur la VAE & BTS</span>
+                        <x-lucide-chevron-right class="w-3 h-3" />
                     </a>
 
                 </div>
 
-                {{-- Points de réassurance rapides --}}
-                <div class="mt-8 flex flex-wrap items-center gap-5 text-xs text-white/50 font-medium">
-                    <span class="flex items-center gap-1.5">
-                        <x-lucide-check class="w-3.5 h-3.5 text-[#F5B800]" />
-                        80% Pratique Studio
-                    </span>
-                    <span class="text-white/20">•</span>
-                    <span class="flex items-center gap-1.5">
-                        <x-lucide-check class="w-3.5 h-3.5 text-[#F5B800]" />
-                        Matériel Cinéma 4K / 6K
-                    </span>
-                    <span class="text-white/20">•</span>
-                    <span class="flex items-center gap-1.5">
-                        <x-lucide-check class="w-3.5 h-3.5 text-[#F5B800]" />
-                        Intervenants Reconnus
-                    </span>
+                {{-- Ruban des indicateurs d'excellence --}}
+                <div class="mt-8 sm:mt-10 pt-6 border-t border-white/10 grid grid-cols-2 sm:grid-cols-4 gap-4 max-w-xl">
+                    <div class="flex flex-col">
+                        <span class="text-xl sm:text-2xl font-bold font-sans text-white tracking-tight">100</span>
+                        <span class="text-[11px] text-white/55 font-medium leading-tight">Jeunes & Pros formés</span>
+                    </div>
+                    <div class="flex flex-col">
+                        <span class="text-xl sm:text-2xl font-bold font-sans text-[#F5B800] tracking-tight">5</span>
+                        <span class="text-[11px] text-white/55 font-medium leading-tight">Filières d'Élite</span>
+                    </div>
+                    <div class="flex flex-col">
+                        <span class="text-xl sm:text-2xl font-bold font-sans text-white tracking-tight">90%</span>
+                        <span class="text-[11px] text-white/55 font-medium leading-tight">Pratique & Plateaux</span>
+                    </div>
+                    <div class="flex flex-col">
+                        <span class="text-xl sm:text-2xl font-bold font-sans text-[#F5B800] tracking-tight">BTS</span>
+                        <span class="text-[11px] text-white/55 font-medium leading-tight">Diplôme d'État / VAE</span>
+                    </div>
                 </div>
 
             </div>
@@ -162,7 +179,7 @@ EMSI — École de Formation Audiovisuelle au cœur du Grand Théâtre National 
 
             {{-- DROITE : Composition des Objets 3D avec Parallaxe Interactive --}}
             <div
-                class="relative h-[480px] sm:h-[540px] md:h-[600px] lg:h-[640px] w-full select-none"
+                class="relative h-[440px] sm:h-[520px] md:h-[580px] lg:h-[620px] w-full select-none"
                 x-data="{
                     mouseX: 0,
                     mouseY: 0,
@@ -182,21 +199,21 @@ EMSI — École de Formation Audiovisuelle au cœur du Grand Théâtre National 
                 @mouseleave="onMouseLeave()"
             >
 
-                {{-- Lueur centrale studio --}}
+                {{-- Lueur centrale studio interactive --}}
                 <div
-                    class="absolute left-[30%] top-[20%] w-80 h-80 rounded-full bg-[#F5B800]/20 blur-3xl pointer-events-none transition-transform duration-700 ease-out"
+                    class="absolute left-[25%] top-[15%] w-72 sm:w-96 h-72 sm:h-96 rounded-full bg-[#F5B800]/18 blur-3xl pointer-events-none transition-transform duration-700 ease-out"
                     :style="'transform: translate3d(' + (mouseX * 18) + 'px, ' + (mouseY * 18) + 'px, 0)'"
                 ></div>
 
-                {{-- Faisceau lumineux du projecteur --}}
+                {{-- Faisceau lumineux du projecteur vers la caméra --}}
                 <div
-                    class="absolute -left-10 bottom-[20%] w-[420px] h-[200px] bg-gradient-to-tr from-[#F5B800]/25 via-[#F5B800]/8 to-transparent rounded-full blur-2xl pointer-events-none animate-hero-lightbeam"
+                    class="absolute -left-8 bottom-[18%] w-[380px] sm:w-[460px] h-[180px] sm:h-[220px] bg-gradient-to-tr from-[#F5B800]/30 via-[#F5B800]/10 to-transparent rounded-full blur-2xl pointer-events-none animate-hero-lightbeam"
                 ></div>
 
 
                 {{-- 01 • CLAP DE TOURNAGE --}}
                 <div
-                    class="absolute left-[4%] top-[6%] w-[115px] sm:w-[130px] md:w-[145px] z-20 cursor-pointer group transition-transform duration-500 ease-out"
+                    class="absolute left-[3%] top-[4%] w-[110px] sm:w-[130px] md:w-[145px] z-20 cursor-pointer group transition-transform duration-500 ease-out"
                     :style="'transform: translate3d(' + (mouseX * -28) + 'px, ' + (mouseY * -24) + 'px, 0)'"
                 >
                     <div class="animate-hero-clap transform group-hover:scale-110 group-hover:rotate-0 transition-transform duration-300">
@@ -208,7 +225,7 @@ EMSI — École de Formation Audiovisuelle au cœur du Grand Théâtre National 
                         {{-- Badge Scène au survol --}}
                         <div class="absolute -bottom-4 left-1/2 -translate-x-1/2 opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none">
                             <span class="px-2.5 py-0.5 rounded-full text-[9px] font-mono uppercase tracking-wider bg-black/90 text-[#F5B800] border border-[#F5B800]/30 whitespace-nowrap shadow-xl">
-                                Scène 01 • Prise 01
+                                Scène 01 • Dakar
                             </span>
                         </div>
                     </div>
@@ -217,7 +234,7 @@ EMSI — École de Formation Audiovisuelle au cœur du Grand Théâtre National 
 
                 {{-- 02 • PROJECTEUR AUDIOVISUEL --}}
                 <div
-                    class="absolute left-[0%] bottom-[12%] w-[145px] sm:w-[165px] md:w-[185px] z-10 cursor-pointer group transition-transform duration-500 ease-out"
+                    class="absolute left-[0%] bottom-[10%] w-[140px] sm:w-[160px] md:w-[180px] z-10 cursor-pointer group transition-transform duration-500 ease-out"
                     :style="'transform: translate3d(' + (mouseX * 22) + 'px, ' + (mouseY * 18) + 'px, 0)'"
                 >
                     <div class="animate-hero-projector transform group-hover:scale-110 transition-transform duration-300">
@@ -226,27 +243,33 @@ EMSI — École de Formation Audiovisuelle au cœur du Grand Théâtre National 
                             alt="Projecteur de studio audiovisuel"
                             class="w-full h-auto object-contain drop-shadow-[0_20px_40px_rgba(0,0,0,0.7)]"
                         >
+                        {{-- Tooltip Lumière --}}
+                        <div class="absolute -top-3 left-1/2 -translate-x-1/2 opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none">
+                            <span class="px-2 py-0.5 rounded-full text-[9px] font-mono uppercase tracking-wider bg-black/90 text-[#F5B800] border border-white/20 whitespace-nowrap shadow-xl">
+                                Technicien Lumière
+                            </span>
+                        </div>
                     </div>
                 </div>
 
 
                 {{-- 03 • CAMÉRA CINÉMA — OBJET PHARE --}}
                 <div
-                    class="absolute left-[24%] top-[16%] w-[250px] sm:w-[300px] md:w-[340px] lg:w-[370px] z-30 cursor-pointer group transition-transform duration-300 ease-out"
+                    class="absolute left-[20%] sm:left-[23%] top-[14%] sm:top-[16%] w-[240px] sm:w-[290px] md:w-[330px] lg:w-[360px] z-30 cursor-pointer group transition-transform duration-300 ease-out"
                     :style="'transform: translate3d(' + (mouseX * 32) + 'px, ' + (mouseY * 32) + 'px, 0) rotateX(' + (-mouseY * 10) + 'deg) rotateY(' + (mouseX * 10) + 'deg)'"
                 >
                     {{-- Widget Écran Caméra (REC & Timecode) --}}
-                    <div class="absolute -top-3 right-4 z-40 inline-flex items-center gap-2 px-3 py-1 rounded-full bg-black/85 backdrop-blur-md border border-white/20 shadow-2xl">
+                    <div class="absolute -top-3.5 right-3 sm:right-6 z-40 inline-flex items-center gap-2 px-3 py-1 rounded-full bg-black/90 backdrop-blur-md border border-white/20 shadow-2xl">
                         <span class="w-2 h-2 rounded-full bg-red-500 animate-ping"></span>
                         <span class="text-[9px] font-mono font-bold uppercase tracking-widest text-red-400">REC</span>
                         <span class="text-white/30 text-[9px]">|</span>
-                        <span class="text-[9px] font-mono text-white/90 font-semibold tracking-wider">4K 60FPS</span>
+                        <span class="text-[9px] font-mono text-white/90 font-semibold tracking-wider">4K 60FPS UHD</span>
                     </div>
 
                     <div class="animate-hero-camera transform group-hover:scale-105 transition-transform duration-300">
                         <img
                             src="{{ asset('images/objects/camera.png') }}"
-                            alt="Caméra professionnelle cinéma"
+                            alt="Caméra professionnelle cinéma et broadcast"
                             class="w-full h-auto object-contain filter drop-shadow-[0_25px_50px_rgba(0,0,0,0.8)]"
                         >
                     </div>
@@ -255,7 +278,7 @@ EMSI — École de Formation Audiovisuelle au cœur du Grand Théâtre National 
 
                 {{-- 04 • MICROPHONE STUDIO & ONDES ACOUSTIQUES --}}
                 <div
-                    class="absolute right-[4%] top-[4%] w-[130px] sm:w-[150px] md:w-[170px] z-20 cursor-pointer group transition-transform duration-500 ease-out"
+                    class="absolute right-[4%] top-[2%] w-[125px] sm:w-[145px] md:w-[165px] z-20 cursor-pointer group transition-transform duration-500 ease-out"
                     :style="'transform: translate3d(' + (mouseX * -32) + 'px, ' + (mouseY * 26) + 'px, 0)'"
                 >
                     {{-- Cercles acoustiques animés --}}
@@ -270,26 +293,26 @@ EMSI — École de Formation Audiovisuelle au cœur du Grand Théâtre National 
                         {{-- Tooltip au survol --}}
                         <div class="absolute -bottom-4 left-1/2 -translate-x-1/2 opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none">
                             <span class="px-2 py-0.5 rounded-full text-[9px] font-mono uppercase tracking-wider bg-black/90 text-white border border-white/20 whitespace-nowrap shadow-lg">
-                                Prise de Son HF
+                                Techniques du Son
                             </span>
                         </div>
                     </div>
                 </div>
 
 
-                {{-- 05 • CONSOLE DE MIXAGE AUDIO --}}
+                {{-- 05 • CONSOLE DE MIXAGE AUDIO & RÉGIE --}}
                 <div
-                    class="absolute right-[10%] bottom-[12%] w-[185px] sm:w-[215px] md:w-[250px] z-20 cursor-pointer group transition-transform duration-500 ease-out"
+                    class="absolute right-[8%] bottom-[10%] w-[180px] sm:w-[210px] md:w-[240px] z-20 cursor-pointer group transition-transform duration-500 ease-out"
                     :style="'transform: translate3d(' + (mouseX * 28) + 'px, ' + (mouseY * -22) + 'px, 0)'"
                 >
                     <div class="animate-hero-console transform group-hover:scale-105 transition-transform duration-300">
                         <img
                             src="{{ asset('images/objects/console.png') }}"
-                            alt="Console de mixage et post-production"
+                            alt="Console de mixage et régie spectacle"
                             class="w-full h-auto object-contain drop-shadow-[0_30px_60px_rgba(0,0,0,0.75)]"
                         >
                         {{-- Barres de VU-mètres LED animées --}}
-                        <div class="absolute top-5 right-6 flex items-end gap-1 h-3 pointer-events-none opacity-85 group-hover:opacity-100">
+                        <div class="absolute top-5 right-6 flex items-end gap-1 h-3 pointer-events-none opacity-90 group-hover:opacity-100">
                             <span class="w-1 h-2 bg-emerald-400 rounded-full animate-pulse"></span>
                             <span class="w-1 h-3 bg-emerald-400 rounded-full animate-pulse" style="animation-delay: 150ms"></span>
                             <span class="w-1 h-2.5 bg-amber-400 rounded-full animate-pulse" style="animation-delay: 300ms"></span>
@@ -299,9 +322,9 @@ EMSI — École de Formation Audiovisuelle au cœur du Grand Théâtre National 
                 </div>
 
 
-                {{-- 06 • CASQUE DE MONITORING AUDIO --}}
+                {{-- 06 • CASQUE DE MONITORING STUDIO --}}
                 <div
-                    class="absolute right-[0%] bottom-[0%] w-[145px] sm:w-[165px] md:w-[195px] z-30 cursor-pointer group transition-transform duration-500 ease-out"
+                    class="absolute right-[0%] bottom-[0%] w-[135px] sm:w-[155px] md:w-[185px] z-30 cursor-pointer group transition-transform duration-500 ease-out"
                     :style="'transform: translate3d(' + (mouseX * -38) + 'px, ' + (mouseY * -30) + 'px, 0)'"
                 >
                     <div class="animate-hero-casque transform group-hover:scale-110 group-hover:rotate-6 transition-transform duration-300">
@@ -310,6 +333,18 @@ EMSI — École de Formation Audiovisuelle au cœur du Grand Théâtre National 
                             alt="Casque audio de monitoring studio"
                             class="w-full h-auto object-contain drop-shadow-[0_20px_40px_rgba(0,0,0,0.7)]"
                         >
+                    </div>
+                </div>
+
+
+                {{-- Badge flottant d'immersion pratique --}}
+                <div class="hidden sm:flex absolute -bottom-2 left-4 z-40 items-center gap-3 px-4 py-2.5 rounded-2xl bg-black/85 backdrop-blur-xl border border-white/15 shadow-2xl">
+                    <div class="w-9 h-9 rounded-xl bg-[#F5B800]/15 border border-[#F5B800]/30 flex items-center justify-center text-[#F5B800]">
+                        <x-lucide-clapperboard class="w-4 h-4" />
+                    </div>
+                    <div>
+                        <div class="text-[11px] font-bold text-white uppercase tracking-wider">Plateaux Réels</div>
+                        <div class="text-[10px] text-white/60">Grand Théâtre & Festivals</div>
                     </div>
                 </div>
 
@@ -325,19 +360,155 @@ EMSI — École de Formation Audiovisuelle au cœur du Grand Théâtre National 
 
 
         {{-- =================================================
-             4. BAS DU HERO / RÉASSURANCE & SCROLL
+             4. BAS DU HERO / FILIÈRES & SCROLL DIRECT
         ================================================== --}}
-        <div class="border-t border-white/[0.08] pt-6 flex flex-wrap items-center justify-between gap-6">
+        <div class="border-t border-white/[0.08] pt-5 flex flex-wrap items-center justify-between gap-4">
 
+            {{-- Tags des 5 filières métiers --}}
+            <div class="hidden md:flex items-center gap-2 text-xs text-white/50 overflow-x-auto py-1">
+                <span class="text-white/30 uppercase tracking-widest text-[10px] font-semibold mr-1">Filières :</span>
+                <span class="px-2.5 py-1 rounded-full bg-white/[0.04] border border-white/10 text-white/80 font-medium">Son</span>
+                <span class="px-2.5 py-1 rounded-full bg-white/[0.04] border border-white/10 text-white/80 font-medium">Lumière</span>
+                <span class="px-2.5 py-1 rounded-full bg-white/[0.04] border border-white/10 text-white/80 font-medium">Régie Spectacle</span>
+                <span class="px-2.5 py-1 rounded-full bg-white/[0.04] border border-white/10 text-white/80 font-medium">Infographie 2D/3D</span>
+                <span class="px-2.5 py-1 rounded-full bg-white/[0.04] border border-white/10 text-white/80 font-medium">Cadrage & Vidéo</span>
+            </div>
+
+            {{-- Bouton de défilement vers le projet --}}
             <a
-                href="#ecole"
-                class="inline-flex items-center gap-2.5 text-[10px] uppercase tracking-[0.25em] text-[#F5B800] hover:text-white font-semibold transition group"
+                href="#projet-integre"
+                class="inline-flex items-center gap-2.5 text-[11px] uppercase tracking-[0.22em] text-[#F5B800] hover:text-white font-semibold transition group ml-auto"
             >
-                <span>Découvrir l'école</span>
+                <span>Découvrir le programme officiel</span>
                 <span class="flex items-center justify-center w-7 h-7 rounded-full border border-[#F5B800]/40 group-hover:border-white group-hover:bg-white group-hover:text-black transition">
                     <x-lucide-arrow-down class="w-3.5 h-3.5 group-hover:translate-y-0.5 transition-transform" />
                 </span>
             </a>
+
+        </div>
+
+    </div>
+
+</section>
+
+
+{{-- =========================================================
+     NOUVELLE SECTION : UN PROJET INTÉGRÉ POUR FORMER LES TALENTS DE DEMAIN
+========================================================= --}}
+<section
+    id="projet-integre"
+    class="relative py-24 sm:py-28 lg:py-32 bg-[#09090c] text-white overflow-hidden border-b border-white/10"
+>
+
+    {{-- Lueur d'ambiance --}}
+    <div class="absolute -top-32 right-1/4 w-[600px] h-[600px] bg-[#320080]/30 rounded-full blur-[150px] pointer-events-none"></div>
+    <div class="absolute -bottom-32 left-10 w-[500px] h-[500px] bg-[#F5B800]/10 rounded-full blur-[140px] pointer-events-none"></div>
+
+    <div class="max-w-7xl mx-auto px-6 sm:px-8 lg:px-10 relative z-10">
+
+        <div class="flex flex-col lg:flex-row lg:items-end justify-between gap-8 pb-14 border-b border-white/10">
+            <div class="max-w-3xl">
+                <div class="inline-flex items-center gap-2.5 px-3.5 py-1.5 rounded-full bg-[#F5B800]/10 border border-[#F5B800]/25 text-[#F5B800] text-xs font-bold uppercase tracking-[0.25em] backdrop-blur-md mb-4">
+                    <span class="w-2 h-2 rounded-full bg-[#F5B800] animate-pulse"></span>
+                    <span>Projet Intégré EMSI · Grand Théâtre National</span>
+                </div>
+                <h2 class="text-3xl sm:text-4xl lg:text-5xl font-serif font-normal tracking-tight text-white leading-tight">
+                    Un projet intégré pour former les talents de demain.
+                </h2>
+            </div>
+            <div class="max-w-md">
+                <p class="text-sm text-white/70 leading-relaxed font-light">
+                    Une alliance stratégique pour combler le déficit de techniciens de haut niveau et ouvrir la voie de la certification <strong class="text-white">BTS par la VAE</strong> sans barrière académique.
+                </p>
+                <div class="mt-4">
+                    <a
+                        href="{{ route('public.project') }}"
+                        class="inline-flex items-center gap-2 text-xs font-bold uppercase tracking-wider text-[#F5B800] hover:text-white transition"
+                    >
+                        <span>En savoir plus sur le projet</span>
+                        <x-lucide-arrow-right class="w-4 h-4" />
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        {{-- 4 Piliers Chiffrés --}}
+        <div class="mt-12 grid grid-cols-2 md:grid-cols-4 gap-4 sm:gap-6">
+            <div class="p-6 rounded-3xl bg-[#131318] border border-white/10 hover:border-[#F5B800]/40 transition-all">
+                <p class="text-3xl sm:text-4xl font-serif font-bold text-[#F5B800]">100</p>
+                <p class="text-xs font-semibold uppercase tracking-wider text-white mt-2">Jeunes Techniciens</p>
+                <p class="text-[11px] text-white/50 mt-1 font-light">Bénéficiaires formés et certifiés</p>
+            </div>
+
+            <div class="p-6 rounded-3xl bg-[#131318] border border-white/10 hover:border-[#F5B800]/40 transition-all">
+                <p class="text-3xl sm:text-4xl font-serif font-bold text-white">5</p>
+                <p class="text-xs font-semibold uppercase tracking-wider text-white mt-2">Filières d'Élite</p>
+                <p class="text-[11px] text-white/50 mt-1 font-light">Son, Lumière, Régie, Vidéo, Motion</p>
+            </div>
+
+            <div class="p-6 rounded-3xl bg-[#131318] border border-white/10 hover:border-[#F5B800]/40 transition-all">
+                <p class="text-3xl sm:text-4xl font-serif font-bold text-[#F5B800]">2</p>
+                <p class="text-xs font-semibold uppercase tracking-wider text-white mt-2">Volets Séquentiels</p>
+                <p class="text-[11px] text-white/50 mt-1 font-light">Intensif (3 mois) & BTS VAE (9 mois)</p>
+            </div>
+
+            <div class="p-6 rounded-3xl bg-[#131318] border border-white/10 hover:border-[#F5B800]/40 transition-all">
+                <p class="text-3xl sm:text-4xl font-serif font-bold text-white">90%</p>
+                <p class="text-xs font-semibold uppercase tracking-wider text-white mt-2">Pratique Immersion</p>
+                <p class="text-[11px] text-white/50 mt-1 font-light">Scènes & régies du Grand Théâtre</p>
+            </div>
+        </div>
+
+        {{-- Les 2 Volets en Cartes Horizontales --}}
+        <div class="mt-8 grid md:grid-cols-2 gap-6">
+
+            {{-- Volet 1 --}}
+            <div class="p-7 sm:p-8 rounded-3xl bg-[#131318] border border-white/10 flex flex-col justify-between">
+                <div>
+                    <div class="flex items-center justify-between mb-4">
+                        <span class="px-3 py-1 rounded-full bg-[#F5B800]/15 text-[#F5B800] text-[11px] font-bold uppercase tracking-wider">
+                            Volet 1 · Septembre — Novembre 2026
+                        </span>
+                        <span class="text-xs text-white/50 font-medium">40 Jeunes</span>
+                    </div>
+                    <h3 class="text-xl font-serif font-bold text-white mb-2">
+                        Perfectionnement Intensif Pré-Événementiel
+                    </h3>
+                    <p class="text-xs sm:text-sm text-white/65 leading-relaxed font-light mb-6">
+                        Camp pratique de 12 semaines (~360h) pour maîtriser le calage Line Array, GrandMA, régies multicaméras et la gestion opérationnelle de festivals.
+                    </p>
+                </div>
+                <div class="flex items-center justify-between pt-4 border-t border-white/10">
+                    <span class="text-xs text-[#F5B800] font-semibold">Diplôme d'École & Certificat Technique</span>
+                    <a href="{{ route('public.project') }}" class="text-xs text-white hover:text-[#F5B800] font-bold flex items-center gap-1">
+                        Détails <x-lucide-chevron-right class="w-3.5 h-3.5" />
+                    </a>
+                </div>
+            </div>
+
+            {{-- Volet 2 --}}
+            <div class="p-7 sm:p-8 rounded-3xl bg-gradient-to-br from-[#1a1228] to-[#120e1e] border border-[#320080]/70 flex flex-col justify-between">
+                <div>
+                    <div class="flex items-center justify-between mb-4">
+                        <span class="px-3 py-1 rounded-full bg-[#320080] text-[#F5B800] text-[11px] font-bold uppercase tracking-wider">
+                            Volet 2 · Démarrage 2027
+                        </span>
+                        <span class="text-xs text-white/50 font-medium">60 Jeunes</span>
+                    </div>
+                    <h3 class="text-xl font-serif font-bold text-white mb-2">
+                        Cycle de Certification BTS par la VAE
+                    </h3>
+                    <p class="text-xs sm:text-sm text-white/65 leading-relaxed font-light mb-6">
+                        Parcours de 9 mois (1 080h) en alternance école-entreprise avec constitution du Livret VAE et soutenance devant jury professionnel pour l'obtention du BTS Bac+2.
+                    </p>
+                </div>
+                <div class="flex items-center justify-between pt-4 border-t border-white/10">
+                    <span class="text-xs text-[#F5B800] font-semibold">Titre BTS d'État (Équivalence Bac+2)</span>
+                    <a href="{{ route('public.vae') }}" class="text-xs text-white hover:text-[#F5B800] font-bold flex items-center gap-1">
+                        Dispositif VAE <x-lucide-chevron-right class="w-3.5 h-3.5" />
+                    </a>
+                </div>
+            </div>
 
         </div>
 
@@ -639,7 +810,7 @@ EMSI — École de Formation Audiovisuelle au cœur du Grand Théâtre National 
                         <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-[#F5B800] opacity-75"></span>
                         <span class="relative inline-flex rounded-full h-2 w-2 bg-[#F5B800]"></span>
                     </span>
-                    <span>Catalogue & Cursus Métiers</span>
+                    <span>Sélection des Formations Phares</span>
                 </div>
 
                 <h2 class="text-4xl sm:text-5xl lg:text-6xl font-serif font-normal tracking-tight leading-[1.08] text-white">
@@ -650,18 +821,16 @@ EMSI — École de Formation Audiovisuelle au cœur du Grand Théâtre National 
 
             <div class="max-w-md">
                 <p class="text-sm sm:text-base leading-relaxed text-white/70 font-light">
-                    Des formations complètes et professionnalisantes combinant <span class="text-white font-medium">80% de pratique studio</span>, manipulation quotidienne d'équipements cinéma 4K/6K et encadrement par des experts actifs du secteur.
+                    Aperçu de nos cursus techniques d'élite combinant <span class="text-white font-medium">90% de pratique en régies réelles</span>, manipulation de matériel broadcast et certification <strong class="text-[#F5B800]">BTS par la VAE</strong>.
                 </p>
-                <div class="mt-5 flex items-center gap-6 text-xs uppercase tracking-wider text-[#F5B800] font-semibold">
-                    <span class="flex items-center gap-1.5">
-                        <x-lucide-check-circle-2 class="w-4 h-4" />
-                        Diplômes & Certifications
-                    </span>
-                    <span class="text-white/20">•</span>
-                    <span class="flex items-center gap-1.5 text-white/70">
-                        <x-lucide-check-circle-2 class="w-4 h-4 text-[#F5B800]" />
-                        Dakar — Grand Théâtre
-                    </span>
+                <div class="mt-5 flex items-center gap-4 text-xs">
+                    <a
+                        href="{{ route('public.courses.index') }}"
+                        class="inline-flex items-center gap-2 text-xs font-bold uppercase tracking-wider text-[#F5B800] hover:text-white transition group"
+                    >
+                        <span>Voir l'ensemble des {{ $totalCoursesCount ?? 5 }} filières officielles</span>
+                        <x-lucide-arrow-right class="w-4 h-4 transition-transform group-hover:translate-x-1" />
+                    </a>
                 </div>
             </div>
 
@@ -669,12 +838,18 @@ EMSI — École de Formation Audiovisuelle au cœur du Grand Théâtre National 
 
 
         {{-- =================================================
-             GRILLE DES FORMATIONS (CRÉÉES DANS L'ADMIN)
+             GRILLE DES FORMATIONS PHARES (3 SÉLECTIONNÉES)
         ================================================== --}}
-        @if(isset($courses) && $courses->isNotEmpty())
+        @php
+            $displayCourses = (isset($featuredCourses) && $featuredCourses->isNotEmpty())
+                ? $featuredCourses
+                : ((isset($courses) && $courses->isNotEmpty()) ? $courses->take(3) : collect());
+        @endphp
 
-            <div class="mt-14 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 sm:gap-7 items-stretch">
-                @foreach($courses->take(4) as $index => $course)
+        @if($displayCourses->isNotEmpty())
+
+            <div class="mt-14 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 sm:gap-8 items-stretch">
+                @foreach($displayCourses as $index => $course)
                     <x-public.formation-item
                         :course="$course"
                         :index="$index"
@@ -684,14 +859,14 @@ EMSI — École de Formation Audiovisuelle au cœur du Grand Théâtre National 
 
         @else
 
-            {{-- État vide lorsque aucune formation n'a encore été créée dans l'admin --}}
+            {{-- État vide --}}
             <div class="mt-14 p-12 sm:p-16 rounded-3xl bg-white/[0.02] border border-white/10 text-center flex flex-col items-center justify-center max-w-2xl mx-auto shadow-2xl">
                 <div class="w-16 h-16 rounded-2xl bg-[#F5B800]/10 border border-[#F5B800]/20 flex items-center justify-center text-[#F5B800] mb-5">
                     <x-lucide-graduation-cap class="w-8 h-8" />
                 </div>
                 <h3 class="text-xl sm:text-2xl font-bold text-white">Formations en cours de publication</h3>
                 <p class="mt-3 text-sm text-white/60 leading-relaxed max-w-lg font-light">
-                    Le catalogue des formations est actuellement en cours de mise à jour pour la prochaine rentrée académique. Vous pouvez dès à présent déposer votre dossier d'admission ou contacter l'administration.
+                    Le catalogue des formations est actuellement en cours de mise à jour pour la prochaine rentrée académique.
                 </p>
                 <div class="mt-8 flex flex-wrap items-center justify-center gap-4">
                     <a
@@ -701,12 +876,6 @@ EMSI — École de Formation Audiovisuelle au cœur du Grand Théâtre National 
                         <span>Déposer ma candidature</span>
                         <x-lucide-arrow-up-right class="w-4 h-4" />
                     </a>
-                    <a
-                        href="{{ route('public.about') }}"
-                        class="inline-flex items-center gap-2 px-6 py-3.5 rounded-full bg-white/5 hover:bg-white/10 text-white text-xs font-semibold uppercase tracking-wider transition border border-white/10"
-                    >
-                        <span>En savoir plus sur l'école</span>
-                    </a>
                 </div>
             </div>
 
@@ -714,31 +883,54 @@ EMSI — École de Formation Audiovisuelle au cœur du Grand Théâtre National 
 
 
         {{-- =================================================
-             PIED DE SECTION / CALL TO ACTION
+             BANNIÈRE DE DÉCOUVERTE DU CATALOGUE COMPLET
         ================================================== --}}
-        <div class="mt-14 pt-10 border-t border-white/[0.08] flex flex-col sm:flex-row items-center justify-between gap-6">
+        <div class="mt-16 rounded-3xl bg-gradient-to-r from-[#14141d] via-[#101016] to-[#181226] border border-white/10 p-8 sm:p-10 shadow-2xl relative overflow-hidden">
+            
+            {{-- Lueur d'appoint dans la bannière --}}
+            <div class="absolute right-0 top-0 w-80 h-80 bg-[#F5B800]/10 rounded-full blur-3xl pointer-events-none"></div>
 
-            <div class="flex items-center gap-3 text-xs uppercase tracking-wider text-white/50 font-medium">
-                <span class="w-2 h-2 rounded-full bg-[#F5B800] animate-ping"></span>
-                <span>Inscriptions ouvertes pour la prochaine rentrée académique</span>
-            </div>
+            <div class="relative z-10 flex flex-col lg:flex-row lg:items-center justify-between gap-8">
+                <div class="max-w-2xl space-y-3">
+                    <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white/5 border border-white/10 text-[11px] font-mono text-[#F5B800] uppercase tracking-wider">
+                        <x-lucide-compass class="w-3.5 h-3.5 text-[#F5B800]" />
+                        <span>Catalogue Complet &bull; {{ $totalCoursesCount ?? 5 }} Filières Spécialisées</span>
+                    </div>
 
-            <div class="flex flex-wrap items-center gap-4">
-                <a
-                    href="{{ route('public.courses.index') }}"
-                    class="group inline-flex items-center gap-3 px-6 py-3.5 rounded-full bg-white/10 hover:bg-white hover:text-black text-white text-xs font-bold uppercase tracking-wider transition-all duration-300 border border-white/15"
-                >
-                    <span>Voir toutes les formations</span>
-                    <x-lucide-arrow-right class="w-4 h-4 transition-transform group-hover:translate-x-1" />
-                </a>
+                    <h3 class="text-2xl sm:text-3xl font-serif font-normal text-white">
+                        Découvrez l'ensemble de nos programmes diplômants
+                    </h3>
 
-                <a
-                    href="{{ route('public.admissions.create') }}"
-                    class="inline-flex items-center gap-2.5 px-6 py-3.5 rounded-full bg-[#F5B800] hover:bg-white text-black font-bold text-xs uppercase tracking-wider transition-all duration-300 shadow-[0_4px_20px_rgba(245,184,0,0.3)]"
-                >
-                    <span>Déposer ma candidature</span>
-                    <x-lucide-arrow-up-right class="w-4 h-4" />
-                </a>
+                    <p class="text-xs sm:text-sm text-white/65 leading-relaxed font-light">
+                        Explorez nos 5 filières (Ingénierie Son, Éclairage & Scénographie, Régie Générale, Infographie 3D et Cadrage Sportif) avec leurs modules détaillés, fiches techniques et débouchés.
+                    </p>
+
+                    <div class="pt-2 flex flex-wrap items-center gap-2 text-[11px]">
+                        <span class="px-2.5 py-1 rounded-lg bg-white/5 border border-white/10 text-white/80">Son & Live</span>
+                        <span class="px-2.5 py-1 rounded-lg bg-white/5 border border-white/10 text-white/80">Lumière GrandMA</span>
+                        <span class="px-2.5 py-1 rounded-lg bg-white/5 border border-white/10 text-white/80">Régie Générale</span>
+                        <span class="px-2.5 py-1 rounded-lg bg-white/5 border border-white/10 text-white/80">Motion 3D</span>
+                        <span class="px-2.5 py-1 rounded-lg bg-white/5 border border-white/10 text-white/80">Broadcast Sportif</span>
+                    </div>
+                </div>
+
+                <div class="flex flex-col sm:flex-row lg:flex-col xl:flex-row items-stretch sm:items-center gap-3 shrink-0">
+                    <a
+                        href="{{ route('public.courses.index') }}"
+                        class="inline-flex items-center justify-center gap-2.5 px-7 py-4 rounded-full bg-[#F5B800] hover:bg-white text-black font-bold text-xs sm:text-sm uppercase tracking-wider transition-all duration-300 shadow-[0_10px_25px_rgba(245,184,0,0.3)] hover:shadow-[0_15px_35px_rgba(255,255,255,0.4)]"
+                    >
+                        <span>Consulter toutes les formations</span>
+                        <x-lucide-arrow-right class="w-4 h-4" />
+                    </a>
+
+                    <a
+                        href="{{ route('public.admissions.create') }}"
+                        class="inline-flex items-center justify-center gap-2 px-6 py-4 rounded-full bg-white/5 hover:bg-white/10 text-white text-xs sm:text-sm font-semibold uppercase tracking-wider transition border border-white/15 hover:border-white/30"
+                    >
+                        <span>Candidater</span>
+                        <x-lucide-arrow-up-right class="w-4 h-4 text-white/70" />
+                    </a>
+                </div>
             </div>
 
         </div>

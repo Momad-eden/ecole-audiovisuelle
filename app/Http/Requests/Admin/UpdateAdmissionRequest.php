@@ -30,6 +30,7 @@ class UpdateAdmissionRequest extends FormRequest
             'previous_school' => ['nullable', 'string', 'max:255'],
             'academic_field'  => ['nullable', 'string', 'max:150'],
             'course_id'       => ['required', 'exists:courses,id'],
+            'volet'           => ['nullable', 'string', 'max:100'],
             'status'          => ['required', Rule::in(AdmissionStatus::values())],
             'message'         => ['nullable', 'string', 'max:5000'],
         ];

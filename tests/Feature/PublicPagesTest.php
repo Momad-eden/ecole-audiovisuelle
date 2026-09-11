@@ -21,6 +21,24 @@ class PublicPagesTest extends TestCase
         $response->assertViewIs('public.home');
     }
 
+    public function test_project_page_is_accessible(): void
+    {
+        $response = $this->get(route('public.project'));
+
+        $response->assertStatus(200);
+        $response->assertViewIs('public.project');
+        $response->assertSee('Grand Théâtre National');
+    }
+
+    public function test_vae_page_is_accessible(): void
+    {
+        $response = $this->get(route('public.vae'));
+
+        $response->assertStatus(200);
+        $response->assertViewIs('public.vae');
+        $response->assertSee('Dispositif VAE');
+    }
+
     public function test_about_page_is_accessible(): void
     {
         Partner::create([
@@ -62,6 +80,16 @@ class PublicPagesTest extends TestCase
             'slug' => 'montage-etalonnage',
             'description' => 'Maîtrisez Premiere Pro et DaVinci Resolve.',
             'category' => 'Post-production',
+            'duration' => '6 mois',
+            'price' => 450000,
+            'is_active' => true,
+        ]);
+
+        $relatedCourse = Course::create([
+            'title' => 'Effets Spéciaux & VFX',
+            'slug' => 'effets-speciaux-vfx',
+            'description' => 'Formation After Effects et 3D.',
+            'category' => 'Post-production',
             'is_active' => true,
         ]);
 
@@ -70,6 +98,8 @@ class PublicPagesTest extends TestCase
         $response->assertStatus(200);
         $response->assertViewIs('public.formation-show');
         $response->assertSee('Montage & Étalonnage');
+        $response->assertSee('Maîtrisez Premiere Pro et DaVinci Resolve.');
+        $response->assertSee('Effets Spéciaux & VFX');
     }
 
     public function test_gallery_page_is_accessible(): void

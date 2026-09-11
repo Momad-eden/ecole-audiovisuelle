@@ -16,9 +16,15 @@ class HomeController extends Controller
      */
     public function __invoke(): View
     {
-        $courses = Course::where('is_active', true)
+        $featuredCourses = Course::where('is_active', true)
             ->latest()
+            ->take(3)
             ->get();
+
+        $totalCoursesCount = Course::where('is_active', true)->count();
+
+        // Alias pour compatibilité
+        $courses = $featuredCourses;
 
         $galleries = Gallery::where('is_active', true)
             ->latest()
@@ -40,6 +46,8 @@ class HomeController extends Controller
 
         return view('public.home', compact(
             'courses',
+            'featuredCourses',
+            'totalCoursesCount',
             'galleries',
             'news',
             'partners'
