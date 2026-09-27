@@ -49,6 +49,10 @@ class UserResource extends Resource
                 Select::make('role')->label('Rôle')->options(UserRole::class)->required()
                     ->disabled(fn (?User $record) => $record?->is(auth()->user()))
                     ->helperText('Directeur : tout. Gestionnaire : scolarité, caisse, formations. Secrétaire : candidatures, étudiants, encaissements. Communication : site, univers et réalisations.'),
+                Select::make('place_id')->label('Campus de rattachement')
+                    ->relationship('place', 'name', fn ($query) => $query->where('kind', 'campus'))
+                    ->placeholder('Tous les campus')
+                    ->helperText('Vide : voit tous les campus (direction). Sinon, ne voit que la caisse, les étudiants et les candidatures de ce campus.'),
                 Toggle::make('is_active')->label('Compte actif')->default(true)->inline(false)
                     ->disabled(fn (?User $record) => $record?->is(auth()->user())),
                 TextInput::make('password')->label(fn (string $operation) => $operation === 'create' ? 'Mot de passe' : 'Nouveau mot de passe (laisser vide pour ne pas changer)')
@@ -66,6 +70,7 @@ class UserResource extends Resource
             ->columns([
                 TextColumn::make('name')->label('Nom')->searchable()->weight('bold'),
                 TextColumn::make('email')->label('E-mail')->searchable(),
+                TextColumn::make('place.city')->label('Campus')->placeholder('Tous'),
                 TextColumn::make('role')->label('Rôle')->formatStateUsing(fn (?string $state) => UserRole::tryFrom((string) $state)?->getLabel() ?? 'Sans rôle')->badge(),
                 IconColumn::make('is_active')->label('Actif')->boolean(),
                 TextColumn::make('created_at')->label('Créé le')->date('d/m/Y'),

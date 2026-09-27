@@ -147,7 +147,7 @@ class CashRegisterTest extends TestCase
         $this->tuition($enrollment, 300000, ['occurred_on' => '2026-09-10']);
         $this->expense(50000, ['occurred_on' => '2026-09-15']);
 
-        $closing = $this->cash->close(Carbon::parse('2026-09-30'), 250000, $this->gestionnaire);
+        $closing = $this->cash->close(null, Carbon::parse('2026-09-30'), 250000, $this->gestionnaire);
 
         $this->assertSame(0, $closing->opening_balance);
         $this->assertSame(300000, $closing->total_in);
@@ -163,10 +163,10 @@ class CashRegisterTest extends TestCase
     {
         Carbon::setTestNow('2026-10-31 18:00');
         $this->expense(10000, ['occurred_on' => '2026-09-05']);
-        $this->cash->close(Carbon::parse('2026-09-30'), null, $this->gestionnaire);
+        $this->cash->close(null, Carbon::parse('2026-09-30'), null, $this->gestionnaire);
         $this->expense(5000, ['occurred_on' => '2026-10-05']);
 
-        $closing = $this->cash->close(Carbon::parse('2026-10-31'), null, $this->gestionnaire);
+        $closing = $this->cash->close(null, Carbon::parse('2026-10-31'), null, $this->gestionnaire);
 
         $this->assertSame('2026-10-01', $closing->period_start->toDateString());
         $this->assertSame(-10000, $closing->opening_balance);

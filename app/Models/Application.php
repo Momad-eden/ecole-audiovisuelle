@@ -5,6 +5,7 @@ namespace App\Models;
 use App\Enums\ApplicationStatus;
 use App\Enums\Audience;
 use App\Enums\Gender;
+use App\Models\Concerns\BelongsToCampus;
 use App\Services\SequenceService;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
@@ -17,7 +18,9 @@ use Illuminate\Support\Str;
 /** Candidature à une offre (école ou programme professionnel). */
 class Application extends Model
 {
-    use HasFactory, SoftDeletes;
+    use BelongsToCampus, HasFactory, SoftDeletes;
+
+    protected $attributes = ['place_id' => null];
 
     protected $fillable = [
         'uuid', 'offering_id', 'place_id', 'audience', 'first_name', 'last_name', 'birth_date', 'birth_place', 'gender', 'nationality',
@@ -70,12 +73,6 @@ class Application extends Model
     public function offering(): BelongsTo
     {
         return $this->belongsTo(Offering::class);
-    }
-
-    /** Campus choisi par le candidat (Dakar, Saint-Louis…). */
-    public function place(): BelongsTo
-    {
-        return $this->belongsTo(Place::class);
     }
 
     public function student(): BelongsTo

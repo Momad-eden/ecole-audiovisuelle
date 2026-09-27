@@ -44,7 +44,11 @@ class PlaceResource extends Resource
         return $schema->columns(1)->components([
             Section::make('Lieu')->description('Campus de l\'EMSI, studio ou centre culturel : ses coordonnées s\'affichent sur le site.')->columns(2)->schema([
                 TextInput::make('name')->label('Nom')->required()->maxLength(120),
-                Select::make('kind')->label('Type')->options(PlaceKind::class)->required(),
+                Select::make('kind')->label('Type')->options(PlaceKind::class)->required()->live(),
+                TextInput::make('code')->label('Code de caisse')->maxLength(5)->alphaNum()->unique(ignoreRecord: true)
+                    ->placeholder('Ex. DKR')->helperText('Campus : préfixe des reçus (REC-DKR-2026-00001). Ne plus le changer après la première opération.')
+                    ->dehydrateStateUsing(fn (?string $state) => $state ? strtoupper($state) : null)
+                    ->visible(fn ($get) => ($get('kind') instanceof PlaceKind ? $get('kind')->value : $get('kind')) === 'campus'),
                 TextInput::make('city')->label('Ville')->maxLength(80),
                 TextInput::make('address')->label('Adresse')->maxLength(255),
                 TextInput::make('phone')->label('Téléphone')->tel()->maxLength(30),

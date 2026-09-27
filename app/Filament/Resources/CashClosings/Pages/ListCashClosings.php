@@ -4,7 +4,9 @@ namespace App\Filament\Resources\CashClosings\Pages;
 
 use App\Exceptions\BusinessRuleException;
 use App\Filament\Resources\CashClosings\CashClosingResource;
+use App\Filament\Support\Fields;
 use App\Models\CashClosing;
+use App\Models\Place;
 use App\Services\CashRegister;
 use Filament\Actions\Action;
 use Filament\Forms\Components\DatePicker;
@@ -25,13 +27,14 @@ class ListCashClosings extends ListRecords
                 ->visible(fn () => auth()->user()->can('create', CashClosing::class))
                 ->modalDescription('Après clôture, plus aucune opération ne pourra être enregistrée ou annulée à une date de la période.')
                 ->schema([
+                    Fields::campus('place_id', 'Caisse à clôturer'),
                     DatePicker::make('period_end')->label('Clôturer jusqu\'au (inclus)')->default(now()->subMonthNoOverflow()->endOfMonth())->maxDate(now())->required(),
                     TextInput::make('counted_cash')->label('Espèces comptées dans la caisse (facultatif)')->integer()->suffix('FCFA'),
                     Textarea::make('notes')->label('Observations')->rows(2),
                 ])
                 ->action(function (array $data) {
                     try {
-                        $closing = app(CashRegister::class)->close(Carbon::parse($data['period_end']), isset($data['counted_cash']) ? (int) $data['counted_cash'] : null, auth()->user(), $data['notes'] ?? null);
+                        $closing = app(CashRegister::class)->close(Place::find(auth()->user()->place_id ?? $data['place_id'] ?? Place::campuses()->value('id')), Carbon::parse($data['period_end']), isset($data['counted_cash']) ? (int) $data['counted_cash'] : null, auth()->user(), $data['notes'] ?? null);
                         Notification::make()->title('Période clôturée au '.$closing->period_end->format('d/m/Y').'.')->success()->send();
                     } catch (BusinessRuleException $e) {
                         Notification::make()->title($e->getMessage())->danger()->send();

@@ -11,6 +11,7 @@ use Filament\Resources\Resource;
 use Filament\Support\Icons\Heroicon;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Table;
+use Illuminate\Database\Eloquent\Builder;
 
 class CashClosingResource extends Resource
 {
@@ -35,6 +36,7 @@ class CashClosingResource extends Resource
         return $table
             ->defaultSort('period_end', 'desc')
             ->columns([
+                TextColumn::make('place.name')->label('Caisse')->placeholder('—')->visible(fn () => ! auth()->user()?->place_id),
                 TextColumn::make('period_start')->label('Du')->date('d/m/Y'),
                 TextColumn::make('period_end')->label('Au')->date('d/m/Y'),
                 TextColumn::make('opening_balance')->label('Solde d\'ouverture')->formatStateUsing($money),
@@ -51,5 +53,11 @@ class CashClosingResource extends Resource
     public static function getPages(): array
     {
         return ['index' => ListCashClosings::route('/')];
+    }
+
+    /** Le personnel rattaché à un campus ne voit que les données de son campus. */
+    public static function getEloquentQuery(): Builder
+    {
+        return parent::getEloquentQuery()->visibleTo(auth()->user());
     }
 }

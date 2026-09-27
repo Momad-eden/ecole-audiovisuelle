@@ -8,6 +8,7 @@ use App\Enums\TransactionCategory;
 use App\Filament\Resources\CashTransactions\Pages\CreateCashTransaction;
 use App\Filament\Resources\CashTransactions\Pages\ListCashTransactions;
 use App\Filament\Resources\CashTransactions\Pages\ViewCashTransaction;
+use App\Filament\Support\Fields;
 use App\Filament\Support\FrenchLabels;
 use App\Models\CashTransaction;
 use App\Models\Enrollment;
@@ -69,6 +70,8 @@ class CashTransactionResource extends Resource
     {
         return $schema->columns(1)->components([
             Section::make('Opération')->columns(2)->schema([
+                Fields::campus('place_id', 'Caisse (campus)')->columnSpanFull()
+                    ->helperText('Un paiement de scolarité va automatiquement dans la caisse du campus de l\'étudiant.'),
                 Radio::make('direction')->label('Nature')
                     ->options([CashDirection::IN->value => 'Encaissement (entrée d\'argent)', CashDirection::OUT->value => 'Décaissement (dépense)'])
                     ->default(CashDirection::IN->value)->required()->live()->inline()->columnSpanFull(),
@@ -118,11 +121,12 @@ class CashTransactionResource extends Resource
     public static function table(Table $table): Table
     {
         return $table
-            ->modifyQueryUsing(fn (Builder $query) => $query->with(['enrollment.student']))
+            ->modifyQueryUsing(fn (Builder $query) => $query->with(['enrollment.student', 'place']))
             ->defaultSort('id', 'desc')
             ->columns([
                 TextColumn::make('occurred_on')->label('Date')->date('d/m/Y')->sortable(),
                 TextColumn::make('number')->label('N°')->searchable(),
+                TextColumn::make('place.name')->label('Caisse')->placeholder('—')->visible(fn () => ! auth()->user()?->place_id)->toggleable(),
                 TextColumn::make('label')->label('Libellé')->searchable()->wrap()
                     ->description(fn (CashTransaction $r) => $r->enrollment?->student?->student_number),
                 TextColumn::make('category')->label('Catégorie')->toggleable(),
@@ -133,6 +137,8 @@ class CashTransactionResource extends Resource
                 TextColumn::make('cancelled_at')->label('')->formatStateUsing(fn ($state) => $state ? 'Annulée' : null)->badge()->color('gray'),
             ])
             ->filters([
+                SelectFilter::make('place_id')->label('Caisse (campus)')->relationship('place', 'name', fn (Builder $query) => $query->where('kind', 'campus'))
+                    ->visible(fn () => ! auth()->user()?->place_id),
                 SelectFilter::make('direction')->label('Nature')->options(CashDirection::class),
                 SelectFilter::make('category')->label('Catégorie')->options(TransactionCategory::class),
                 SelectFilter::make('method')->label('Moyen')->options(PaymentMethod::class),
@@ -156,5 +162,11 @@ class CashTransactionResource extends Resource
             'create' => CreateCashTransaction::route('/create'),
             'view' => ViewCashTransaction::route('/{record}'),
         ];
+    }
+
+    /** Le personnel rattaché à un campus ne voit que les données de son campus. */
+    public static function getEloquentQuery(): Builder
+    {
+        return parent::getEloquentQuery()->visibleTo(auth()->user());
     }
 }

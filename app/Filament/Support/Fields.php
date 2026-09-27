@@ -3,6 +3,7 @@
 namespace App\Filament\Support;
 
 use App\Enums\PublicationStatus;
+use App\Models\Place;
 use Filament\Forms\Components\DateTimePicker;
 use Filament\Forms\Components\FileUpload;
 use Filament\Forms\Components\Select;
@@ -46,5 +47,20 @@ final class Fields
             TextInput::make('seo.title')->label('Titre affiché dans Google')->maxLength(70),
             Textarea::make('seo.description')->label('Description affichée dans Google')->maxLength(160)->rows(2),
         ]);
+    }
+
+    /**
+     * Choix du campus (caisse, étudiant). Masqué pour le personnel rattaché à un campus
+     * (le sien s'applique) et quand l'école n'a qu'un campus.
+     */
+    public static function campus(string $field = 'place_id', string $label = 'Campus'): Select
+    {
+        $campuses = fn () => Place::campuses()->orderBy('position')->pluck('name', 'id')->all();
+
+        return Select::make($field)->label($label)
+            ->options($campuses)
+            ->default(fn () => auth()->user()?->place_id ?? (count($campuses()) === 1 ? array_key_first($campuses()) : null))
+            ->visible(fn () => ! auth()->user()?->place_id && count($campuses()) > 1)
+            ->required(fn () => ! auth()->user()?->place_id && count($campuses()) > 1);
     }
 }

@@ -5,6 +5,7 @@ namespace App\Models;
 use App\Enums\CashDirection;
 use App\Enums\PaymentMethod;
 use App\Enums\TransactionCategory;
+use App\Models\Concerns\BelongsToCampus;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -17,10 +18,10 @@ use LogicException;
  */
 class CashTransaction extends Model
 {
-    use HasFactory;
+    use BelongsToCampus, HasFactory;
 
     protected $fillable = [
-        'number', 'direction', 'category', 'amount', 'method', 'external_reference', 'occurred_on', 'enrollment_id',
+        'place_id', 'number', 'direction', 'category', 'amount', 'method', 'external_reference', 'occurred_on', 'enrollment_id',
         'payee', 'label', 'notes', 'reverses_id', 'cancelled_at', 'cancel_reason', 'created_by',
     ];
 

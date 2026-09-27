@@ -250,4 +250,10 @@ class ApplicationResource extends Resource
             'edit' => EditApplication::route('/{record}/edit'),
         ];
     }
+
+    /** Le personnel rattaché à un campus ne voit que les données de son campus. */
+    public static function getEloquentQuery(): Builder
+    {
+        return parent::getEloquentQuery()->visibleTo(auth()->user());
+    }
 }
