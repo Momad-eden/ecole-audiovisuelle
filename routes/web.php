@@ -1,31 +1,27 @@
 <?php
 
-use Illuminate\Support\Facades\Route;
-
-use App\Http\Controllers\ProfileController;
-
+use App\Http\Controllers\Admin\AdmissionController;
+use App\Http\Controllers\Admin\CourseController;
 // Controllers Admin
 use App\Http\Controllers\Admin\DashboardController;
-use App\Http\Controllers\Admin\CourseController;
-use App\Http\Controllers\Admin\StudentController;
-use App\Http\Controllers\Admin\AdmissionController;
-use App\Http\Controllers\Admin\PaymentController;
 use App\Http\Controllers\Admin\GalleryController;
 use App\Http\Controllers\Admin\NewsController;
 use App\Http\Controllers\Admin\PartnerController;
+use App\Http\Controllers\Admin\PaymentController;
 use App\Http\Controllers\Admin\SettingController;
+use App\Http\Controllers\Admin\StudentController;
 use App\Http\Controllers\Admin\UserController;
-
-// Controllers Public
-use App\Http\Controllers\Public\HomeController as PublicHomeController;
+use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\Public\AboutController as PublicAboutController;
+// Controllers Public
+use App\Http\Controllers\Public\AdmissionController as PublicAdmissionController;
 use App\Http\Controllers\Public\CourseController as PublicCourseController;
 use App\Http\Controllers\Public\GalleryController as PublicGalleryController;
+use App\Http\Controllers\Public\HomeController as PublicHomeController;
 use App\Http\Controllers\Public\NewsController as PublicNewsController;
-use App\Http\Controllers\Public\AdmissionController as PublicAdmissionController;
 use App\Http\Controllers\Public\ProjectController as PublicProjectController;
 use App\Http\Controllers\Public\VaeController as PublicVaeController;
-
+use Illuminate\Support\Facades\Route;
 
 /*
 |--------------------------------------------------------------------------
@@ -56,7 +52,6 @@ Route::get('/galerie', [PublicGalleryController::class, 'index'])->name('public.
 Route::get('/actualites', [PublicNewsController::class, 'index'])->name('public.news.index');
 Route::get('/actualites/{news:slug}', [PublicNewsController::class, 'show'])->name('public.news.show');
 
-
 /*
 |--------------------------------------------------------------------------
 | CANDIDATURES PUBLIQUES
@@ -66,7 +61,6 @@ Route::get('/actualites/{news:slug}', [PublicNewsController::class, 'show'])->na
 | d'administration.
 |
 */
-
 
 /*
 |--------------------------------------------------------------------------
@@ -78,12 +72,11 @@ Route::get(
     '/admission',
     [
         PublicAdmissionController::class,
-        'create'
+        'create',
     ]
 )->name('public.admissions.create');
 
 Route::redirect('/candidater', '/admission', 301);
-
 
 /*
 |--------------------------------------------------------------------------
@@ -95,10 +88,9 @@ Route::post(
     '/admission',
     [
         PublicAdmissionController::class,
-        'store'
+        'store',
     ]
 )->middleware('throttle:admissions')->name('public.admissions.store');
-
 
 /*
 |--------------------------------------------------------------------------
@@ -110,11 +102,9 @@ Route::get(
     '/admission/succes',
     [
         PublicAdmissionController::class,
-        'success'
+        'success',
     ]
 )->name('public.admissions.success');
-
-
 
 /*
 |--------------------------------------------------------------------------
@@ -125,9 +115,7 @@ Route::get(
 |
 */
 
-
 Route::middleware(['auth'])->group(function () {
-
 
     /*
     |--------------------------------------------------------------------------
@@ -147,8 +135,6 @@ Route::middleware(['auth'])->group(function () {
         );
     });
 
-
-
     /*
     |--------------------------------------------------------------------------
     | DIRECTEUR + GESTIONNAIRE
@@ -158,7 +144,6 @@ Route::middleware(['auth'])->group(function () {
     Route::middleware(
         'role:directeur,gestionnaire'
     )->group(function () {
-
 
         /*
         |--------------------------------------------------------------------------
@@ -171,7 +156,6 @@ Route::middleware(['auth'])->group(function () {
             CourseController::class
         );
 
-
         /*
         |--------------------------------------------------------------------------
         | Étudiants
@@ -182,7 +166,6 @@ Route::middleware(['auth'])->group(function () {
             'students',
             StudentController::class
         );
-
 
         /*
         |--------------------------------------------------------------------------
@@ -216,7 +199,6 @@ Route::middleware(['auth'])->group(function () {
             [AdmissionController::class, 'reject']
         )->name('admissions.reject');
 
-
         /*
         |--------------------------------------------------------------------------
         | Transformer une admission en étudiant
@@ -227,10 +209,9 @@ Route::middleware(['auth'])->group(function () {
             '/admissions/{admission}/enroll',
             [
                 AdmissionController::class,
-                'enroll'
+                'enroll',
             ]
         )->name('admissions.enroll');
-
 
         /*
         |--------------------------------------------------------------------------
@@ -259,8 +240,6 @@ Route::middleware(['auth'])->group(function () {
         );
     });
 
-
-
     /*
     |--------------------------------------------------------------------------
     | DIRECTEUR + COMMUNICATION
@@ -270,7 +249,6 @@ Route::middleware(['auth'])->group(function () {
     Route::middleware(
         'role:directeur,communication'
     )->group(function () {
-
 
         /*
         |--------------------------------------------------------------------------
@@ -283,7 +261,6 @@ Route::middleware(['auth'])->group(function () {
             GalleryController::class
         );
 
-
         /*
         |--------------------------------------------------------------------------
         | Actualités
@@ -294,7 +271,6 @@ Route::middleware(['auth'])->group(function () {
             'news',
             NewsController::class
         );
-
 
         /*
         |--------------------------------------------------------------------------
@@ -308,8 +284,6 @@ Route::middleware(['auth'])->group(function () {
         );
     });
 
-
-
     /*
     |--------------------------------------------------------------------------
     | DIRECTEUR UNIQUEMENT
@@ -319,7 +293,6 @@ Route::middleware(['auth'])->group(function () {
     Route::middleware(
         'role:directeur'
     )->group(function () {
-
 
         /*
         |--------------------------------------------------------------------------
@@ -331,21 +304,18 @@ Route::middleware(['auth'])->group(function () {
             '/settings',
             [
                 SettingController::class,
-                'index'
+                'index',
             ]
         )->name('settings.index');
-
 
         Route::put(
             '/settings',
             [
                 SettingController::class,
-                'update'
+                'update',
             ]
         )->name('settings.update');
     });
-
-
 
     /*
     |--------------------------------------------------------------------------
@@ -357,44 +327,40 @@ Route::middleware(['auth'])->group(function () {
         'role:directeur,gestionnaire,secretaire,communication'
     )->group(function () {
 
+        /*
+        | Dashboard
+        */
 
-    /*
-    | Dashboard
-    */
+        Route::get(
+            '/dashboard',
+            [
+                DashboardController::class,
+                'index',
+            ]
+        )->name('dashboard');
 
-    Route::get(
-        '/dashboard',
-        [
-            DashboardController::class,
-            'index'
-        ]
-    )->name('dashboard');
+        /*
+        | Profil
+        */
 
+        Route::get(
+            '/profile',
+            [
+                ProfileController::class,
+                'edit',
+            ]
+        )->name('profile.edit');
 
-    /*
-    | Profil
-    */
-
-    Route::get(
-        '/profile',
-        [
-            ProfileController::class,
-            'edit'
-        ]
-    )->name('profile.edit');
-
-
-    Route::patch(
-        '/profile',
-        [
-            ProfileController::class,
-            'update'
-        ]
-    )->name('profile.update');
+        Route::patch(
+            '/profile',
+            [
+                ProfileController::class,
+                'update',
+            ]
+        )->name('profile.update');
 
     });
 });
-
 
 /*
 |--------------------------------------------------------------------------
@@ -402,4 +368,4 @@ Route::middleware(['auth'])->group(function () {
 |--------------------------------------------------------------------------
 */
 
-require __DIR__ . '/auth.php';
+require __DIR__.'/auth.php';

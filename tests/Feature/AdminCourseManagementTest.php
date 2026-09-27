@@ -17,6 +17,7 @@ class AdminCourseManagementTest extends TestCase
     use RefreshDatabase;
 
     protected User $directeur;
+
     protected User $gestionnaire;
 
     protected function setUp(): void
@@ -96,15 +97,15 @@ class AdminCourseManagementTest extends TestCase
 
         $response = $this->actingAs($this->directeur)
             ->post(route('courses.store'), [
-                'title'          => 'Régie Générale Spectacle',
-                'category'       => 'Régie & Management Technique',
-                'level'          => 'Perfectionnement intensif & BTS Bac+2 (VAE)',
-                'duration'       => '3 à 9 mois',
+                'title' => 'Régie Générale Spectacle',
+                'category' => 'Régie & Management Technique',
+                'level' => 'Perfectionnement intensif & BTS Bac+2 (VAE)',
+                'duration' => '3 à 9 mois',
                 'students_count' => 25,
-                'price'          => 450000,
-                'description'    => 'Cursus de management technique de spectacles.',
-                'image'          => $image,
-                'is_active'      => '1',
+                'price' => 450000,
+                'description' => 'Cursus de management technique de spectacles.',
+                'image' => $image,
+                'is_active' => '1',
             ]);
 
         $course = Course::where('title', 'Régie Générale Spectacle')->first();
@@ -121,35 +122,35 @@ class AdminCourseManagementTest extends TestCase
     public function test_admin_can_view_course_360_show_page_with_students_and_admissions(): void
     {
         $course = Course::factory()->create([
-            'title'          => 'Infographie et Création Numérique',
+            'title' => 'Infographie et Création Numérique',
             'students_count' => 20,
-            'price'          => 500000,
-            'is_active'      => true,
+            'price' => 500000,
+            'is_active' => true,
         ]);
 
         $student = Student::factory()->create([
-            'course_id'   => $course->id,
-            'first_name'  => 'Mamadou',
-            'last_name'   => 'Ba',
+            'course_id' => $course->id,
+            'first_name' => 'Mamadou',
+            'last_name' => 'Ba',
         ]);
 
         Payment::create([
-            'reference'      => 'REC-TEST-001',
+            'reference' => 'REC-TEST-001',
             'receipt_number' => 'REC-TEST-001',
-            'student_id'     => $student->id,
-            'amount'         => 200000,
-            'type'           => 'inflow',
-            'category'       => 'scolarite',
+            'student_id' => $student->id,
+            'amount' => 200000,
+            'type' => 'inflow',
+            'category' => 'scolarite',
             'payment_method' => 'especes',
-            'payment_date'   => now(),
+            'payment_date' => now(),
         ]);
 
         $admission = Admission::factory()->create([
-            'course_id'   => $course->id,
-            'first_name'  => 'Amina',
-            'last_name'   => 'Sarr',
-            'volet'       => 'volet2',
-            'status'      => 'pending',
+            'course_id' => $course->id,
+            'first_name' => 'Amina',
+            'last_name' => 'Sarr',
+            'volet' => 'volet2',
+            'status' => 'pending',
         ]);
 
         $response = $this->actingAs($this->directeur)
@@ -173,14 +174,14 @@ class AdminCourseManagementTest extends TestCase
 
         $response = $this->actingAs($this->directeur)
             ->put(route('courses.update', $course), [
-                'title'          => 'Nouveau Titre Formation',
-                'category'       => 'Nouveau Métier',
-                'level'          => 'BTS',
-                'duration'       => '6 mois',
+                'title' => 'Nouveau Titre Formation',
+                'category' => 'Nouveau Métier',
+                'level' => 'BTS',
+                'duration' => '6 mois',
                 'students_count' => 30,
-                'price'          => 250000,
-                'description'    => 'Nouvelle description.',
-                'is_active'      => '1',
+                'price' => 250000,
+                'description' => 'Nouvelle description.',
+                'is_active' => '1',
             ]);
 
         $course->refresh();

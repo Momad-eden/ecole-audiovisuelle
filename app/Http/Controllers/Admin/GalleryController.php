@@ -33,10 +33,10 @@ class GalleryController extends Controller
         $validated = $request->validated();
 
         $data = [
-            'title'       => $validated['title'],
-            'type'        => $validated['type'],
+            'title' => $validated['title'],
+            'type' => $validated['type'],
             'description' => $validated['description'] ?? null,
-            'is_active'   => $request->boolean('is_active'),
+            'is_active' => $request->boolean('is_active'),
         ];
 
         if ($request->input('type') === 'image' && $request->hasFile('file')) {
@@ -69,10 +69,10 @@ class GalleryController extends Controller
         $validated = $request->validated();
 
         $data = [
-            'title'       => $validated['title'],
-            'type'        => $validated['type'],
+            'title' => $validated['title'],
+            'type' => $validated['type'],
             'description' => $validated['description'] ?? null,
-            'is_active'   => $request->boolean('is_active'),
+            'is_active' => $request->boolean('is_active'),
         ];
 
         if ($request->input('type') === 'image') {

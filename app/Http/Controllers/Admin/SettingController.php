@@ -19,7 +19,7 @@ class SettingController extends Controller
     {
         $settings = Setting::first();
 
-        if (!$settings) {
+        if (! $settings) {
             $settings = Setting::create([
                 'school_name' => 'École de Formation Audiovisuelle',
             ]);
@@ -30,7 +30,7 @@ class SettingController extends Controller
 
     public function update(UpdateSettingRequest $request): RedirectResponse
     {
-        $settings = Setting::first() ?? new Setting();
+        $settings = Setting::first() ?? new Setting;
 
         $validated = $request->validated();
 

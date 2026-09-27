@@ -32,9 +32,9 @@ class UserController extends Controller
         $validated = $request->validated();
 
         User::create([
-            'name'     => $validated['name'],
-            'email'    => $validated['email'],
-            'role'     => $validated['role'],
+            'name' => $validated['name'],
+            'email' => $validated['email'],
+            'role' => $validated['role'],
             'password' => Hash::make($validated['password']),
         ]);
 
@@ -63,7 +63,7 @@ class UserController extends Controller
         $user->email = $validated['email'];
         $user->role = $validated['role'];
 
-        if (!empty($validated['password'])) {
+        if (! empty($validated['password'])) {
             $user->password = Hash::make($validated['password']);
         }
 

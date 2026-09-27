@@ -18,16 +18,16 @@ class CourseFactory extends Factory
         $title = fake()->unique()->words(3, true);
 
         return [
-            'title'          => ucfirst($title),
-            'slug'           => Str::slug($title),
-            'category'       => fake()->randomElement(['Audiovisuel', 'Son', 'Montage', 'Photographie']),
-            'description'    => fake()->paragraph(),
-            'duration'       => fake()->randomElement(['6 mois', '1 an', '2 ans']),
-            'level'          => fake()->randomElement(['Débutant', 'Intermédiaire', 'Avancé']),
+            'title' => ucfirst($title),
+            'slug' => Str::slug($title),
+            'category' => fake()->randomElement(['Audiovisuel', 'Son', 'Montage', 'Photographie']),
+            'description' => fake()->paragraph(),
+            'duration' => fake()->randomElement(['6 mois', '1 an', '2 ans']),
+            'level' => fake()->randomElement(['Débutant', 'Intermédiaire', 'Avancé']),
             'students_count' => fake()->numberBetween(5, 30),
-            'price'          => fake()->randomFloat(2, 200000, 1500000),
-            'image'          => null,
-            'is_active'      => true,
+            'price' => fake()->randomFloat(2, 200000, 1500000),
+            'image' => null,
+            'is_active' => true,
         ];
     }
 }

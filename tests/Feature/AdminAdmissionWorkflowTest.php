@@ -73,28 +73,28 @@ class AdminAdmissionWorkflowTest extends TestCase
         $course = Course::factory()->create(['is_active' => true]);
 
         $admission = Admission::factory()->create([
-            'course_id'   => $course->id,
-            'status'      => AdmissionStatus::APPROVED->value,
-            'gender'      => 'M',
-            'first_name'  => 'Moussa',
-            'last_name'   => 'Ndiaye',
-            'student_id'  => null,
+            'course_id' => $course->id,
+            'status' => AdmissionStatus::APPROVED->value,
+            'gender' => 'M',
+            'first_name' => 'Moussa',
+            'last_name' => 'Ndiaye',
+            'student_id' => null,
         ]);
 
         $response = $this->actingAs($this->adminUser)->post(route('admissions.enroll', $admission));
 
         $this->assertDatabaseHas('students', [
             'first_name' => 'Moussa',
-            'last_name'  => 'Ndiaye',
-            'gender'     => Gender::HOMME->value, // Homme (not M)
-            'status'     => StudentStatus::INSCRIT->value,
-            'course_id'  => $course->id,
+            'last_name' => 'Ndiaye',
+            'gender' => Gender::HOMME->value, // Homme (not M)
+            'status' => StudentStatus::INSCRIT->value,
+            'course_id' => $course->id,
         ]);
 
         $student = Student::where('first_name', 'Moussa')->first();
 
         $this->assertNotNull($student);
-        $this->assertStringStartsWith('EMSI-' . date('Y') . '-', $student->student_number);
+        $this->assertStringStartsWith('EMSI-'.date('Y').'-', $student->student_number);
         $this->assertEquals($student->id, $admission->fresh()->student_id);
 
         $response->assertRedirect(route('students.show', $student));

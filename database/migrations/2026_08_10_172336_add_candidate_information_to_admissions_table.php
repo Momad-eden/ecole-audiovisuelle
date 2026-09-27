@@ -32,7 +32,6 @@ return new class extends Migration
                 ->nullable()
                 ->after('nationality');
 
-
             // Parcours académique
 
             $table->string('last_diploma')

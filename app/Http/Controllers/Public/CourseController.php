@@ -48,7 +48,7 @@ class CourseController extends Controller
 
         $relatedCourses = Course::where('is_active', true)
             ->where('id', '!=', $course->id)
-            ->when($course->category, fn($q) => $q->where('category', $course->category))
+            ->when($course->category, fn ($q) => $q->where('category', $course->category))
             ->take(3)
             ->get();
 

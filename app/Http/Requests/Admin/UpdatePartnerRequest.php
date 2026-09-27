@@ -14,11 +14,11 @@ class UpdatePartnerRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'name'        => ['required', 'string', 'max:255'],
-            'website'     => ['nullable', 'url', 'max:255'],
-            'logo'        => ['nullable', 'image', 'mimes:jpg,jpeg,png,webp,svg', 'max:5120'],
+            'name' => ['required', 'string', 'max:255'],
+            'website' => ['nullable', 'url', 'max:255'],
+            'logo' => ['nullable', 'image', 'mimes:jpg,jpeg,png,webp,svg', 'max:5120'],
             'description' => ['nullable', 'string'],
-            'is_active'   => ['nullable', 'boolean'],
+            'is_active' => ['nullable', 'boolean'],
         ];
     }
 }

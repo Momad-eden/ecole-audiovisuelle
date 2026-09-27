@@ -14,10 +14,10 @@ class UpdateGalleryRequest extends FormRequest
     public function rules(): array
     {
         $rules = [
-            'title'       => ['required', 'string', 'max:255'],
-            'type'        => ['required', 'in:image,video'],
+            'title' => ['required', 'string', 'max:255'],
+            'type' => ['required', 'in:image,video'],
             'description' => ['nullable', 'string'],
-            'is_active'   => ['nullable', 'boolean'],
+            'is_active' => ['nullable', 'boolean'],
         ];
 
         if ($this->input('type') === 'image') {

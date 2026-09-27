@@ -10,6 +10,7 @@ use App\Models\Admission;
 use App\Models\Course;
 use App\Services\AdmissionService;
 use Illuminate\Http\RedirectResponse;
+use Illuminate\Http\Request;
 use Illuminate\View\View;
 use InvalidArgumentException;
 
@@ -22,7 +23,7 @@ class AdmissionController extends Controller
     /**
      * Liste des demandes d'admission avec filtres de recherche.
      */
-    public function index(\Illuminate\Http\Request $request): View
+    public function index(Request $request): View
     {
         $query = Admission::with('course');
 
@@ -54,8 +55,8 @@ class AdmissionController extends Controller
             ->withQueryString();
 
         $statistics = [
-            'total'    => Admission::count(),
-            'pending'  => Admission::where('status', AdmissionStatus::PENDING->value)->count(),
+            'total' => Admission::count(),
+            'pending' => Admission::where('status', AdmissionStatus::PENDING->value)->count(),
             'approved' => Admission::where('status', AdmissionStatus::APPROVED->value)->count(),
             'rejected' => Admission::where('status', AdmissionStatus::REJECTED->value)->count(),
         ];
@@ -88,7 +89,7 @@ class AdmissionController extends Controller
             ->where('is_active', true)
             ->first();
 
-        if (!$course) {
+        if (! $course) {
             return back()
                 ->withErrors(['course_id' => 'La formation sélectionnée n’est plus disponible.'])
                 ->withInput();
@@ -134,7 +135,7 @@ class AdmissionController extends Controller
             ->where('is_active', true)
             ->first();
 
-        if (!$course) {
+        if (! $course) {
             return back()
                 ->withErrors(['course_id' => 'La formation sélectionnée n’est plus disponible.'])
                 ->withInput();
@@ -168,7 +169,7 @@ class AdmissionController extends Controller
      */
     public function approve(Admission $admission): RedirectResponse
     {
-        if (!$this->admissionService->approve($admission)) {
+        if (! $this->admissionService->approve($admission)) {
             return back()->with('error', 'Cette candidature a déjà été traitée.');
         }
 
@@ -180,7 +181,7 @@ class AdmissionController extends Controller
      */
     public function reject(Admission $admission): RedirectResponse
     {
-        if (!$this->admissionService->reject($admission)) {
+        if (! $this->admissionService->reject($admission)) {
             return back()->with('error', 'Cette candidature a déjà été traitée.');
         }
 

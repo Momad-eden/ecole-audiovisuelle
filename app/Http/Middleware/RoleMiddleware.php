@@ -15,13 +15,13 @@ class RoleMiddleware
         ...$roles
     ): Response {
 
-        if (!Auth::check()) {
+        if (! Auth::check()) {
             abort(403);
         }
 
         $user = Auth::user();
 
-        if (!$user || !in_array($user->role, $roles, true)) {
+        if (! $user || ! in_array($user->role, $roles, true)) {
             abort(403, 'Vous n’avez pas l’autorisation d’accéder à cette section.');
         }
 

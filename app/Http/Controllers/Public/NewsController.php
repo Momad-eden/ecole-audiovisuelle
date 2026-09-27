@@ -32,7 +32,7 @@ class NewsController extends Controller
         $news = $query->latest('published_at')->paginate(9)->withQueryString();
 
         $featuredNews = null;
-        if (!$request->filled('search') && $news->currentPage() === 1 && $news->count() > 0) {
+        if (! $request->filled('search') && $news->currentPage() === 1 && $news->count() > 0) {
             $featuredNews = $news->first();
         }
 
