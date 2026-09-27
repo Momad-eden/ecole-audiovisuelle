@@ -349,9 +349,13 @@ Route::middleware(['auth'])->group(function () {
 
     /*
     |--------------------------------------------------------------------------
-    | TOUS LES UTILISATEURS CONNECTÉS
+    | TOUS LES UTILISATEURS CONNECTÉS AYANT UN RÔLE VALIDE
     |--------------------------------------------------------------------------
     */
+
+    Route::middleware(
+        'role:directeur,gestionnaire,secretaire,communication'
+    )->group(function () {
 
 
     /*
@@ -388,14 +392,7 @@ Route::middleware(['auth'])->group(function () {
         ]
     )->name('profile.update');
 
-
-    Route::delete(
-        '/profile',
-        [
-            ProfileController::class,
-            'destroy'
-        ]
-    )->name('profile.destroy');
+    });
 });
 
 

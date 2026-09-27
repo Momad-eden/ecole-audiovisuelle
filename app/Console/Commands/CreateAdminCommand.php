@@ -15,11 +15,17 @@ class CreateAdminCommand extends Command
      *
      * @var string
      */
-    protected $signature = 'make:admin 
-                            {--name= : Nom complet de l\'administrateur}
+    protected $signature = 'emsi:create-admin
+                            {--name= : Nom complet}
                             {--email= : Adresse email}
-                            {--password= : Mot de passe}
-                            {--role=directeur : Rôle (directeur, gestionnaire, secretaire, communication)}';
+                            {--role= : Rôle (directeur, gestionnaire, secretaire, communication)}';
+
+    /**
+     * Ancien nom conservé pour compatibilité.
+     *
+     * @var array<int, string>
+     */
+    protected $aliases = ['make:admin'];
 
     /**
      * The console command description.
@@ -43,33 +49,41 @@ class CreateAdminCommand extends Command
             0
         );
 
-        $password = $this->option('password') ?: $this->secret('Mot de passe (au moins 8 caractères)');
+        // Le mot de passe n'est jamais passé en option (il resterait dans l'historique du shell).
+        $password = $this->secret('Mot de passe (au moins 8 caractères)');
+
+        if ($password !== $this->secret('Confirmez le mot de passe')) {
+            $this->error('Les deux mots de passe ne correspondent pas.');
+
+            return self::FAILURE;
+        }
 
         $validator = Validator::make([
-            'name'     => $name,
-            'email'    => $email,
+            'name' => $name,
+            'email' => $email,
             'password' => $password,
-            'role'     => $role,
+            'role' => $role,
         ], [
-            'name'     => ['required', 'string', 'max:255'],
-            'email'    => ['required', 'string', 'email', 'max:255', 'unique:users,email'],
+            'name' => ['required', 'string', 'max:255'],
+            'email' => ['required', 'string', 'email', 'max:255', 'unique:users,email'],
             'password' => ['required', 'string', 'min:8'],
-            'role'     => ['required', 'string', 'in:' . implode(',', UserRole::values())],
+            'role' => ['required', 'string', 'in:'.implode(',', UserRole::values())],
         ]);
 
         if ($validator->fails()) {
             $this->error('Erreurs de validation :');
             foreach ($validator->errors()->all() as $error) {
-                $this->error(' - ' . $error);
+                $this->error(' - '.$error);
             }
+
             return self::FAILURE;
         }
 
         $user = User::create([
-            'name'     => $name,
-            'email'    => $email,
+            'name' => $name,
+            'email' => $email,
             'password' => Hash::make($password),
-            'role'     => $role,
+            'role' => $role,
         ]);
 
         $this->newLine();
@@ -78,7 +92,7 @@ class CreateAdminCommand extends Command
             ['ID', 'Nom', 'Email', 'Rôle'],
             [[$user->id, $user->name, $user->email, $user->role]]
         );
-        $this->line('Vous pouvez maintenant vous connecter sur : <fg=yellow>' . url('/login') . '</>');
+        $this->line('Vous pouvez maintenant vous connecter sur : <fg=yellow>'.url('/login').'</>');
 
         return self::SUCCESS;
     }
