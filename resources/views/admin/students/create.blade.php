@@ -29,6 +29,17 @@
 
     </div>
 
+    @if ($errors->any())
+        <div class="bg-red-50 border border-red-200 text-red-700 rounded-xl p-5" role="alert">
+            <p class="font-semibold mb-2">Veuillez corriger les erreurs suivantes :</p>
+            <ul class="list-disc list-inside text-sm space-y-1">
+                @foreach ($errors->all() as $error)
+                    <li>{{ $error }}</li>
+                @endforeach
+            </ul>
+        </div>
+    @endif
+
     <form
         method="POST"
         action="{{ route('students.store') }}"
