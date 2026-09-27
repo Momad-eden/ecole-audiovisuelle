@@ -10,6 +10,7 @@ use App\Filament\Resources\Programs\Pages\EditProgram;
 use App\Filament\Resources\Programs\Pages\ListPrograms;
 use App\Filament\Resources\Programs\RelationManagers\CohortsRelationManager;
 use App\Filament\Support\Fields;
+use App\Filament\Support\FrenchLabels;
 use App\Models\Program;
 use BackedEnum;
 use Filament\Actions\EditAction;
@@ -33,6 +34,8 @@ use Illuminate\Database\Eloquent\SoftDeletingScope;
 
 class ProgramResource extends Resource
 {
+    use FrenchLabels;
+
     protected static ?string $model = Program::class;
 
     protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedAcademicCap;
@@ -51,7 +54,7 @@ class ProgramResource extends Resource
 
     public static function form(Schema $schema): Schema
     {
-        return $schema->components([
+        return $schema->columns(1)->components([
             Tabs::make()->columnSpanFull()->persistTabInQueryString()->tabs([
                 Tab::make('Présentation')->schema([
                     Section::make()->columns(2)->schema([

@@ -5,6 +5,7 @@ namespace App\Filament\Resources\MenuItems;
 use App\Filament\Resources\MenuItems\Pages\CreateMenuItem;
 use App\Filament\Resources\MenuItems\Pages\EditMenuItem;
 use App\Filament\Resources\MenuItems\Pages\ListMenuItems;
+use App\Filament\Support\FrenchLabels;
 use App\Models\MenuItem;
 use BackedEnum;
 use Filament\Actions\EditAction;
@@ -22,6 +23,8 @@ use Filament\Tables\Table;
 
 class MenuItemResource extends Resource
 {
+    use FrenchLabels;
+
     protected static ?string $model = MenuItem::class;
 
     protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedBars3;
@@ -38,7 +41,7 @@ class MenuItemResource extends Resource
 
     public static function form(Schema $schema): Schema
     {
-        return $schema->components([
+        return $schema->columns(1)->components([
             Section::make()->columns(2)->schema([
                 Select::make('location')->label('Emplacement')->options(MenuItem::LOCATIONS)->default('main')->required(),
                 TextInput::make('label')->label('Texte du lien')->required()->maxLength(40),

@@ -5,6 +5,7 @@ namespace App\Filament\Resources\Redirects;
 use App\Filament\Resources\Redirects\Pages\CreateRedirect;
 use App\Filament\Resources\Redirects\Pages\EditRedirect;
 use App\Filament\Resources\Redirects\Pages\ListRedirects;
+use App\Filament\Support\FrenchLabels;
 use App\Models\Redirect;
 use BackedEnum;
 use Filament\Actions\EditAction;
@@ -19,6 +20,8 @@ use Filament\Tables\Table;
 
 class RedirectResource extends Resource
 {
+    use FrenchLabels;
+
     protected static ?string $model = Redirect::class;
 
     protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedArrowUturnRight;
@@ -35,7 +38,7 @@ class RedirectResource extends Resource
 
     public static function form(Schema $schema): Schema
     {
-        return $schema->components([
+        return $schema->columns(1)->components([
             Section::make()->columns(3)->schema([
                 TextInput::make('from_path')->label('Ancienne adresse')->required()->placeholder('/ancienne-page')->regex('#^/#')->unique(ignoreRecord: true),
                 TextInput::make('to_path')->label('Nouvelle adresse')->required()->placeholder('/nouvelle-page')->regex('#^(/|https?://)#'),

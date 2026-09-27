@@ -6,6 +6,7 @@ use App\Filament\Resources\Rooms\Pages\CreateRoom;
 use App\Filament\Resources\Rooms\Pages\EditRoom;
 use App\Filament\Resources\Rooms\Pages\ListRooms;
 use App\Filament\Support\Fields;
+use App\Filament\Support\FrenchLabels;
 use App\Models\Room;
 use BackedEnum;
 use Filament\Actions\EditAction;
@@ -22,6 +23,8 @@ use Filament\Tables\Table;
 
 class RoomResource extends Resource
 {
+    use FrenchLabels;
+
     protected static ?string $model = Room::class;
 
     protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedBuildingLibrary;
@@ -38,7 +41,7 @@ class RoomResource extends Resource
 
     public static function form(Schema $schema): Schema
     {
-        return $schema->components([
+        return $schema->columns(1)->components([
             Section::make('Salle')->columns(2)->schema([
                 TextInput::make('name')->label('Nom')->required()->placeholder('Ex. Salle du Son'),
                 ColorPicker::make('accent_color')->label('Couleur de lumière')->required()->default('#F5B83D')

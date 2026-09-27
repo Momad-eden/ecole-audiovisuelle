@@ -6,6 +6,7 @@ use App\Enums\UserRole;
 use App\Filament\Resources\Users\Pages\CreateUser;
 use App\Filament\Resources\Users\Pages\EditUser;
 use App\Filament\Resources\Users\Pages\ListUsers;
+use App\Filament\Support\FrenchLabels;
 use App\Models\User;
 use BackedEnum;
 use Filament\Actions\EditAction;
@@ -23,6 +24,8 @@ use Illuminate\Validation\Rules\Password;
 
 class UserResource extends Resource
 {
+    use FrenchLabels;
+
     protected static ?string $model = User::class;
 
     protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedUserCircle;
@@ -39,7 +42,7 @@ class UserResource extends Resource
 
     public static function form(Schema $schema): Schema
     {
-        return $schema->components([
+        return $schema->columns(1)->components([
             Section::make()->columns(2)->schema([
                 TextInput::make('name')->label('Nom complet')->required()->maxLength(120),
                 TextInput::make('email')->label('Adresse e-mail')->email()->required()->unique(ignoreRecord: true),

@@ -4,6 +4,7 @@ namespace App\Filament\Resources\ContactMessages;
 
 use App\Enums\ContactMessageStatus;
 use App\Filament\Resources\ContactMessages\Pages\ListContactMessages;
+use App\Filament\Support\FrenchLabels;
 use App\Models\ContactMessage;
 use BackedEnum;
 use Filament\Actions\Action;
@@ -18,6 +19,8 @@ use Filament\Tables\Table;
 
 class ContactMessageResource extends Resource
 {
+    use FrenchLabels;
+
     protected static ?string $model = ContactMessage::class;
 
     protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedEnvelope;

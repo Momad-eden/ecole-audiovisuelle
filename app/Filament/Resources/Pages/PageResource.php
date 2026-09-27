@@ -6,6 +6,7 @@ use App\Filament\Resources\Pages\Pages\CreatePage;
 use App\Filament\Resources\Pages\Pages\EditPage;
 use App\Filament\Resources\Pages\Pages\ListPages;
 use App\Filament\Support\Fields;
+use App\Filament\Support\FrenchLabels;
 use App\Filament\Support\PageBlocks;
 use App\Models\Page;
 use BackedEnum;
@@ -22,6 +23,8 @@ use Filament\Tables\Table;
 
 class PageResource extends Resource
 {
+    use FrenchLabels;
+
     protected static ?string $model = Page::class;
 
     protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedDocumentDuplicate;
@@ -45,7 +48,7 @@ class PageResource extends Resource
 
     public static function form(Schema $schema): Schema
     {
-        return $schema->components([
+        return $schema->columns(1)->components([
             Section::make()->columns(3)->schema([
                 TextInput::make('title')->label('Titre de la page')->required()->maxLength(120),
                 TextInput::make('slug')->label('Adresse')->prefix('/')

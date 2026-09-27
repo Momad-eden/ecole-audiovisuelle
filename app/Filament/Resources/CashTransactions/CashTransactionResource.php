@@ -8,6 +8,7 @@ use App\Enums\TransactionCategory;
 use App\Filament\Resources\CashTransactions\Pages\CreateCashTransaction;
 use App\Filament\Resources\CashTransactions\Pages\ListCashTransactions;
 use App\Filament\Resources\CashTransactions\Pages\ViewCashTransaction;
+use App\Filament\Support\FrenchLabels;
 use App\Models\CashTransaction;
 use App\Models\Enrollment;
 use App\Support\Money;
@@ -33,6 +34,8 @@ use Illuminate\Database\Eloquent\Builder;
 
 class CashTransactionResource extends Resource
 {
+    use FrenchLabels;
+
     protected static ?string $model = CashTransaction::class;
 
     protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedBanknotes;
@@ -64,7 +67,7 @@ class CashTransactionResource extends Resource
 
     public static function form(Schema $schema): Schema
     {
-        return $schema->components([
+        return $schema->columns(1)->components([
             Section::make('Opération')->columns(2)->schema([
                 Radio::make('direction')->label('Nature')
                     ->options([CashDirection::IN->value => 'Encaissement (entrée d\'argent)', CashDirection::OUT->value => 'Décaissement (dépense)'])
@@ -91,7 +94,7 @@ class CashTransactionResource extends Resource
 
     public static function infolist(Schema $schema): Schema
     {
-        return $schema->components([
+        return $schema->columns(1)->components([
             Section::make()->columns(3)->schema([
                 TextEntry::make('number')->label('N° de pièce'),
                 TextEntry::make('direction')->label('Nature')->badge(),

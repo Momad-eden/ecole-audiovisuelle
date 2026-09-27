@@ -3,6 +3,7 @@
 namespace App\Filament\Resources\CashClosings;
 
 use App\Filament\Resources\CashClosings\Pages\ListCashClosings;
+use App\Filament\Support\FrenchLabels;
 use App\Models\CashClosing;
 use App\Support\Money;
 use BackedEnum;
@@ -13,6 +14,8 @@ use Filament\Tables\Table;
 
 class CashClosingResource extends Resource
 {
+    use FrenchLabels;
+
     protected static ?string $model = CashClosing::class;
 
     protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedLockClosed;

@@ -5,6 +5,7 @@ namespace App\Filament\Resources\Partners;
 use App\Filament\Resources\Partners\Pages\CreatePartner;
 use App\Filament\Resources\Partners\Pages\EditPartner;
 use App\Filament\Resources\Partners\Pages\ListPartners;
+use App\Filament\Support\FrenchLabels;
 use App\Models\Partner;
 use BackedEnum;
 use Filament\Actions\EditAction;
@@ -24,6 +25,8 @@ use Filament\Tables\Table;
 
 class PartnerResource extends Resource
 {
+    use FrenchLabels;
+
     protected static ?string $model = Partner::class;
 
     protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedHandRaised;
@@ -40,7 +43,7 @@ class PartnerResource extends Resource
 
     public static function form(Schema $schema): Schema
     {
-        return $schema->components([
+        return $schema->columns(1)->components([
             Section::make()->columns(2)->schema([
                 TextInput::make('name')->label('Nom')->required()->maxLength(150),
                 Select::make('category')->label('Catégorie')->options(Partner::CATEGORIES)->default('institutional')->required(),

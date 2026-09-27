@@ -5,6 +5,7 @@ namespace App\Filament\Resources\Faqs;
 use App\Filament\Resources\Faqs\Pages\CreateFaq;
 use App\Filament\Resources\Faqs\Pages\EditFaq;
 use App\Filament\Resources\Faqs\Pages\ListFaqs;
+use App\Filament\Support\FrenchLabels;
 use App\Models\Faq;
 use BackedEnum;
 use Filament\Actions\EditAction;
@@ -23,6 +24,8 @@ use Filament\Tables\Table;
 
 class FaqResource extends Resource
 {
+    use FrenchLabels;
+
     protected static ?string $model = Faq::class;
 
     protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedQuestionMarkCircle;
@@ -39,7 +42,7 @@ class FaqResource extends Resource
 
     public static function form(Schema $schema): Schema
     {
-        return $schema->components([
+        return $schema->columns(1)->components([
             Section::make()->schema([
                 Select::make('group')->label('Rubrique')->options(Faq::GROUPS)->default('general')->required(),
                 TextInput::make('question')->label('Question')->required()->maxLength(200),

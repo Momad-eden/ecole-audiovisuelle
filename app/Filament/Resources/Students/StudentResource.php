@@ -8,6 +8,7 @@ use App\Filament\Resources\Students\Pages\EditStudent;
 use App\Filament\Resources\Students\Pages\ListStudents;
 use App\Filament\Resources\Students\Pages\ViewStudent;
 use App\Filament\Resources\Students\RelationManagers\EnrollmentsRelationManager;
+use App\Filament\Support\FrenchLabels;
 use App\Models\Student;
 use BackedEnum;
 use Filament\Actions\ViewAction;
@@ -28,6 +29,8 @@ use Illuminate\Database\Eloquent\SoftDeletingScope;
 
 class StudentResource extends Resource
 {
+    use FrenchLabels;
+
     protected static ?string $model = Student::class;
 
     protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedUserGroup;
@@ -49,7 +52,7 @@ class StudentResource extends Resource
 
     public static function form(Schema $schema): Schema
     {
-        return $schema->components([
+        return $schema->columns(1)->components([
             Section::make('Identité')->columns(3)->schema([
                 TextInput::make('first_name')->label('Prénom')->required()->maxLength(100),
                 TextInput::make('last_name')->label('Nom')->required()->maxLength(100),
@@ -69,7 +72,7 @@ class StudentResource extends Resource
 
     public static function infolist(Schema $schema): Schema
     {
-        return $schema->components([
+        return $schema->columns(1)->components([
             Section::make()->columns(4)->schema([
                 TextEntry::make('student_number')->label('Matricule')->copyable(),
                 TextEntry::make('full_name')->label('Nom complet'),

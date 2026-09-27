@@ -5,6 +5,7 @@ namespace App\Filament\Resources\Tracks;
 use App\Filament\Resources\Tracks\Pages\CreateTrack;
 use App\Filament\Resources\Tracks\Pages\EditTrack;
 use App\Filament\Resources\Tracks\Pages\ListTracks;
+use App\Filament\Support\FrenchLabels;
 use App\Models\Track;
 use BackedEnum;
 use Filament\Actions\EditAction;
@@ -24,6 +25,8 @@ use Filament\Tables\Table;
 
 class TrackResource extends Resource
 {
+    use FrenchLabels;
+
     protected static ?string $model = Track::class;
 
     protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedSquares2x2;
@@ -40,7 +43,7 @@ class TrackResource extends Resource
 
     public static function form(Schema $schema): Schema
     {
-        return $schema->components([
+        return $schema->columns(1)->components([
             Section::make()->columns(2)->schema([
                 TextInput::make('name')->label('Nom de la filière')->required()->maxLength(120),
                 TextInput::make('short_name')->label('Nom court')->placeholder('Ex. Son'),

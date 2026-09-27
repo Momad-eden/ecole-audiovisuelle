@@ -6,6 +6,7 @@ use App\Filament\Resources\Exhibitions\Pages\CreateExhibition;
 use App\Filament\Resources\Exhibitions\Pages\EditExhibition;
 use App\Filament\Resources\Exhibitions\Pages\ListExhibitions;
 use App\Filament\Support\Fields;
+use App\Filament\Support\FrenchLabels;
 use App\Models\Exhibition;
 use BackedEnum;
 use Filament\Actions\EditAction;
@@ -22,6 +23,8 @@ use Filament\Tables\Table;
 
 class ExhibitionResource extends Resource
 {
+    use FrenchLabels;
+
     protected static ?string $model = Exhibition::class;
 
     protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedSparkles;
@@ -38,7 +41,7 @@ class ExhibitionResource extends Resource
 
     public static function form(Schema $schema): Schema
     {
-        return $schema->components([
+        return $schema->columns(1)->components([
             Section::make('Exposition')->columns(2)->schema([
                 TextInput::make('title')->label('Titre')->required()->maxLength(150)->columnSpanFull(),
                 TextInput::make('subtitle')->label('Sous-titre')->maxLength(200)->columnSpanFull(),

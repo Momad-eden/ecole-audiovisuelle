@@ -7,6 +7,7 @@ use App\Filament\Resources\Cohorts\Pages\CreateCohort;
 use App\Filament\Resources\Cohorts\Pages\EditCohort;
 use App\Filament\Resources\Cohorts\Pages\ListCohorts;
 use App\Filament\Resources\Cohorts\RelationManagers\OfferingsRelationManager;
+use App\Filament\Support\FrenchLabels;
 use App\Models\Cohort;
 use BackedEnum;
 use Filament\Actions\Action;
@@ -29,6 +30,8 @@ use Illuminate\Database\Eloquent\Builder;
 
 class CohortResource extends Resource
 {
+    use FrenchLabels;
+
     protected static ?string $model = Cohort::class;
 
     protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedCalendarDays;
@@ -45,7 +48,7 @@ class CohortResource extends Resource
 
     public static function form(Schema $schema): Schema
     {
-        return $schema->components([
+        return $schema->columns(1)->components([
             Section::make('Session')->columns(2)->schema([
                 Select::make('program_id')->label('Formation')->relationship('program', 'title')->searchable()->preload()->required()
                     ->visible(fn ($livewire) => ! $livewire instanceof RelationManager),

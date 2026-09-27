@@ -5,6 +5,7 @@ namespace App\Filament\Resources\News;
 use App\Filament\Resources\News\Pages\CreateNews;
 use App\Filament\Resources\News\Pages\EditNews;
 use App\Filament\Resources\News\Pages\ListNews;
+use App\Filament\Support\FrenchLabels;
 use App\Models\News;
 use BackedEnum;
 use Filament\Actions\EditAction;
@@ -25,6 +26,8 @@ use Filament\Tables\Table;
 
 class NewsResource extends Resource
 {
+    use FrenchLabels;
+
     protected static ?string $model = News::class;
 
     protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedNewspaper;
@@ -41,7 +44,7 @@ class NewsResource extends Resource
 
     public static function form(Schema $schema): Schema
     {
-        return $schema->components([
+        return $schema->columns(1)->components([
             Section::make()->columns(2)->schema([
                 TextInput::make('title')->label('Titre')->required()->maxLength(180)->columnSpanFull(),
                 Textarea::make('excerpt')->label('Résumé (cartes et référencement)')->rows(2)->maxLength(300)->columnSpanFull(),

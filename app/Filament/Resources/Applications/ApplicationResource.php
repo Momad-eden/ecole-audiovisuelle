@@ -10,6 +10,7 @@ use App\Filament\Resources\Applications\Pages\CreateApplication;
 use App\Filament\Resources\Applications\Pages\EditApplication;
 use App\Filament\Resources\Applications\Pages\ListApplications;
 use App\Filament\Resources\Applications\Pages\ViewApplication;
+use App\Filament\Support\FrenchLabels;
 use App\Models\Application;
 use App\Models\Offering;
 use App\Models\Program;
@@ -37,6 +38,8 @@ use Illuminate\Database\Eloquent\SoftDeletingScope;
 
 class ApplicationResource extends Resource
 {
+    use FrenchLabels;
+
     protected static ?string $model = Application::class;
 
     protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedInboxArrowDown;
@@ -78,7 +81,7 @@ class ApplicationResource extends Resource
 
     public static function form(Schema $schema): Schema
     {
-        return $schema->components([
+        return $schema->columns(1)->components([
             Section::make('Formation demandée')->schema([
                 Select::make('offering_id')
                     ->label('Offre (formation, session, filière)')
@@ -129,7 +132,7 @@ class ApplicationResource extends Resource
 
     public static function infolist(Schema $schema): Schema
     {
-        return $schema->components([
+        return $schema->columns(1)->components([
             Grid::make(3)->schema([
                 Section::make('Candidature')->columnSpan(2)->columns(2)->schema([
                     TextEntry::make('reference')->label('Numéro'),
@@ -164,8 +167,8 @@ class ApplicationResource extends Resource
             Section::make('Pièces justificatives')->schema([
                 RepeatableEntry::make('documents')->hiddenLabel()->columns(3)->placeholder('Aucune pièce jointe.')->schema([
                     TextEntry::make('type')->label('Type')->formatStateUsing(fn (?string $state) => DocumentType::tryFrom((string) $state)?->getLabel() ?? '—'),
-                    TextEntry::make('name')->label('Fichier')->placeholder('—'),
-                    TextEntry::make('path')->label('')->formatStateUsing(fn () => 'Télécharger')
+                    TextEntry::make('name')->label('Nom du fichier')->placeholder('—'),
+                    TextEntry::make('path')->label('Fichier joint')->formatStateUsing(fn () => 'Télécharger')
                         ->url(fn (?string $state, Application $record) => $state ? route('admin.applications.document', ['application' => $record, 'path' => $state]) : null, true)
                         ->color('primary'),
                 ]),

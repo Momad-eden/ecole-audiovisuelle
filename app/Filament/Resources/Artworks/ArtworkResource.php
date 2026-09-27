@@ -8,6 +8,7 @@ use App\Filament\Resources\Artworks\Pages\CreateArtwork;
 use App\Filament\Resources\Artworks\Pages\EditArtwork;
 use App\Filament\Resources\Artworks\Pages\ListArtworks;
 use App\Filament\Support\Fields;
+use App\Filament\Support\FrenchLabels;
 use App\Models\Artwork;
 use BackedEnum;
 use Filament\Actions\EditAction;
@@ -36,6 +37,8 @@ use Illuminate\Database\Eloquent\SoftDeletingScope;
 
 class ArtworkResource extends Resource
 {
+    use FrenchLabels;
+
     protected static ?string $model = Artwork::class;
 
     protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedPhoto;
@@ -52,7 +55,7 @@ class ArtworkResource extends Resource
 
     public static function form(Schema $schema): Schema
     {
-        return $schema->components([
+        return $schema->columns(1)->components([
             Tabs::make()->columnSpanFull()->persistTabInQueryString()->tabs([
                 Tab::make('1. Médias')->icon('heroicon-o-photo')->schema([
                     Select::make('kind')->label('Type d\'œuvre')->options(ArtworkKind::class)->required()->live(),
