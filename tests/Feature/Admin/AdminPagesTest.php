@@ -5,11 +5,16 @@ namespace Tests\Feature\Admin;
 use App\Enums\ApplicationStatus;
 use App\Filament\Resources\Applications\ApplicationResource;
 use App\Filament\Resources\CashTransactions\CashTransactionResource;
+use App\Filament\Resources\Pages\PageResource;
+use App\Filament\Resources\Rooms\RoomResource;
 use App\Filament\Resources\Students\StudentResource;
 use App\Models\Application;
 use App\Models\Enrollment;
+use App\Models\Page;
+use App\Models\Room;
 use App\Models\User;
 use App\Services\CashRegister;
+use Database\Seeders\ContentSeeder;
 use Filament\Facades\Filament;
 use Filament\Resources\Resource;
 use Illuminate\Foundation\Testing\RefreshDatabase;
@@ -65,5 +70,22 @@ class AdminPagesTest extends TestCase
         $this->get(CashTransactionResource::getUrl('view', ['record' => $transaction]))->assertOk()->assertSee($transaction->number);
         $this->get(route('admin.cash.receipt', $transaction))->assertOk()->assertSee($transaction->number)->assertSee('1 000 FCFA');
         $this->get(route('admin.cash.export', ['from' => now()->startOfMonth()->toDateString(), 'until' => now()->toDateString()]))->assertOk();
+    }
+
+    public function test_v2_home_page_and_universe_open_in_the_editor(): void
+    {
+        $this->seed(ContentSeeder::class);
+        $this->actingAs($this->directeur);
+
+        $home = Page::where('slug', 'accueil')->firstOrFail();
+        $this->get(PageResource::getUrl('edit', ['record' => $home]))->assertOk()
+            ->assertSee('Mots qui défilent à la fin du titre')
+            ->assertSee('Le lieu (Grand Théâtre)')
+            ->assertSee('Le matériel');
+
+        $cinema = Room::where('slug', 'cinema')->firstOrFail();
+        $this->get(RoomResource::getUrl('edit', ['record' => $cinema]))->assertOk()
+            ->assertSee('Animation de l&#039;univers', false)
+            ->assertSee('Bientôt à l&#039;EMSI', false);
     }
 }
