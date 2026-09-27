@@ -34,11 +34,18 @@ class AdmissionController extends Controller
     {
         $validated = $request->validated();
 
+        // Robot détecté par le champ piège : même réponse qu'un succès, rien n'est enregistré.
+        if ($request->filled('website')) {
+            return redirect()
+                ->route('public.admissions.success')
+                ->with('candidate_name', $validated['first_name']);
+        }
+
         $course = Course::where('id', $validated['course_id'])
             ->where('is_active', true)
             ->first();
 
-        if (!$course) {
+        if (! $course) {
             return back()
                 ->withErrors(['course_id' => 'La formation sélectionnée n’est plus disponible.'])
                 ->withInput();
@@ -54,8 +61,12 @@ class AdmissionController extends Controller
     /**
      * Page de confirmation après candidature.
      */
-    public function success(): View
+    public function success(): View|RedirectResponse
     {
+        if (! session()->has('candidate_name')) {
+            return redirect()->route('public.admissions.create');
+        }
+
         return view('public.admissions.success');
     }
 }

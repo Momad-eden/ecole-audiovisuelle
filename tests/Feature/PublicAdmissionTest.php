@@ -3,7 +3,6 @@
 namespace Tests\Feature;
 
 use App\Models\Course;
-use App\Models\Admission;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
 
@@ -26,20 +25,20 @@ class PublicAdmissionTest extends TestCase
         $course = Course::factory()->create(['is_active' => true]);
 
         $payload = [
-            'first_name'      => 'Amadou',
-            'last_name'       => 'Diallo',
-            'birth_date'      => '2000-05-15',
-            'birth_place'     => 'Dakar',
-            'gender'          => 'M',
-            'nationality'     => 'Sénégalaise',
-            'phone'           => '+221 77 123 45 67',
-            'email'           => 'amadou.diallo@example.com',
-            'address'         => 'Médina, Dakar',
-            'last_diploma'    => 'Baccalauréat',
+            'first_name' => 'Amadou',
+            'last_name' => 'Diallo',
+            'birth_date' => '2000-05-15',
+            'birth_place' => 'Dakar',
+            'gender' => 'M',
+            'nationality' => 'Sénégalaise',
+            'phone' => '+221 77 123 45 67',
+            'email' => 'amadou.diallo@example.com',
+            'address' => 'Médina, Dakar',
+            'last_diploma' => 'Baccalauréat',
             'graduation_year' => 2022,
-            'course_id'       => $course->id,
-            'volet'           => 'Volet 1 — Perfectionnement intensif (3 mois)',
-            'message'         => 'Passionné par le montage vidéo et la réalisation.',
+            'course_id' => $course->id,
+            'volet' => 'Volet 1 — Perfectionnement intensif (3 mois)',
+            'message' => 'Passionné par le montage vidéo et la réalisation.',
         ];
 
         $response = $this->post(route('public.admissions.store'), $payload);
@@ -49,11 +48,11 @@ class PublicAdmissionTest extends TestCase
 
         $this->assertDatabaseHas('admissions', [
             'first_name' => 'Amadou',
-            'last_name'  => 'Diallo',
-            'gender'     => 'M',
-            'status'     => 'pending',
-            'course_id'  => $course->id,
-            'volet'      => 'Volet 1 — Perfectionnement intensif (3 mois)',
+            'last_name' => 'Diallo',
+            'gender' => 'M',
+            'status' => 'pending',
+            'course_id' => $course->id,
+            'volet' => 'Volet 1 — Perfectionnement intensif (3 mois)',
         ]);
     }
 
@@ -75,9 +74,9 @@ class PublicAdmissionTest extends TestCase
 
         $payload = [
             'first_name' => 'Fatou',
-            'last_name'  => 'Sow',
-            'phone'      => '+221 78 987 65 43',
-            'course_id'  => $inactiveCourse->id,
+            'last_name' => 'Sow',
+            'phone' => '+221 78 987 65 43',
+            'course_id' => $inactiveCourse->id,
         ];
 
         $response = $this->post(route('public.admissions.store'), $payload);
@@ -85,7 +84,69 @@ class PublicAdmissionTest extends TestCase
         $response->assertSessionHasErrors(['course_id']);
         $this->assertDatabaseMissing('admissions', [
             'first_name' => 'Fatou',
-            'last_name'  => 'Sow',
+            'last_name' => 'Sow',
         ]);
+    }
+
+    private function validPayload(array $overrides = []): array
+    {
+        $course = Course::factory()->create(['is_active' => true]);
+
+        return array_merge([
+            'first_name' => 'Awa',
+            'last_name' => 'Ndiaye',
+            'phone' => '+221 77 123 45 67',
+            'course_id' => $course->id,
+            'volet' => 'Volet 2 — Certification BTS-VAE (9 mois)',
+        ], $overrides);
+    }
+
+    public function test_submissions_are_rate_limited_per_ip(): void
+    {
+        for ($i = 0; $i < 5; $i++) {
+            $this->post(route('public.admissions.store'), $this->validPayload(['first_name' => "Awa{$i}"]))
+                ->assertRedirect(route('public.admissions.success'));
+        }
+
+        $this->post(route('public.admissions.store'), $this->validPayload())->assertStatus(429);
+        $this->assertDatabaseCount('admissions', 5);
+    }
+
+    public function test_honeypot_submission_looks_successful_but_is_not_saved(): void
+    {
+        $this->post(route('public.admissions.store'), $this->validPayload(['website' => 'http://spam.example']))
+            ->assertRedirect(route('public.admissions.success'));
+
+        $this->assertDatabaseCount('admissions', 0);
+    }
+
+    public function test_phone_number_must_look_like_a_phone_number(): void
+    {
+        $this->post(route('public.admissions.store'), $this->validPayload(['phone' => 'abc']))
+            ->assertSessionHasErrors('phone');
+
+        $this->post(route('public.admissions.store'), $this->validPayload(['phone' => '+221 77 123 45 67']))
+            ->assertSessionHasNoErrors();
+    }
+
+    public function test_volet_must_be_one_of_the_offered_values(): void
+    {
+        $this->post(route('public.admissions.store'), $this->validPayload(['volet' => "n'importe quoi"]))
+            ->assertSessionHasErrors('volet');
+
+        $this->assertDatabaseCount('admissions', 0);
+    }
+
+    public function test_success_page_requires_a_submission(): void
+    {
+        $this->get(route('public.admissions.success'))->assertRedirect(route('public.admissions.create'));
+    }
+
+    public function test_diploma_list_offers_cps_and_cs(): void
+    {
+        $this->get(route('public.admissions.create'))
+            ->assertOk()
+            ->assertSee('value="CPS"', false)
+            ->assertSee('value="CS"', false);
     }
 }

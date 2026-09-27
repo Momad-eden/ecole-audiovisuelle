@@ -97,7 +97,7 @@ Route::post(
         PublicAdmissionController::class,
         'store'
     ]
-)->name('public.admissions.store');
+)->middleware('throttle:admissions')->name('public.admissions.store');
 
 
 /*

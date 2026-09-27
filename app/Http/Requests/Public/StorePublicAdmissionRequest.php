@@ -2,7 +2,9 @@
 
 namespace App\Http\Requests\Public;
 
+use App\Models\Admission;
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Validation\Rule;
 
 class StorePublicAdmissionRequest extends FormRequest
 {
@@ -14,22 +16,22 @@ class StorePublicAdmissionRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'first_name'      => ['required', 'string', 'max:100'],
-            'last_name'       => ['required', 'string', 'max:100'],
-            'birth_date'      => ['nullable', 'date', 'before:today'],
-            'birth_place'     => ['nullable', 'string', 'max:150'],
-            'gender'          => ['nullable', 'in:M,F'],
-            'nationality'     => ['nullable', 'string', 'max:100'],
-            'phone'           => ['required', 'string', 'max:30'],
-            'email'           => ['nullable', 'email', 'max:255'],
-            'address'         => ['nullable', 'string', 'max:255'],
-            'last_diploma'    => ['nullable', 'string', 'max:100'],
-            'graduation_year' => ['nullable', 'integer', 'min:1950', 'max:' . now()->year],
+            'first_name' => ['required', 'string', 'max:100'],
+            'last_name' => ['required', 'string', 'max:100'],
+            'birth_date' => ['nullable', 'date', 'before:today'],
+            'birth_place' => ['nullable', 'string', 'max:150'],
+            'gender' => ['nullable', 'in:M,F'],
+            'nationality' => ['nullable', 'string', 'max:100'],
+            'phone' => ['required', 'string', 'max:30', 'regex:/^\+?[0-9][0-9 ().-]{7,19}$/'],
+            'email' => ['nullable', 'email', 'max:255'],
+            'address' => ['nullable', 'string', 'max:255'],
+            'last_diploma' => ['nullable', 'string', 'max:100'],
+            'graduation_year' => ['nullable', 'integer', 'min:1950', 'max:'.now()->year],
             'previous_school' => ['nullable', 'string', 'max:255'],
-            'academic_field'  => ['nullable', 'string', 'max:150'],
-            'course_id'       => ['required', 'exists:courses,id'],
-            'volet'           => ['nullable', 'string', 'max:100'],
-            'message'         => ['nullable', 'string', 'max:5000'],
+            'academic_field' => ['nullable', 'string', 'max:150'],
+            'course_id' => ['required', 'exists:courses,id'],
+            'volet' => ['nullable', 'string', Rule::in(Admission::PUBLIC_VOLETS)],
+            'message' => ['nullable', 'string', 'max:5000'],
         ];
     }
 }

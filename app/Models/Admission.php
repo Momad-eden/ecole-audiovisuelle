@@ -9,6 +9,14 @@ class Admission extends Model
 {
     use HasFactory;
 
+    /**
+     * Volets proposés dans le formulaire public (normalisés en Phase 2).
+     */
+    public const PUBLIC_VOLETS = [
+        'Volet 1 — Perfectionnement intensif (3 mois)',
+        'Volet 2 — Certification BTS-VAE (9 mois)',
+    ];
+
     protected $fillable = [
         // Identité
         'first_name',

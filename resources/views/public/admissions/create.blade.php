@@ -106,6 +106,12 @@
                 >
                     @csrf
 
+                    {{-- Champ piège anti-robots : invisible et ignoré par les humains --}}
+                    <div class="absolute -left-[9999px] w-px h-px overflow-hidden" aria-hidden="true">
+                        <label for="website">Ne pas remplir ce champ</label>
+                        <input type="text" id="website" name="website" value="" tabindex="-1" autocomplete="off">
+                    </div>
+
                     {{-- =====================================================
                          ÉTAPE 1 : IDENTITÉ DU CANDIDAT
                     ====================================================== --}}
@@ -346,6 +352,8 @@
                                     class="w-full rounded-xl border border-black/15 bg-white px-4 py-3.5 text-sm text-black focus:border-[#F5B800] focus:ring-2 focus:ring-[#F5B800]/20 transition outline-none"
                                 >
                                     <option value="">Sélectionner</option>
+                                    <option value="CPS" @selected(old('last_diploma') === 'CPS')>CPS — Certificat de Professionnalisation Spécialisée</option>
+                                    <option value="CS" @selected(old('last_diploma') === 'CS')>CS — Certificat de Spécialité</option>
                                     <option value="BFEM" @selected(old('last_diploma') === 'BFEM')>BFEM / Collège</option>
                                     <option value="Baccalauréat" @selected(old('last_diploma') === 'Baccalauréat')>Baccalauréat</option>
                                     <option value="BTS" @selected(old('last_diploma') === 'BTS')>BTS / DUT (Bac+2)</option>
