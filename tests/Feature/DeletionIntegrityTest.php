@@ -84,4 +84,18 @@ class DeletionIntegrityTest extends TestCase
 
         $this->assertTrue(\Schema::hasColumn('students', 'deleted_at'));
     }
+
+    public function test_a_course_can_reuse_the_title_of_a_deleted_course(): void
+    {
+        $payload = ['title' => 'Technicien Lumière', 'price' => 0, 'students_count' => 10, 'is_active' => 1];
+
+        $this->actingAs($this->directeur)->post(route('courses.store'), $payload)->assertRedirect();
+        $first = Course::where('title', 'Technicien Lumière')->firstOrFail();
+        $this->actingAs($this->directeur)->delete(route('courses.destroy', $first))->assertRedirect();
+
+        $this->actingAs($this->directeur)->post(route('courses.store'), $payload)->assertRedirect();
+
+        $this->assertSame(2, Course::withTrashed()->where('title', 'Technicien Lumière')->count());
+        $this->assertNotSame($first->slug, Course::where('title', 'Technicien Lumière')->firstOrFail()->slug);
+    }
 }

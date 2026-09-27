@@ -293,7 +293,7 @@ class CourseController extends Controller
         $originalSlug = $slug;
         $counter = 1;
 
-        while (Course::where('slug', $slug)->when($ignoreId, fn ($q) => $q->where('id', '!=', $ignoreId))->exists()) {
+        while (Course::withTrashed()->where('slug', $slug)->when($ignoreId, fn ($q) => $q->where('id', '!=', $ignoreId))->exists()) {
             $slug = $originalSlug.'-'.$counter;
             $counter++;
         }
