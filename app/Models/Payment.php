@@ -4,6 +4,7 @@ namespace App\Models;
 
 use App\Enums\PaymentMethod;
 use App\Enums\TransactionCategory;
+use App\Services\SequenceService;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
@@ -46,10 +47,12 @@ class Payment extends Model
             if (empty($payment->receipt_number)) {
                 $prefix = $payment->type === 'inflow' ? 'REC' : 'DEP';
                 $period = date('Ym');
-                $count = static::whereYear('created_at', date('Y'))
-                    ->whereMonth('created_at', date('m'))
-                    ->count() + 1;
-                $payment->receipt_number = sprintf('%s-%s-%04d', $prefix, $period, $count);
+                $base = "{$prefix}-{$period}-";
+                $number = app(SequenceService::class)->next(
+                    "receipt:{$prefix}:{$period}",
+                    fn () => SequenceService::maxSuffix('payments', 'receipt_number', $base)
+                );
+                $payment->receipt_number = sprintf('%s%04d', $base, $number);
             }
         });
     }

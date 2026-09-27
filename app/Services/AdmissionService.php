@@ -22,6 +22,7 @@ class AdmissionService
     public function createAdmission(array $data): Admission
     {
         $data['status'] = $data['status'] ?? AdmissionStatus::PENDING->value;
+
         return Admission::create($data);
     }
 
@@ -89,7 +90,7 @@ class AdmissionService
             throw new InvalidArgumentException('Ce candidat est déjà inscrit comme étudiant.');
         }
 
-        if (!$admission->course_id) {
+        if (! $admission->course_id) {
             throw new InvalidArgumentException('Aucune formation n’est associée à cette candidature.');
         }
 
@@ -100,19 +101,19 @@ class AdmissionService
             $studentGender = Gender::fromAdmissionCode($admission->gender) ?? Gender::HOMME->value;
 
             $student = Student::create([
-                'student_number'    => $studentNumber,
-                'first_name'        => $admission->first_name,
-                'last_name'         => $admission->last_name,
-                'birth_date'        => $admission->birth_date,
-                'birth_place'       => $admission->birth_place,
-                'gender'            => $studentGender,
-                'nationality'       => $admission->nationality ?? 'Sénégalaise',
-                'phone'             => $admission->phone,
-                'email'             => $admission->email,
-                'address'           => $admission->address,
-                'course_id'         => $admission->course_id,
+                'student_number' => $studentNumber,
+                'first_name' => $admission->first_name,
+                'last_name' => $admission->last_name,
+                'birth_date' => $admission->birth_date,
+                'birth_place' => $admission->birth_place,
+                'gender' => $studentGender,
+                'nationality' => $admission->nationality ?? 'Sénégalaise',
+                'phone' => $admission->phone,
+                'email' => $admission->email,
+                'address' => $admission->address,
+                'course_id' => $admission->course_id,
                 'registration_date' => now()->toDateString(),
-                'status'            => StudentStatus::INSCRIT->value,
+                'status' => StudentStatus::INSCRIT->value,
             ]);
 
             $admission->update([

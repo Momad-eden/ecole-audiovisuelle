@@ -20,7 +20,7 @@ class FileUploadService
      */
     public function replace(?UploadedFile $newFile, ?string $oldPath, string $directory): ?string
     {
-        if (!$newFile) {
+        if (! $newFile) {
             return $oldPath;
         }
 
