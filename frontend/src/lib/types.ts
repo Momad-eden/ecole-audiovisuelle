@@ -51,6 +51,7 @@ export type Site = {
   };
   menus: { main: MenuLink[]; footer: MenuLink[]; legal: MenuLink[] };
   rooms: RoomSummary[];
+  places: Place[];
   hasSchoolPrograms: boolean;
 };
 
@@ -79,6 +80,9 @@ export type ArtworkSummary = {
   hasVideo: boolean;
   room?: { name: string; slug: string; accentColor: string } | null;
   track?: { name: string; slug: string } | null;
+  origin?: "school" | "studio";
+  /** Productions du studio seulement : écoute directe depuis la liste. */
+  audio?: { url: string; peaks: number[] | null; durationSeconds: number | null } | null;
 };
 
 export type Artwork = ArtworkSummary & {
@@ -170,3 +174,88 @@ export type Paginated<T> = {
   data: T[];
   meta: { current_page: number; last_page: number; total: number; per_page: number };
 };
+
+// ——— Impact Live : studio, événementiel, Espace Habib Faye, lieux ———
+
+export type Activity = "school" | "studio" | "events" | "space";
+
+export type Place = {
+  id: number;
+  name: string;
+  slug: string;
+  kind: "campus" | "studio" | "cultural_center";
+  city: string | null;
+  address: string | null;
+  phone: string | null;
+  whatsapp: string | null;
+  email: string | null;
+  mapUrl: string | null;
+  openingHours: string | null;
+  description: string | null;
+  image: Image | null;
+};
+
+export type Service = {
+  id: number;
+  name: string;
+  slug: string;
+  activity: Activity;
+  summary: string | null;
+  description: string | null;
+  priceFrom: number | null;
+  priceUnit: string | null;
+  priceLabel: string;
+  icon: string | null;
+  image: Image | null;
+};
+
+export type EquipmentItem = {
+  id: number;
+  name: string;
+  slug: string;
+  brand: string | null;
+  usage: "rental" | "studio";
+  summary: string | null;
+  image: Image | null;
+  priceFrom: number | null;
+  priceLabel: string;
+  isFeatured: boolean;
+  category?: { name: string; slug: string };
+  description?: string | null;
+  specs?: { label: string; value: string }[];
+  quantity?: number | null;
+  gallery?: Image[];
+};
+
+export type EquipmentCategory = { id: number; name: string; slug: string; summary: string | null; itemsCount: number };
+
+export type RentalPack = {
+  id: number;
+  name: string;
+  slug: string;
+  summary: string | null;
+  capacity: string | null;
+  contents: string[];
+  priceFrom: number | null;
+  priceLabel: string;
+  image: Image | null;
+};
+
+export type AgendaEvent = {
+  id: number;
+  title: string;
+  slug: string;
+  activity: Activity;
+  activityLabel: string;
+  venue: string | null;
+  city: string | null;
+  startsAt: string | null;
+  endsAt: string | null;
+  summary: string | null;
+  content: string | null;
+  image: Image | null;
+  ticketUrl: string | null;
+  isReference: boolean;
+};
+
+export type BookingType = "studio_session" | "equipment_rental" | "event_service" | "space_rental";

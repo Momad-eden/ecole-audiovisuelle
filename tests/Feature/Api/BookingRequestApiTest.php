@@ -51,7 +51,8 @@ class BookingRequestApiTest extends TestCase
 
         $request = BookingRequest::where('reference', $reference)->firstOrFail();
         $this->assertSame(BookingStatus::NEW, $request->status);
-        $this->assertSame([['kind' => 'equipment', 'id' => $item->id, 'name' => 'Line array K2', 'quantity' => 4], ['kind' => 'pack', 'id' => $pack->id, 'name' => 'Pack concert', 'quantity' => 1]], $request->items);
+        // MySQL réordonne les clés JSON : on compare le contenu, pas l'ordre des clés.
+        $this->assertEquals([['kind' => 'equipment', 'id' => $item->id, 'name' => 'Line array K2', 'quantity' => 4], ['kind' => 'pack', 'id' => $pack->id, 'name' => 'Pack concert', 'quantity' => 1]], $request->items);
         $this->assertSame(800, $request->attendees);
         $this->assertCount(1, $request->logs);
 

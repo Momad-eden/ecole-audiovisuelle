@@ -6,7 +6,7 @@ import { useEffect, useState } from "react";
 import { useFieldArray, useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
-import type { Offering } from "@/lib/types";
+import type { Offering, Place } from "@/lib/types";
 import { fcfa, cn } from "@/lib/utils";
 import { Field, Honeypot, inputClass } from "./Field";
 
@@ -16,6 +16,7 @@ const DOCUMENT_TYPES = { diploma: "Diplôme (CPS, CS…)", id_card: "Pièce d'id
 
 const schema = z.object({
   offeringId: z.string().min(1, "Choisissez une formation."),
+  placeId: z.string().optional(),
   firstName: z.string().trim().min(1, "Indiquez votre prénom.").max(100),
   lastName: z.string().trim().min(1, "Indiquez votre nom.").max(100),
   gender: z.enum(["female", "male", ""]).optional(),
@@ -41,7 +42,7 @@ type Values = z.infer<typeof schema>;
 
 const STEPS = ["Formation", "Identité", "Coordonnées", "Parcours", "Envoi"];
 
-export function ApplicationForm({ offerings, audience, preselected }: { offerings: Offering[]; audience: "school" | "professional"; preselected?: string }) {
+export function ApplicationForm({ offerings, audience, preselected, campuses = [] }: { offerings: Offering[]; audience: "school" | "professional"; preselected?: string; campuses?: Place[] }) {
   const router = useRouter();
   const draftKey = `emsi-candidature-${audience}`;
   const [step, setStep] = useState(0);
@@ -53,6 +54,7 @@ export function ApplicationForm({ offerings, audience, preselected }: { offering
     mode: "onTouched",
     defaultValues: {
       offeringId: preselected ?? (offerings.length === 1 ? String(offerings[0].id) : ""),
+      placeId: campuses.length === 1 ? String(campuses[0].id) : "",
       nationality: "Sénégalaise", gender: "", whatsapp: "", email: "", portfolioUrl: "",
       experience: [], documents: professional ? [{ type: "diploma", file: undefined as unknown as FileList }, { type: "id_card", file: undefined as unknown as FileList }] : [],
     },
@@ -91,7 +93,13 @@ export function ApplicationForm({ offerings, audience, preselected }: { offering
   ];
 
   const next = async () => {
-    if (await trigger(stepFields[step])) setStep((s) => Math.min(s + 1, STEPS.length - 1));
+    const valid = await trigger(stepFields[step]);
+    // Plusieurs campus : le candidat choisit le sien (mêmes formations à Dakar et à Saint-Louis).
+    if (step === 0 && campuses.length > 1 && !watch("placeId")) {
+      setError("placeId", { message: "Choisissez votre campus." });
+      return;
+    }
+    if (valid) setStep((s) => Math.min(s + 1, STEPS.length - 1));
   };
 
   const onSubmit = async (values: Values) => {
@@ -105,6 +113,7 @@ export function ApplicationForm({ offerings, audience, preselected }: { offering
     const body = new FormData();
     const append = (key: string, value: string | undefined | null) => value && body.append(key, value);
     append("offeringId", values.offeringId);
+    append("placeId", values.placeId);
     append("firstName", values.firstName);
     append("lastName", values.lastName);
     append("gender", values.gender);
@@ -183,6 +192,20 @@ export function ApplicationForm({ offerings, audience, preselected }: { offering
                 </span>
               </label>
             ))}
+            {campuses.length > 1 && (
+              <div className="pt-6">
+                <p className="mb-4 font-display text-2xl">Dans quel campus ?</p>
+                {errors.placeId && <p role="alert" className="mb-3 text-sm text-rec">{errors.placeId.message}</p>}
+                <div className="grid gap-3 sm:grid-cols-2">
+                  {campuses.map((campus) => (
+                    <label key={campus.id} className="flex cursor-pointer items-start gap-4 rounded-2xl border border-line p-5 has-[:checked]:border-brand">
+                      <input type="radio" value={String(campus.id)} className="mt-1 size-4 accent-brand" {...register("placeId")} />
+                      <span><span className="block font-medium">{campus.city ?? campus.name}</span><span className="text-sm text-ink-muted">{campus.address ?? campus.name}</span></span>
+                    </label>
+                  ))}
+                </div>
+              </div>
+            )}
           </fieldset>
         )}
 

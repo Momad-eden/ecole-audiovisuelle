@@ -12,6 +12,7 @@ Mot de passe oublié : lien « Mot de passe oublié ? » sur la page de connexio
 | **Directeur** | Tout, y compris les comptes et les paramètres du site |
 | **Gestionnaire** | Candidatures (y compris la décision), étudiants, caisse et clôtures, formations et sessions |
 | **Secrétaire** | Candidatures (sans la décision finale), étudiants, encaissements et reçus |
+| **Commercial (Impact Live)** | Demandes de devis et de réservation, matériel, packs, services, agenda, productions du studio |
 | **Communication** | Pages du site, actualités, univers et réalisations (univers, expositions, réalisations des étudiants), partenaires, FAQ, menus, messages reçus, paramètres du site |
 
 Le menu de gauche n'affiche que ce que votre rôle permet d'ouvrir.
@@ -94,6 +95,29 @@ On ne modifie jamais une opération enregistrée. Ouvrez-la › **Annuler cette 
 **Caisse › Clôtures de caisse** › **Clôturer une période** : choisissez la date de fin (souvent le dernier jour du mois) et, si vous l'avez compté, le montant d'espèces en caisse. L'écart s'affiche. Après la clôture, plus aucune opération ne peut être saisie à une date de la période.
 
 **Exporter le journal** : Journal de caisse › **Exporter le journal** (fichier CSV qui s'ouvre dans Excel).
+
+---
+
+## Impact Live : studio, événementiel, Espace Habib Faye
+
+Menu **Impact Live** (rôles Directeur et Commercial ; la Communication peut aussi mettre à jour la vitrine).
+
+### Traiter une demande de devis ou de réservation
+
+1. **Impact Live › Demandes** : le chiffre à côté du menu indique les nouvelles demandes. Chaque demande a une référence (ex. `DEM-2026-00012`), le matériel choisi par le client, ses dates, son lieu et son message.
+2. Rappelez le client (bouton WhatsApp ou téléphone sur la fiche). Consignez l'échange avec **⋮ › Ajouter une note**.
+3. **Devis envoyé** : indiquez le montant. Puis **Confirmer**, et après l'événement **Marquer réalisée**. Une demande abandonnée : **⋮ › Annuler la demande** (motif obligatoire).
+4. Une demande reçue par téléphone se saisit avec **Saisir une demande (téléphone)**.
+
+### Mettre à jour la vitrine
+
+- **Matériel** : nom, marque, catégorie, photos, caractéristiques (ex. « Puissance — 2 × 1 000 W »), quantité et **prix « à partir de »** par jour. Laissez le prix vide pour afficher « Sur devis ». « Usage » : *à louer* (catalogue Impact Live Events) ou *équipement du studio* (fiche technique de la page Studio).
+- **Packs** : un nom, « pour qui » (ex. jusqu'à 500 personnes), le contenu et un prix indicatif.
+- **Services** : les services du studio (enregistrement, mixage, mastering…), les prestations événementielles et la location de l'Espace Habib Faye, avec leur prix indicatif.
+- **Agenda et références** : les prochains événements (dates, lieu, billetterie) et, en cochant « Référence », les prestations réalisées (ex. Festival de Saint-Louis) qui s'affichent dans « Ils nous ont fait confiance ».
+- **Productions du studio** : dans Univers & réalisations › Réalisations, choisissez « Réalisée par : Impact Live Studio » et ajoutez le fichier son ; elle s'écoute sur la page Studio.
+- **Pages Studio, Events et Espace Habib Faye** : Site › Pages du site, comme la page d'accueil (titres, textes, ordre des blocs).
+- **Lieux** (Administration › Lieux) : adresses, téléphones, horaires et photos des campus de Dakar et de Saint-Louis, du studio et de l'Espace Habib Faye.
 
 ---
 

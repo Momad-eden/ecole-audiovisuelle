@@ -6,7 +6,7 @@ import { StageHero } from "./StageHero";
 import type { HeroData } from "./types";
 
 export function HeroBlock({ data, first }: { data: HeroData; first: boolean }) {
-  if (data.layout === "stage") return <StageHero data={data} first={first} />;
+  if (data.layout === "stage" || data.layout === "studio" || data.layout === "events") return <StageHero data={data} first={first} variant={data.layout} />;
   const split = data.layout === "split" && data.image;
   const Heading = first ? "h1" : "h2";
 

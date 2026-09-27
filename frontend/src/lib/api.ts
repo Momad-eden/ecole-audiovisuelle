@@ -1,5 +1,5 @@
 import "server-only";
-import type { Artwork, Exhibition, NewsItem, Offering, Page, Paginated, Program, RoomSummary, Site } from "./types";
+import type { AgendaEvent, Artwork, EquipmentCategory, EquipmentItem, Exhibition, NewsItem, Offering, Page, Paginated, Program, RentalPack, RoomSummary, Service, Site } from "./types";
 
 const API_URL = process.env.API_URL ?? "http://127.0.0.1:8000";
 
@@ -51,6 +51,13 @@ export const api = {
   offerings: (audience?: "school" | "professional") => data(get<{ data: Offering[] }>(`offerings${audience ? `?audience=${audience}` : ""}`)),
   news: (page = 1) => get<Paginated<NewsItem>>(`news?page=${page}`),
   newsItem: (slug: string) => maybe(data(get<{ data: NewsItem }>(`news/${slug}`))),
+  services: (activity?: string) => data(get<{ data: Service[] }>(`services${activity ? `?activity=${activity}` : ""}`)),
+  equipmentCategories: () => data(get<{ data: EquipmentCategory[] }>("equipment-categories")),
+  equipment: (query = "") => data(get<{ data: EquipmentItem[] }>(`equipment${query ? `?${query}` : ""}`)),
+  equipmentItem: (slug: string) => maybe(data(get<{ data: EquipmentItem }>(`equipment/${slug}`))),
+  packs: () => data(get<{ data: RentalPack[] }>("packs")),
+  agenda: (query = "") => data(get<{ data: AgendaEvent[] }>(`agenda${query ? `?${query}` : ""}`)),
+  agendaEvent: (slug: string) => maybe(data(get<{ data: AgendaEvent }>(`agenda/${slug}`))),
   redirects: () => data(get<{ data: { from: string; to: string; status: number }[] }>("redirects")),
   sitemap: () => data(get<{ data: { path: string; updatedAt: string | null }[] }>("sitemap")),
 };

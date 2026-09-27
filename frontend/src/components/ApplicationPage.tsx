@@ -3,7 +3,8 @@ import { ApplicationForm } from "@/components/forms/ApplicationForm";
 import { api } from "@/lib/api";
 
 export async function ApplicationPage({ audience, formation }: { audience: "school" | "professional"; formation?: string }) {
-  const offerings = await api.offerings(audience);
+  const [offerings, site] = await Promise.all([api.offerings(audience), api.site()]);
+  const campuses = site.places.filter((place) => place.kind === "campus");
   const program = formation ? await api.program(formation) : null;
   const preselected = program?.cohorts?.flatMap((c) => c.offerings ?? []).find((o) => offerings.some((open) => open.id === o.id))?.id;
 
@@ -24,7 +25,7 @@ export async function ApplicationPage({ audience, formation }: { audience: "scho
           </div>
         </div>
       ) : (
-        <div className="mt-10"><ApplicationForm offerings={offerings} audience={audience} preselected={preselected ? String(preselected) : undefined} /></div>
+        <div className="mt-10"><ApplicationForm offerings={offerings} audience={audience} campuses={campuses} preselected={preselected ? String(preselected) : undefined} /></div>
       )}
     </div>
   );

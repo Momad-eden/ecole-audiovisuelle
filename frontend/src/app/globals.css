@@ -276,6 +276,26 @@ body::after {
 }
 .uv-film { animation: film 6s linear infinite; }
 
+/* ——— Héros « Studio » et « Événementiel » ——— */
+@keyframes meter {
+  0%, 100% { transform: scaleY(var(--m-lo, 0.3)); }
+  35% { transform: scaleY(var(--m-hi, 0.9)); }
+  60% { transform: scaleY(calc(var(--m-hi, 0.9) * 0.7)); }
+}
+.meter-bar { transform-origin: 50% 100%; transform-box: fill-box; animation: meter 0.7s ease-in-out infinite; }
+@keyframes needle {
+  0%, 100% { transform: rotate(-38deg); }
+  30% { transform: rotate(18deg); }
+  55% { transform: rotate(-6deg); }
+  75% { transform: rotate(26deg); }
+}
+.vu-needle { transform-origin: 50% 100%; transform-box: fill-box; animation: needle 2.4s ease-in-out infinite; }
+@keyframes onair { 50% { opacity: 0.35; } }
+.onair-glow { animation: onair 2.6s ease-in-out infinite; }
+.cab-led { animation: blink 1.6s steps(1) infinite; }
+@keyframes sub-pulse { 50% { transform: scale(1.12); } }
+.sub-cone { transform-origin: center; transform-box: fill-box; animation: sub-pulse 0.48s ease-in-out infinite; }
+
 @media (prefers-reduced-motion: reduce) {
   html { scroll-behavior: auto; }
   *, *::before, *::after {

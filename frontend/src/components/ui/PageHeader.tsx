@@ -1,5 +1,5 @@
 import type { ReactNode } from "react";
-import { cn } from "@/lib/utils";
+import { cn, frenchSpacing } from "@/lib/utils";
 
 type Props = { eyebrow?: string | null; title: string; text?: string | null; accent?: string; children?: ReactNode; aside?: ReactNode; className?: string };
 
@@ -16,7 +16,7 @@ export function PageHeader({ eyebrow, title, text, accent, children, aside, clas
               {eyebrow}
             </p>
           )}
-          <h1 className="display text-[clamp(2.6rem,7vw,6.2rem)] text-balance">{title}</h1>
+          <h1 className="display text-[clamp(2.6rem,7vw,6.2rem)] text-balance">{frenchSpacing(title)}</h1>
           {text && <p className="mt-6 max-w-2xl text-lg text-ink/80 sm:text-xl">{text}</p>}
           {children}
         </div>
