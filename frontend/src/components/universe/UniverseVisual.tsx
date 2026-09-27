@@ -10,7 +10,7 @@ import { cn } from "@/lib/utils";
 export function UniverseVisual({ kind, className }: { kind: UniverseVisualKind; className?: string }) {
   const Visual = VISUALS[kind] ?? SoundVisual;
   return (
-    <svg viewBox="0 0 400 300" className={cn("h-full w-full text-[var(--accent)]", className)} aria-hidden focusable="false" preserveAspectRatio="xMidYMid meet">
+    <svg viewBox="0 0 400 300" className={cn("h-full w-full text-[var(--accent-ink)]", className)} aria-hidden focusable="false" preserveAspectRatio="xMidYMid meet">
       <Visual />
     </svg>
   );

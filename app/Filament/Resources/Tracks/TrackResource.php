@@ -6,10 +6,10 @@ use App\Filament\Resources\Tracks\Pages\CreateTrack;
 use App\Filament\Resources\Tracks\Pages\EditTrack;
 use App\Filament\Resources\Tracks\Pages\ListTracks;
 use App\Filament\Support\FrenchLabels;
+use App\Filament\Support\RichText\TypographyPlugin;
 use App\Models\Track;
 use BackedEnum;
 use Filament\Actions\EditAction;
-use Filament\Forms\Components\RichEditor;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\TagsInput;
 use Filament\Forms\Components\Textarea;
@@ -50,8 +50,7 @@ class TrackResource extends Resource
                 Select::make('room_id')->label('Univers')->relationship('room', 'name')->preload(),
                 Toggle::make('is_active')->label('Active')->default(true)->inline(false),
                 Textarea::make('summary')->label('Résumé')->rows(2)->maxLength(300)->columnSpanFull(),
-                RichEditor::make('description')->label('Description')
-                    ->toolbarButtons([['bold', 'italic', 'link'], ['h2', 'h3'], ['bulletList', 'orderedList'], ['undo', 'redo']])
+                TypographyPlugin::editor('description', 'Description')
                     ->columnSpanFull(),
                 TagsInput::make('skills')->label('Compétences')->columnSpanFull(),
                 TagsInput::make('outcomes')->label('Débouchés')->columnSpanFull(),

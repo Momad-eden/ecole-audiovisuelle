@@ -11,10 +11,10 @@ use App\Filament\Resources\Programs\Pages\ListPrograms;
 use App\Filament\Resources\Programs\RelationManagers\CohortsRelationManager;
 use App\Filament\Support\Fields;
 use App\Filament\Support\FrenchLabels;
+use App\Filament\Support\RichText\TypographyPlugin;
 use App\Models\Program;
 use BackedEnum;
 use Filament\Actions\EditAction;
-use Filament\Forms\Components\RichEditor;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\TagsInput;
 use Filament\Forms\Components\Textarea;
@@ -65,8 +65,7 @@ class ProgramResource extends Resource
                         TextInput::make('level_label')->label('Niveau / titre délivré')->placeholder('Ex. Certification de niveau BTS (Bac+2)'),
                         TextInput::make('duration_label')->label('Durée')->placeholder('Ex. 9 mois (1 080 h)'),
                         Textarea::make('summary')->label('Résumé (cartes et référencement)')->rows(3)->maxLength(300)->columnSpanFull(),
-                        RichEditor::make('description')->label('Présentation détaillée')
-                            ->toolbarButtons([['bold', 'italic', 'link'], ['h2', 'h3'], ['bulletList', 'orderedList', 'blockquote'], ['undo', 'redo']])
+                        TypographyPlugin::editor('description', 'Présentation détaillée')
                             ->columnSpanFull(),
                     ]),
                 ]),

@@ -51,7 +51,7 @@ export function SiteFooter({ site }: { site: Site }) {
               {site.rooms.map((universe) => (
                 <li key={universe.id}>
                   <Link href={`/univers/${universe.slug}`} className="inline-flex min-h-8 items-center gap-2 text-ink/80 transition hover:text-ink" style={{ ["--accent" as string]: universe.accentColor }}>
-                    <span className="size-1.5 rounded-full bg-[var(--accent)]" aria-hidden />
+                    <span className="size-1.5 rounded-full bg-[var(--accent-ink)]" aria-hidden />
                     {universe.name}
                   </Link>
                 </li>

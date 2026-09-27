@@ -4,6 +4,7 @@ import { MediaImage } from "@/components/ui/MediaImage";
 import type { Site } from "@/lib/types";
 import { HeaderShell } from "./HeaderShell";
 import { MobileMenu } from "./MobileMenu";
+import { ThemeToggle } from "./ThemeToggle";
 
 export function SiteHeader({ site }: { site: Site }) {
   const links = site.menus.main;
@@ -41,11 +42,11 @@ export function SiteHeader({ site }: { site: Site }) {
                         {universes.map((universe) => (
                           <li key={universe.id}>
                             <Link href={`/univers/${universe.slug}`} className="group/item flex h-full gap-3 rounded-2xl p-3 transition hover:bg-ink/5" style={{ ["--accent" as string]: universe.accentColor }}>
-                              <span className="mt-1.5 size-2.5 shrink-0 rounded-full bg-[var(--accent)] shadow-[0_0_14px_var(--accent)]" aria-hidden />
+                              <span className="mt-1.5 size-2.5 shrink-0 rounded-full bg-[var(--accent-ink)] shadow-[0_0_14px_var(--accent)]" aria-hidden />
                               <span>
                                 <span className="flex items-center gap-2 font-semibold">
                                   {universe.name}
-                                  {universe.isUpcoming && <span className="cartel text-[var(--accent)]">Bientôt</span>}
+                                  {universe.isUpcoming && <span className="cartel text-[var(--accent-ink)]">Bientôt</span>}
                                 </span>
                                 {universe.tagline && <span className="mt-1 line-clamp-2 block text-xs text-ink-muted">{universe.tagline}</span>}
                               </span>
@@ -62,8 +63,9 @@ export function SiteHeader({ site }: { site: Site }) {
         </nav>
 
         <div className="flex items-center gap-2">
+          <ThemeToggle className="hidden sm:grid" />
           {cta && (
-            <Link href={cta.url} className="group hidden min-h-11 items-center gap-2 rounded-full bg-brand px-5 text-sm font-semibold text-night shadow-[0_0_40px_-10px_var(--color-brand)] transition hover:brightness-110 sm:inline-flex">
+            <Link href={cta.url} className="group hidden min-h-11 items-center gap-2 rounded-full bg-brand px-5 text-sm font-semibold text-on-accent shadow-[0_0_40px_-10px_var(--color-brand)] transition hover:brightness-110 sm:inline-flex">
               {cta.label}
               <ArrowRight className="size-4 transition-transform group-hover:translate-x-0.5" aria-hidden />
             </Link>

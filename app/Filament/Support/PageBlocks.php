@@ -3,6 +3,7 @@
 namespace App\Filament\Support;
 
 use App\Enums\Audience;
+use App\Filament\Support\RichText\TypographyPlugin;
 use App\Models\Faq;
 use App\Models\Partner;
 use App\Models\Room;
@@ -36,8 +37,7 @@ final class PageBlocks
 
     private static function richText(string $name = 'body', string $label = 'Texte'): RichEditor
     {
-        return RichEditor::make($name)->label($label)
-            ->toolbarButtons([['bold', 'italic', 'link'], ['h2', 'h3'], ['bulletList', 'orderedList', 'blockquote'], ['undo', 'redo']]);
+        return TypographyPlugin::editor($name, $label);
     }
 
     private static function image(string $name = 'image', string $label = 'Image', bool $required = false): array

@@ -32,6 +32,7 @@
 - Pages construites par **blocs (sections) réorganisables** depuis l'admin (glisser-déposer), à partir d'une bibliothèque de blocs prédéfinis et testés (héros, texte + image, galerie, lecteur audio, vidéo, chiffres clés, citation, appel à l'action, liste de formations, etc.). Pas d'éditeur HTML libre.
 - **Médiathèque** centrale (images, vidéos, fichiers audio, PDF) avec recadrage, texte alternatif, crédits.
 - **Brouillon / aperçu / publication** pour chaque contenu, historique des versions, restauration.
+- Mise en forme « comme un traitement de texte » mais **guidée** (décision de Momar, 27/09/2026) : polices, tailles et couleurs choisies dans des listes fermées (`app/Filament/Support/RichText`), jamais de style libre.
 - Interface admin en français simple, sans jargon technique (« Publier », « Masquer du site », pas « is_active »), aides contextuelles, messages de confirmation clairs, impossibilité de casser la mise en page (champs limités, formats imposés, compression automatique des médias).
 - Critère de recette : **une personne de l'administration de l'école, sans formation technique, doit pouvoir réaliser seule** : publier une actualité, ajouter une réalisation d'étudiant, modifier la page d'accueil, ouvrir une session de candidature, traiter une candidature, encaisser un paiement.
 

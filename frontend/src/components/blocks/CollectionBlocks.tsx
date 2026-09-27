@@ -107,7 +107,7 @@ export function ProfessionalSpaceBlock({ data }: { data: ProfessionalSpaceData }
     <Section>
       <Reveal className="relative grid overflow-hidden rounded-[2rem] border border-line bg-night-2 lg:grid-cols-[1.2fr_1fr]" >
         <div className="relative z-10 p-8 sm:p-12" style={{ ["--accent" as string]: "var(--color-hmi)" }}>
-          <p className="cartel flex items-center gap-3 text-[var(--accent)]"><span className="h-px w-10 bg-[var(--accent)]" aria-hidden />Espace Professionnels</p>
+          <p className="cartel flex items-center gap-3 text-[var(--accent-ink)]"><span className="h-px w-10 bg-[var(--accent-ink)]" aria-hidden />Espace Professionnels</p>
           <h2 className="display mt-5 text-[clamp(2rem,4vw,3.4rem)] text-balance">{data.title}</h2>
           {data.text && <p className="mt-5 max-w-xl text-lg text-ink/80">{data.text}</p>}
           <div className="mt-9"><ButtonLink href="/professionnels">{data.buttonLabel || "Découvrir le programme"}</ButtonLink></div>

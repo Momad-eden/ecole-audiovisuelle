@@ -93,7 +93,7 @@ export default async function ArtworkPage({ params }: Props) {
         </div>
 
         <div className="lg:col-span-5">
-          <p className="cartel" style={{ color: "var(--accent)" }}>{[artwork.kindLabel, artwork.year].filter(Boolean).join(" · ")}</p>
+          <p className="cartel" style={{ color: "var(--accent-ink)" }}>{[artwork.kindLabel, artwork.year].filter(Boolean).join(" · ")}</p>
           <h1 className="display mt-4 text-[clamp(2.2rem,4.5vw,3.8rem)] text-balance">{artwork.title}</h1>
           {artwork.summary && <p className="mt-5 text-lg text-ink/85">{artwork.summary}</p>}
 
@@ -128,7 +128,7 @@ export default async function ArtworkPage({ params }: Props) {
                 <span className="cartel block">Apprendre à faire ça</span>
                 <span className="display mt-1 block text-xl">Filière {artwork.track.name}</span>
               </span>
-              <ArrowRight className="size-5 text-[var(--accent)]" aria-hidden />
+              <ArrowRight className="size-5 text-[var(--accent-ink)]" aria-hidden />
             </Link>
           )}
         </div>

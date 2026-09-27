@@ -18,8 +18,10 @@
   --color-magenta: #ff4fa3;
   --color-gold: #ffb020;
   --color-rec: #ff3b30;
+  --color-on-accent: #07070a;
 
   --font-display: var(--font-archivo), ui-sans-serif, system-ui, sans-serif;
+  --font-serif: var(--font-fraunces), Georgia, "Times New Roman", serif;
   --font-sans: var(--font-inter), ui-sans-serif, system-ui, sans-serif;
   --font-mono: var(--font-jetbrains), ui-monospace, monospace;
 
@@ -29,6 +31,40 @@
 :root {
   --accent: var(--color-brand);
   color-scheme: dark;
+}
+
+/*
+ * Thème clair « Plein jour » (bouton soleil/lune de l'en-tête, choix mémorisé).
+ * Les couleurs de marque sont assombries pour garder un contraste AA sur fond clair.
+ */
+:root[data-theme="light"] {
+  color-scheme: light;
+  --color-night: #f7f4ee;
+  --color-night-2: #ffffff;
+  --color-night-3: #ece7de;
+  --color-ink: #121217;
+  --color-ink-muted: #595664;
+  --color-line: rgb(18 18 23 / 0.13);
+  --color-brand: #c2410c;
+  --color-violet: #6d4fe0;
+  --color-hmi: #0e7490;
+  --color-magenta: #be185d;
+  --color-gold: #a16207;
+  --color-rec: #b91c1c;
+  --color-on-accent: #ffffff;
+}
+
+/*
+ * --accent : lumière de la page ou de l'univers (couleurs vives saisies dans l'admin).
+ * --accent-ink : la même, utilisable pour du texte et des boutons ; assombrie en thème clair.
+ * Redéclarée sur chaque élément qui change --accent, pour suivre la bonne couleur.
+ */
+:root,
+[style*="--accent"] {
+  --accent-ink: var(--accent);
+}
+:root[data-theme="light"] [style*="--accent"] {
+  --accent-ink: color-mix(in oklab, var(--accent) 55%, black);
 }
 
 html {
@@ -116,6 +152,22 @@ body::after {
 .rich-text blockquote { border-left: 2px solid var(--accent); padding-left: 1rem; font-size: 1.2rem; }
 .rich-text strong { color: var(--color-ink); }
 .rich-text img { border-radius: 0.75rem; }
+.rich-text s { opacity: 0.7; }
+
+/* Mise en forme guidée saisie dans l'éditeur de l'admin (listes fermées : voir TypographyPlugin). */
+.rich-text [data-font="display"] { font-family: var(--font-display); font-variation-settings: "wdth" 118; font-weight: 800; letter-spacing: -0.02em; }
+.rich-text [data-font="serif"] { font-family: var(--font-serif); }
+.rich-text [data-font="mono"] { font-family: var(--font-mono); }
+.rich-text [data-size="sm"] { font-size: 0.875em; }
+.rich-text [data-size="lg"] { font-size: 1.25em; }
+.rich-text [data-size="xl"] { font-size: 1.6em; line-height: 1.25; }
+.rich-text [data-size="2xl"] { font-size: clamp(1.6em, 5vw, 2.2em); line-height: 1.15; }
+.rich-text [data-color="brand"] { color: var(--color-brand); }
+.rich-text [data-color="violet"] { color: var(--color-violet); }
+.rich-text [data-color="cyan"] { color: var(--color-hmi); }
+.rich-text [data-color="magenta"] { color: var(--color-magenta); }
+.rich-text [data-color="gold"] { color: var(--color-gold); }
+.rich-text [data-color="red"] { color: var(--color-rec); }
 
 /* Apparition au défilement : masquée seulement si JavaScript tourne (Reveal ajoute .is-in). */
 @media (scripting: enabled) and (prefers-reduced-motion: no-preference) {

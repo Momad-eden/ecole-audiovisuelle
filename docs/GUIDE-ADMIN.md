@@ -97,6 +97,21 @@ On ne modifie jamais une opération enregistrée. Ouvrez-la › **Annuler cette 
 
 ---
 
+## Mettre en forme un texte (comme dans un traitement de texte)
+
+Dans tout champ de texte (article, page, formation, réalisation…), la barre d'outils propose :
+
+- **Gras, italique, souligné, barré, lien** ;
+- **Police** (icône 文A) : Texte (par défaut), Titre (large), Élégante, Machine à écrire ;
+- **Taille** : Petit, Normale, Grand, Très grand, Énorme ;
+- **Couleur du texte** : les couleurs de l'école (orange, violet, bleu lumière, magenta, or, rouge) ;
+- **Titres** (H2, H3), **alignement** (gauche, centre, droite), **listes** et **citation** ;
+- **Effacer la mise en forme** pour revenir au texte normal.
+
+Sélectionnez le texte, puis choisissez. Les polices, tailles et couleurs sont volontairement limitées à celles du site : le texte reste beau et lisible sur téléphone, en thème sombre comme en thème clair.
+
+---
+
 ## Autres tâches courantes
 
 - **Répondre aux messages du site** : Site › Messages reçus › Lire › « Marquer comme traité ».

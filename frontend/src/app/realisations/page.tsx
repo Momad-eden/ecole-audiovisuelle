@@ -32,7 +32,7 @@ export default async function RealisationsPage({ searchParams }: Props) {
         <nav aria-label="Filtrer par univers" className="mb-12">
           <ul className="flex flex-wrap gap-2">
             <li>
-              <Link href="/realisations" aria-current={!active ? "page" : undefined} className={cn("inline-flex min-h-11 items-center rounded-full border px-5 text-sm transition", !active ? "border-brand bg-brand text-night" : "border-line hover:border-ink/40")}>Tout</Link>
+              <Link href="/realisations" aria-current={!active ? "page" : undefined} className={cn("inline-flex min-h-11 items-center rounded-full border px-5 text-sm transition", !active ? "border-brand bg-brand text-on-accent" : "border-line hover:border-ink/40")}>Tout</Link>
             </li>
             {universes.filter((u) => !u.isUpcoming).map((universe) => {
               const selected = universe.slug === active?.slug;
@@ -41,10 +41,10 @@ export default async function RealisationsPage({ searchParams }: Props) {
                   <Link
                     href={`/realisations?univers=${universe.slug}`}
                     aria-current={selected ? "page" : undefined}
-                    className={cn("inline-flex min-h-11 items-center gap-2 rounded-full border px-5 text-sm transition", selected ? "border-[var(--accent)] bg-[var(--accent)] text-night" : "border-line hover:border-[var(--accent)]")}
+                    className={cn("inline-flex min-h-11 items-center gap-2 rounded-full border px-5 text-sm transition", selected ? "border-[var(--accent)] bg-[var(--accent-ink)] text-on-accent" : "border-line hover:border-[var(--accent)]")}
                     style={{ ["--accent" as string]: universe.accentColor }}
                   >
-                    {!selected && <span className="size-2 rounded-full bg-[var(--accent)]" aria-hidden />}
+                    {!selected && <span className="size-2 rounded-full bg-[var(--accent-ink)]" aria-hidden />}
                     {universe.name}
                   </Link>
                 </li>

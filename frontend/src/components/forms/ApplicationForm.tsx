@@ -273,9 +273,9 @@ export function ApplicationForm({ offerings, audience, preselected }: { offering
       <div className="mt-8 flex justify-between gap-4">
         <button type="button" onClick={() => setStep((s) => Math.max(0, s - 1))} className={cn("min-h-12 rounded-full border border-line px-6", step === 0 && "invisible")}>Retour</button>
         {step < STEPS.length - 1 ? (
-          <button type="button" onClick={next} className="min-h-12 rounded-full bg-brand px-8 font-semibold text-night">Continuer</button>
+          <button type="button" onClick={next} className="min-h-12 rounded-full bg-brand px-8 font-semibold text-on-accent">Continuer</button>
         ) : (
-          <button type="submit" disabled={isSubmitting} className="min-h-12 rounded-full bg-brand px-8 font-semibold text-night disabled:opacity-60">{isSubmitting ? "Envoi en cours…" : "Envoyer ma candidature"}</button>
+          <button type="submit" disabled={isSubmitting} className="min-h-12 rounded-full bg-brand px-8 font-semibold text-on-accent disabled:opacity-60">{isSubmitting ? "Envoi en cours…" : "Envoyer ma candidature"}</button>
         )}
       </div>
     </form>

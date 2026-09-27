@@ -44,7 +44,7 @@ export function VenueBlock({ data }: { data: VenueData }) {
       <Container>
         <div className="grid items-center gap-14 lg:grid-cols-[1fr_1.1fr]">
           <Reveal>
-            {data.eyebrow && <p className="cartel mb-5 flex items-center gap-3 text-[var(--accent)]"><span className="h-px w-10 bg-[var(--accent)]" aria-hidden />{data.eyebrow}</p>}
+            {data.eyebrow && <p className="cartel mb-5 flex items-center gap-3 text-[var(--accent-ink)]"><span className="h-px w-10 bg-[var(--accent-ink)]" aria-hidden />{data.eyebrow}</p>}
             <h2 className="display text-[clamp(1.9rem,3.4vw,3rem)] text-balance">{data.title}</h2>
             {data.text && <p className="mt-6 max-w-xl text-lg text-ink/80">{data.text}</p>}
             {data.buttons && data.buttons.length > 0 && (
@@ -71,7 +71,7 @@ export function VenueBlock({ data }: { data: VenueData }) {
             {facts.map((fact, i) => (
               <Reveal key={fact.label} delay={i * 100} className="bg-night p-8">
                 <dt className="sr-only">{fact.label}</dt>
-                <dd className="display text-[clamp(2.4rem,5vw,3.8rem)] text-[var(--accent)]">{fact.value}</dd>
+                <dd className="display text-[clamp(2.4rem,5vw,3.8rem)] text-[var(--accent-ink)]">{fact.value}</dd>
                 <dd className="mt-2 text-ink-muted">{fact.label}</dd>
               </Reveal>
             ))}

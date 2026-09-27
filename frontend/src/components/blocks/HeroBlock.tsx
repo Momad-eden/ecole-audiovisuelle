@@ -26,7 +26,7 @@ export function HeroBlock({ data, first }: { data: HeroData; first: boolean }) {
 
       <div className={cn("mx-auto w-full max-w-7xl px-4 sm:px-6 lg:px-8", split && "grid items-center gap-12 lg:grid-cols-2")}>
         <div className="max-w-3xl">
-          {data.eyebrow && <p className="cartel mb-5 flex items-center gap-3 text-[var(--accent)]"><span className="h-px w-10 bg-[var(--accent)]" aria-hidden />{data.eyebrow}</p>}
+          {data.eyebrow && <p className="cartel mb-5 flex items-center gap-3 text-[var(--accent-ink)]"><span className="h-px w-10 bg-[var(--accent-ink)]" aria-hidden />{data.eyebrow}</p>}
           <Heading className="display text-[clamp(2.4rem,6.5vw,5.8rem)] text-balance">{data.title}</Heading>
           {data.subtitle && <p className="mt-6 max-w-2xl text-lg text-ink/80 sm:text-xl">{data.subtitle}</p>}
           {data.buttons && data.buttons.length > 0 && (

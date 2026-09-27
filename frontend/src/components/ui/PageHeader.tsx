@@ -11,8 +11,8 @@ export function PageHeader({ eyebrow, title, text, accent, children, aside, clas
       <div className={cn("mx-auto grid max-w-7xl gap-12 px-4 sm:px-6 lg:px-8", aside && "lg:grid-cols-[1.2fr_1fr] lg:items-center")}>
         <div>
           {eyebrow && (
-            <p className="cartel mb-5 flex items-center gap-3 text-[var(--accent)]">
-              <span className="h-px w-10 bg-[var(--accent)]" aria-hidden />
+            <p className="cartel mb-5 flex items-center gap-3 text-[var(--accent-ink)]">
+              <span className="h-px w-10 bg-[var(--accent-ink)]" aria-hidden />
               {eyebrow}
             </p>
           )}

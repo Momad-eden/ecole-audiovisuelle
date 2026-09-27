@@ -6,12 +6,12 @@ use App\Filament\Resources\News\Pages\CreateNews;
 use App\Filament\Resources\News\Pages\EditNews;
 use App\Filament\Resources\News\Pages\ListNews;
 use App\Filament\Support\FrenchLabels;
+use App\Filament\Support\RichText\TypographyPlugin;
 use App\Models\News;
 use BackedEnum;
 use Filament\Actions\EditAction;
 use Filament\Forms\Components\DateTimePicker;
 use Filament\Forms\Components\FileUpload;
-use Filament\Forms\Components\RichEditor;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Toggle;
@@ -48,8 +48,7 @@ class NewsResource extends Resource
             Section::make()->columns(2)->schema([
                 TextInput::make('title')->label('Titre')->required()->maxLength(180)->columnSpanFull(),
                 Textarea::make('excerpt')->label('Résumé (cartes et référencement)')->rows(2)->maxLength(300)->columnSpanFull(),
-                RichEditor::make('content')->label('Article')->required()
-                    ->toolbarButtons([['bold', 'italic', 'link'], ['h2', 'h3'], ['bulletList', 'orderedList', 'blockquote'], ['attachFiles'], ['undo', 'redo']])
+                TypographyPlugin::editor('content', 'Article', images: true)->required()
                     ->fileAttachmentsDisk('public')->fileAttachmentsDirectory('news/attachments')
                     ->columnSpanFull(),
                 FileUpload::make('image')->label('Image de couverture')->image()->disk('public')->directory('news')->imageEditor()->maxSize(8192),

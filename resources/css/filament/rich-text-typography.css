@@ -1,0 +1,8 @@
+/* Aperçu, dans l'éditeur de l'administration, des polices et tailles choisies (même rendu que le site). */
+.fi-fo-rich-editor [data-font="display"] { font-weight: 800; letter-spacing: -0.02em; font-stretch: 125%; }
+.fi-fo-rich-editor [data-font="serif"] { font-family: Georgia, "Times New Roman", serif; }
+.fi-fo-rich-editor [data-font="mono"] { font-family: ui-monospace, "SFMono-Regular", Menlo, monospace; }
+.fi-fo-rich-editor [data-size="sm"] { font-size: 0.875em; }
+.fi-fo-rich-editor [data-size="lg"] { font-size: 1.25em; }
+.fi-fo-rich-editor [data-size="xl"] { font-size: 1.6em; line-height: 1.25; }
+.fi-fo-rich-editor [data-size="2xl"] { font-size: 2.2em; line-height: 1.15; }

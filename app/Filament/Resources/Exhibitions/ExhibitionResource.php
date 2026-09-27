@@ -7,11 +7,11 @@ use App\Filament\Resources\Exhibitions\Pages\EditExhibition;
 use App\Filament\Resources\Exhibitions\Pages\ListExhibitions;
 use App\Filament\Support\Fields;
 use App\Filament\Support\FrenchLabels;
+use App\Filament\Support\RichText\TypographyPlugin;
 use App\Models\Exhibition;
 use BackedEnum;
 use Filament\Actions\EditAction;
 use Filament\Forms\Components\DatePicker;
-use Filament\Forms\Components\RichEditor;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\TextInput;
 use Filament\Resources\Resource;
@@ -48,8 +48,7 @@ class ExhibitionResource extends Resource
                 DatePicker::make('starts_on')->label('Du'),
                 DatePicker::make('ends_on')->label('Au')->afterOrEqual('starts_on'),
                 TextInput::make('venue')->label('Lieu')->placeholder('Ex. Grand Théâtre National, Dakar')->columnSpanFull(),
-                RichEditor::make('curatorial_text')->label('Texte de présentation')
-                    ->toolbarButtons([['bold', 'italic', 'link'], ['h2', 'h3'], ['bulletList', 'blockquote'], ['undo', 'redo']])
+                TypographyPlugin::editor('curatorial_text', 'Texte de présentation')
                     ->columnSpanFull(),
                 Select::make('artworks')->label('Réalisations exposées')->relationship('artworks', 'title')->multiple()->searchable()->preload()->columnSpanFull(),
                 ...Fields::image('cover_image', 'exhibitions', 'Affiche / visuel'),
