@@ -20,7 +20,7 @@ export async function ApplicationPage({ audience, formation }: { audience: "scho
           </p>
           <div className="mt-6 flex flex-wrap gap-3">
             <Link href={audience === "professional" ? "/professionnels" : "/formations"} className="rounded-full border border-line px-5 py-2">Voir les formations</Link>
-            <Link href="/contact" className="rounded-full bg-brand px-5 py-2 font-semibold text-night">Nous contacter</Link>
+            <Link href="/contact" className="rounded-full bg-brand px-5 py-2 font-semibold text-on-accent">Nous contacter</Link>
           </div>
         </div>
       ) : (

@@ -18,7 +18,7 @@ export function SectionTitle({ eyebrow, title, text, className }: { eyebrow?: st
     <header className={cn("mb-12 max-w-3xl", className)}>
       {eyebrow && (
         <p className="cartel mb-4 flex items-center gap-3">
-          <span className="h-px w-10 bg-[var(--accent)]" aria-hidden />
+          <span className="h-px w-10 bg-[var(--accent-ink)]" aria-hidden />
           {eyebrow}
         </p>
       )}

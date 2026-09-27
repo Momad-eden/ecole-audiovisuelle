@@ -195,17 +195,17 @@ function UniversePanel({
             style={{ ["--accent" as string]: universe.accentColor }}
         >
             <div
-                className="absolute inset-x-10 top-0 h-px bg-[var(--accent)] opacity-70 shadow-[0_0_24px_2px_var(--accent)]"
+                className="absolute inset-x-10 top-0 h-px bg-[var(--accent-ink)] opacity-70 shadow-[0_0_24px_2px_var(--accent)]"
                 aria-hidden
             />
             <div className="relative z-10 flex flex-col p-7 sm:p-10">
                 <p className="cartel flex items-center gap-3">
-                    <span className="tabular-nums text-[var(--accent)]">
+                    <span className="tabular-nums text-[var(--accent-ink)]">
                         {String(index + 1).padStart(2, "0")}
                     </span>
                     <span>Univers</span>
                     {universe.isUpcoming && (
-                        <span className="rounded-full border border-[var(--accent)] px-2.5 py-0.5 text-[var(--accent)]">
+                        <span className="rounded-full border border-[var(--accent)] px-2.5 py-0.5 text-[var(--accent-ink)]">
                             Bientôt
                         </span>
                     )}
@@ -233,7 +233,7 @@ function UniversePanel({
                         ))}
                     </ul>
                 )}
-                <span className="mt-auto inline-flex items-center gap-2 pt-8 text-sm font-semibold text-[var(--accent)]">
+                <span className="mt-auto inline-flex items-center gap-2 pt-8 text-sm font-semibold text-[var(--accent-ink)]">
                     {universe.isUpcoming
                         ? "Découvrir le projet"
                         : "Explorer l'univers"}

@@ -69,7 +69,7 @@ export function ContactForm() {
         </label>
       </Field>
       {status === "error" && <p role="alert" className="text-sm text-rec">L&apos;envoi a échoué. Réessayez dans quelques minutes.</p>}
-      <button type="submit" disabled={isSubmitting} className="inline-flex min-h-12 items-center rounded-full bg-brand px-8 font-semibold text-night disabled:opacity-60">
+      <button type="submit" disabled={isSubmitting} className="inline-flex min-h-12 items-center rounded-full bg-brand px-8 font-semibold text-on-accent disabled:opacity-60">
         {isSubmitting ? "Envoi…" : "Envoyer"}
       </button>
     </form>

@@ -65,7 +65,7 @@ export default async function UniversePage({ params }: Props) {
             {tracks.map((track, index) => (
               <Reveal key={track.id} className="grid gap-10 rounded-[2rem] border border-line bg-night-2 p-7 sm:p-10 lg:grid-cols-[1fr_1.3fr]">
                 <div>
-                  <p className="cartel tabular-nums text-[var(--accent)]">{`${String(index + 1).padStart(2, "0")} · Filière`}</p>
+                  <p className="cartel tabular-nums text-[var(--accent-ink)]">{`${String(index + 1).padStart(2, "0")} · Filière`}</p>
                   <h3 className="display mt-4 text-[clamp(1.8rem,3.4vw,2.8rem)]">{track.name}</h3>
                   {track.summary && <p className="mt-5 text-ink/80">{track.summary}</p>}
                 </div>
@@ -75,7 +75,7 @@ export default async function UniversePage({ params }: Props) {
                       <p className="cartel mb-4">Vous apprendrez</p>
                       <ul className="space-y-3">
                         {track.skills.map((skill) => (
-                          <li key={skill} className="flex gap-3"><Check className="mt-0.5 size-4 shrink-0 text-[var(--accent)]" aria-hidden />{skill}</li>
+                          <li key={skill} className="flex gap-3"><Check className="mt-0.5 size-4 shrink-0 text-[var(--accent-ink)]" aria-hidden />{skill}</li>
                         ))}
                       </ul>
                     </div>
@@ -118,9 +118,9 @@ export default async function UniversePage({ params }: Props) {
           <Link href={`/univers/${next.slug}`} className="group mx-auto flex max-w-7xl items-center justify-between gap-6 px-4 py-14 sm:px-6 lg:px-8">
             <span>
               <span className="cartel block">Univers suivant</span>
-              <span className="display mt-3 block text-[clamp(2rem,5vw,4rem)] transition group-hover:text-[var(--accent)]">{next.name}</span>
+              <span className="display mt-3 block text-[clamp(2rem,5vw,4rem)] transition group-hover:text-[var(--accent-ink)]">{next.name}</span>
             </span>
-            <ArrowRight className="size-10 shrink-0 text-[var(--accent)] transition-transform duration-500 group-hover:translate-x-2" aria-hidden />
+            <ArrowRight className="size-10 shrink-0 text-[var(--accent-ink)] transition-transform duration-500 group-hover:translate-x-2" aria-hidden />
           </Link>
         </section>
       )}

@@ -26,7 +26,7 @@ export function VideoEmbed({ url, title, poster }: { url: string; title: string;
       ) : (
         <button type="button" onClick={() => setActive(true)} className="group absolute inset-0 grid place-items-center" aria-label={`Lire la vidéo « ${title} »`}>
           {cover && <Image src={cover} alt="" fill sizes="(min-width: 1024px) 60vw, 100vw" className="object-cover opacity-70 transition group-hover:opacity-90" />}
-          <span className="relative grid size-20 place-items-center rounded-full bg-[var(--accent)] text-night shadow-[0_0_60px_-5px_var(--accent)]">
+          <span className="relative grid size-20 place-items-center rounded-full bg-[var(--accent-ink)] text-on-accent shadow-[0_0_60px_-5px_var(--accent)]">
             <Play className="size-8 translate-x-0.5" aria-hidden />
           </span>
         </button>

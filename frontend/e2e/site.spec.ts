@@ -72,3 +72,15 @@ test("la candidature professionnelle guide le candidat étape par étape", async
   await page.getByRole("button", { name: "Continuer" }).click();
   await expect(page.getByText("Numéro invalide (ex. +221 77 123 45 67).")).toBeVisible();
 });
+
+test("le changeur de thème passe en clair et s'en souvient", async ({ page, isMobile }) => {
+  await page.goto("/formations");
+  await expect(page.locator("html")).toHaveAttribute("data-theme", "dark");
+  if (isMobile) await page.getByRole("button", { name: "Ouvrir le menu" }).click();
+  await page.getByRole("button", { name: "Passer au thème clair" }).first().click();
+  await expect(page.locator("html")).toHaveAttribute("data-theme", "light");
+  await page.reload();
+  await expect(page.locator("html")).toHaveAttribute("data-theme", "light");
+  if (isMobile) await page.getByRole("button", { name: "Ouvrir le menu" }).click();
+  await expect(page.getByRole("button", { name: "Passer au thème sombre" }).first()).toBeVisible();
+});

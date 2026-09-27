@@ -9,12 +9,12 @@ use App\Filament\Resources\Artworks\Pages\EditArtwork;
 use App\Filament\Resources\Artworks\Pages\ListArtworks;
 use App\Filament\Support\Fields;
 use App\Filament\Support\FrenchLabels;
+use App\Filament\Support\RichText\TypographyPlugin;
 use App\Models\Artwork;
 use BackedEnum;
 use Filament\Actions\EditAction;
 use Filament\Forms\Components\FileUpload;
 use Filament\Forms\Components\Repeater;
-use Filament\Forms\Components\RichEditor;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\TagsInput;
 use Filament\Forms\Components\Textarea;
@@ -76,8 +76,7 @@ class ArtworkResource extends Resource
                     TextInput::make('title')->label('Titre')->required()->maxLength(150),
                     TextInput::make('year')->label('Année')->integer()->minValue(2000)->maxValue(now()->year + 1),
                     Textarea::make('summary')->label('Présentation courte (cartel)')->rows(3)->maxLength(300),
-                    RichEditor::make('creation_story')->label('Récit de création')
-                        ->toolbarButtons([['bold', 'italic', 'link'], ['h2', 'h3'], ['bulletList', 'blockquote'], ['undo', 'redo']]),
+                    TypographyPlugin::editor('creation_story', 'Récit de création'),
                     Textarea::make('transcript')->label('Transcription ou description du son (accessibilité)')->rows(4),
                     TagsInput::make('equipment')->label('Matériel utilisé')->placeholder('Ex. Console DiGiCo SD12'),
                 ]),

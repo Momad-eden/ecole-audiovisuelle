@@ -14,7 +14,7 @@ export function PlayButton({ track, className, label }: { track: Track; classNam
       type="button"
       onClick={() => (isCurrent ? toggle() : play(track))}
       aria-label={isPlaying ? `Mettre en pause « ${track.title} »` : `Écouter « ${track.title} »`}
-      className={cn("inline-flex items-center gap-3 rounded-full bg-[var(--accent)] px-5 py-3 font-medium text-night transition hover:brightness-110", className)}
+      className={cn("inline-flex items-center gap-3 rounded-full bg-[var(--accent-ink)] px-5 py-3 font-medium text-on-accent transition hover:brightness-110", className)}
     >
       {isPlaying ? <Pause className="size-5" aria-hidden /> : <Play className="size-5" aria-hidden />}
       {label ?? (isPlaying ? "Pause" : "Écouter")}

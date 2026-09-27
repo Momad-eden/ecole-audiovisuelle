@@ -86,7 +86,7 @@ export function StatsBlock({ data }: { data: StatsData }) {
         {(data.items ?? []).map((item, i) => (
           <Reveal key={item.label} delay={i * 100} className="bg-night p-8 sm:p-10">
             <dt className="cartel">{item.label}</dt>
-            <dd className="display mt-4 text-[clamp(3rem,6vw,4.8rem)] text-[var(--accent)]">{item.value}</dd>
+            <dd className="display mt-4 text-[clamp(3rem,6vw,4.8rem)] text-[var(--accent-ink)]">{item.value}</dd>
             {item.detail && <dd className="mt-3 text-sm text-ink-muted">{item.detail}</dd>}
           </Reveal>
         ))}
@@ -99,7 +99,7 @@ export function QuoteBlock({ data }: { data: QuoteData }) {
   return (
     <Section>
       <Reveal as="figure" className="mx-auto max-w-5xl">
-        <span className="display block text-8xl leading-none text-[var(--accent)]" aria-hidden>«</span>
+        <span className="display block text-8xl leading-none text-[var(--accent-ink)]" aria-hidden>«</span>
         <blockquote className="display -mt-6 text-[clamp(1.8rem,4vw,3.2rem)] text-balance">{data.text}</blockquote>
         {(data.author || data.role) && (
           <figcaption className="mt-10 flex items-center gap-4">
@@ -151,12 +151,12 @@ export function CardsBlock({ data }: { data: CardsData }) {
           const body = (
             <>
               <div className="flex items-center justify-between">
-                {Icon ? <Icon className="size-7 text-[var(--accent)]" aria-hidden /> : <span />}
+                {Icon ? <Icon className="size-7 text-[var(--accent-ink)]" aria-hidden /> : <span />}
                 <span className="cartel tabular-nums">{String(index + 1).padStart(2, "0")}</span>
               </div>
               <h3 className="display mt-8 text-2xl">{item.title}</h3>
               {item.text && <p className="mt-3 text-ink-muted">{item.text}</p>}
-              {item.url && <span className="mt-6 inline-flex items-center gap-2 text-sm font-semibold text-[var(--accent)]">En savoir plus <ArrowRight className="size-4 transition-transform group-hover:translate-x-1" aria-hidden /></span>}
+              {item.url && <span className="mt-6 inline-flex items-center gap-2 text-sm font-semibold text-[var(--accent-ink)]">En savoir plus <ArrowRight className="size-4 transition-transform group-hover:translate-x-1" aria-hidden /></span>}
             </>
           );
           return (
@@ -201,7 +201,7 @@ export function TimelineBlock({ data }: { data: TimelineData }) {
       <ol className="relative space-y-10 border-l border-line pl-8">
         {steps.map((step, index) => (
           <Reveal as="li" key={index} className="relative">
-            <span className="absolute -left-[2.3rem] top-1.5 size-3 rounded-full bg-[var(--accent)] shadow-[0_0_20px_var(--accent)]" aria-hidden />
+            <span className="absolute -left-[2.3rem] top-1.5 size-3 rounded-full bg-[var(--accent-ink)] shadow-[0_0_20px_var(--accent)]" aria-hidden />
             <p className="cartel">{step.period}{step.tag && <span className="ml-3 rounded-full border border-line px-2 py-0.5">{step.tag}</span>}</p>
             <h3 className="display mt-2 text-2xl">{step.title}</h3>
             {step.text && <p className="mt-2 max-w-2xl text-ink-muted">{step.text}</p>}
@@ -224,7 +224,7 @@ export function FaqBlock({ data }: { data: FaqData }) {
             <details key={item.question} className="group py-6">
               <summary className="flex cursor-pointer list-none items-center justify-between gap-6 text-lg font-medium">
                 {item.question}
-                <Plus className="size-5 shrink-0 text-[var(--accent)] transition duration-300 group-open:rotate-45" aria-hidden />
+                <Plus className="size-5 shrink-0 text-[var(--accent-ink)] transition duration-300 group-open:rotate-45" aria-hidden />
               </summary>
               <p className="mt-4 whitespace-pre-line text-ink-muted">{item.answer}</p>
             </details>

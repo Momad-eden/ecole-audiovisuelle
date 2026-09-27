@@ -13,7 +13,7 @@ function List({ title, items }: { title: string; items?: string[] }) {
       <h2 className="cartel mb-4">{title}</h2>
       <ul className="space-y-3">
         {items.map((item) => (
-          <li key={item} className="flex gap-3"><Check className="mt-1 size-4 shrink-0 text-[var(--accent)]" aria-hidden />{item}</li>
+          <li key={item} className="flex gap-3"><Check className="mt-1 size-4 shrink-0 text-[var(--accent-ink)]" aria-hidden />{item}</li>
         ))}
       </ul>
     </div>
@@ -33,7 +33,7 @@ export function ProgramDetail({ program, applyHref }: { program: Program; applyH
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
           <p className="cartel">{[program.kindLabel, program.durationLabel].filter(Boolean).join(" · ")}</p>
           <h1 className="mt-4 max-w-4xl font-display text-4xl leading-tight font-medium text-balance sm:text-6xl">{program.title}</h1>
-          {program.levelLabel && <p className="mt-4 text-lg text-[var(--accent)]">{program.levelLabel}</p>}
+          {program.levelLabel && <p className="mt-4 text-lg text-[var(--accent-ink)]">{program.levelLabel}</p>}
           {program.summary && <p className="mt-6 max-w-3xl text-lg text-ink/80">{program.summary}</p>}
           <div className="mt-10 flex flex-wrap gap-3">
             {program.acceptsApplications ? (

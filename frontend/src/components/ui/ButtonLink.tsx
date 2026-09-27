@@ -9,8 +9,8 @@ export function ButtonLink({ href, children, variant = "primary", size = "md", c
     "group inline-flex items-center gap-3 rounded-full font-semibold transition duration-300",
     size === "lg" ? "min-h-14 px-7 text-base" : "min-h-11 px-6 text-sm",
     variant === "primary"
-      ? "bg-[var(--accent)] text-night shadow-[0_0_50px_-12px_var(--accent)] hover:shadow-[0_0_70px_-8px_var(--accent)] hover:brightness-110"
-      : "border border-ink/25 bg-night/30 text-ink hover:border-[var(--accent)] hover:text-[var(--accent)]",
+      ? "bg-[var(--accent-ink)] text-on-accent shadow-[0_0_50px_-12px_var(--accent)] hover:shadow-[0_0_70px_-8px_var(--accent)] hover:brightness-110"
+      : "border border-ink/25 bg-night/30 text-ink hover:border-[var(--accent)] hover:text-[var(--accent-ink)]",
     className,
   );
 

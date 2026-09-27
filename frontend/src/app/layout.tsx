@@ -1,15 +1,18 @@
 import type { Metadata } from "next";
-import { Archivo, Inter, JetBrains_Mono } from "next/font/google";
+import { Archivo, Fraunces, Inter, JetBrains_Mono } from "next/font/google";
 import { AudioProvider } from "@/components/audio/AudioProvider";
 import { PlayerBar } from "@/components/audio/PlayerBar";
 import { SiteFooter } from "@/components/layout/SiteFooter";
 import { SiteHeader } from "@/components/layout/SiteHeader";
+import { themeInitScript } from "@/components/layout/ThemeToggle";
 import { api } from "@/lib/api";
 import { siteUrl } from "@/lib/utils";
 import "./globals.css";
 
 // Archivo variable : l'axe de largeur (wdth) donne les titres d'affiche étendus.
 const archivo = Archivo({ subsets: ["latin"], variable: "--font-archivo", display: "swap", axes: ["wdth"] });
+// Police « élégante » proposée dans l'éditeur : téléchargée seulement si un texte l'utilise.
+const fraunces = Fraunces({ subsets: ["latin"], variable: "--font-fraunces", display: "swap", preload: false });
 const inter = Inter({ subsets: ["latin"], variable: "--font-inter", display: "swap" });
 // Police des petits cartels : non préchargée, pour laisser la bande passante aux titres.
 const jetbrains = JetBrains_Mono({ subsets: ["latin"], variable: "--font-jetbrains", display: "swap", preload: false });
@@ -45,9 +48,12 @@ export default async function RootLayout({ children }: Readonly<{ children: Reac
   };
 
   return (
-    <html lang="fr" className={`${archivo.variable} ${inter.variable} ${jetbrains.variable}`}>
+    <html lang="fr" data-theme="dark" suppressHydrationWarning className={`${archivo.variable} ${fraunces.variable} ${inter.variable} ${jetbrains.variable}`}>
+      <head>
+        <script dangerouslySetInnerHTML={{ __html: themeInitScript }} />
+      </head>
       <body className="min-h-dvh bg-night text-ink">
-        <a href="#contenu" className="sr-only focus:not-sr-only focus:fixed focus:left-4 focus:top-4 focus:z-[60] focus:rounded-full focus:bg-brand focus:px-5 focus:py-3 focus:text-night">
+        <a href="#contenu" className="sr-only focus:not-sr-only focus:fixed focus:left-4 focus:top-4 focus:z-[60] focus:rounded-full focus:bg-brand focus:px-5 focus:py-3 focus:text-on-accent">
           Aller au contenu
         </a>
         <AudioProvider>

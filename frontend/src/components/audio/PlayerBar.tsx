@@ -25,7 +25,7 @@ export function PlayerBar() {
           type="button"
           onClick={toggle}
           aria-label={playing ? "Mettre en pause" : "Lire"}
-          className="grid size-11 shrink-0 place-items-center rounded-full bg-[var(--accent)] text-night"
+          className="grid size-11 shrink-0 place-items-center rounded-full bg-[var(--accent-ink)] text-on-accent"
         >
           {playing ? <Pause className="size-5" aria-hidden /> : <Play className="size-5 translate-x-px" aria-hidden />}
         </button>
