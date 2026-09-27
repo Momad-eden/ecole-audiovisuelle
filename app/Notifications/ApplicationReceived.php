@@ -5,11 +5,12 @@ namespace App\Notifications;
 use App\Models\Application;
 use App\Models\Setting;
 use Illuminate\Bus\Queueable;
+use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Notifications\Messages\MailMessage;
 use Illuminate\Notifications\Notification;
 
 /** Accusé de réception envoyé au candidat. */
-class ApplicationReceived extends Notification
+class ApplicationReceived extends Notification implements ShouldQueue
 {
     use Queueable;
 

@@ -93,4 +93,24 @@ class PublicFormsApiTest extends TestCase
         $this->assertSame('Moussa', ContactMessage::firstOrFail()->name);
         $this->postJson('/api/v1/public/contact-messages', ['subject' => 'x', 'name' => '', 'message' => ''])->assertUnprocessable();
     }
+
+    public function test_a_mail_failure_does_not_break_the_submission(): void
+    {
+        $offering = Offering::factory()->create();
+        \Illuminate\Support\Facades\Notification::shouldReceive('route')->andThrow(new \RuntimeException('SMTP injoignable'));
+
+        $this->postJson('/api/v1/public/applications', $this->payload($offering))->assertCreated();
+        $this->assertDatabaseCount('applications', 1);
+    }
+
+    public function test_acknowledgement_is_queued(): void
+    {
+        \Illuminate\Support\Facades\Notification::fake();
+        $offering = Offering::factory()->create();
+
+        $this->postJson('/api/v1/public/applications', $this->payload($offering))->assertCreated();
+
+        \Illuminate\Support\Facades\Notification::assertSentOnDemand(\App\Notifications\ApplicationReceived::class);
+        $this->assertInstanceOf(\Illuminate\Contracts\Queue\ShouldQueue::class, new \App\Notifications\ApplicationReceived(Application::firstOrFail()));
+    }
 }

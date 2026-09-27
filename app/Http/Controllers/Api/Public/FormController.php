@@ -14,6 +14,7 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Notification;
 use Illuminate\Support\Str;
 use Illuminate\Validation\Rule;
+use Throwable;
 
 class FormController extends Controller
 {
@@ -76,8 +77,13 @@ class FormController extends Controller
             return $application;
         });
 
+        // L'accusé de réception ne doit jamais faire échouer un dépôt déjà enregistré.
         if ($application->email) {
-            Notification::route('mail', $application->email)->notify(new ApplicationReceived($application));
+            try {
+                Notification::route('mail', $application->email)->notify(new ApplicationReceived($application));
+            } catch (Throwable $e) {
+                report($e);
+            }
         }
 
         return response()->json(['data' => ['reference' => $application->reference]], 201);
