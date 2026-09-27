@@ -91,7 +91,9 @@ Des skills sont installées dans l'environnement de l'agent.
 ```bash
 # Backend
 composer install && php artisan migrate && php artisan db:seed
-php artisan test
+php artisan test                 # SQLite en mémoire (rapide)
+composer test:mysql              # même suite sur MySQL 8.4 (conteneur Docker jetable, port 33306)
+php artisan emsi:create-admin    # créer un compte (aucun compte par défaut)
 ./vendor/bin/pint
 
 # Frontend
