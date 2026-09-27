@@ -28,9 +28,9 @@ class CashRegister
      */
     public function record(array $data, User $by): CashTransaction
     {
-        $direction = CashDirection::from($data['direction']);
-        $category = TransactionCategory::from($data['category']);
-        $method = PaymentMethod::from($data['method']);
+        $direction = $data['direction'] instanceof CashDirection ? $data['direction'] : CashDirection::from($data['direction']);
+        $category = $data['category'] instanceof TransactionCategory ? $data['category'] : TransactionCategory::from($data['category']);
+        $method = $data['method'] instanceof PaymentMethod ? $data['method'] : PaymentMethod::from($data['method']);
         $occurredOn = Carbon::parse($data['occurred_on'])->startOfDay();
         $amount = (int) $data['amount'];
 

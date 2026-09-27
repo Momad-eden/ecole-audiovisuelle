@@ -227,7 +227,9 @@ class ApplicationResource extends Resource
 
     public static function getRecordRouteBindingEloquentQuery(): Builder
     {
-        return parent::getRecordRouteBindingEloquentQuery()->withoutGlobalScopes([SoftDeletingScope::class]);
+        return parent::getRecordRouteBindingEloquentQuery()
+            ->withoutGlobalScopes([SoftDeletingScope::class])
+            ->with(['offering.cohort.program', 'offering.track', 'student', 'decider', 'events.user']);
     }
 
     public static function getPages(): array

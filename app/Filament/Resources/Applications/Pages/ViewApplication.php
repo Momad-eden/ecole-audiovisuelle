@@ -39,7 +39,7 @@ class ViewApplication extends ViewRecord
         try {
             $callback();
             Notification::make()->title($success)->success()->send();
-            $this->record->refresh();
+            $this->record->refresh()->load(['offering.cohort.program', 'offering.track', 'student', 'decider', 'events.user']);
         } catch (BusinessRuleException $e) {
             Notification::make()->title($e->getMessage())->danger()->send();
         }
