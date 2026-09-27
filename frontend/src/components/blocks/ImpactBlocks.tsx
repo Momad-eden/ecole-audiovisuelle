@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { ArrowRight, Clock, Mail, MapPin, Phone } from "lucide-react";
+import { ArrowRight, Clock, Disc3, Mail, MapPin, Phone } from "lucide-react";
 import { PlayButton } from "@/components/audio/PlayButton";
 import { ArtworkWaveform } from "@/components/museum/ArtworkWaveform";
 import { InView } from "@/components/motion/InView";
@@ -218,8 +218,8 @@ export function ProductionsBlock({ data }: { data: { title?: string; items?: Art
               <li key={item.id} className="grid items-center gap-5 p-5 sm:grid-cols-[auto_auto_1fr] sm:p-7">
                 <span className="cartel hidden tabular-nums sm:block">{String(index + 1).padStart(2, "0")}</span>
                 <div className="flex items-center gap-4">
-                  <span className="relative size-16 shrink-0 overflow-hidden rounded-xl border border-line bg-night-3">
-                    {item.cover && <MediaImage image={item.cover} sizes="64px" />}
+                  <span className="relative grid size-16 shrink-0 place-items-center overflow-hidden rounded-xl border border-line bg-night-3" style={{ background: "radial-gradient(circle at 50% 50%, color-mix(in oklab, var(--accent) 30%, transparent), transparent 70%)" }}>
+                    {item.cover ? <MediaImage image={item.cover} sizes="64px" /> : <Disc3 className="size-8 text-[var(--accent-ink)]" aria-hidden />}
                   </span>
                   <span>
                     <Link href={`/realisations/${item.slug}`} className="display block text-lg leading-tight hover:text-[var(--accent-ink)]">{item.title}</Link>
@@ -227,7 +227,7 @@ export function ProductionsBlock({ data }: { data: { title?: string; items?: Art
                   </span>
                 </div>
                 <div className="flex items-center gap-4">
-                  <PlayButton track={track} label="" className="size-12 justify-center px-0" />
+                  <PlayButton track={track} iconOnly />
                   <div className="min-w-0 flex-1 [&>*]:mt-0"><ArtworkWaveform track={track} /></div>
                 </div>
               </li>

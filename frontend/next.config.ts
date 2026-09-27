@@ -41,7 +41,11 @@ const nextConfig: NextConfig = {
   },
   async rewrites() {
     // Formulaires et API publics servis sur le même domaine que le site.
-    return [{ source: "/api/v1/:path*", destination: `${apiUrl.origin}/api/v1/:path*` }];
+    // /storage : médias servis par Laravel (le navigateur peut ainsi lire un son pour en tracer la forme d'onde).
+    return [
+      { source: "/api/v1/:path*", destination: `${apiUrl.origin}/api/v1/:path*` },
+      { source: "/storage/:path*", destination: `${mediaUrl.origin}/storage/:path*` },
+    ];
   },
   async headers() {
     return [{ source: "/:path*", headers: securityHeaders }];

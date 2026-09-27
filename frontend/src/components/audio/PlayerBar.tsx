@@ -1,14 +1,22 @@
 "use client";
 
+import { useEffect } from "react";
 import Link from "next/link";
 import { Pause, Play, X } from "lucide-react";
 import { formatDuration } from "@/lib/utils";
 import { useAudio } from "./AudioProvider";
+import { usePeaks } from "./peaks";
 import { Waveform } from "./Waveform";
 
 /** Barre de lecture fixe en bas d'écran, visible dès qu'un son a été lancé. */
 export function PlayerBar() {
   const { track, playing, toggle, seek, close, currentTime, duration } = useAudio();
+  const peaks = usePeaks(track?.src, track?.peaks, Boolean(track));
+
+  useEffect(() => {
+    document.body.toggleAttribute("data-player", Boolean(track));
+    return () => document.body.removeAttribute("data-player");
+  }, [track]);
   if (!track) return null;
 
   const progress = duration ? currentTime / duration : 0;
@@ -39,7 +47,7 @@ export function PlayerBar() {
               {formatDuration(currentTime)} / {formatDuration(duration)}
             </span>
           </div>
-          <Waveform peaks={track.peaks} progress={progress} onSeek={seek} label={`Position dans « ${track.title} »`} className="h-8" />
+          <Waveform peaks={peaks} progress={progress} onSeek={seek} label={`Position dans « ${track.title} »`} className="h-8" />
         </div>
         <button type="button" onClick={close} aria-label="Fermer le lecteur" className="grid size-9 place-items-center rounded-full text-ink-muted hover:text-ink">
           <X className="size-5" aria-hidden />

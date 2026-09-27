@@ -11,7 +11,8 @@ type Props = {
 };
 
 /**
- * Forme d'onde précalculée par le serveur ; à défaut, simple barre de progression.
+ * Forme d'onde (précalculée par le serveur ou dans le navigateur) ; en attendant, une ligne
+ * de progression. Les couleurs suivent le thème (sombre ou clair).
  * Utilisable au clavier (flèches gauche/droite) comme un curseur.
  */
 export function Waveform({ peaks, progress, onSeek, label, className }: Props) {
@@ -51,14 +52,14 @@ export function Waveform({ peaks, progress, onSeek, label, className }: Props) {
                 width={0.7}
                 height={height}
                 rx={0.35}
-                fill={played ? "var(--accent)" : "rgb(242 238 230 / 0.25)"}
+                fill={played ? "var(--accent-ink)" : "color-mix(in oklab, var(--color-ink) 22%, transparent)"}
               />
             );
           })}
         </svg>
       ) : (
         <div className="absolute inset-x-0 top-1/2 h-1 -translate-y-1/2 rounded-full bg-ink/20" aria-hidden="true">
-          <div className="h-full rounded-full" style={{ width: `${progress * 100}%`, background: "var(--accent)" }} />
+          <div className="h-full rounded-full" style={{ width: `${progress * 100}%`, background: "var(--accent-ink)" }} />
         </div>
       )}
     </div>

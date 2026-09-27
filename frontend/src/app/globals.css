@@ -296,6 +296,35 @@ body::after {
 @keyframes sub-pulse { 50% { transform: scale(1.12); } }
 .sub-cone { transform-origin: center; transform-box: fill-box; animation: sub-pulse 0.48s ease-in-out infinite; }
 
+/* Boutons flottants (WhatsApp, « Ma demande ») : au-dessus du lecteur audio quand il est ouvert. */
+.floating-action { transition: bottom 0.3s ease; }
+body[data-player] .floating-action { bottom: 7rem; }
+
+/* ——— Héros « Œuvre » : titre rempli par la photo ou par une lumière qui circule ——— */
+.art-title {
+  color: transparent;
+  background-image: linear-gradient(100deg, var(--color-ink) 0%, var(--color-brand) 28%, var(--color-gold) 45%, var(--color-ink) 60%, var(--color-violet) 80%, var(--color-ink) 100%);
+  background-size: 220% 100%;
+  background-position: 0% 50%;
+  -webkit-background-clip: text;
+  background-clip: text;
+  animation: art-rise 1.2s cubic-bezier(0.2, 0.7, 0.2, 1) both, art-light 14s ease-in-out 1.2s infinite alternate;
+}
+.art-title[data-image] {
+  /* La photo dans les lettres : éclaircie et cernée d'un filet pour rester lisible, quelle que soit l'image. */
+  filter: brightness(1.45) contrast(1.08) saturate(1.25);
+  -webkit-text-stroke: 1.5px color-mix(in oklab, var(--color-ink) 55%, transparent);
+  background-size: cover;
+  background-position: center 40%;
+  animation: art-rise 1.2s cubic-bezier(0.2, 0.7, 0.2, 1) both, art-image 30s ease-in-out 1.2s infinite alternate;
+}
+@keyframes art-light { to { background-position: 100% 50%; } }
+@keyframes art-image { to { background-position: center 60%; } }
+@keyframes art-rise {
+  from { opacity: 0; transform: translateY(0.25em); letter-spacing: 0.02em; }
+  to { opacity: 1; transform: none; letter-spacing: -0.035em; }
+}
+
 /* ——— Héros « Projecteur » ——— */
 .spotlight-cone {
   background: conic-gradient(from 180deg at 50% 0%, transparent 160deg, color-mix(in oklab, var(--accent) 16%, transparent) 172deg, color-mix(in oklab, var(--color-ink) 14%, transparent) 180deg, color-mix(in oklab, var(--accent) 16%, transparent) 188deg, transparent 200deg);

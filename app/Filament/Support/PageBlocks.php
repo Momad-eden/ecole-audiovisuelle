@@ -171,6 +171,7 @@ final class PageBlocks
                 ->acceptedFileTypes(['video/mp4', 'video/webm'])->maxSize(20480)
                 ->helperText('MP4 court et léger (moins de 20 Mo). Remplacé par l\'image si l\'internaute limite les animations.'),
             Radio::make('layout')->label('Mise en page')->options([
+                'masterpiece' => 'Œuvre d\'art (rubans de lumière interactifs, titre-image, cartel)',
                 'stage' => 'Scène animée (faisceaux de lumière)',
                 'studio' => 'Studio animé (console de mixage)',
                 'events' => 'Événementiel animé (sonorisation et lumières)',
@@ -189,7 +190,8 @@ final class PageBlocks
                 ->disk('public')->directory('pages')->maxSize(8192)
                 ->visible(fn ($get) => $get('layout') === 'mosaic'),
             TextInput::make('caption')->label('Légende de la photo')->maxLength(120)
-                ->visible(fn ($get) => in_array($get('layout'), ['editorial', 'mosaic', 'poster'], true)),
+                ->visible(fn ($get) => in_array($get('layout'), ['masterpiece', 'editorial', 'mosaic', 'poster'], true))
+                ->helperText('Œuvre d\'art : le titre du cartel de musée. Éditorial, mosaïque, affiche : la légende de la photo.'),
             ColorPicker::make('accent')->label('Couleur de lumière (facultatif)'),
             self::buttons(),
         ]);

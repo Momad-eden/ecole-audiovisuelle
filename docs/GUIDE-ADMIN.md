@@ -52,7 +52,7 @@ Le menu de gauche n'affiche que ce que votre rôle permet d'ouvrir.
 
 ### Les blocs propres au site « Plein feux »
 
-- **Grand titre (héros)** : dix mises en page au choix. *Scène animée*, *Studio animé* et *Événementiel animé* (décors lumineux, mots qui défilent) ; *Projecteur* (titre centré) ; *Éditorial* (grand titre et portrait) ; *Affiche de concert* (titre géant sur aplat de couleur, idéal pour un événement) ; *Mosaïque* (collage de 3 ou 4 photos) ; *Plein écran* ; *Texte et image côte à côte* ; *Sobre* (pages secondaires). La taille du titre s'adapte à sa longueur.
+- **Grand titre (héros)** : onze mises en page au choix, dont *Œuvre d'art* : des rubans de lumière qui réagissent à la souris ou au doigt, un titre rempli par votre photo (ou par la lumière), un cartel de musée (sa « légende ») et un bouton « Écouter l'œuvre » qui fait chanter la lumière. Les autres : *Scène animée*, *Studio animé* et *Événementiel animé* (décors lumineux, mots qui défilent) ; *Projecteur* (titre centré) ; *Éditorial* (grand titre et portrait) ; *Affiche de concert* (titre géant sur aplat de couleur, idéal pour un événement) ; *Mosaïque* (collage de 3 ou 4 photos) ; *Plein écran* ; *Texte et image côte à côte* ; *Sobre* (pages secondaires). La taille du titre s'adapte à sa longueur.
 - **Nos campus** : Dakar et Saint-Louis côte à côte, avec photo, accroche, points forts, adresse et un bouton « Candidater à … » qui présélectionne le campus. Ces informations se saisissent une fois dans Administration › Lieux.
 - **Grand titre (héros)**, mise en page « Scène animée » : faisceaux de lumière ; les **mots qui défilent** terminent le titre (« Apprenez à faire vibrer… le son, l'image… »). Ajoutez une photo de fond quand vous en avez une.
 - **Bandeau défilant** : quelques mots courts en très grand.
@@ -120,6 +120,10 @@ Menu **Impact Live** (rôles Directeur et Commercial ; la Communication peut aus
 2. Rappelez le client (bouton WhatsApp ou téléphone sur la fiche). Consignez l'échange avec **⋮ › Ajouter une note**.
 3. **Devis envoyé** : indiquez le montant. Puis **Confirmer**, et après l'événement **Marquer réalisée**. Une demande abandonnée : **⋮ › Annuler la demande** (motif obligatoire).
 4. Une demande reçue par téléphone se saisit avec **Saisir une demande (téléphone)**.
+
+### Ajouter un titre à écouter sur la page du studio
+
+Menu **Impact Live › Productions du studio** › **Ajouter un titre à écouter** : titre, fichier son (MP3, WAV, M4A ou OGG, 50 Mo maximum), pochette et crédits. Choisissez « Publié » : le titre s'écoute aussitôt sur la page Studio, avec sa forme d'onde, dans le lecteur qui suit le visiteur de page en page.
 
 ### Mettre à jour la vitrine
 
