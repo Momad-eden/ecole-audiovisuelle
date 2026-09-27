@@ -25,7 +25,7 @@
         </h1>
 
         <p class="text-base text-white/70 leading-relaxed max-w-lg mx-auto mb-10">
-            Votre demande d'admission a bien été enregistrée. Notre commission pédagogique va étudier votre profil et prendra contact avec vous sous <strong class="text-white">48 heures</strong> pour convenir de votre entretien d'orientation.
+            Votre demande d'admission a bien été enregistrée. Notre commission pédagogique va étudier votre profil et prendra contact avec vous <strong class="text-white">dans les meilleurs délais</strong> pour convenir de votre entretien d'orientation.
         </p>
 
         {{-- Prochaines étapes --}}

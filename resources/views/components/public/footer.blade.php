@@ -32,14 +32,8 @@
                 </a>
 
                 <p class="text-sm text-white/60 leading-relaxed max-w-sm font-light">
-                    {{ $siteSettings?->description ?? 'École des Métiers du Son et de l’Image au cœur du Grand Théâtre National Doudou Ndiaye Rose à Dakar. Formations pratiques d’excellence aux métiers du cinéma et de l’audiovisuel.' }}
+                    {{ $siteSettings?->description ?: 'École des Métiers du Son et de l’Image, Dakar : formations aux métiers techniques du son, de la lumière, de l’image et du spectacle vivant.' }}
                 </p>
-
-                {{-- Badge Statut --}}
-                <div class="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full text-[11px] font-bold uppercase tracking-wider bg-white/[0.05] border border-white/10 text-[#F5B800]">
-                    <span class="w-1.5 h-1.5 rounded-full bg-[#F5B800] animate-pulse"></span>
-                    Promotion 2026 · Inscriptions Ouvertes
-                </div>
 
                 {{-- HUB RÉSEAUX SOCIAUX DYNAMIQUES (Configurés depuis l'Admin) --}}
                 <div class="pt-2">
@@ -202,7 +196,7 @@
                     <div class="flex items-start gap-3">
                         <x-lucide-map-pin class="w-4 h-4 text-[#F5B800] shrink-0 mt-0.5" />
                         <span class="leading-relaxed">
-                            {{ $siteSettings?->address ?? 'Grand Théâtre National Doudou Ndiaye Rose, Dakar, Sénégal' }}
+                            {{ $siteSettings?->address ?: 'Dakar, Sénégal' }}
                         </span>
                     </div>
 

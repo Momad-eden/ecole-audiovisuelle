@@ -3,7 +3,7 @@
 @section('title', 'EMSI — École de Formation Audiovisuelle')
 
 @section('description')
-    École de Formation Audiovisuelle au cœur du Grand Théâtre National Doudou Ndiaye Rose, Dakar.
+    École des Métiers du Son et de l'Image, Dakar.
 @endsection
 
 @section('content')

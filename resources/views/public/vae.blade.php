@@ -1,7 +1,7 @@
 @extends('layouts.public')
 
 @section('title', 'Dispositif VAE — Validation des Acquis de l’Expérience | EMSI Dakar')
-@section('description', 'Obtenez votre Brevet de Technicien Supérieur (BTS Bac+2) par la Validation des Acquis de l’Expérience à l’EMSI, au Grand Théâtre National de Dakar. Double tutelle ministérielle.')
+@section('description', 'Cycle de certification de niveau BTS (équivalent Bac+2) par la Validation des Acquis de l’Expérience, pour les titulaires d’un CPS ou d’un CS — programme EMSI × Grand Théâtre National Doudou Ndiaye Coumba Rose.')
 
 @section('content')
 
@@ -28,7 +28,7 @@
         <div class="flex items-center gap-2 text-xs font-mono uppercase tracking-widest text-white/50 mb-6">
             <a href="{{ route('public.home') }}" class="hover:text-white transition">Accueil</a>
             <span class="text-white/30">/</span>
-            <span class="text-[#F5B800]">Dispositif VAE BTS d'État</span>
+            <span class="text-[#F5B800]">Certification de niveau BTS par la VAE</span>
         </div>
 
         <div class="max-w-4xl space-y-6">
@@ -37,7 +37,7 @@
             <div class="flex flex-wrap items-center gap-3">
                 <div class="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-[#F5B800]/15 text-[#F5B800] border border-[#F5B800]/30 text-xs font-mono font-bold uppercase tracking-wider backdrop-blur-md">
                     <x-lucide-award class="w-3.5 h-3.5 text-[#F5B800]" />
-                    <span>Diplôme d'État · Niveau BTS (Bac+2)</span>
+                    <span>Certification de niveau BTS (Bac+2)</span>
                 </div>
                 <div class="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-white/[0.06] text-white/80 border border-white/15 text-xs font-mono font-medium tracking-wider backdrop-blur-md">
                     <x-lucide-shield-check class="w-3.5 h-3.5 text-emerald-400" />
@@ -48,12 +48,12 @@
             {{-- Titre Principal --}}
             <h1 class="font-serif text-3xl sm:text-5xl lg:text-6xl xl:text-7xl font-normal tracking-tight text-white leading-[1.06]">
                 Transformez votre savoir-faire terrain <br>
-                <span class="italic text-transparent bg-clip-text bg-gradient-to-r from-[#F5B800] via-[#FFE59E] to-white font-light">en un Brevet de Technicien Supérieur.</span>
+                <span class="italic text-transparent bg-clip-text bg-gradient-to-r from-[#F5B800] via-[#FFE59E] to-white font-light">en une certification de niveau BTS.</span>
             </h1>
 
             {{-- Paragraphe d'Accroche --}}
             <p class="text-base sm:text-lg text-white/75 font-light leading-relaxed max-w-3xl">
-                Vous exercez déjà comme technicien du son, éclairagiste, cadreur, monteur ou régisseur ? La <strong class="text-white font-medium">Validation des Acquis de l'Expérience (VAE)</strong> vous permet d'obtenir un titre officiel d'État de niveau <strong>Bac+2 (BTS)</strong> en valorisant votre pratique réelle, soutenu par la double tutelle des ministères sénégalais.
+                                Vous êtes titulaire d'un CPS ou d'un CS dans les métiers du son, de la lumière, de l'image ou du spectacle ? La <strong class="text-white font-medium">Validation des Acquis de l'Expérience (VAE)</strong> vous ouvre, sans Baccalauréat, une <strong>certification de niveau BTS (équivalent Bac+2)</strong> au terme d'un cycle de 9 mois en alternance.
             </p>
 
             {{-- Actions Rapides --}}
@@ -78,7 +78,7 @@
                     href="#filieres-bts"
                     class="inline-flex items-center gap-2 px-5 py-4 text-xs font-mono font-bold text-white/70 hover:text-white transition"
                 >
-                    <span>Voir les 5 spécialités BTS</span>
+                    <span>Voir les 5 filières</span>
                     <x-lucide-arrow-down class="w-4 h-4" />
                 </a>
             </div>
@@ -89,13 +89,13 @@
         <div class="mt-14 pt-8 border-t border-white/10 grid grid-cols-2 md:grid-cols-4 gap-6">
             <div>
                 <div class="text-2xl sm:text-3xl font-serif font-bold text-[#F5B800]">Bac + 2</div>
-                <div class="text-xs font-mono text-white/60 uppercase mt-1">Niveau Reconnu d'État</div>
-                <div class="text-[11px] text-white/40">Grille indiciaire officielle</div>
+                <div class="text-xs font-mono text-white/60 uppercase mt-1">Niveau BTS</div>
+                <div class="text-[11px] text-white/40">Certification par la VAE</div>
             </div>
             <div>
                 <div class="text-2xl sm:text-3xl font-serif font-bold text-white">9 Mois</div>
-                <div class="text-xs font-mono text-white/60 uppercase mt-1">Accompagnement Sur-Mesure</div>
-                <div class="text-[11px] text-white/40">Compatible avec votre emploi</div>
+                <div class="text-xs font-mono text-white/60 uppercase mt-1">1 080 heures</div>
+                <div class="text-[11px] text-white/40">30 h par semaine en alternance</div>
             </div>
             <div>
                 <div class="text-2xl sm:text-3xl font-serif font-bold text-[#F5B800]">5 Spécialités</div>
@@ -103,9 +103,9 @@
                 <div class="text-[11px] text-white/40">Son, Lumière, Vidéo, Motion, Régie</div>
             </div>
             <div>
-                <div class="text-2xl sm:text-3xl font-serif font-bold text-white">100% Souverain</div>
-                <div class="text-xs font-mono text-white/60 uppercase mt-1">Jury Mixte Professionnels & État</div>
-                <div class="text-[11px] text-white/40">Direction des Examens & Concours</div>
+                <div class="text-2xl sm:text-3xl font-serif font-bold text-white">Jury</div>
+                <div class="text-xs font-mono text-white/60 uppercase mt-1">Professionnels & représentants de l'État</div>
+                <div class="text-[11px] text-white/40">Soutenance professionnelle</div>
             </div>
         </div>
 
@@ -127,29 +127,29 @@
         statut: 'prestataire', // 'prestataire' | 'salarie' | 'freelance' | 'autre'
 
         get isEligible() {
-            if (this.experience === '<1' && this.diplome === 'aucun') return 'faible';
+                        if (this.diplome !== 'cps') return 'faible';
             if (this.experience === '<1') return 'conditionnel';
             return 'excellent';
         },
 
         get specialiteLabel() {
             const map = {
-                'son': 'BTS Ingénierie Son & Mixage Live',
-                'lumiere': 'BTS Régie Lumière & Scénographie',
-                'video': 'BTS Cadrage & Réalisation Broadcast',
-                'motion': 'BTS Motion Design & Régie d\'Écrans LED',
-                'regie': 'BTS Régie Générale & Logistique de Spectacle'
+                                'son': 'Filière Son',
+                                'lumiere': 'Filière Technicien Lumière',
+                                'video': 'Filière Cadrage Sportif et Régie Vidéo',
+                                'motion': 'Filière Infographie et Création Numérique',
+                                'regie': 'Filière Régie Générale Spectacle'
             };
-            return map[this.specialite] || 'BTS Métiers de l\'Audiovisuel';
+            return map[this.specialite] || 'Filière du programme';
         },
 
         get recommendationText() {
             if (this.isEligible === 'excellent') {
-                return 'Votre profil correspond aux critères d\'accès direct au Volet 2 (Certification BTS par VAE). Vos années d\'expérience vous dispensent de modules généraux et vous permettent de vous concentrer directement sur la rédaction du Livret 2 et la préparation de la soutenance officielle.';
+                                return 'Votre profil correspond au public du Volet 2 : titulaire d\'un CPS ou d\'un CS avec une première expérience. Le recrutement se fait sur dossier et entretien de motivation.';
             } else if (this.isEligible === 'conditionnel') {
-                return 'Vous êtes éligible avec un aménagement préparatoire. Nous vous conseillons d\'intégrer d\'abord le Volet 1 (Perfectionnement intensif de 3 mois au Grand Théâtre) pour consolider vos preuves techniques avant de soutenir votre Livret 2.';
+                                return 'Votre CPS ou CS correspond au public du Volet 2 ; une première expérience pratique renforcera votre dossier. Le recrutement se fait sur dossier et entretien de motivation.';
             } else {
-                return 'Une première expérience pratique supplémentaire est recommandée. Nous vous invitons à suivre le Volet 1 immersif de 3 mois pour acquérir les heures opérationnelles requises au Grand Théâtre National.';
+                                return 'Le programme professionnel s\'adresse aux titulaires d\'un CPS ou d\'un CS. Contactez l\'EMSI pour étudier votre situation et les formations qui y préparent.';
             }
         }
     }">
@@ -163,7 +163,7 @@
                 Simulateur d'Éligibilité VAE Immédiat
             </h2>
             <p class="text-sm text-white/60 leading-relaxed font-light">
-                Indiquez votre parcours en 4 critères pour recevoir un diagnostic immédiat sur votre accès au titre BTS.
+                Indiquez votre parcours en 4 critères pour recevoir un diagnostic immédiat sur votre accès au Volet 2.
             </p>
         </div>
 
@@ -226,7 +226,7 @@
                             class="p-3 rounded-xl border text-xs font-semibold text-left transition"
                             :class="diplome === 'aucun' ? 'border-[#F5B800] bg-[#F5B800]/10 text-white ring-1 ring-[#F5B800]' : 'border-white/10 bg-white/[0.02] text-white/70 hover:bg-white/[0.05]'"
                         >
-                            Autodidacte (Sans diplôme)
+                            Sans diplôme
                         </button>
                         <button
                             type="button"
@@ -234,7 +234,7 @@
                             class="p-3 rounded-xl border text-xs font-semibold text-left transition"
                             :class="diplome === 'cps' ? 'border-[#F5B800] bg-[#F5B800]/10 text-white ring-1 ring-[#F5B800]' : 'border-white/10 bg-white/[0.02] text-white/70 hover:bg-white/[0.05]'"
                         >
-                            Certificat CPS / CAP / BEP
+                            CPS ou CS
                         </button>
                         <button
                             type="button"
@@ -264,11 +264,11 @@
                         x-model="specialite"
                         class="w-full p-3.5 rounded-xl border border-white/15 bg-black/60 text-white text-xs font-semibold focus:border-[#F5B800] focus:ring-1 focus:ring-[#F5B800] outline-none"
                     >
-                        <option value="son">Son & Mixage Façade / Retours / Studio</option>
-                        <option value="lumiere">Lumière & Pupitre GrandMA3 / Scénographie</option>
-                        <option value="video">Cadrage Broadcast & Réalisation Multicaméra</option>
-                        <option value="motion">Motion Design, Écrans LED Novastar & XR</option>
-                        <option value="regie">Régie Générale, Logistique & Sécurité ERP</option>
+                        <option value="son">Son</option>
+                        <option value="lumiere">Technicien Lumière</option>
+                        <option value="video">Cadrage Sportif et Régie Vidéo</option>
+                        <option value="motion">Infographie et Création Numérique</option>
+                        <option value="regie">Régie Générale Spectacle</option>
                     </select>
                 </div>
 
@@ -300,7 +300,7 @@
                             <template x-if="isEligible === 'excellent'">
                                 <span class="text-emerald-400 flex items-center gap-2">
                                     <x-lucide-check-circle-2 class="w-6 h-6 text-emerald-400" />
-                                    <span>Forte Éligibilité VAE Directe (BTS Bac+2)</span>
+                                    <span>Profil correspondant au Volet 2</span>
                                 </span>
                             </template>
                             <template x-if="isEligible === 'conditionnel'">
@@ -328,7 +328,7 @@
 
                 <div class="flex flex-wrap items-center justify-between gap-4 pt-2">
                     <div class="text-xs font-mono text-white/60">
-                        Accompagnement par des directeurs techniques et jurys officiels d'État.
+                        Recrutement sur dossier et entretien de motivation.
                     </div>
 
                     <a
@@ -359,15 +359,15 @@
         <div class="flex flex-col lg:flex-row lg:items-end justify-between gap-8 pb-16 border-b border-white/10">
             <div class="max-w-3xl">
                 <span class="text-xs font-mono uppercase tracking-[0.25em] text-[#F5B800] block mb-3 font-bold">
-                    [Référentiel des Titres d'État]
+                    [Les 5 filières]
                 </span>
                 <h2 class="text-3xl sm:text-5xl font-serif font-normal tracking-tight text-white leading-tight">
-                    Les 5 Brevets de Technicien Supérieur certifiés.
+                    Cinq filières de niveau BTS.
                 </h2>
             </div>
             <div class="max-w-md">
                 <p class="text-sm text-white/70 leading-relaxed font-light">
-                    Chaque filière est adossée au référentiel officiel du Ministère de la Formation Professionnelle et validée en situation réelle au Grand Théâtre National.
+                    Chaque filière s'appuie sur le référentiel de compétences du programme et sur des mises en situation réelles.
                 </p>
             </div>
         </div>
@@ -379,18 +379,18 @@
                 <div class="space-y-4">
                     <div class="flex items-center justify-between">
                         <span class="px-3 py-1 rounded-full bg-emerald-500/15 text-emerald-400 font-mono text-xs font-bold border border-emerald-500/30">
-                            BTS 01 &bull; SON
+                            FILIÈRE 01 &bull; SON
                         </span>
                         <x-lucide-sliders class="w-5 h-5 text-emerald-400" />
                     </div>
-                    <h3 class="text-xl font-serif font-bold text-white">Ingénierie du Son & Mixage Live</h3>
+                    <h3 class="text-xl font-serif font-bold text-white">Son</h3>
                     <p class="text-xs text-white/70 leading-relaxed font-light">
-                        Validation de vos compétences en calage de systèmes Line Array, mixage numérique façade et retours (DiGiCo / Yamaha), réseaux audionumériques Dante et prise de son studio.
+                        Calage de systèmes Line Array, consoles numériques professionnelles (Yamaha, Allen & Heath, DiGiCo, Midas), mixage live, réseaux audio Dante et MADI, mastering studio.
                     </p>
                 </div>
                 <div class="pt-4 border-t border-white/10 space-y-2 text-xs font-mono text-white/60">
-                    <div>Épreuve clé : <strong class="text-white">Mixage live sous pression & Dante</strong></div>
-                    <div>Débouché : <strong class="text-emerald-400">Chef Opérateur Son, Ingé Façade</strong></div>
+                    <div>Parcours : <strong class="text-white">Volet 1 et Volet 2</strong></div>
+                    <div>Débouchés : <strong class="text-emerald-400">Ingénieur du son live, technicien système, concepteur sonore</strong></div>
                 </div>
             </div>
 
@@ -399,18 +399,18 @@
                 <div class="space-y-4">
                     <div class="flex items-center justify-between">
                         <span class="px-3 py-1 rounded-full bg-[#F5B800]/15 text-[#F5B800] font-mono text-xs font-bold border border-[#F5B800]/30">
-                            BTS 02 &bull; LUMIÈRE
+                            FILIÈRE 02 &bull; LUMIÈRE
                         </span>
                         <x-lucide-sun class="w-5 h-5 text-[#F5B800]" />
                     </div>
-                    <h3 class="text-xl font-serif font-bold text-white">Régie Lumière & Scénographie</h3>
+                    <h3 class="text-xl font-serif font-bold text-white">Technicien Lumière</h3>
                     <p class="text-xs text-white/70 leading-relaxed font-light">
-                        Validation de la programmation sur consoles GrandMA3 et ChamSys, gestion des protocoles DMX/Art-Net, accroche et rigging sécurisé sous grill 45m et création d'ambiances scéniques.
+                        Programmation sur consoles GrandMA, Chamsys et Avolites, réseaux DMX/Art-Net/sACN, dimensionnement d'un parc projecteurs, synchronisation lumière-son-vidéo et conduite de spectacle.
                     </p>
                 </div>
                 <div class="pt-4 border-t border-white/10 space-y-2 text-xs font-mono text-white/60">
-                    <div>Épreuve clé : <strong class="text-white">Show timecodé & sécurité rigging</strong></div>
-                    <div>Débouché : <strong class="text-[#F5B800]">Directeur d'Éclairage, Éclairagiste</strong></div>
+                    <div>Parcours : <strong class="text-white">Volet 1 et Volet 2</strong></div>
+                    <div>Débouchés : <strong class="text-[#F5B800]">Régisseur lumière, concepteur lumière, programmateur lumière</strong></div>
                 </div>
             </div>
 
@@ -419,18 +419,18 @@
                 <div class="space-y-4">
                     <div class="flex items-center justify-between">
                         <span class="px-3 py-1 rounded-full bg-purple-500/15 text-purple-400 font-mono text-xs font-bold border border-purple-500/30">
-                            BTS 03 &bull; BROADCAST
+                            FILIÈRE 03 &bull; CADRAGE
                         </span>
                         <x-lucide-video class="w-5 h-5 text-purple-400" />
                     </div>
-                    <h3 class="text-xl font-serif font-bold text-white">Cadrage & Réalisation Live</h3>
+                    <h3 class="text-xl font-serif font-bold text-white">Cadrage Sportif et Régie Vidéo</h3>
                     <p class="text-xs text-white/70 leading-relaxed font-light">
-                        Certification de l'exploitation de caméras de plateau broadcast à longues focales (80x), mélangeurs live 4K, serveurs de ralentis Super Slow Motion et liaisons fibre SMPTE.
+                        Cadrage multicaméra sportif, ralenti Super Slow Motion, caméras broadcast (Fiber, RF), anticipation des trajectoires et communication avec la régie.
                     </p>
                 </div>
                 <div class="pt-4 border-t border-white/10 space-y-2 text-xs font-mono text-white/60">
-                    <div>Épreuve clé : <strong class="text-white">Réalisation multicam de direct</strong></div>
-                    <div>Débouché : <strong class="text-purple-400">Chef Cadreur TV, Réalisateur Live</strong></div>
+                    <div>Parcours : <strong class="text-white">Volet 1 et Volet 2</strong></div>
+                    <div>Débouchés : <strong class="text-purple-400">Cadreur sportif, assistant réalisateur, chef opérateur</strong></div>
                 </div>
             </div>
 
@@ -439,18 +439,18 @@
                 <div class="space-y-4">
                     <div class="flex items-center justify-between">
                         <span class="px-3 py-1 rounded-full bg-blue-500/15 text-blue-400 font-mono text-xs font-bold border border-blue-500/30">
-                            BTS 04 &bull; MOTION & XR
+                            FILIÈRE 04 &bull; INFOGRAPHIE
                         </span>
                         <x-lucide-monitor-play class="w-5 h-5 text-blue-400" />
                     </div>
-                    <h3 class="text-xl font-serif font-bold text-white">Motion Design & Régie d'Écrans</h3>
+                    <h3 class="text-xl font-serif font-bold text-white">Infographie et Création Numérique</h3>
                     <p class="text-xs text-white/70 leading-relaxed font-light">
-                        Valorisation de vos compétences en création graphique 3D temps réel (Unreal Engine / After Effects), gestion de processeurs murs LED Novastar et vidéo-mapping scénique.
+                        Motion design (After Effects, Cinema 4D), habillage d'émission, modélisation 3D, incrustation Chroma Key en temps réel et identité visuelle événementielle.
                     </p>
                 </div>
                 <div class="pt-4 border-t border-white/10 space-y-2 text-xs font-mono text-white/60">
-                    <div>Épreuve clé : <strong class="text-white">Habillage dynamique live sur mur LED</strong></div>
-                    <div>Débouché : <strong class="text-blue-400">Opérateur Murs LED, Motion Designer</strong></div>
+                    <div>Parcours : <strong class="text-white">Volet 1 et Volet 2</strong></div>
+                    <div>Débouchés : <strong class="text-blue-400">Infographiste et motion designer, directeur artistique graphique</strong></div>
                 </div>
             </div>
 
@@ -459,18 +459,18 @@
                 <div class="space-y-4">
                     <div class="flex items-center justify-between">
                         <span class="px-3 py-1 rounded-full bg-amber-500/15 text-amber-400 font-mono text-xs font-bold border border-amber-500/30">
-                            BTS 05 &bull; RÉGIE GÉNÉRALE
+                            FILIÈRE 05 &bull; RÉGIE GÉNÉRALE
                         </span>
                         <x-lucide-layers class="w-5 h-5 text-amber-400" />
                     </div>
-                    <h3 class="text-xl font-serif font-bold text-white">Régie Générale & Logistique ERP</h3>
+                    <h3 class="text-xl font-serif font-bold text-white">Régie Générale Spectacle</h3>
                     <p class="text-xs text-white/70 leading-relaxed font-light">
-                        Reconnaissance de votre autorité sur la coordination générale de plateaux de spectacle, sécurité incendie ERP, gestion des fiches techniques internationales et management d'équipes.
+                        Cahier des charges, dimensionnement matériel et humain, coordination des équipes son, lumière, vidéo et sécurité, synoptiques et gestion des flux de publics.
                     </p>
                 </div>
                 <div class="pt-4 border-t border-white/10 space-y-2 text-xs font-mono text-white/60">
-                    <div>Épreuve clé : <strong class="text-white">Plan d'implantation & sécurité ERP</strong></div>
-                    <div>Débouché : <strong class="text-amber-400">Régisseur Général de Festival / Salle</strong></div>
+                    <div>Parcours : <strong class="text-white">Volet 2 (module transversal au Volet 1)</strong></div>
+                    <div>Débouchés : <strong class="text-amber-400">Régisseur général, régisseur adjoint, coordinateur technique</strong></div>
                 </div>
             </div>
 
@@ -478,11 +478,11 @@
             <div class="p-8 rounded-3xl bg-gradient-to-b from-[#310181]/50 to-[#120a22] border border-[#310181] flex flex-col justify-between space-y-6 shadow-xl">
                 <div class="space-y-4">
                     <span class="px-3 py-1 rounded-full bg-[#F5B800] text-black font-mono text-xs font-bold">
-                        TUTORAT VIP
+                        ACCOMPAGNEMENT
                     </span>
-                    <h3 class="text-xl font-serif font-bold text-white">Accompagnement Sur-Mesure EMSI</h3>
+                    <h3 class="text-xl font-serif font-bold text-white">Un tuteur EMSI à vos côtés</h3>
                     <p class="text-xs text-white/80 leading-relaxed font-light">
-                        Bénéficiez de 9 mois d'ateliers méthodologiques, de séances d'écriture assistée du Livret 2 et d'accès illimité aux régies du Grand Théâtre pour vos répétitions de soutenance.
+                        Un tuteur pédagogique de l'EMSI suit chaque apprenant pendant les 9 mois du cycle et valide la qualité des preuves du Livret VAE.
                     </p>
                 </div>
                 <div class="pt-4 border-t border-white/15">
@@ -515,10 +515,10 @@
                 [Méthodologie de Preuves]
             </span>
             <h2 class="text-3xl sm:text-4xl lg:text-5xl font-serif font-normal text-white">
-                Les Deux Piliers du Dossier VAE
+                Le Livret de compétences VAE
             </h2>
             <p class="text-xs sm:text-sm text-white/60 leading-relaxed font-light">
-                La VAE repose sur la démonstration concrète de votre maîtrise technique à travers deux étapes documentées.
+                Dès le premier mois du cycle, chaque apprenant ouvre son Livret VAE, alimenté en continu pendant 9 mois : c'est la pièce maîtresse de la soutenance.
             </p>
         </div>
 
@@ -528,17 +528,17 @@
             <div class="p-8 sm:p-10 rounded-3xl bg-[#111118] border border-white/15 space-y-6 relative overflow-hidden">
                 <div class="flex items-center justify-between">
                     <span class="px-3.5 py-1.5 rounded-full bg-white/10 text-white font-mono text-xs font-bold border border-white/15">
-                        PHASE ADMINISTRATIVE
+                        CONTENU DU LIVRET
                     </span>
-                    <span class="text-2xl font-serif font-bold text-[#F5B800]">Livret 01</span>
+                    <span class="text-2xl font-serif font-bold text-[#F5B800]">Les preuves<</span>
                 </div>
 
                 <h3 class="text-2xl font-serif font-bold text-white">
-                    Dossier de Recevabilité & Parcours
+                    Chaque projet documenté
                 </h3>
 
                 <p class="text-sm text-white/70 font-light leading-relaxed">
-                    Le Livret 1 certifie la conformité de vos années d'expérience et votre éligibilité légale au titre BTS. Il recense l'ensemble de votre historique professionnel :
+                    Chaque projet réalisé en entreprise ou sur un événement est consigné, photographié, filmé et rédigé pour prouver l'acquisition des compétences de niveau BTS :
                 </p>
 
                 <ul class="space-y-3 text-xs text-white/80 font-light">
@@ -552,12 +552,12 @@
                     </li>
                     <li class="flex items-start gap-2.5">
                         <x-lucide-check-circle-2 class="w-4 h-4 text-[#F5B800] shrink-0 mt-0.5" />
-                        <span>Attestations de stages ou certificat initial (CPS, BEP ou pratique autodidacte certifiée)</span>
+                        <span>Copie du CPS ou du CS et attestations d'expérience</span>
                     </li>
                 </ul>
 
                 <div class="p-4 rounded-2xl bg-black/40 border border-white/10 text-xs font-mono text-white/60">
-                    Validation par le Comité Pédagogique EMSI sous 7 jours.
+                    Le tuteur EMSI valide la qualité de chaque preuve.
                 </div>
             </div>
 
@@ -565,17 +565,17 @@
             <div class="p-8 sm:p-10 rounded-3xl bg-gradient-to-b from-[#1c142c] to-[#120d20] border border-[#F5B800]/30 space-y-6 relative overflow-hidden shadow-2xl">
                 <div class="flex items-center justify-between">
                     <span class="px-3.5 py-1.5 rounded-full bg-[#F5B800] text-black font-mono text-xs font-bold">
-                        PHASE D'EXPERTISE TECHNIQUE
+                        SUIVI & SOUTENANCE
                     </span>
-                    <span class="text-2xl font-serif font-bold text-[#F5B800]">Livret 02</span>
+                    <span class="text-2xl font-serif font-bold text-[#F5B800]">Le jury<</span>
                 </div>
 
                 <h3 class="text-2xl font-serif font-bold text-white">
-                    Dossier d'Expérience & Analyse de Cas Réels
+                    Suivi individualisé et soutenance
                 </h3>
 
                 <p class="text-sm text-white/80 font-light leading-relaxed">
-                    Le cœur de la VAE. Vous y décrivez avec précision méthodologique plusieurs interventions professionnelles d'envergure, appuyé par un tuteur EMSI :
+                    Un tuteur pédagogique de l'EMSI valide les preuves et vous oriente vers les compétences encore non couvertes :
                 </p>
 
                 <ul class="space-y-3 text-xs text-white/85 font-light">
@@ -589,12 +589,12 @@
                     </li>
                     <li class="flex items-start gap-2.5">
                         <x-lucide-check-circle-2 class="w-4 h-4 text-emerald-400 shrink-0 mt-0.5" />
-                        <span>Soutenance orale de 45 minutes devant le Jury Officiel d'État</span>
+                        <span>Soutenance devant un jury professionnel : présentation du parcours, défense du Livret et mise en situation technique</span>
                     </li>
                 </ul>
 
                 <div class="p-4 rounded-2xl bg-[#F5B800]/10 border border-[#F5B800]/20 text-xs font-mono text-[#F5B800]">
-                    Accompagnement individuel et jurys blancs d'entraînement inclus.
+                    Point d'étape du Livret en mai 2027, soutenances en octobre 2027.
                 </div>
             </div>
 
@@ -620,7 +620,7 @@
                 Les 8 Étapes du Parcours de Certification
             </h2>
             <p class="text-sm text-white/60 leading-relaxed font-light">
-                Un accompagnement structuré pas-à-pas sur 9 mois pour transformer votre savoir-faire en diplôme officiel.
+                Un cycle de 9 mois, de la sélection à la certification de niveau BTS.
             </p>
         </div>
 
@@ -632,9 +632,9 @@
                     <span class="text-xs font-mono font-bold text-[#F5B800] px-3 py-1 rounded-full bg-[#F5B800]/10 border border-[#F5B800]/30">01</span>
                     <x-lucide-user-check class="w-4 h-4 text-white/50" />
                 </div>
-                <h4 class="text-base font-bold text-white">Candidature & Diagnostic</h4>
-                <p class="text-xs text-white/60 leading-relaxed">Dépôt du formulaire en ligne, étude de votre profil et validation de la recevabilité du Livret 1.</p>
-                <div class="text-[11px] font-mono text-[#F5B800] pt-1">Mois 1</div>
+                <h4 class="text-base font-bold text-white">Candidature & sélection</h4>
+                <p class="text-xs text-white/60 leading-relaxed">Dépôt du dossier (CPS ou CS, expérience), présélection et entretien de motivation.</p>
+                <div class="text-[11px] font-mono text-[#F5B800] pt-1">Janvier 2027</div>
             </div>
 
             {{-- 2 --}}
@@ -643,9 +643,9 @@
                     <span class="text-xs font-mono font-bold text-white px-3 py-1 rounded-full bg-white/10 border border-white/15">02</span>
                     <x-lucide-compass class="w-4 h-4 text-white/50" />
                 </div>
-                <h4 class="text-base font-bold text-white">Affectation du Tuteur</h4>
-                <p class="text-xs text-white/60 leading-relaxed">Attribution d'un directeur technique référent pour vous guider tout au long du parcours VAE.</p>
-                <div class="text-[11px] font-mono text-white/40 pt-1">Mois 2</div>
+                <h4 class="text-base font-bold text-white">Ouverture du Livret</h4>
+                <p class="text-xs text-white/60 leading-relaxed">Ouverture du Livret VAE dès le premier mois et affectation d'un tuteur pédagogique EMSI.</p>
+                <div class="text-[11px] font-mono text-white/40 pt-1">Février 2027</div>
             </div>
 
             {{-- 3 --}}
@@ -654,9 +654,9 @@
                     <span class="text-xs font-mono font-bold text-[#F5B800] px-3 py-1 rounded-full bg-[#F5B800]/10 border border-[#F5B800]/30">03</span>
                     <x-lucide-book-open class="w-4 h-4 text-white/50" />
                 </div>
-                <h4 class="text-base font-bold text-white">Ateliers d'Écriture Technique</h4>
-                <p class="text-xs text-white/60 leading-relaxed">Méthodologie de rédaction, formalisation des compétences et structuration des cas d'expertise.</p>
-                <div class="text-[11px] font-mono text-[#F5B800] pt-1">Mois 3 - 4</div>
+                <h4 class="text-base font-bold text-white">Alternance école-entreprise</h4>
+                <p class="text-xs text-white/60 leading-relaxed">30 h par semaine : 10 h de théorie et de gestion de projet, 20 h de pratique en situation réelle.</p>
+                <div class="text-[11px] font-mono text-[#F5B800] pt-1">Février – octobre 2027</div>
             </div>
 
             {{-- 4 --}}
@@ -665,9 +665,9 @@
                     <span class="text-xs font-mono font-bold text-white px-3 py-1 rounded-full bg-white/10 border border-white/15">04</span>
                     <x-lucide-tv class="w-4 h-4 text-white/50" />
                 </div>
-                <h4 class="text-base font-bold text-white">Immersion Grand Théâtre</h4>
-                <p class="text-xs text-white/60 leading-relaxed">Mise en pratique sur les régies broadcast et le grill 45m pour documenter vos réalisations techniques.</p>
-                <div class="text-[11px] font-mono text-white/40 pt-1">Mois 5</div>
+                <h4 class="text-base font-bold text-white">Mises en situation réelles</h4>
+                <p class="text-xs text-white/60 leading-relaxed">Position d'assistant chef de projet sur de grands événements, sous supervision.</p>
+                <div class="text-[11px] font-mono text-white/40 pt-1">Tout au long du cycle</div>
             </div>
 
             {{-- 5 --}}
@@ -676,9 +676,9 @@
                     <span class="text-xs font-mono font-bold text-[#F5B800] px-3 py-1 rounded-full bg-[#F5B800]/10 border border-[#F5B800]/30">05</span>
                     <x-lucide-file-text class="w-4 h-4 text-white/50" />
                 </div>
-                <h4 class="text-base font-bold text-white">Finalisation du Livret 2</h4>
-                <p class="text-xs text-white/60 leading-relaxed">Relecture approfondie par le tuteur, vérification des annexes techniques et dépôt officiel.</p>
-                <div class="text-[11px] font-mono text-[#F5B800] pt-1">Mois 6 - 7</div>
+                <h4 class="text-base font-bold text-white">Documentation continue</h4>
+                <p class="text-xs text-white/60 leading-relaxed">Chaque projet est consigné, photographié, filmé et rédigé dans le Livret VAE.</p>
+                <div class="text-[11px] font-mono text-[#F5B800] pt-1">En continu</div>
             </div>
 
             {{-- 6 --}}
@@ -687,9 +687,9 @@
                     <span class="text-xs font-mono font-bold text-white px-3 py-1 rounded-full bg-white/10 border border-white/15">06</span>
                     <x-lucide-presentation class="w-4 h-4 text-white/50" />
                 </div>
-                <h4 class="text-base font-bold text-white">Simulation Jury Blanc</h4>
-                <p class="text-xs text-white/60 leading-relaxed">Entraînement en conditions réelles à la prise de parole, à l'argumentation et aux questions pièges.</p>
-                <div class="text-[11px] font-mono text-white/40 pt-1">Mois 8</div>
+                <h4 class="text-base font-bold text-white">Point d'étape</h4>
+                <p class="text-xs text-white/60 leading-relaxed">Évaluation intermédiaire du Livret VAE avec le tuteur.</p>
+                <div class="text-[11px] font-mono text-white/40 pt-1">Mai 2027</div>
             </div>
 
             {{-- 7 --}}
@@ -698,9 +698,9 @@
                     <span class="text-xs font-mono font-bold text-[#F5B800] px-3 py-1 rounded-full bg-[#F5B800]/10 border border-[#F5B800]/30">07</span>
                     <x-lucide-award class="w-4 h-4 text-[#F5B800]" />
                 </div>
-                <h4 class="text-base font-bold text-white">Soutenance Officielle</h4>
-                <p class="text-xs text-white/60 leading-relaxed">Exposé de 45 minutes devant le Jury souverain composé de professionnels et représentants de l'État.</p>
-                <div class="text-[11px] font-mono text-[#F5B800] pt-1">Mois 9</div>
+                <h4 class="text-base font-bold text-white">Soutenance</h4>
+                <p class="text-xs text-white/60 leading-relaxed">Soutenance devant un jury de professionnels du secteur et de représentants de l'État.</p>
+                <div class="text-[11px] font-mono text-[#F5B800] pt-1">Octobre 2027</div>
             </div>
 
             {{-- 8 --}}
@@ -709,9 +709,9 @@
                     <span class="text-xs font-mono font-bold text-black px-3 py-1 rounded-full bg-[#F5B800]">08</span>
                     <x-lucide-sparkles class="w-4 h-4 text-[#F5B800]" />
                 </div>
-                <h4 class="text-base font-bold text-white">Diplôme BTS Délivré</h4>
-                <p class="text-xs text-white/80 leading-relaxed">Remise officielle du Brevet de Technicien Supérieur d'État et inscription au registre national.</p>
-                <div class="text-[11px] font-mono text-[#F5B800] font-bold pt-1">Consécration Bac+2</div>
+                <h4 class="text-base font-bold text-white">Certification</h4>
+                <p class="text-xs text-white/80 leading-relaxed">Délivrance de la certification de niveau BTS (équivalent Bac+2).</p>
+                <div class="text-[11px] font-mono text-[#F5B800] font-bold pt-1">Novembre 2027</div>
             </div>
 
         </div>
@@ -732,48 +732,48 @@
 
             <div class="lg:col-span-7 space-y-6">
                 <span class="text-xs font-mono uppercase tracking-[0.25em] text-[#F5B800] font-bold">
-                    [Garantie Légale & Reconnaissance]
+                    [Jury & certification]
                 </span>
 
                 <h2 class="text-3xl sm:text-4xl lg:text-5xl font-serif font-normal text-white leading-tight">
-                    Un Jury souverain et un titre à haute valeur ajoutée.
+                    Un jury professionnel, une certification de niveau BTS.
                 </h2>
 
                 <p class="text-sm sm:text-base text-white/70 leading-relaxed font-light">
-                    Le diplôme de BTS délivré par la voie de la VAE est strictement identique à celui obtenu par la formation initiale. Il confère les mêmes prérogatives légales et professionnelles.
+                    En fin de cycle, un jury évalue le Livret VAE de chaque apprenant et le soumet à une soutenance professionnelle. La certification délivrée équivaut à un Baccalauréat+2 (niveau BTS) et ouvre l'accès à des postes de responsabilité.
                 </p>
 
                 <div class="grid sm:grid-cols-2 gap-4 pt-2">
                     <div class="p-4 rounded-2xl bg-white/[0.03] border border-white/10 space-y-2">
                         <div class="flex items-center gap-2 text-xs font-bold text-[#F5B800]">
                             <x-lucide-check class="w-4 h-4" />
-                            <span>REVALORISATION DE CARRIÈRE</span>
+                            <span>PRÉSENTATION DU PARCOURS</span>
                         </div>
-                        <p class="text-xs text-white/60 font-light leading-relaxed">Accès aux échelons de cadres techniques, chefs d'équipes et grilles indiciaires supérieures.</p>
+                        <p class="text-xs text-white/60 font-light leading-relaxed">L'apprenant présente son parcours et les projets menés pendant le cycle.</p>
                     </div>
 
                     <div class="p-4 rounded-2xl bg-white/[0.03] border border-white/10 space-y-2">
                         <div class="flex items-center gap-2 text-xs font-bold text-emerald-400">
                             <x-lucide-check class="w-4 h-4" />
-                            <span>RESPONSABILITÉ ERP & SÉCURITÉ</span>
+                            <span>DÉFENSE DU LIVRET VAE</span>
                         </div>
-                        <p class="text-xs text-white/60 font-light leading-relaxed">Habilitation à signer les dossiers de sécurité pour les événements recevant du public.</p>
+                        <p class="text-xs text-white/60 font-light leading-relaxed">Il défend les preuves consignées dans son Livret de compétences.</p>
                     </div>
 
                     <div class="p-4 rounded-2xl bg-white/[0.03] border border-white/10 space-y-2">
                         <div class="flex items-center gap-2 text-xs font-bold text-purple-400">
                             <x-lucide-check class="w-4 h-4" />
-                            <span>ACCÈS AUX MARCHÉS PUBLICS</span>
+                            <span>MISE EN SITUATION TECHNIQUE</span>
                         </div>
-                        <p class="text-xs text-white/60 font-light leading-relaxed">Éligibilité aux appels d'offres d'État exigeant des profils certifiés Bac+2.</p>
+                        <p class="text-xs text-white/60 font-light leading-relaxed">Le jury vérifie l'acquisition effective des compétences en situation.</p>
                     </div>
 
                     <div class="p-4 rounded-2xl bg-white/[0.03] border border-white/10 space-y-2">
                         <div class="flex items-center gap-2 text-xs font-bold text-blue-400">
                             <x-lucide-check class="w-4 h-4" />
-                            <span>MOBILITÉ INTERNATIONALE</span>
+                            <span>DÉBOUCHÉS</span>
                         </div>
-                        <p class="text-xs text-white/60 font-light leading-relaxed">Reconnaissance dans l'espace UEMOA et auprès des diffuseurs internationaux.</p>
+                        <p class="text-xs text-white/60 font-light leading-relaxed">Chef de projet, cadreur principal, régisseur adjoint ou création d'entreprise.</p>
                     </div>
                 </div>
             </div>
@@ -785,8 +785,8 @@
                     </div>
 
                     <div>
-                        <span class="text-xs font-mono uppercase tracking-wider text-[#F5B800]">COMPOSITION DU JURY D'ÉTAT</span>
-                        <h3 class="text-2xl font-serif font-bold text-white mt-1">L'Élite des Professionnels</h3>
+                        <span class="text-xs font-mono uppercase tracking-wider text-[#F5B800]">COMPOSITION DU JURY</span>
+                        <h3 class="text-2xl font-serif font-bold text-white mt-1">Des professionnels du secteur</h3>
                     </div>
 
                     <ul class="space-y-3 text-xs text-white/75 font-light">
@@ -804,7 +804,7 @@
                         </li>
                         <li class="flex items-center gap-3">
                             <span class="w-1.5 h-1.5 rounded-full bg-[#F5B800]"></span>
-                            <span>Représentants officiels des Ministères de tutelle</span>
+                            <span>Représentants de l'État</span>
                         </li>
                     </ul>
 
@@ -861,7 +861,7 @@
                     </span>
                 </button>
                 <div x-show="activeFaq === 1" x-collapse class="px-5 sm:px-6 pb-6 text-xs sm:text-sm text-white/70 font-light leading-relaxed border-t border-white/5 pt-4">
-                    Non. C'est précisément l'objectif de la VAE : permettre à des techniciens en activité, qu'ils soient autodidactes ou diplômés du CPS, d'accéder au niveau supérieur BTS (Bac+2) sur la base exclusive de leurs compétences et réalisations sur le terrain.
+                    Non. Le Volet 2 s'adresse aux titulaires d'un CPS ou d'un CS sans Baccalauréat : la VAE leur permet d'accéder à une certification de niveau BTS sur la base des compétences acquises.
                 </div>
             </div>
 
@@ -872,13 +872,13 @@
                     @click="activeFaq = (activeFaq === 2 ? null : 2)"
                     class="w-full p-5 sm:p-6 text-left flex items-center justify-between gap-4"
                 >
-                    <span class="text-sm sm:text-base font-bold text-white">Puis-je continuer à travailler pendant mon accompagnement VAE ?</span>
+                    <span class="text-sm sm:text-base font-bold text-white">Quel est le rythme du cycle ?</span>
                     <span class="transition-transform duration-300" :class="activeFaq === 2 ? 'rotate-180' : ''">
                         <x-lucide-chevron-down class="w-5 h-5 text-[#F5B800]" />
                     </span>
                 </button>
                 <div x-show="activeFaq === 2" x-collapse class="px-5 sm:px-6 pb-6 text-xs sm:text-sm text-white/70 font-light leading-relaxed border-t border-white/5 pt-4">
-                    Oui, absolument. Le calendrier pédagogique du Volet 2 est spécialement adapté aux professionnels en activité. Les séances de tutorat individuel et les ateliers d'écriture se déroulent en horaires aménagés et peuvent être suivis en partie à distance.
+                    30 heures par semaine pendant 9 mois : 10 heures de théorie et de gestion de projet, 20 heures de travaux pratiques en situation réelle, en alternance école-entreprise.
                 </div>
             </div>
 
@@ -895,7 +895,7 @@
                     </span>
                 </button>
                 <div x-show="activeFaq === 3" x-collapse class="px-5 sm:px-6 pb-6 text-xs sm:text-sm text-white/70 font-light leading-relaxed border-t border-white/5 pt-4">
-                    Le parcours complet s'étend sur 9 mois. Il comprend la recevabilité du Livret 1, la rédaction méthodique du Livret 2, la mise en situation technique sur les régies du Grand Théâtre, la simulation en jury blanc et la soutenance finale officielle.
+                    Le cycle dure 9 mois (février à octobre 2027). Le Livret VAE est ouvert dès le premier mois, un point d'étape a lieu en mai et les soutenances se tiennent en octobre.
                 </div>
             </div>
 
@@ -906,13 +906,13 @@
                     @click="activeFaq = (activeFaq === 4 ? null : 4)"
                     class="w-full p-5 sm:p-6 text-left flex items-center justify-between gap-4"
                 >
-                    <span class="text-sm sm:text-base font-bold text-white">Quelle est la valeur officielle du diplôme obtenu ?</span>
+                    <span class="text-sm sm:text-base font-bold text-white">Quelle certification est délivrée ?</span>
                     <span class="transition-transform duration-300" :class="activeFaq === 4 ? 'rotate-180' : ''">
                         <x-lucide-chevron-down class="w-5 h-5 text-[#F5B800]" />
                     </span>
                 </button>
                 <div x-show="activeFaq === 4" x-collapse class="px-5 sm:px-6 pb-6 text-xs sm:text-sm text-white/70 font-light leading-relaxed border-t border-white/5 pt-4">
-                    Le diplôme obtenu est le Brevet de Technicien Supérieur (BTS) d'État, délivré sous le contrôle direct du Ministère de la Formation Professionnelle. Il a exactement la même valeur juridique et académique qu'un BTS obtenu après deux ans de scolarité classique.
+                    Une certification de niveau BTS, équivalente à un Baccalauréat+2, délivrée après évaluation du Livret VAE et soutenance devant un jury de professionnels du secteur et de représentants de l'État.
                 </div>
             </div>
 
@@ -942,20 +942,20 @@
                 </h2>
 
                 <p class="text-sm sm:text-base text-white/70 leading-relaxed font-light">
-                    Ne laissez pas votre savoir-faire sans reconnaissance officielle. Nos conseillers VAE sont à votre disposition pour analyser gratuitement votre dossier initial et vous orienter vers la filière BTS la plus pertinente.
+                    Nos équipes étudient votre dossier et vous orientent vers la filière la plus adaptée à votre parcours.
                 </p>
 
                 <div class="pt-4 grid sm:grid-cols-2 gap-4">
                     <div class="p-5 rounded-2xl bg-white/[0.03] border border-white/10 space-y-1">
                         <div class="text-xs font-mono text-[#F5B800]">PÔLE CONSEIL VAE</div>
-                        <div class="text-sm font-semibold text-white">Grand Théâtre National, Dakar</div>
+                        <div class="text-sm font-semibold text-white">{{ $siteSettings?->address ?: 'Dakar, Sénégal' }}</div>
                         <div class="text-xs text-white/50">Entretiens d'orientation sur rendez-vous</div>
                     </div>
 
                     <div class="p-5 rounded-2xl bg-white/[0.03] border border-white/10 space-y-1">
                         <div class="text-xs font-mono text-[#F5B800]">LIGNE DIRECTE VAE</div>
-                        <div class="text-sm font-semibold text-white">{{ $siteSettings?->phone ?? '+221 33 800 00 00' }}</div>
-                        <div class="text-xs text-white/50">{{ $siteSettings?->email ?? 'contact@emsi.sn' }}</div>
+                        <div class="text-sm font-semibold text-white">{{ $siteSettings?->phone ?: '—' }}</div>
+                        <div class="text-xs text-white/50">{{ $siteSettings?->email }}</div>
                     </div>
                 </div>
             </div>
@@ -963,7 +963,7 @@
             <div class="lg:col-span-5">
                 <div class="p-8 sm:p-10 rounded-3xl bg-gradient-to-b from-[#13131c] to-[#1c142c] border border-white/15 shadow-2xl space-y-6">
                     <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-[#F5B800]/15 text-[#F5B800] text-xs font-bold font-mono">
-                        <span>SESSION VAE 2026-2027</span>
+                        <span>VOLET 2 · RECRUTEMENT EN JANVIER 2027</span>
                     </div>
 
                     <h3 class="text-2xl font-serif font-bold text-white">

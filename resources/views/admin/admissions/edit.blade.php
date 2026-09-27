@@ -620,7 +620,7 @@
                             Volet 1 — 3 mois intensif (Perfectionnement & Festivals)
                         </option>
                         <option value="Volet 2 — 9 mois (BTS d'État par la VAE)" @selected(old('volet', $admission->volet) === "Volet 2 — 9 mois (BTS d'État par la VAE)")>
-                            Volet 2 — 9 mois (Certification BTS d'État par la VAE)
+                            Volet 2 — 9 mois (Certification de niveau BTS par la VAE)
                         </option>
                     </select>
                 </div>

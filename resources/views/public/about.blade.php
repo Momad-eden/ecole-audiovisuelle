@@ -649,7 +649,7 @@
                 Un ancrage institutionnel garantissant l'excellence.
             </h2>
             <p class="text-xs sm:text-sm text-white/60 leading-relaxed font-light">
-                L'EMSI bénéficie de la double tutelle des ministères sénégalais pour délivrer des certifications et diplômes d'État (BTS / VAE) de renommée internationale.
+                Le programme EMSI × Grand Théâtre s'appuie sur des partenaires institutionnels et culturels engagés à ses côtés.
             </p>
         </div>
 
@@ -659,15 +659,15 @@
                     <x-lucide-landmark class="w-6 h-6" />
                 </div>
                 <h4 class="text-base font-bold text-white">Grand Théâtre National</h4>
-                <p class="text-xs text-white/60 font-light">Résidence permanente, mise à disposition des scènes et régies de prestige.</p>
+                <p class="text-xs text-white/60 font-light">Co-porteur du programme : met à disposition ses salles, plateaux et équipements techniques.</p>
             </div>
 
             <div class="p-6 rounded-2xl bg-white/[0.03] border border-white/10 text-center space-y-3">
                 <div class="w-12 h-12 rounded-full bg-emerald-500/15 text-emerald-400 flex items-center justify-center mx-auto">
                     <x-lucide-award class="w-6 h-6" />
                 </div>
-                <h4 class="text-base font-bold text-white">Ministère de la Formation</h4>
-                <p class="text-xs text-white/60 font-light">Homologation des référentiels pédagogiques et délivrance du Brevet de Technicien Supérieur (BTS).</p>
+                <h4 class="text-base font-bold text-white">Direction des Concours</h4>
+                <p class="text-xs text-white/60 font-light">Partenaire institutionnel garant de la certification du Volet 1.</p>
             </div>
 
             <div class="p-6 rounded-2xl bg-white/[0.03] border border-white/10 text-center space-y-3">
@@ -675,15 +675,15 @@
                     <x-lucide-sparkles class="w-6 h-6" />
                 </div>
                 <h4 class="text-base font-bold text-white">Ministère de la Culture</h4>
-                <p class="text-xs text-white/60 font-light">Accompagnement du patrimoine culturel vivant et des industries créatives sénégalaises.</p>
+                <p class="text-xs text-white/60 font-light">Associé à la gouvernance stratégique du programme.</p>
             </div>
 
             <div class="p-6 rounded-2xl bg-white/[0.03] border border-white/10 text-center space-y-3">
                 <div class="w-12 h-12 rounded-full bg-blue-500/15 text-blue-400 flex items-center justify-center mx-auto">
                     <x-lucide-tv class="w-6 h-6" />
                 </div>
-                <h4 class="text-base font-bold text-white">Diffuseurs & Chaînes TV</h4>
-                <p class="text-xs text-white/60 font-light">Partenariats de stages et d'embauches directes (RTS, Canal+ Afrique, chaînes privées).</p>
+                <h4 class="text-base font-bold text-white">Ministère de la Formation professionnelle</h4>
+                <p class="text-xs text-white/60 font-light">Associé à la gouvernance stratégique du programme.</p>
             </div>
         </div>
 
@@ -721,8 +721,8 @@
 
                     <div class="p-5 rounded-2xl bg-white/[0.03] border border-white/10 space-y-1">
                         <div class="text-xs font-mono text-[#F5B800]">LIGNE DIRECTE ADMISSIONS</div>
-                        <div class="text-sm font-semibold text-white">{{ $siteSettings?->phone ?? '+221 33 800 00 00' }}</div>
-                        <div class="text-xs text-white/50">{{ $siteSettings?->email ?? 'contact@emsi.sn' }}</div>
+                        <div class="text-sm font-semibold text-white">{{ $siteSettings?->phone ?: '—' }}</div>
+                        <div class="text-xs text-white/50">{{ $siteSettings?->email }}</div>
                     </div>
                 </div>
             </div>

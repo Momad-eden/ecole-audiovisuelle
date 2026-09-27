@@ -87,7 +87,7 @@
                         type="text"
                         name="phone"
                         value="{{ old('phone', $settings->phone) }}"
-                        placeholder="+221 33 000 00 00"
+                        placeholder="+221 77 000 00 00"
                         class="w-full rounded-xl border-gray-300 focus:border-[#F5B800] focus:ring-[#F5B800] text-sm">
                 </div>
 
@@ -110,7 +110,7 @@
                     <textarea
                         name="address"
                         rows="2"
-                        placeholder="Grand Théâtre National Doudou Ndiaye Rose, Dakar, Sénégal"
+                        placeholder="Quartier, rue — Dakar, Sénégal"
                         class="w-full rounded-xl border-gray-300 focus:border-[#F5B800] focus:ring-[#F5B800] text-sm">{{ old('address', $settings->address) }}</textarea>
                 </div>
 

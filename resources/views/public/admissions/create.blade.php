@@ -2,7 +2,7 @@
 
 @section('title', 'Candidature & Admission — EMSI Dakar')
 
-@section('description', 'Déposez votre candidature en ligne pour rejoindre les formations audiovisuelles de l’EMSI au Grand Théâtre National Doudou Ndiaye Rose à Dakar.')
+@section('description', 'Déposez votre candidature en ligne pour rejoindre les formations audiovisuelles de l’EMSI au Grand Théâtre National Doudou Ndiaye Coumba Rose à Dakar.')
 
 @section('content')
 
@@ -27,8 +27,7 @@
         <div class="max-w-3xl">
 
             <div class="inline-flex items-center gap-2 px-3 py-1.5 rounded-full text-xs font-bold uppercase tracking-wider bg-[#F5B800]/10 text-[#F5B800] border border-[#F5B800]/30 mb-4">
-                <span class="w-2 h-2 rounded-full bg-[#F5B800] animate-pulse"></span>
-                Session 2026 · Inscriptions Ouvertes
+                Candidature en ligne
             </div>
 
             <h1 class="text-3xl sm:text-4xl lg:text-5xl font-serif font-normal tracking-tight text-white leading-tight mb-4">
@@ -36,19 +35,11 @@
             </h1>
 
             <p class="text-base sm:text-lg text-white/70 leading-relaxed font-light">
-                Rejoignez l'École des Métiers du Son et de l'Image au cœur du Grand Théâtre National de Dakar. Remplissez le formulaire ci-dessous en quelques minutes pour initier votre parcours.
+                Rejoignez l'École des Métiers du Son et de l'Image (EMSI) à Dakar. Remplissez le formulaire ci-dessous en quelques minutes pour initier votre parcours.
             </p>
 
             {{-- Avantages rapides --}}
             <div class="mt-8 flex flex-wrap items-center gap-4 text-xs font-medium text-white/80">
-                <span class="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-white/[0.06] border border-white/10">
-                    <x-lucide-clock class="w-3.5 h-3.5 text-[#F5B800]" />
-                    Réponse sous 48h
-                </span>
-                <span class="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-white/[0.06] border border-white/10">
-                    <x-lucide-check-circle-2 class="w-3.5 h-3.5 text-[#F5B800]" />
-                    Sans frais de dossier préalables
-                </span>
                 <span class="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-white/[0.06] border border-white/10">
                     <x-lucide-award class="w-3.5 h-3.5 text-[#F5B800]" />
                     Entretien d'orientation individuel
@@ -550,7 +541,7 @@
                                     >
                                     <div>
                                         <p class="text-xs font-bold text-[#111111]">Volet 2 — Cycle BTS-VAE</p>
-                                        <p class="text-[11px] text-black/60 mt-0.5">9 mois (1 080h) · Alternance · Titre BTS Bac+2 d'État</p>
+                                        <p class="text-[11px] text-black/60 mt-0.5">9 mois (1 080 h) · Alternance · Certification de niveau BTS · Titulaires d'un CPS ou d'un CS</p>
                                     </div>
                                 </label>
                             </div>
@@ -647,7 +638,7 @@
                         </div>
 
                         <div class="mt-6 pt-5 border-t border-black/5 text-[11px] text-black/50 leading-relaxed">
-                            💡 Aucun prérequis complexe n'est exigé : nous évaluons avant tout votre motivation et votre sensibilité créative.
+                            Les programmes professionnels (Volets 1 et 2) s'adressent aux titulaires d'un CPS ou d'un CS. Pour les autres formations, votre motivation est au cœur de l'entretien.
                         </div>
 
                     </div>
@@ -661,13 +652,15 @@
                         <p class="text-xs text-black/60 leading-relaxed mb-4">
                             Notre équipe des admissions est joignable du lundi au vendredi.
                         </p>
-                        <a
-                            href="tel:+221338000000"
-                            class="inline-flex items-center gap-2 text-xs font-bold text-[#C15C03] hover:underline"
-                        >
-                            <span>Appeler le service admissions</span>
-                            <x-lucide-arrow-right class="w-3.5 h-3.5" />
-                        </a>
+                        @if($siteSettings?->phone)
+                            <a
+                                href="tel:{{ preg_replace('/[^0-9+]/', '', $siteSettings->phone) }}"
+                                class="inline-flex items-center gap-2 text-xs font-bold text-[#C15C03] hover:underline"
+                            >
+                                <span>Appeler le {{ $siteSettings->phone }}</span>
+                                <x-lucide-arrow-right class="w-3.5 h-3.5" />
+                            </a>
+                        @endif
                     </div>
 
                 </aside>

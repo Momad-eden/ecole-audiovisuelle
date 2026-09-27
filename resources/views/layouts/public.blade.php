@@ -13,7 +13,7 @@
     <title>
         @yield(
         'title',
-        'EMSI — École de Formation Audiovisuelle'
+        'EMSI — École des Métiers du Son et de l’Image'
         )
     </title>
 
@@ -21,7 +21,7 @@
         name="description"
         content="@yield(
             'description',
-            'EMSI — École de Formation Audiovisuelle au cœur du Grand Théâtre National Doudou Ndiaye Rose, Dakar.'
+            'EMSI — École des Métiers du Son et de l’Image, Dakar : formations aux métiers techniques du son, de la lumière, de l’image et du spectacle vivant.'
         )">
 
     <!-- Favicon EMSI -->

@@ -60,7 +60,7 @@
 
                 <span class="hidden lg:flex items-center gap-1.5 text-white/60">
                     <x-lucide-map-pin class="w-3 h-3 text-[#F5B800]/80" />
-                    Grand Théâtre National Doudou Ndiaye Rose, Dakar
+                    {{ $siteSettings?->address ?: 'Dakar, Sénégal' }}
                 </span>
             </div>
 
@@ -351,7 +351,7 @@
                                         </div>
 
                                         <h4 class="font-serif text-sm font-bold text-white leading-snug">
-                                            Grand Théâtre National Doudou Ndiaye Rose
+                                            Grand Théâtre National Doudou Ndiaye Coumba Rose
                                         </h4>
 
                                         <p class="text-xs text-gray-300 mt-2 leading-relaxed">
@@ -679,7 +679,7 @@
         <div class="p-6 bg-black/40 border-t border-white/[0.08] relative z-10 space-y-4">
             <div class="text-xs text-white/50 space-y-1">
                 <p class="font-semibold text-white/80">EMSI — École des Métiers du Son et de l'Image</p>
-                <p>Grand Théâtre National Doudou Ndiaye Rose, Dakar</p>
+                <p>{{ $siteSettings?->address ?: 'Dakar, Sénégal' }}</p>
             </div>
 
             <div class="flex items-center gap-3 pt-2">

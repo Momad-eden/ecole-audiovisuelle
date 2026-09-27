@@ -2,12 +2,12 @@
 
 
 @section('title')
-EMSI - École de Formation Audiovisuelle
+EMSI — École des Métiers du Son et de l'Image
 @endsection
 
 
 @section('description')
-EMSI — École de Formation Audiovisuelle au cœur du Grand Théâtre National Doudou Ndiaye Rose, Dakar.
+EMSI — École des Métiers du Son et de l'Image, Dakar : formations aux métiers techniques du son, de la lumière, de l'image et du spectacle vivant.
 @endsection
 
 
@@ -76,7 +76,7 @@ EMSI — École de Formation Audiovisuelle au cœur du Grand Théâtre National 
                     <span class="relative inline-flex rounded-full h-2 w-2 bg-[#F5B800]"></span>
                 </span>
                 <span class="text-[11px] sm:text-xs uppercase tracking-[0.18em] font-bold text-[#F5B800]">
-                    Inscriptions Ouvertes • Session {{ date('Y') }}-{{ date('Y') + 1 }}
+                    École des Métiers du Son et de l'Image • Dakar
                 </span>
             </div>
 
@@ -116,7 +116,7 @@ EMSI — École de Formation Audiovisuelle au cœur du Grand Théâtre National 
 
                 {{-- Paragraphe d'impact clair et professionnel --}}
                 <p class="mt-6 sm:mt-7 text-base sm:text-lg leading-relaxed text-white/75 font-light max-w-xl">
-                    L'école d'excellence pour former et certifier l'élite technique du <strong class="text-white font-semibold">son, de la lumière, de la vidéo broadcast, de la régie générale et de la création numérique</strong>. 90% d'immersion pratique en conditions réelles et certification <strong class="text-[#F5B800] font-semibold">BTS d'État par la VAE</strong>.
+                    L'école d'excellence pour former et certifier l'élite technique du <strong class="text-white font-semibold">son, de la lumière, de la vidéo broadcast, de la régie générale et de la création numérique</strong>. Une pédagogie de la pratique en conditions réelles et, pour les professionnels, une <strong class="text-[#F5B800] font-semibold">certification de niveau BTS par la VAE</strong>.
                 </p>
 
                 {{-- Groupe CTA Principal --}}
@@ -170,7 +170,7 @@ EMSI — École de Formation Audiovisuelle au cœur du Grand Théâtre National 
                     </div>
                     <div class="flex flex-col">
                         <span class="text-xl sm:text-2xl font-bold font-sans text-[#F5B800] tracking-tight">BTS</span>
-                        <span class="text-[11px] text-white/55 font-medium leading-tight">Diplôme d'État / VAE</span>
+                        <span class="text-[11px] text-white/55 font-medium leading-tight">Niveau par la VAE</span>
                     </div>
                 </div>
 
@@ -499,11 +499,11 @@ EMSI — École de Formation Audiovisuelle au cœur du Grand Théâtre National 
                         Cycle de Certification BTS par la VAE
                     </h3>
                     <p class="text-xs sm:text-sm text-white/65 leading-relaxed font-light mb-6">
-                        Parcours de 9 mois (1 080h) en alternance école-entreprise avec constitution du Livret VAE et soutenance devant jury professionnel pour l'obtention du BTS Bac+2.
+                        Parcours de 9 mois (1 080h) en alternance école-entreprise avec constitution du Livret VAE et soutenance devant jury professionnel pour l'obtention d'une certification de niveau BTS (équivalent Bac+2).
                     </p>
                 </div>
                 <div class="flex items-center justify-between pt-4 border-t border-white/10">
-                    <span class="text-xs text-[#F5B800] font-semibold">Titre BTS d'État (Équivalence Bac+2)</span>
+                    <span class="text-xs text-[#F5B800] font-semibold">Certification de niveau BTS (équivalent Bac+2)</span>
                     <a href="{{ route('public.vae') }}" class="text-xs text-white hover:text-[#F5B800] font-bold flex items-center gap-1">
                         Dispositif VAE <x-lucide-chevron-right class="w-3.5 h-3.5" />
                     </a>
@@ -553,7 +553,7 @@ EMSI — École de Formation Audiovisuelle au cœur du Grand Théâtre National 
 
             <div class="max-w-lg">
                 <p class="text-sm sm:text-base leading-relaxed text-white/70 font-light">
-                    Implantée au cœur du <span class="text-white font-medium">Grand Théâtre National Doudou Ndiaye Rose</span>, l'EMSI est l'institution d'excellence dédiée à l'apprentissage intensif et professionnalisant des métiers du cinéma, de la télévision, du son et de la création digitale à Dakar.
+                    Créée en 2016 à Dakar, l'EMSI forme aux métiers techniques et artistiques du son, de la lumière, de l'image et du spectacle vivant, en partenariat avec le <span class="text-white font-medium">Grand Théâtre National Doudou Ndiaye Coumba Rose</span>.
                 </p>
                 <div class="mt-6 flex flex-wrap items-center gap-4">
                     <a
@@ -579,7 +579,7 @@ EMSI — École de Formation Audiovisuelle au cœur du Grand Théâtre National 
                 <div class="absolute inset-0 z-0">
                     <img
                         src="{{ asset('images/grand-theatre.jpg') }}"
-                        alt="Grand Théâtre National Doudou Ndiaye Rose - Dakar"
+                        alt="Grand Théâtre National Doudou Ndiaye Coumba Rose - Dakar"
                         class="w-full h-full object-cover transition-transform duration-1000 ease-out group-hover:scale-105 opacity-40 group-hover:opacity-55 filter brightness-95"
                     >
                     <div class="absolute inset-0 bg-gradient-to-t from-[#08080a] via-[#08080a]/60 to-black/30"></div>
@@ -620,7 +620,7 @@ EMSI — École de Formation Audiovisuelle au cœur du Grand Théâtre National 
                         <p class="text-xs uppercase tracking-[0.2em] text-[#F5B800] font-bold">Un Monument Artistique & Culturel</p>
                     </div>
                     <h3 class="text-2xl sm:text-3xl lg:text-4xl font-serif text-white leading-tight">
-                        Grand Théâtre National Doudou Ndiaye Rose
+                        Grand Théâtre National Doudou Ndiaye Coumba Rose
                     </h3>
                     <p class="mt-3 text-xs sm:text-sm text-white/75 leading-relaxed font-light">
                         Un écrin architectural majestueux offrant à nos étudiants des plateaux de tournage grandeur nature, des régies de captation multicaméras et des espaces de post-production haut de gamme pour une immersion totale dans les conditions réelles de l'industrie.
@@ -1601,11 +1601,7 @@ EMSI — École de Formation Audiovisuelle au cœur du Grand Théâtre National 
                                         class="max-h-full max-w-full object-contain filter brightness-90 group-hover:brightness-100 group-hover:scale-105 transition-all duration-300"
                                     >
                                 @else
-                                    <img
-                                        src="{{ asset('images/partenaires/partenaire-' . (($loop->index % 6) + 1) . '.png') }}"
-                                        alt="{{ $partner->name }}"
-                                        class="max-h-full max-w-full object-contain filter brightness-90 group-hover:brightness-100 group-hover:scale-105 transition-all duration-300"
-                                    >
+                                    <x-lucide-handshake class="w-7 h-7 text-white/40" aria-hidden="true" />
                                 @endif
                             </div>
                             <span class="mt-2 text-xs font-semibold text-white/80 group-hover:text-[#F5B800] transition-colors">
@@ -1627,11 +1623,7 @@ EMSI — École de Formation Audiovisuelle au cœur du Grand Théâtre National 
                                         class="max-h-full max-w-full object-contain filter brightness-90 group-hover:brightness-100 group-hover:scale-105 transition-all duration-300"
                                     >
                                 @else
-                                    <img
-                                        src="{{ asset('images/partenaires/partenaire-' . (($loop->index % 6) + 1) . '.png') }}"
-                                        alt="{{ $partner->name }}"
-                                        class="max-h-full max-w-full object-contain filter brightness-90 group-hover:brightness-100 group-hover:scale-105 transition-all duration-300"
-                                    >
+                                    <x-lucide-handshake class="w-7 h-7 text-white/40" aria-hidden="true" />
                                 @endif
                             </div>
                             <span class="mt-2 text-xs font-semibold text-white/80 group-hover:text-[#F5B800] transition-colors">
@@ -1645,113 +1637,6 @@ EMSI — École de Formation Audiovisuelle au cœur du Grand Théâtre National 
                         </div>
                     @endif
                 @endforeach
-            </div>
-        @else
-            {{-- Partenaires institutionnels et industriels avec vrais logos --}}
-            <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-4 sm:gap-6 items-stretch">
-
-                {{-- 01. Grand Théâtre National --}}
-                <div class="group p-6 rounded-2xl bg-white/[0.03] hover:bg-white/[0.07] border border-white/[0.08] hover:border-[#F5B800]/40 flex flex-col items-center justify-center text-center transition-all duration-300 hover:-translate-y-1 shadow-lg hover:shadow-[0_10px_30px_rgba(245,184,0,0.1)]">
-                    <div class="w-20 h-14 rounded-xl bg-white/[0.04] border border-white/10 p-2.5 flex items-center justify-center mb-3 group-hover:border-[#F5B800]/50 group-hover:bg-white/[0.08] transition-all shadow-md">
-                        <img
-                            src="{{ asset('images/partenaires/partenaire-1.png') }}"
-                            alt="Grand Théâtre National Doudou Ndiaye Rose"
-                            class="max-h-full max-w-full object-contain filter brightness-90 contrast-110 group-hover:brightness-110 group-hover:scale-105 transition-all duration-300"
-                        >
-                    </div>
-                    <span class="text-xs font-bold text-white group-hover:text-[#F5B800] transition-colors">
-                        Grand Théâtre National
-                    </span>
-                    <span class="mt-1 text-[10px] text-white/45 uppercase tracking-wider font-medium">
-                        Résidence & Campus
-                    </span>
-                </div>
-
-                {{-- 02. Ministère de la Culture --}}
-                <div class="group p-6 rounded-2xl bg-white/[0.03] hover:bg-white/[0.07] border border-white/[0.08] hover:border-[#F5B800]/40 flex flex-col items-center justify-center text-center transition-all duration-300 hover:-translate-y-1 shadow-lg hover:shadow-[0_10px_30px_rgba(245,184,0,0.1)]">
-                    <div class="w-20 h-14 rounded-xl bg-white/[0.04] border border-white/10 p-2.5 flex items-center justify-center mb-3 group-hover:border-[#F5B800]/50 group-hover:bg-white/[0.08] transition-all shadow-md">
-                        <img
-                            src="{{ asset('images/partenaires/partenaire-2.png') }}"
-                            alt="Ministère de la Culture"
-                            class="max-h-full max-w-full object-contain filter brightness-90 contrast-110 group-hover:brightness-110 group-hover:scale-105 transition-all duration-300"
-                        >
-                    </div>
-                    <span class="text-xs font-bold text-white group-hover:text-[#F5B800] transition-colors">
-                        Ministère de la Culture
-                    </span>
-                    <span class="mt-1 text-[10px] text-white/45 uppercase tracking-wider font-medium">
-                        Soutien Institutionnel
-                    </span>
-                </div>
-
-                {{-- 03. FOPICA --}}
-                <div class="group p-6 rounded-2xl bg-white/[0.03] hover:bg-white/[0.07] border border-white/[0.08] hover:border-[#F5B800]/40 flex flex-col items-center justify-center text-center transition-all duration-300 hover:-translate-y-1 shadow-lg hover:shadow-[0_10px_30px_rgba(245,184,0,0.1)]">
-                    <div class="w-20 h-14 rounded-xl bg-white/[0.04] border border-white/10 p-2.5 flex items-center justify-center mb-3 group-hover:border-[#F5B800]/50 group-hover:bg-white/[0.08] transition-all shadow-md">
-                        <img
-                            src="{{ asset('images/partenaires/partenaire-3.png') }}"
-                            alt="FOPICA"
-                            class="max-h-full max-w-full object-contain filter brightness-90 contrast-110 group-hover:brightness-110 group-hover:scale-105 transition-all duration-300"
-                        >
-                    </div>
-                    <span class="text-xs font-bold text-white group-hover:text-[#F5B800] transition-colors">
-                        FOPICA
-                    </span>
-                    <span class="mt-1 text-[10px] text-white/45 uppercase tracking-wider font-medium">
-                        Fonds Cinéma Sénégal
-                    </span>
-                </div>
-
-                {{-- 04. RTS --}}
-                <div class="group p-6 rounded-2xl bg-white/[0.03] hover:bg-white/[0.07] border border-white/[0.08] hover:border-[#F5B800]/40 flex flex-col items-center justify-center text-center transition-all duration-300 hover:-translate-y-1 shadow-lg hover:shadow-[0_10px_30px_rgba(245,184,0,0.1)]">
-                    <div class="w-20 h-14 rounded-xl bg-white/[0.04] border border-white/10 p-2.5 flex items-center justify-center mb-3 group-hover:border-[#F5B800]/50 group-hover:bg-white/[0.08] transition-all shadow-md">
-                        <img
-                            src="{{ asset('images/partenaires/partenaire-4.png') }}"
-                            alt="RTS Sénégal"
-                            class="max-h-full max-w-full object-contain filter brightness-90 contrast-110 group-hover:brightness-110 group-hover:scale-105 transition-all duration-300"
-                        >
-                    </div>
-                    <span class="text-xs font-bold text-white group-hover:text-[#F5B800] transition-colors">
-                        RTS Sénégal
-                    </span>
-                    <span class="mt-1 text-[10px] text-white/45 uppercase tracking-wider font-medium">
-                        Audiovisuel Public
-                    </span>
-                </div>
-
-                {{-- 05. Chaînes & Diffuseurs --}}
-                <div class="group p-6 rounded-2xl bg-white/[0.03] hover:bg-white/[0.07] border border-white/[0.08] hover:border-[#F5B800]/40 flex flex-col items-center justify-center text-center transition-all duration-300 hover:-translate-y-1 shadow-lg hover:shadow-[0_10px_30px_rgba(245,184,0,0.1)]">
-                    <div class="w-20 h-14 rounded-xl bg-white/[0.04] border border-white/10 p-2.5 flex items-center justify-center mb-3 group-hover:border-[#F5B800]/50 group-hover:bg-white/[0.08] transition-all shadow-md">
-                        <img
-                            src="{{ asset('images/partenaires/partenaire-5.png') }}"
-                            alt="Diffuseurs et Médias"
-                            class="max-h-full max-w-full object-contain filter brightness-90 contrast-110 group-hover:brightness-110 group-hover:scale-105 transition-all duration-300"
-                        >
-                    </div>
-                    <span class="text-xs font-bold text-white group-hover:text-[#F5B800] transition-colors">
-                        Diffuseurs & Médias
-                    </span>
-                    <span class="mt-1 text-[10px] text-white/45 uppercase tracking-wider font-medium">
-                        Diffusion & Stages
-                    </span>
-                </div>
-
-                {{-- 06. Studios de Post-Production --}}
-                <div class="group p-6 rounded-2xl bg-white/[0.03] hover:bg-white/[0.07] border border-white/[0.08] hover:border-[#F5B800]/40 flex flex-col items-center justify-center text-center transition-all duration-300 hover:-translate-y-1 shadow-lg hover:shadow-[0_10px_30px_rgba(245,184,0,0.1)]">
-                    <div class="w-20 h-14 rounded-xl bg-white/[0.04] border border-white/10 p-2.5 flex items-center justify-center mb-3 group-hover:border-[#F5B800]/50 group-hover:bg-white/[0.08] transition-all shadow-md">
-                        <img
-                            src="{{ asset('images/partenaires/partenaire-6.png') }}"
-                            alt="Studios de Production"
-                            class="max-h-full max-w-full object-contain filter brightness-90 contrast-110 group-hover:brightness-110 group-hover:scale-105 transition-all duration-300"
-                        >
-                    </div>
-                    <span class="text-xs font-bold text-white group-hover:text-[#F5B800] transition-colors">
-                        Studios de Production
-                    </span>
-                    <span class="mt-1 text-[10px] text-white/45 uppercase tracking-wider font-medium">
-                        Plateaux & Tournages
-                    </span>
-                </div>
-
             </div>
         @endif
 

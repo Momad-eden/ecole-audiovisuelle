@@ -9,6 +9,7 @@ use App\Http\Requests\Admin\StorePaymentRequest;
 use App\Http\Requests\Admin\UpdatePaymentRequest;
 use App\Models\Course;
 use App\Models\Payment;
+use App\Models\Setting;
 use App\Models\Student;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -221,7 +222,14 @@ class PaymentController extends Controller
             ];
         }
 
-        return view('admin.payments.receipt', compact('payment', 'studentStats'));
+        // Année académique de la date du paiement (rentrée en septembre), et non de la date d'impression.
+        $date = $payment->payment_date ?? $payment->created_at;
+        $startYear = $date->month >= 9 ? $date->year : $date->year - 1;
+        $academicSession = $startYear.'-'.($startYear + 1);
+
+        $settings = Setting::first();
+
+        return view('admin.payments.receipt', compact('payment', 'studentStats', 'academicSession', 'settings'));
     }
 
     /**

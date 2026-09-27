@@ -268,7 +268,7 @@
                         Cycle de Certification BTS par la VAE
                     </h3>
                     <p class="text-sm text-white/70 leading-relaxed mb-8">
-                        Parcours complet d'ascension professionnelle permettant à 60 jeunes titulaires du CPS d'obtenir un diplôme officiel d'État de niveau BTS (Bac+2) via la Validation des Acquis de l'Expérience.
+                        Parcours complet d'ascension professionnelle permettant à 60 jeunes titulaires du CPS d'obtenir une certification de niveau BTS (équivalent Bac+2) via la Validation des Acquis de l'Expérience.
                     </p>
 
                     {{-- Spécifications clés --}}
@@ -299,7 +299,7 @@
                         </div>
                         <div class="flex items-center gap-2">
                             <x-lucide-check class="w-4 h-4 text-[#F5B800] shrink-0" />
-                            <span>Soutenance devant Jury Professionnel & Titre officiel de niveau BTS (Bac+2)</span>
+                            <span>Soutenance devant un jury professionnel et certification de niveau BTS (équivalent Bac+2)</span>
                         </div>
                     </div>
                 </div>
@@ -525,7 +525,7 @@
                         <div>
                             <span class="text-xs font-bold text-[#F5B800] uppercase tracking-wider">Novembre → Décembre 2027</span>
                             <h4 class="text-sm font-semibold text-white mt-1">Certification BTS & Lancement Académie</h4>
-                            <p class="text-xs text-white/60 mt-1">Délivrance des diplômes BTS d'État et pose des bases institutionnelles de l'Académie des Métiers Techniques.</p>
+                            <p class="text-xs text-white/60 mt-1">Délivrance des certifications de niveau BTS et pose des bases institutionnelles de l'Académie des Métiers Techniques.</p>
                         </div>
                     </div>
 
@@ -569,7 +569,7 @@
                 <div class="h-16 flex items-center justify-center mb-4">
                     <span class="font-serif text-xl font-bold text-white">Grand Théâtre National</span>
                 </div>
-                <h3 class="text-lg font-bold text-white mb-2">Grand Théâtre Doudou Ndiaye Rose</h3>
+                <h3 class="text-lg font-bold text-white mb-2">Grand Théâtre Doudou Ndiaye Coumba Rose</h3>
                 <p class="text-xs text-white/60">Co-porteur officiel, mise à disposition des scènes live, régies techniques, plateaux et logistique d'envergure.</p>
             </div>
 
@@ -578,7 +578,7 @@
                     <span class="font-serif text-lg font-bold text-[#F5B800]">Direction des Concours</span>
                 </div>
                 <h3 class="text-lg font-bold text-white mb-2">Ministères & Direction des Concours</h3>
-                <p class="text-xs text-white/60">Cadre réglementaire de la VAE, organisation des jurys d'évaluation et délivrance des certifications d'État.</p>
+                <p class="text-xs text-white/60">Partenaire institutionnel garant de la certification du Volet 1 (Diplôme d'École).</p>
             </div>
         </div>
 

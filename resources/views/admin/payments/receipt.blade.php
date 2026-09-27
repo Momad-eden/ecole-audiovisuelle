@@ -70,7 +70,7 @@
                     <h1 class="text-2xl font-black tracking-tight text-gray-900 uppercase">EMSI</h1>
                     <p class="text-xs font-semibold text-gray-700 uppercase tracking-wider">École des Métiers du Son et de l'Image</p>
                     <p class="text-[11px] text-gray-500 mt-0.5">Grand Théâtre National — Dakar, Sénégal</p>
-                    <p class="text-[11px] text-gray-500">Tél : +221 33 000 00 00 | Email : contact@emsi.sn</p>
+                    <p class="text-[11px] text-gray-500">{{ collect([$settings?->phone ? 'Tél : '.$settings->phone : null, $settings?->email ? 'Email : '.$settings->email : null])->filter()->implode(' | ') }}</p>
                 </div>
             </div>
 
@@ -106,7 +106,7 @@
                     <div>
                         <span class="text-gray-400 font-semibold uppercase tracking-wider block">Filière / Programme :</span>
                         <p class="text-sm font-bold text-gray-900 mt-0.5">{{ $payment->student->course?->title ?? 'Formation générale' }}</p>
-                        <p class="text-gray-500">Session : {{ date('Y') }}-{{ date('Y')+1 }}</p>
+                        <p class="text-gray-500">Session : {{ $academicSession }}</p>
                     </div>
                 @else
                     <div class="sm:col-span-2">
