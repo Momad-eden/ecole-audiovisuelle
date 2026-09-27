@@ -41,7 +41,7 @@ return new class extends Migration
                 'Inscrit',
                 'Diplômé',
                 'Suspendu',
-                'Abandonné'
+                'Abandonné',
             ])->default('Inscrit');
 
             // Divers

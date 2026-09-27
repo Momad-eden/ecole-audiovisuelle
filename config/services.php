@@ -35,4 +35,10 @@ return [
         ],
     ],
 
+    'frontend' => [
+        // Site public Next.js : aperçus et régénération des pages après publication.
+        'url' => env('FRONTEND_URL', 'http://localhost:3000'),
+        'revalidate_secret' => env('FRONTEND_REVALIDATE_SECRET'),
+    ],
+
 ];

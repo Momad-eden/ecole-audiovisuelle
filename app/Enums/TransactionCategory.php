@@ -2,7 +2,9 @@
 
 namespace App\Enums;
 
-enum TransactionCategory: string
+use Filament\Support\Contracts\HasLabel;
+
+enum TransactionCategory: string implements HasLabel
 {
     // Encaissements / Recettes (Inflows)
     case SCOLARITE = 'scolarite';
@@ -19,6 +21,11 @@ enum TransactionCategory: string
     case LOGISTIQUE = 'logistique';
     case COMMUNICATION = 'communication';
     case AUTRE_DEPENSE = 'autre_depense';
+
+    public function getLabel(): string
+    {
+        return $this->label();
+    }
 
     public function label(): string
     {
@@ -37,6 +44,33 @@ enum TransactionCategory: string
             self::COMMUNICATION => 'Marketing & communication',
             self::AUTRE_DEPENSE => 'Autre dépense de fonctionnement',
         };
+    }
+
+    public function direction(): CashDirection
+    {
+        return match ($this) {
+            self::SCOLARITE, self::INSCRIPTION, self::PRESTATION, self::VENTE_MATERIEL, self::AUTRE_RECETTE => CashDirection::IN,
+            default => CashDirection::OUT,
+        };
+    }
+
+    /** Catégories qui doivent être rattachées à l'inscription d'un étudiant. */
+    public function requiresEnrollment(): bool
+    {
+        return in_array($this, [self::SCOLARITE, self::INSCRIPTION], true);
+    }
+
+    /** @return array<string, string> */
+    public static function optionsFor(CashDirection $direction): array
+    {
+        $options = [];
+        foreach (self::cases() as $case) {
+            if ($case->direction() === $direction) {
+                $options[$case->value] = $case->label();
+            }
+        }
+
+        return $options;
     }
 
     public static function values(): array
@@ -74,6 +108,7 @@ enum TransactionCategory: string
         foreach (self::cases() as $case) {
             $options[$case->value] = $case->label();
         }
+
         return $options;
     }
 }

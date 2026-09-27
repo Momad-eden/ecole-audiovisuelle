@@ -2,29 +2,27 @@
 
 namespace App\Enums;
 
-enum Gender: string
+use Filament\Support\Contracts\HasLabel;
+
+enum Gender: string implements HasLabel
 {
-    case HOMME = 'Homme';
-    case FEMME = 'Femme';
+    case FEMALE = 'female';
+    case MALE = 'male';
 
-    public static function fromAdmissionCode(?string $code): ?string
+    public function getLabel(): string
     {
-        return match (strtoupper((string) $code)) {
-            'M', 'HOMME' => self::HOMME->value,
-            'F', 'FEMME' => self::FEMME->value,
-            default => null,
+        return match ($this) {
+            self::FEMALE => 'Femme',
+            self::MALE => 'Homme',
         };
     }
 
-    public static function toAdmissionCode(?string $gender): ?string
+    public function label(): string
     {
-        return match ($gender) {
-            'Homme', 'M' => 'M',
-            'Femme', 'F' => 'F',
-            default => null,
-        };
+        return $this->getLabel();
     }
 
+    /** @return array<int, string> */
     public static function values(): array
     {
         return array_column(self::cases(), 'value');

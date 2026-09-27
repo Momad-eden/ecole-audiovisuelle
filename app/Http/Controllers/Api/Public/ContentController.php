@@ -1,0 +1,227 @@
+<?php
+
+namespace App\Http\Controllers\Api\Public;
+
+use App\Http\Controllers\Controller;
+use App\Http\Resources\Public\ArtworkResource;
+use App\Http\Resources\Public\ExhibitionResource;
+use App\Http\Resources\Public\NewsResource;
+use App\Http\Resources\Public\OfferingResource;
+use App\Http\Resources\Public\ProgramResource;
+use App\Http\Resources\Public\RoomResource;
+use App\Models\Artwork;
+use App\Models\Exhibition;
+use App\Models\Faq;
+use App\Models\MenuItem;
+use App\Models\News;
+use App\Models\Offering;
+use App\Models\Page;
+use App\Models\Partner;
+use App\Models\Program;
+use App\Models\Redirect;
+use App\Models\Room;
+use App\Models\Setting;
+use App\Models\Track;
+use App\Services\BlockResolver;
+use App\Support\Media;
+use App\Support\PreviewToken;
+use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Http\JsonResponse;
+use Illuminate\Http\Request;
+use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
+
+/**
+ * API publique en lecture seule : uniquement les contenus publiés.
+ */
+class ContentController extends Controller
+{
+    public function __construct(private BlockResolver $blocks) {}
+
+    public function site(): JsonResponse
+    {
+        $settings = Setting::current();
+
+        return response()->json(['data' => [
+            'settings' => [
+                'schoolName' => $settings->school_name,
+                'description' => $settings->description,
+                'logo' => Media::image($settings->logo, $settings->school_name),
+                'phone' => $settings->phone,
+                'whatsapp' => $settings->whatsapp,
+                'email' => $settings->email,
+                'address' => $settings->address,
+                'openingHours' => $settings->opening_hours,
+                'mapUrl' => $settings->map_url,
+                'seoTitle' => $settings->seo_title,
+                'seoDescription' => $settings->seo_description,
+                'social' => collect($settings->only(['facebook', 'instagram', 'youtube', 'tiktok', 'linkedin', 'twitter']))->filter()->all(),
+            ],
+            'menus' => MenuItem::where('is_visible', true)->orderBy('position')->get()
+                ->groupBy('location')
+                ->map(fn ($items) => $items->map(fn (MenuItem $i) => ['label' => $i->label, 'url' => $i->url, 'isButton' => $i->is_button])->values())
+                ->all() + ['main' => [], 'footer' => [], 'legal' => []],
+            'rooms' => RoomResource::collection(Room::published()->orderBy('position')->get())->resolve(),
+            'hasSchoolPrograms' => Program::published()->where('audience', 'school')->exists(),
+        ]]);
+    }
+
+    public function page(string $slug): JsonResponse
+    {
+        $page = Page::published()->where('slug', $slug)->firstOrFail();
+
+        return $this->pageResponse($page, $page->blocks);
+    }
+
+    public function preview(Request $request): JsonResponse
+    {
+        $target = PreviewToken::verify((string) $request->query('token'));
+        abort_unless($target && $target['type'] === 'page', 403, 'Lien d\'aperçu invalide ou expiré.');
+
+        $page = Page::findOrFail($target['id']);
+
+        return $this->pageResponse($page, $page->draft_blocks);
+    }
+
+    private function pageResponse(Page $page, ?array $blocks): JsonResponse
+    {
+        return response()->json(['data' => [
+            'title' => $page->title,
+            'slug' => $page->slug,
+            'type' => $page->type,
+            'seo' => $page->seo,
+            'blocks' => $this->blocks->resolve($blocks),
+            'updatedAt' => $page->updated_at?->toIso8601String(),
+        ]]);
+    }
+
+    public function rooms(): AnonymousResourceCollection
+    {
+        return RoomResource::collection(Room::published()->withCount(['artworks' => fn ($q) => $q->published()])->orderBy('position')->get());
+    }
+
+    public function room(string $slug): RoomResource
+    {
+        $room = Room::published()->where('slug', $slug)
+            ->with(['artworks' => fn ($q) => $q->published()->with(['room', 'track'])])
+            ->firstOrFail();
+
+        return new RoomResource($room);
+    }
+
+    public function artworks(Request $request): AnonymousResourceCollection
+    {
+        $artworks = Artwork::published()->with(['room', 'track'])
+            ->when($request->query('room'), fn (Builder $q, $slug) => $q->whereHas('room', fn ($r) => $r->where('slug', $slug)))
+            ->when($request->query('track'), fn (Builder $q, $slug) => $q->whereHas('track', fn ($t) => $t->where('slug', $slug)))
+            ->when($request->query('kind'), fn (Builder $q, $kind) => $q->where('kind', $kind))
+            ->when($request->boolean('featured'), fn (Builder $q) => $q->where('is_featured', true))
+            ->latest('published_at')->latest('id')
+            ->paginate(min((int) $request->query('perPage', 24), 60));
+
+        return ArtworkResource::collection($artworks);
+    }
+
+    public function artwork(string $slug): ArtworkResource
+    {
+        $artwork = Artwork::published()->where('slug', $slug)
+            ->with(['room', 'track', 'cohort', 'credits', 'exhibitions' => fn ($q) => $q->published()])
+            ->firstOrFail();
+
+        return (new ArtworkResource($artwork))->full();
+    }
+
+    public function exhibitions(Request $request): AnonymousResourceCollection
+    {
+        $exhibitions = Exhibition::published()->orderByDesc('starts_on')->get();
+
+        if ($state = $request->query('state')) {
+            $exhibitions = $exhibitions->filter(fn (Exhibition $e) => $e->state() === $state)->values();
+        }
+
+        return ExhibitionResource::collection($exhibitions);
+    }
+
+    public function exhibition(string $slug): ExhibitionResource
+    {
+        return new ExhibitionResource(Exhibition::published()->where('slug', $slug)
+            ->with(['artworks' => fn ($q) => $q->published()->with(['room', 'track'])])->firstOrFail());
+    }
+
+    public function programs(Request $request): AnonymousResourceCollection
+    {
+        return ProgramResource::collection(Program::published()
+            ->when($request->query('audience'), fn (Builder $q, $audience) => $q->where('audience', $audience))
+            ->orderBy('position')->get());
+    }
+
+    public function program(string $slug): ProgramResource
+    {
+        $program = Program::published()->where('slug', $slug)
+            ->with(['cohorts' => fn ($q) => $q->whereNotIn('status', ['cancelled'])->with(['offerings.track'])])
+            ->firstOrFail();
+
+        return new ProgramResource($program);
+    }
+
+    public function tracks(): JsonResponse
+    {
+        return response()->json(['data' => Track::where('is_active', true)->with('room')->orderBy('position')->get()
+            ->map(fn (Track $t) => [
+                'name' => $t->name, 'slug' => $t->slug, 'shortName' => $t->short_name, 'summary' => $t->summary,
+                'description' => $t->description, 'skills' => $t->skills ?? [], 'outcomes' => $t->outcomes ?? [],
+                'room' => $t->room ? ['name' => $t->room->name, 'slug' => $t->room->slug, 'accentColor' => $t->room->accent_color] : null,
+            ])]);
+    }
+
+    public function offerings(Request $request): AnonymousResourceCollection
+    {
+        return OfferingResource::collection(Offering::openForApplications()
+            ->with(['cohort.program', 'track'])
+            ->when($request->query('audience'), fn (Builder $q, $audience) => $q->whereHas('cohort.program', fn ($p) => $p->where('audience', $audience)))
+            ->get());
+    }
+
+    public function news(Request $request): AnonymousResourceCollection
+    {
+        return NewsResource::collection(News::published()->latest('published_at')->paginate(min((int) $request->query('perPage', 12), 48)));
+    }
+
+    public function newsItem(string $slug): NewsResource
+    {
+        return (new NewsResource(News::published()->where('slug', $slug)->firstOrFail()))->full();
+    }
+
+    public function faqs(Request $request): JsonResponse
+    {
+        return response()->json(['data' => Faq::where('is_visible', true)
+            ->when($request->query('group'), fn (Builder $q, $group) => $q->where('group', $group))
+            ->orderBy('position')->get(['group', 'question', 'answer'])]);
+    }
+
+    public function partners(): JsonResponse
+    {
+        return response()->json(['data' => Partner::where('is_active', true)->orderBy('position')->get()
+            ->map(fn (Partner $p) => ['name' => $p->name, 'category' => $p->category, 'website' => $p->website, 'description' => $p->description, 'logo' => Media::image($p->logo, $p->name)])]);
+    }
+
+    public function redirects(): JsonResponse
+    {
+        return response()->json(['data' => Redirect::get(['from_path', 'to_path', 'status_code'])
+            ->map(fn (Redirect $r) => ['from' => $r->from_path, 'to' => $r->to_path, 'status' => $r->status_code])]);
+    }
+
+    public function sitemap(): JsonResponse
+    {
+        $entry = fn (string $path, $updatedAt) => ['path' => $path, 'updatedAt' => $updatedAt?->toIso8601String()];
+
+        return response()->json(['data' => collect()
+            ->merge(Page::published()->get(['slug', 'type', 'updated_at'])->map(fn (Page $p) => $entry($p->type === 'home' ? '/' : '/'.$p->slug, $p->updated_at)))
+            ->merge(Room::published()->get(['slug', 'updated_at'])->map(fn (Room $r) => $entry('/musee/'.$r->slug, $r->updated_at)))
+            ->merge(Artwork::published()->get(['slug', 'updated_at'])->map(fn (Artwork $a) => $entry('/musee/oeuvres/'.$a->slug, $a->updated_at)))
+            ->merge(Exhibition::published()->get(['slug', 'updated_at'])->map(fn (Exhibition $e) => $entry('/expositions/'.$e->slug, $e->updated_at)))
+            ->merge(Program::published()->get(['slug', 'audience', 'updated_at'])->map(fn (Program $p) => $entry(
+                ($p->audience?->value === 'professional' ? '/professionnels/' : '/formations/').$p->slug, $p->updated_at)))
+            ->merge(News::published()->get(['slug', 'updated_at'])->map(fn (News $n) => $entry('/actualites/'.$n->slug, $n->updated_at)))
+            ->values()]);
+    }
+}

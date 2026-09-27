@@ -1,337 +1,192 @@
-# 🚀 Guide & Checklist Officielle de Déploiement en Production — EMSI
+# Déploiement — EMSI (Laravel + Next.js, un seul serveur)
 
-> **École des Métiers du Son et de l'Image (EMSI)**  
-> *Ce guide détaille l'intégralité des opérations nécessaires pour déployer le projet en environnement de production (VPS Linux Ubuntu/Debian, Nginx, PHP 8.2+, MySQL).*
+Architecture de production : **un VPS**, **un domaine** (ex. `emsi.sn`).
 
----
+```
+                         ┌──────────── Nginx (HTTPS) ────────────┐
+ visiteurs ──► emsi.sn ──┤ /admin, /api, /livewire, /storage,    ├──► PHP-FPM ─► Laravel 13 (Filament, API)
+                         │ /filament, /css/filament, /js/filament│                  │
+                         │ tout le reste                          ├──► Node :3000 ─► Next.js (site public)
+                         └────────────────────────────────────────┘                  │
+                                                                      MySQL 8.4 ◄───┘
+```
 
-## 📋 Table des Matières
-1. [Prérequis Serveur](#1-prérequis-serveur)
-2. [Étape 1 : Récupération du Code & Dépendances](#2-étape-1--récupération-du-code--dépendances)
-3. [Étape 2 : Configuration de l'Environnement (.env)](#3-étape-2--configuration-de-lenvironnement-env)
-4. [Étape 3 : Base de Données, Médias & Premier Administrateur](#4-étape-3--base-de-données-médias--premier-administrateur)
-5. [Étape 4 : Permissions des Dossiers](#5-étape-4--permissions-des-dossiers)
-6. [Étape 5 : Mise en Cache des Performances](#6-étape-5--mise-en-cache-des-performances)
-7. [Étape 6 : Configuration du Serveur Web Nginx & Certificat SSL](#7-étape-6--configuration-du-serveur-web-nginx--certificat-ssl)
-8. [Étape 7 : Tâches Automatisées (Cron & Queue Worker)](#8-étape-7--tâches-automatisées-cron--queue-worker)
-9. [Étape 8 : Script de Mise à Jour Continue (CI/CD / Déploiement rapide)](#9-étape-8--script-de-mise-à-jour-continue-cicd--déploiement-rapide)
+Même domaine pour tout : les cookies de l'admin restent simples et il n'y a pas de CORS.
 
----
+## 1. Prérequis
 
-## 1. Prérequis Serveur
+- Ubuntu 24.04 LTS, Nginx, Certbot
+- PHP 8.4 (fpm, cli) avec `mbstring intl gd zip xml curl mysql bcmath`
+- Composer 2, Node.js 22 LTS, MySQL 8.4
+- `ffmpeg` (formes d'onde des sons MP3/M4A/OGG ; sans lui, seuls les WAV en ont une)
 
-Assurez-vous que votre serveur VPS ou Cloud dispose des paquets suivants :
-
-- **Système d'exploitation** : Ubuntu 22.04 LTS ou 24.04 LTS (ou Debian 12)
-- **Serveur Web** : Nginx
-- **PHP** : PHP 8.2 ou PHP 8.3 avec les extensions requises :
-  ```bash
-  sudo apt update
-  sudo apt install -y php8.2-fpm php8.2-mysql php8.2-mbstring php8.2-xml php8.2-bcmath \
-                      php8.2-curl php8.2-zip php8.2-intl php8.2-gd php8.2-sqlite3
-  ```
-- **Base de données** : MySQL 8.0+ ou MariaDB 10.11+
-- **Gestionnaires de paquets** : Composer 2.x et Node.js 20+ (LTS) / NPM
-
----
-
-## 2. Étape 1 : Récupération du Code & Dépendances
-
-Sur votre serveur :
+## 2. Code et dépendances
 
 ```bash
-# 1. Cloner le projet dans le répertoire web
-cd /var/www
-sudo git clone https://github.com/votre-compte/ecole-audiovisuelle.git
-cd /var/www/ecole-audiovisuelle
+sudo mkdir -p /var/www/emsi && sudo chown $USER:www-data /var/www/emsi
+git clone <dépôt> /var/www/emsi && cd /var/www/emsi
 
-# 2. Installer les dépendances PHP optimisées pour la production
 composer install --no-dev --optimize-autoloader
-
-# 3. Installer et compiler les assets frontend (Vite & Tailwind)
-npm ci
-npm run build
+cp .env.example .env && php artisan key:generate
 ```
 
----
+## 3. Configuration `.env` (Laravel)
 
-## 3. Étape 2 : Configuration de l'Environnement (.env)
-
-Créez le fichier de configuration de production :
-
-```bash
-cp .env.example .env
-nano .env
-```
-
-Renseignez les variables clés de production :
-
-```ini
-APP_NAME="EMSI - École des Métiers du Son et de l'Image"
+```dotenv
+APP_NAME=EMSI
 APP_ENV=production
 APP_DEBUG=false
-APP_URL=https://votre-domaine.com
-APP_TIMEZONE=Africa/Dakar
-APP_LOCALE=fr
+APP_URL=https://emsi.sn
 
-# Connexion MySQL
 DB_CONNECTION=mysql
 DB_HOST=127.0.0.1
-DB_PORT=3306
-DB_DATABASE=emsi_prod_db
-DB_USERNAME=emsi_prod_user
-DB_PASSWORD=VOTRE_MOT_DE_PASSE_SECURISE
+DB_DATABASE=emsi
+DB_USERNAME=emsi
+DB_PASSWORD=********
 
-# Sessions & Cache
-SESSION_DRIVER=database
-SESSION_SECURE_COOKIE=true
-SESSION_LIFETIME=120
 QUEUE_CONNECTION=database
-CACHE_STORE=database
+SESSION_SECURE_COOKIE=true
 
-# Configuration des Emails (SMTP)
-MAIL_MAILER=smtp
-MAIL_HOST=smtp.mailtrap.io # ou votre serveur SMTP (Sendgrid, Google Workspace...)
-MAIL_PORT=587
-MAIL_USERNAME=votre_utilisateur
-MAIL_PASSWORD=votre_mot_de_passe
-MAIL_ENCRYPTION=tls
-MAIL_FROM_ADDRESS="contact@emsi.sn"
-MAIL_FROM_NAME="EMSI Administration"
+MAIL_MAILER=smtp            # accusés de réception des candidatures
+MAIL_HOST=…
+MAIL_FROM_ADDRESS=contact@emsi.sn
+MAIL_FROM_NAME="EMSI"
+
+FRONTEND_URL=http://127.0.0.1:3000        # appel interne de régénération du site
+FRONTEND_REVALIDATE_SECRET=<chaîne aléatoire longue>
 ```
 
----
-
-## 4. Étape 3 : Base de Données, Médias & Premier Administrateur
+## 4. Base de données, fichiers, premier compte
 
 ```bash
-# 1. Générer la clé de chiffrement Laravel
-php artisan key:generate --force
-
-# 2. Exécuter les migrations de base de données
 php artisan migrate --force
-
-# 3. Créer le lien symbolique vers le dossier public pour les médias (logos, photos, reçus)
+php artisan db:seed --force              # contenu de référence (salles, filières, programmes, pages…)
 php artisan storage:link
+php artisan emsi:create-admin            # premier directeur (mot de passe saisi de façon masquée)
+php artisan filament:assets
+php artisan optimize && php artisan filament:optimize
 
-# 4. Créer le premier compte administrateur (Directeur)
-php artisan make:admin
-# Répondez aux questions : Nom, Email, Rôle (directeur), Mot de passe
+sudo chown -R www-data:www-data storage bootstrap/cache
 ```
 
----
+Aucun compte n'est créé par défaut. Les documents des candidats sont stockés dans `storage/app/private` (jamais publics).
 
-## 5. Étape 4 : Permissions des Dossiers
+## 5. Site Next.js
 
-Il est capital de donner les droits d'écriture au serveur web (`www-data`) sur les répertoires de stockage et de cache :
+`frontend/.env.local` :
+
+```dotenv
+API_URL=https://emsi.sn            # l'API Laravel, via Nginx
+MEDIA_URL=https://emsi.sn
+NEXT_PUBLIC_SITE_URL=https://emsi.sn
+REVALIDATE_SECRET=<même valeur que FRONTEND_REVALIDATE_SECRET>
+```
 
 ```bash
-# Définir l'utilisateur propriétaire
-sudo chown -R www-data:www-data /var/www/ecole-audiovisuelle
-
-# Ajuster les droits sur les dossiers sensibles
-sudo chmod -R 775 /var/www/ecole-audiovisuelle/storage
-sudo chmod -R 775 /var/www/ecole-audiovisuelle/bootstrap/cache
-sudo chmod -R 775 /var/www/ecole-audiovisuelle/public/storage
+cd frontend && npm ci && npm run build   # l'API Laravel doit répondre pendant le build
 ```
 
----
+Service systemd `/etc/systemd/system/emsi-web.service` :
 
-## 6. Étape 5 : Mise en Cache des Performances
+```ini
+[Unit]
+Description=EMSI site public (Next.js)
+After=network.target
 
-Pour obtenir des temps de réponse ultra-rapides (< 50ms) :
+[Service]
+WorkingDirectory=/var/www/emsi/frontend
+ExecStart=/usr/bin/npm run start -- --port 3000 --hostname 127.0.0.1
+Restart=always
+User=www-data
+Environment=NODE_ENV=production
+
+[Install]
+WantedBy=multi-user.target
+```
+
+## 6. File d'attente et tâches planifiées
+
+`/etc/systemd/system/emsi-queue.service` (formes d'onde, e-mails) :
+
+```ini
+[Unit]
+Description=EMSI file d'attente Laravel
+After=network.target mysql.service
+
+[Service]
+WorkingDirectory=/var/www/emsi
+ExecStart=/usr/bin/php artisan queue:work --sleep=3 --tries=3 --max-time=3600
+Restart=always
+User=www-data
+
+[Install]
+WantedBy=multi-user.target
+```
+
+Crontab de `www-data` : `* * * * * cd /var/www/emsi && php artisan schedule:run >> /dev/null 2>&1`
 
 ```bash
-php artisan config:cache
-php artisan route:cache
-php artisan view:cache
-php artisan event:cache
+sudo systemctl daemon-reload && sudo systemctl enable --now emsi-web emsi-queue
 ```
 
-> 💡 *Si vous modifiez le fichier `.env` ou les routes plus tard, pensez à vider puis recréer les caches (`php artisan optimize:clear && php artisan optimize`).*
-
----
-
-## 7. Étape 6 : Configuration du Serveur Web Nginx & Certificat SSL
-
-Créez le bloc serveur Nginx :
-
-```bash
-sudo nano /etc/nginx/sites-available/ecole-audiovisuelle
-```
-
-Collez la configuration suivante :
+## 7. Nginx
 
 ```nginx
 server {
-    listen 80;
-    listen [::]:80;
-    server_name votre-domaine.com www.votre-domaine.com;
-    return 301 https://$host$request_uri;
-}
+    server_name emsi.sn www.emsi.sn;
+    root /var/www/emsi/public;
+    client_max_body_size 60M;          # sons (50 Mo) et pièces jointes
 
-server {
-    listen 443 ssl http2;
-    listen [::]:443 ssl http2;
-    server_name votre-domaine.com www.votre-domaine.com;
-
-    root /var/www/ecole-audiovisuelle/public;
-    index index.php index.html;
-
-    # En-têtes de sécurité renforcés
-    add_header X-Frame-Options "SAMEORIGIN" always;
-    add_header X-XSS-Protection "1; mode=block" always;
-    add_header X-Content-Type-Options "nosniff" always;
-    add_header Referrer-Policy "no-referrer-when-downgrade" always;
-    add_header Strict-Transport-Security "max-age=31536000; includeSubDomains" always;
-
-    charset utf-8;
-
-    # Limite de téléversement (permet les uploads de vidéos et photos jusqu'à 50 Mo)
-    client_max_body_size 50M;
-
-    location / {
-        try_files $uri $uri/ /index.php?$query_string;
+    # Laravel : administration, API, fichiers publics, ressources Filament/Livewire
+    location ~ ^/(admin|api/v1|livewire|filament|css/filament|js/filament|fonts/filament|up)(/|$) {
+        try_files $uri /index.php?$query_string;
     }
-
-    location = /favicon.ico { access_log off; log_not_found off; }
-    location = /robots.txt  { access_log off; log_not_found off; }
-
-    error_page 404 /index.php;
-
-    # Traitement PHP-FPM
-    location ~ \.php$ {
-        fastcgi_pass unix:/var/run/php/php8.2-fpm.sock; # ou php8.3-fpm
-        fastcgi_param SCRIPT_FILENAME $realpath_root$fastcgi_script_name;
-        include fastcgi_params;
-        fastcgi_hide_header X-Powered-By;
-    }
-
-    # Bloquer l'accès aux fichiers cachés (.env, .git...)
-    location ~ /\.(?!well-known).* {
-        deny all;
-    }
-
-    # Mise en cache des assets statiques (images, css, js)
-    location ~* \.(jpg|jpeg|png|gif|ico|css|js|webp|svg|woff2)$ {
+    location ^~ /storage/ {
         expires 30d;
-        add_header Cache-Control "public, no-transform";
+        try_files $uri =404;
+    }
+    location ~ \.php$ {
+        include snippets/fastcgi-php.conf;
+        fastcgi_pass unix:/run/php/php8.4-fpm.sock;
+    }
+
+    # Tout le reste : site public Next.js
+    location / {
+        proxy_pass http://127.0.0.1:3000;
+        proxy_set_header Host $host;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto $scheme;
     }
 }
 ```
 
-Activez le site et rechargez Nginx :
+`sudo certbot --nginx -d emsi.sn -d www.emsi.sn`. Le réglage `upload_max_filesize = 60M` et `post_max_size = 64M` est aussi à appliquer dans `php.ini` (FPM).
+
+## 8. Sauvegardes (quotidiennes)
 
 ```bash
-sudo ln -s /etc/nginx/sites-available/ecole-audiovisuelle /etc/nginx/sites-enabled/
-sudo nginx -t
-sudo systemctl reload nginx
+# /etc/cron.daily/emsi-backup
+mysqldump --single-transaction emsi | gzip > /var/backups/emsi/db-$(date +%F).sql.gz
+tar czf /var/backups/emsi/files-$(date +%F).tgz -C /var/www/emsi storage/app
+find /var/backups/emsi -mtime +30 -delete
 ```
 
-### Installation du Certificat SSL Gratuit (Let's Encrypt)
-```bash
-sudo apt install -y certbot python3-certbot-nginx
-sudo certbot --nginx -d votre-domaine.com -d www.votre-domaine.com
-```
+Copier ensuite `/var/backups/emsi` hors du serveur (stockage distant). Tester une restauration au moins une fois par trimestre.
 
----
-
-## 8. Étape 7 : Tâches Automatisées (Cron & Queue Worker)
-
-### A. Planificateur de tâches Laravel (Cron)
-Ouvrez le crontab du serveur web :
-```bash
-sudo crontab -e -u www-data
-```
-Ajoutez cette unique ligne à la fin :
-```bash
-* * * * * cd /var/www/ecole-audiovisuelle && php artisan schedule:run >> /dev/null 2>&1
-```
-
-### B. Gestionnaire de file d'attente (Supervisor)
-Si vous envoyez des emails ou traitez des fichiers en arrière-plan :
-```bash
-sudo apt install -y supervisor
-sudo nano /etc/supervisor/conf.d/emsi-worker.conf
-```
-
-Collez :
-```ini
-[program:emsi-worker]
-process_name=%(program_name)s_%(process_num)02d
-command=php /var/www/ecole-audiovisuelle/artisan queue:work --sleep=3 --tries=3 --max-time=3600
-autostart=true
-autorestart=true
-stopasgroup=true
-killasgroup=true
-user=www-data
-numprocs=2
-redirect_stderr=true
-stdout_logfile=/var/www/ecole-audiovisuelle/storage/logs/worker.log
-stopwaitsecs=3600
-```
-
-Activez le worker :
-```bash
-sudo supervisorctl reread
-sudo supervisorctl update
-sudo supervisorctl start emsi-worker:*
-```
-
----
-
-## 9. Étape 8 : Script de Mise à Jour Continue (Déploiement Rapide)
-
-Pour les futures mises à jour du site en 1 seule commande, créez un fichier `deploy.sh` à la racine :
+## 9. Mise à jour
 
 ```bash
-nano /var/www/ecole-audiovisuelle/deploy.sh
-```
-
-Collez :
-```bash
-#!/bin/bash
-set -e
-
-echo "🚀 Début du déploiement..."
-
-# Passer en mode maintenance avec écran élégant
-php artisan down --render="errors::500" --secret="emsi-secret-bypass" || true
-
-# Récupérer la dernière version du code
-git pull origin main
-
-# Mettre à jour les dépendances
-composer install --no-dev --no-interaction --prefer-dist --optimize-autoloader
-npm ci
-npm run build
-
-# Exécuter les nouvelles migrations éventuelles
+cd /var/www/emsi && git pull
+composer install --no-dev --optimize-autoloader
 php artisan migrate --force
-
-# Recréer les caches de performance
-php artisan optimize:clear
-php artisan optimize
-
-# Redémarrer les workers de queue
-php artisan queue:restart || true
-
-# Désactiver le mode maintenance
-php artisan up
-
-echo "✅ Déploiement terminé avec succès !"
+php artisan optimize && php artisan filament:optimize && php artisan filament:assets
+sudo systemctl restart emsi-queue
+cd frontend && npm ci && npm run build && sudo systemctl restart emsi-web
 ```
 
-Rendez le script exécutable :
-```bash
-chmod +x /var/www/ecole-audiovisuelle/deploy.sh
-```
+## 10. Vérifications après déploiement
 
-Désormais, pour mettre à jour le site en production, il vous suffira de lancer :
-```bash
-./deploy.sh
-```
-
----
-
-*Document généré pour l'École des Métiers du Son et de l'Image (EMSI).*
+- `https://emsi.sn/up` répond 200 ; `https://emsi.sn/admin` affiche la connexion.
+- Publier une actualité dans l'admin : elle apparaît immédiatement sur le site.
+- Déposer une candidature de test avec une pièce jointe, puis la retrouver dans Scolarité › Candidatures.
+- `APP_DEBUG=false` : une erreur n'affiche jamais de trace technique.

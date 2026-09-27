@@ -2,25 +2,18 @@
 
 namespace Database\Seeders;
 
-use App\Enums\UserRole;
-use App\Models\User;
 use Illuminate\Database\Seeder;
-use Illuminate\Support\Facades\Hash;
 
 class DatabaseSeeder extends Seeder
 {
     /**
-     * Seed the application's database.
+     * Aucun compte n'est créé automatiquement : le premier directeur
+     * est créé avec `php artisan emsi:create-admin`.
      */
     public function run(): void
     {
-        if (User::where('email', 'admin@emsi.sn')->doesntExist()) {
-            User::create([
-                'name'     => 'Directeur EMSI',
-                'email'    => 'admin@emsi.sn',
-                'password' => Hash::make('password'),
-                'role'     => UserRole::DIRECTEUR->value,
-            ]);
-        }
+        $this->call(ContentSeeder::class);
+
+        $this->command?->info('Aucun compte créé. Utilisez « php artisan emsi:create-admin » pour créer le premier directeur.');
     }
 }

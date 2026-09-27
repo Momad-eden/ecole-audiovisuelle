@@ -2,29 +2,28 @@
 
 namespace App\Providers;
 
-use App\View\Composers\SettingComposer;
-use Illuminate\Support\Facades\View;
+use App\Services\FrontendRevalidator;
+use Illuminate\Cache\RateLimiting\Limit;
+use Illuminate\Database\Eloquent\Model;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\RateLimiter;
 use Illuminate\Support\ServiceProvider;
 
 class AppServiceProvider extends ServiceProvider
 {
-    /**
-     * Register any application services.
-     */
     public function register(): void
     {
-        //
+        $this->app->singleton(FrontendRevalidator::class);
     }
 
-    /**
-     * Bootstrap any application services.
-     */
     public function boot(): void
     {
-        View::composer(
-            ['components.public.*', 'layouts.public', 'layouts.admin', 'public.*'],
-            SettingComposer::class
-        );
+        // Détecte en développement les chargements paresseux (N+1) et les attributs inconnus.
+        Model::shouldBeStrict(! $this->app->isProduction());
+
+        // Formulaires publics : 5 envois par tranche de 10 minutes et par adresse IP.
+        RateLimiter::for('applications', fn (Request $request) => Limit::perMinutes(10, 5)->by($request->ip()));
+        RateLimiter::for('contact', fn (Request $request) => Limit::perMinutes(10, 5)->by($request->ip()));
+        RateLimiter::for('public-api', fn (Request $request) => Limit::perMinute(120)->by($request->ip()));
     }
 }
-
