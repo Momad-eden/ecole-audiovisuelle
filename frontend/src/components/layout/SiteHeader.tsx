@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { MediaImage } from "@/components/ui/MediaImage";
 import type { Site } from "@/lib/types";
 import { MobileMenu } from "./MobileMenu";
 
@@ -15,8 +16,14 @@ export function SiteHeader({ site }: { site: Site }) {
   return (
     <header className="sticky top-0 z-40 border-b border-line bg-night/85 backdrop-blur">
       <div className="mx-auto flex h-16 max-w-7xl items-center justify-between gap-6 px-4 sm:px-6 lg:px-8">
-        <Link href="/" className="flex items-baseline gap-2" aria-label={`${site.settings.schoolName} — accueil`}>
-          <span className="font-display text-2xl font-semibold tracking-tight">EMSI</span>
+        <Link href="/" className="flex items-center gap-3" aria-label={`${site.settings.schoolName} — accueil`}>
+          {site.settings.logo ? (
+            <span className="relative block h-12 w-12">
+              <MediaImage image={site.settings.logo} sizes="48px" priority fit="contain" className="object-left" />
+            </span>
+          ) : (
+            <span className="font-display text-2xl font-semibold tracking-tight">EMSI</span>
+          )}
           <span className="cartel hidden sm:inline">Son · Lumière · Image</span>
         </Link>
 
