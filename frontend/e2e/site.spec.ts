@@ -1,17 +1,40 @@
 import { expect, test } from "@playwright/test";
 
-test("l'accueil présente les salles du musée et un seul lien vers l'Espace Professionnels", async ({ page }) => {
+test("l'accueil présente l'école, ses univers et un appel à candidater", async ({ page }) => {
   await page.goto("/");
-  await expect(page.getByRole("heading", { level: 1 })).toBeVisible();
-  await expect(page.getByRole("heading", { name: "Entrez dans les salles" })).toBeVisible();
-  await expect(page.locator('a[href="/musee/salle-du-son"]').first()).toBeVisible();
+  await expect(page.getByRole("heading", { level: 1 })).toContainText("Apprenez à faire vibrer");
+  await expect(page.getByRole("heading", { name: "Choisissez votre univers" })).toBeVisible();
+  await expect(page.locator('a[href="/univers/son"]').first()).toBeAttached();
+  await expect(page.getByRole("link", { name: "Candidater" }).first()).toBeVisible();
 });
 
-test("on entre dans une salle depuis le plan du musée", async ({ page }) => {
+test("on découvre un univers, ses filières et ses métiers", async ({ page }) => {
+  await page.goto("/univers");
+  // Attendre que le défilement horizontal soit en place (bureau) ; sur mobile, la pile est statique.
+  await page.waitForFunction(() => window.matchMedia("(max-width: 1023px)").matches || document.querySelector(".universe-track")?.classList.contains("is-horizontal"));
+  // Au clavier : le panneau qui reçoit le focus est amené à l'écran, même pendant le défilement horizontal.
+  const panel = page.locator('main a[href="/univers/scene"]').first();
+  await panel.focus();
+  await expect(panel).toBeInViewport();
+  await page.keyboard.press("Enter");
+  await expect(page).toHaveURL(/\/univers\/scene$/, { timeout: 15000 });
+  await expect(page.getByRole("heading", { level: 1, name: /^Scène\s: régie & lumière$/ })).toBeVisible({ timeout: 15000 });
+  await expect(page.getByRole("heading", { name: "Technicien Lumière" })).toBeVisible();
+  await expect(page.getByText("Régisseur lumière", { exact: true })).toBeVisible();
+});
+
+test("la page Formations range les filières par univers", async ({ page }) => {
+  await page.goto("/formations");
+  await expect(page.getByRole("heading", { level: 2, name: /^Image\s: vidéo & photo$/ })).toBeVisible();
+  await expect(page.getByRole("heading", { name: "Cadrage Sportif et Régie Vidéo" })).toBeVisible();
+});
+
+test("les adresses de l'ancien musée redirigent vers les univers et les réalisations", async ({ page }) => {
+  await page.goto("/musee/salle-du-son");
+  await expect(page).toHaveURL(/\/univers\/son$/);
   await page.goto("/musee");
-  await page.locator('a[href="/musee/salle-du-son"]').first().click();
-  await expect(page).toHaveURL(/\/musee\/salle-du-son$/);
-  await expect(page.getByRole("heading", { level: 1, name: "Salle du Son" })).toBeVisible();
+  await expect(page).toHaveURL(/\/realisations$/);
+  await expect(page.getByRole("heading", { level: 1, name: "Faites par nos étudiants" })).toBeVisible();
 });
 
 test("les anciennes adresses redirigent vers la nouvelle arborescence", async ({ page }) => {
@@ -23,7 +46,7 @@ test("les anciennes adresses redirigent vers la nouvelle arborescence", async ({
 test("une page inconnue affiche la page 404 du musée", async ({ page }) => {
   const response = await page.goto("/page-qui-n-existe-pas");
   expect(response?.status()).toBe(404);
-  await expect(page.getByText("Cette salle est plongée dans le noir.")).toBeVisible();
+  await expect(page.getByText("Noir complet sur le plateau.")).toBeVisible();
 });
 
 test("le formulaire de contact signale les champs manquants en français", async ({ page }) => {

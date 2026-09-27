@@ -8,7 +8,7 @@ export async function ApplicationPage({ audience, formation }: { audience: "scho
   const preselected = program?.cohorts?.flatMap((c) => c.offerings ?? []).find((o) => offerings.some((open) => open.id === o.id))?.id;
 
   return (
-    <div className="mx-auto max-w-4xl px-4 pb-16 pt-20 sm:px-6">
+    <div className="mx-auto max-w-4xl px-4 pb-16 pt-36 sm:px-6">
       <p className="cartel mb-4">{audience === "professional" ? "Espace Professionnels" : "Candidature"}</p>
       <h1 className="font-display text-4xl font-medium sm:text-6xl">{audience === "professional" ? "Candidature professionnelle" : "Candidater à l'EMSI"}</h1>
       {offerings.length === 0 ? (
@@ -20,7 +20,7 @@ export async function ApplicationPage({ audience, formation }: { audience: "scho
           </p>
           <div className="mt-6 flex flex-wrap gap-3">
             <Link href={audience === "professional" ? "/professionnels" : "/formations"} className="rounded-full border border-line px-5 py-2">Voir les formations</Link>
-            <Link href="/contact" className="rounded-full bg-amber px-5 py-2 font-semibold text-night">Nous contacter</Link>
+            <Link href="/contact" className="rounded-full bg-brand px-5 py-2 font-semibold text-night">Nous contacter</Link>
           </div>
         </div>
       ) : (

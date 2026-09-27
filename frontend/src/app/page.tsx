@@ -5,8 +5,9 @@ import { api } from "@/lib/api";
 import { pageMetadata } from "@/lib/metadata";
 
 export async function generateMetadata(): Promise<Metadata> {
-  const page = await api.page("accueil");
-  return page ? { ...pageMetadata(page), title: { absolute: page.seo?.title || (await api.site()).settings.schoolName } } : {};
+  const [page, site] = await Promise.all([api.page("accueil"), api.site()]);
+  const { settings } = site;
+  return page ? { ...pageMetadata(page, settings.seoDescription || settings.description), title: { absolute: page.seo?.title || settings.seoTitle || settings.schoolName } } : {};
 }
 
 export default async function HomePage() {

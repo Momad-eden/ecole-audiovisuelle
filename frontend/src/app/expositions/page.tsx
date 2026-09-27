@@ -35,7 +35,7 @@ export default async function ExhibitionsPage() {
 
   return (
     <>
-      <section className="beam pb-4 pt-24">
+      <section className="beam pb-4 pt-40">
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
           <p className="cartel mb-4">Musée numérique</p>
           <h1 className="font-display text-5xl font-medium sm:text-7xl">Expositions</h1>

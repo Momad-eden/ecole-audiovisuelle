@@ -19,9 +19,13 @@ class RoomResource extends JsonResource
             'tagline' => $this->tagline,
             'intro' => $this->intro,
             'accentColor' => $this->accent_color,
+            'visual' => $this->visual,
+            'isUpcoming' => (bool) $this->is_upcoming,
             'cover' => Media::image($this->cover_image, $this->cover_alt),
             'artworksCount' => $this->whenCounted('artworks'),
             'artworks' => ArtworkResource::collection($this->whenLoaded('artworks')),
+            'tracks' => TrackResource::collection($this->whenLoaded('tracks')),
+            'programs' => ProgramResource::collection($this->whenLoaded('programs')),
         ];
     }
 }

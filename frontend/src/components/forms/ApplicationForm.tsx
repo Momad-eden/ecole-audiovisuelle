@@ -160,7 +160,7 @@ export function ApplicationForm({ offerings, audience, preselected }: { offering
       <Honeypot register={register("website")} />
       <ol className="mb-10 flex flex-wrap gap-2" aria-label="Étapes">
         {STEPS.map((label, i) => (
-          <li key={label} aria-current={i === step ? "step" : undefined} className={cn("rounded-full border px-4 py-1.5 text-sm", i === step ? "border-amber text-amber" : i < step ? "border-line text-ink" : "border-line text-ink-muted")}>
+          <li key={label} aria-current={i === step ? "step" : undefined} className={cn("rounded-full border px-4 py-1.5 text-sm", i === step ? "border-brand text-brand" : i < step ? "border-line text-ink" : "border-line text-ink-muted")}>
             {i + 1}. {label}
           </li>
         ))}
@@ -172,8 +172,8 @@ export function ApplicationForm({ offerings, audience, preselected }: { offering
             <legend className="mb-6 font-display text-3xl">Quelle formation vous intéresse ?</legend>
             {errors.offeringId && <p role="alert" className="text-sm text-rec">{errors.offeringId.message}</p>}
             {offerings.map((offering) => (
-              <label key={offering.id} className="flex cursor-pointer items-start gap-4 rounded-2xl border border-line p-5 has-[:checked]:border-amber">
-                <input type="radio" value={String(offering.id)} className="mt-1 size-4 accent-amber" {...register("offeringId")} />
+              <label key={offering.id} className="flex cursor-pointer items-start gap-4 rounded-2xl border border-line p-5 has-[:checked]:border-brand">
+                <input type="radio" value={String(offering.id)} className="mt-1 size-4 accent-brand" {...register("offeringId")} />
                 <span>
                   <span className="block font-medium">{offering.label}</span>
                   <span className="text-sm text-ink-muted">
@@ -235,7 +235,7 @@ export function ApplicationForm({ offerings, audience, preselected }: { offering
             )}
 
             <fieldset>
-              <legend className="mb-2 text-lg font-medium">Pièces justificatives {professional && <span className="text-amber">*</span>}</legend>
+              <legend className="mb-2 text-lg font-medium">Pièces justificatives {professional && <span className="text-brand">*</span>}</legend>
               <p className="mb-4 text-sm text-ink-muted">PDF, JPG ou PNG, 10 Mo maximum par fichier.{professional && " La copie du CPS ou du CS est obligatoire."}</p>
               {errors.documents?.message && <p role="alert" className="mb-3 text-sm text-rec">{errors.documents.message}</p>}
               <div className="space-y-3">
@@ -261,8 +261,8 @@ export function ApplicationForm({ offerings, audience, preselected }: { offering
             {selected && <p className="rounded-2xl border border-line p-4 text-sm"><span className="cartel block">Formation choisie</span>{selected.label}</p>}
             <Field id="consent" label="" error={errors.consent?.message}>
               <label className="flex items-start gap-3 text-sm text-ink-muted">
-                <input id="consent" type="checkbox" className="mt-1 size-4 accent-amber" {...register("consent")} />
-                <span>J&apos;accepte que l&apos;EMSI traite ces informations pour étudier ma candidature et me contacter. Elles ne sont utilisées qu&apos;à cette fin. Voir la page <Link href="/confidentialite" className="text-amber underline">Protection des données</Link>.</span>
+                <input id="consent" type="checkbox" className="mt-1 size-4 accent-brand" {...register("consent")} />
+                <span>J&apos;accepte que l&apos;EMSI traite ces informations pour étudier ma candidature et me contacter. Elles ne sont utilisées qu&apos;à cette fin. Voir la page <Link href="/confidentialite" className="text-brand underline">Protection des données</Link>.</span>
               </label>
             </Field>
             {serverError && <p role="alert" className="text-sm text-rec">{serverError}</p>}
@@ -273,9 +273,9 @@ export function ApplicationForm({ offerings, audience, preselected }: { offering
       <div className="mt-8 flex justify-between gap-4">
         <button type="button" onClick={() => setStep((s) => Math.max(0, s - 1))} className={cn("min-h-12 rounded-full border border-line px-6", step === 0 && "invisible")}>Retour</button>
         {step < STEPS.length - 1 ? (
-          <button type="button" onClick={next} className="min-h-12 rounded-full bg-amber px-8 font-semibold text-night">Continuer</button>
+          <button type="button" onClick={next} className="min-h-12 rounded-full bg-brand px-8 font-semibold text-night">Continuer</button>
         ) : (
-          <button type="submit" disabled={isSubmitting} className="min-h-12 rounded-full bg-amber px-8 font-semibold text-night disabled:opacity-60">{isSubmitting ? "Envoi en cours…" : "Envoyer ma candidature"}</button>
+          <button type="submit" disabled={isSubmitting} className="min-h-12 rounded-full bg-brand px-8 font-semibold text-night disabled:opacity-60">{isSubmitting ? "Envoi en cours…" : "Envoyer ma candidature"}</button>
         )}
       </div>
     </form>

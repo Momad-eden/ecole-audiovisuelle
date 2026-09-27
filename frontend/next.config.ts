@@ -29,6 +29,16 @@ const nextConfig: NextConfig = {
       { protocol: "https", hostname: "i.ytimg.com", pathname: "/vi/**" },
     ],
   },
+  async redirects() {
+    // Le « musée » est devenu les univers (disciplines) et les réalisations des étudiants.
+    const rooms: Record<string, string> = { "salle-du-son": "son", "salle-de-la-lumiere": "scene", "salle-de-limage": "image", "salle-du-visuel": "design" };
+    return [
+      { source: "/musee", destination: "/realisations", permanent: true },
+      { source: "/musee/oeuvres/:slug", destination: "/realisations/:slug", permanent: true },
+      ...Object.entries(rooms).map(([from, to]) => ({ source: `/musee/${from}`, destination: `/univers/${to}`, permanent: true })),
+      { source: "/musee/:slug", destination: "/univers/:slug", permanent: true },
+    ];
+  },
   async rewrites() {
     // Formulaires et API publics servis sur le même domaine que le site.
     return [{ source: "/api/v1/:path*", destination: `${apiUrl.origin}/api/v1/:path*` }];

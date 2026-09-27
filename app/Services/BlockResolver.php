@@ -61,7 +61,8 @@ class BlockResolver
                 ->limit((int) ($data['limit'] ?? 6))->get())->resolve()],
             'artworks' => [...$data, 'items' => ArtworkResource::collection($this->artworks($data))->resolve()],
             'rooms' => [...$data, 'items' => RoomResource::collection(Room::published()->withCount(['artworks' => fn ($q) => $q->published()])
-                ->orderBy('position')->get())->resolve()],
+                ->with(['tracks' => fn ($q) => $q->where('is_active', true)])->orderBy('position')->get())->resolve()],
+            'equipment' => [...$data, 'groups' => collect($data['groups'] ?? [])->map(fn ($group) => $this->withImages($group))->values()->all()],
             'news' => [...$data, 'items' => NewsResource::collection(News::published()->latest('published_at')
                 ->limit((int) ($data['limit'] ?? 3))->get())->resolve()],
             'partners' => [...$data, 'items' => Partner::where('is_active', true)

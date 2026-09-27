@@ -12,6 +12,6 @@ class ListArtworks extends ListRecords
 
     protected function getHeaderActions(): array
     {
-        return [CreateAction::make()->label('Ajouter une œuvre')];
+        return [CreateAction::make()->label('Ajouter une réalisation')];
     }
 }

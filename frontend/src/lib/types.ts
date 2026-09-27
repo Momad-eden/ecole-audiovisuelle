@@ -4,6 +4,20 @@ export type Image = { url: string; alt: string };
 
 export type MenuLink = { label: string; url: string; isButton: boolean };
 
+/** Signature animée d'un univers (voir UniverseVisual). */
+export type UniverseVisualKind = "sound" | "image" | "design" | "stage" | "cinema";
+
+export type Track = {
+  id: number;
+  name: string;
+  slug: string;
+  shortName: string;
+  summary: string | null;
+  skills: string[];
+  outcomes: string[];
+};
+
+/** Un univers de l'école (Son, Image, Infographie & design, Scène, Cinéma…). */
 export type RoomSummary = {
   id: number;
   name: string;
@@ -11,9 +25,13 @@ export type RoomSummary = {
   tagline: string | null;
   intro: string | null;
   accentColor: string;
+  visual: UniverseVisualKind;
+  isUpcoming: boolean;
   cover: Image | null;
   artworksCount?: number;
   artworks?: ArtworkSummary[];
+  tracks?: Track[];
+  programs?: Program[];
 };
 
 export type Site = {

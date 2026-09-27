@@ -4,16 +4,23 @@ import { ArtworksBlock, NewsBlock, PartnersBlock, ProfessionalSpaceBlock, Progra
 import { ContactBlock } from "./ContactBlock";
 import { CardsBlock, CtaBlock, FaqBlock, GalleryBlock, QuoteBlock, StatsBlock, TextBlock, TextImageBlock, TimelineBlock, VideoBlock } from "./ContentBlocks";
 import { HeroBlock } from "./HeroBlock";
+import { EquipmentBlock, MarqueeBlock, VenueBlock } from "./ShowcaseBlocks";
 import type * as T from "./types";
 
-/** Un composant par type de bloc de l'administration (même nom). Un type inconnu est ignoré. */
+/**
+ * Un composant par type de bloc de l'administration (même nom). Un type inconnu est ignoré.
+ * Une page qui ne s'ouvre pas sur un héros laisse la place de l'en-tête fixe.
+ */
 export function BlockRenderer({ blocks }: { blocks: Block[] }) {
   return (
-    <>
+    <div className={blocks[0]?.type === "hero" ? undefined : "pt-20"}>
       {blocks.map((block, index) => {
         const d = block.data as never;
         switch (block.type) {
           case "hero": return <HeroBlock key={block.id} data={d as T.HeroData} first={index === 0} />;
+          case "marquee": return <MarqueeBlock key={block.id} data={d as T.MarqueeData} />;
+          case "venue": return <VenueBlock key={block.id} data={d as T.VenueData} />;
+          case "equipment": return <EquipmentBlock key={block.id} data={d as T.EquipmentData} />;
           case "text": return <TextBlock key={block.id} data={d as T.TextData} />;
           case "text_image": return <TextImageBlock key={block.id} data={d as T.TextImageData} />;
           case "gallery": return <GalleryBlock key={block.id} data={d as T.GalleryData} />;
@@ -35,6 +42,6 @@ export function BlockRenderer({ blocks }: { blocks: Block[] }) {
           default: return null;
         }
       })}
-    </>
+    </div>
   );
 }

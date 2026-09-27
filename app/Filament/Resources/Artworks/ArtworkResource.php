@@ -43,13 +43,13 @@ class ArtworkResource extends Resource
 
     protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedPhoto;
 
-    protected static string|\UnitEnum|null $navigationGroup = 'Musée';
+    protected static string|\UnitEnum|null $navigationGroup = 'Univers & réalisations';
 
     protected static ?int $navigationSort = 3;
 
-    protected static ?string $modelLabel = 'œuvre';
+    protected static ?string $modelLabel = 'réalisation';
 
-    protected static ?string $pluralModelLabel = 'œuvres';
+    protected static ?string $pluralModelLabel = 'réalisations';
 
     protected static ?string $recordTitleAttribute = 'title';
 
@@ -58,7 +58,7 @@ class ArtworkResource extends Resource
         return $schema->columns(1)->components([
             Tabs::make()->columnSpanFull()->persistTabInQueryString()->tabs([
                 Tab::make('1. Médias')->icon('heroicon-o-photo')->schema([
-                    Select::make('kind')->label('Type d\'œuvre')->options(ArtworkKind::class)->required()->live(),
+                    Select::make('kind')->label('Type de réalisation')->options(ArtworkKind::class)->required()->live(),
                     Section::make('Image principale')->columns(2)->schema(Fields::image('cover_image', 'artworks', 'Image principale (vignette, affiche, photo)')),
                     FileUpload::make('audio_file')->label('Fichier son')
                         ->disk('public')->directory('artworks/audio')->visibility('public')
@@ -73,7 +73,7 @@ class ArtworkResource extends Resource
                         ->image()->multiple()->reorderable()->maxFiles(24)->disk('public')->directory('artworks/gallery')->maxSize(8192),
                 ]),
                 Tab::make('2. Description')->icon('heroicon-o-document-text')->schema([
-                    TextInput::make('title')->label('Titre de l\'œuvre')->required()->maxLength(150),
+                    TextInput::make('title')->label('Titre')->required()->maxLength(150),
                     TextInput::make('year')->label('Année')->integer()->minValue(2000)->maxValue(now()->year + 1),
                     Textarea::make('summary')->label('Présentation courte (cartel)')->rows(3)->maxLength(300),
                     RichEditor::make('creation_story')->label('Récit de création')
@@ -83,7 +83,7 @@ class ArtworkResource extends Resource
                 ]),
                 Tab::make('3. Classement et crédits')->icon('heroicon-o-users')->schema([
                     Section::make()->columns(3)->schema([
-                        Select::make('room_id')->label('Salle')->relationship('room', 'name')->preload(),
+                        Select::make('room_id')->label('Univers')->relationship('room', 'name')->preload(),
                         Select::make('track_id')->label('Filière')->relationship('track', 'name')->preload(),
                         Select::make('cohort_id')->label('Promotion / session')->relationship('cohort', 'name')->preload(),
                         Select::make('exhibitions')->label('Expositions')->relationship('exhibitions', 'title')->multiple()->preload()->columnSpan(2),
@@ -98,7 +98,7 @@ class ArtworkResource extends Resource
                                 ->getOptionLabelFromRecordUsing(fn ($record) => "{$record->full_name} ({$record->student_number})")
                                 ->searchable(['first_name', 'last_name', 'student_number']),
                         ])
-                        ->helperText('Vérifiez que chaque personne a donné son accord pour la diffusion de l\'œuvre.'),
+                        ->helperText('Vérifiez que chaque personne a donné son accord pour la diffusion de la réalisation.'),
                 ]),
                 Tab::make('4. Publication')->icon('heroicon-o-globe-alt')->schema([Fields::publication()]),
             ]),
@@ -112,14 +112,14 @@ class ArtworkResource extends Resource
             ->defaultSort('created_at', 'desc')
             ->columns([
                 ImageColumn::make('cover_image')->label('')->disk('public')->square(),
-                TextColumn::make('title')->label('Œuvre')->searchable()->weight('bold')->description(fn (Artwork $r) => $r->kind?->getLabel()),
-                TextColumn::make('room.name')->label('Salle')->placeholder('—'),
+                TextColumn::make('title')->label('Réalisation')->searchable()->weight('bold')->description(fn (Artwork $r) => $r->kind?->getLabel()),
+                TextColumn::make('room.name')->label('Univers')->placeholder('—'),
                 TextColumn::make('track.name')->label('Filière')->placeholder('—')->toggleable(),
                 IconColumn::make('is_featured')->label('À la une')->boolean(),
                 TextColumn::make('status')->label('État')->badge(),
             ])
             ->filters([
-                SelectFilter::make('room_id')->label('Salle')->relationship('room', 'name'),
+                SelectFilter::make('room_id')->label('Univers')->relationship('room', 'name'),
                 SelectFilter::make('kind')->label('Type')->options(ArtworkKind::class),
                 SelectFilter::make('status')->label('État')->options(PublicationStatus::class),
                 TrashedFilter::make(),

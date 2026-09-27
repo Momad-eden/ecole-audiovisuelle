@@ -43,7 +43,7 @@ class AdminPanelProvider extends PanelProvider
                 NavigationGroup::make('Scolarité'),
                 NavigationGroup::make('Caisse'),
                 NavigationGroup::make('Formations'),
-                NavigationGroup::make('Musée'),
+                NavigationGroup::make('Univers & réalisations'),
                 NavigationGroup::make('Site'),
                 NavigationGroup::make('Administration')->collapsed(),
             ])

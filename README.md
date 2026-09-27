@@ -1,12 +1,12 @@
 # EMSI — École des Métiers du Son et de l'Image (Dakar)
 
-Plateforme de l'école : **site public « musée numérique »** et **administration** pour l'équipe.
+Plateforme de l'école : **site public « Plein feux »** (univers, formations, réalisations) et **administration** pour l'équipe.
 
 | Partie | Technologie | Dossier |
 |---|---|---|
-| Administration (candidatures, étudiants, caisse, formations, musée, pages) | Laravel 13 + Filament 5 | racine — `/admin` |
+| Administration (candidatures, étudiants, caisse, formations, univers et réalisations, pages) | Laravel 13 + Filament 5 | racine — `/admin` |
 | API publique (lecture seule + formulaires) | Laravel 13 | `routes/api.php` — `/api/v1/public` |
-| Site public (musée, formations, Espace Professionnels, candidature) | Next.js 16 + TypeScript + Tailwind 4 | `frontend/` |
+| Site public (univers, formations, réalisations, Espace Professionnels, candidature) | Next.js 16 + TypeScript + Tailwind 4 | `frontend/` |
 | Base de données | MySQL 8.4 | — |
 
 ## Démarrer en local

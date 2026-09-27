@@ -1,13 +1,13 @@
 import { cn } from "@/lib/utils";
 
 export const inputClass =
-  "w-full rounded-xl border border-line bg-night-2 px-4 py-3 text-ink placeholder:text-ink-muted/60 focus:border-amber focus:outline-none aria-[invalid=true]:border-rec";
+  "w-full rounded-xl border border-line bg-night-2 px-4 py-3 text-ink placeholder:text-ink-muted/60 focus:border-brand focus:outline-none aria-[invalid=true]:border-rec";
 
 export function Field({ id, label, error, hint, required, children, className }: { id: string; label: string; error?: string; hint?: string; required?: boolean; children: React.ReactNode; className?: string }) {
   return (
     <div className={cn("space-y-2", className)}>
       <label htmlFor={id} className="block text-sm font-medium">
-        {label} {required && <span className="text-amber" aria-hidden>*</span>}
+        {label} {required && <span className="text-brand" aria-hidden>*</span>}
       </label>
       {children}
       {hint && !error && <p id={`${id}-hint`} className="text-xs text-ink-muted">{hint}</p>}

@@ -23,13 +23,16 @@ use Illuminate\Support\Str;
 /**
  * Contenu de référence (idempotent), tiré du document de projet EMSI × Grand Théâtre
  * après correction de ses incohérences. Aucun chiffre ni partenaire non sourcé.
+ *
+ * refreshSite() met à niveau une base existante vers le site « Plein feux » (v2)
+ * sans toucher aux paramètres ni aux autres pages (commande emsi:site-v2).
  */
 class ContentSeeder extends Seeder
 {
     public function run(): void
     {
         $this->settings();
-        $rooms = $this->rooms();
+        $rooms = $this->universes();
         $tracks = $this->tracks($rooms);
         $this->programs($tracks);
         $this->faqs();
@@ -39,32 +42,69 @@ class ContentSeeder extends Seeder
         $this->redirects();
     }
 
+    /** Met à niveau une base existante : univers, filières, Accueil, L'École, menus et redirections. */
+    public function refreshSite(): void
+    {
+        $rooms = $this->universes();
+
+        foreach (self::TRACK_UNIVERSE as $slug => $universe) {
+            Track::where('slug', $slug)->update(['room_id' => $rooms[$universe]->id]);
+        }
+
+        $this->pages(overwrite: true);
+        $this->menus(hideOthers: true);
+        $this->redirects();
+    }
+
+    /** Filière (slug) → univers. */
+    private const TRACK_UNIVERSE = [
+        'son' => 'son',
+        'technicien-lumiere' => 'scene',
+        'regie-generale-spectacle' => 'scene',
+        'infographie-et-creation-numerique' => 'design',
+        'cadrage-sportif-et-regie-video' => 'image',
+    ];
+
     private function settings(): void
     {
         Setting::current()->update([
             'school_name' => 'EMSI — École des Métiers du Son et de l\'Image',
-            'description' => 'École de formation aux métiers techniques et artistiques du son, de la lumière, de l\'image et du spectacle vivant, à Dakar.',
+            'description' => 'École de formation aux métiers techniques et artistiques du son, de l\'image, de la lumière et du spectacle vivant, installée au Grand Théâtre National Doudou Ndiaye Coumba Rose à Dakar.',
             'seo_title' => 'EMSI — École des Métiers du Son et de l\'Image, Dakar',
-            'seo_description' => 'Formations aux métiers techniques du son, de la lumière, de l\'image et du spectacle vivant à Dakar. Musée numérique des réalisations des apprenants.',
+            'seo_description' => 'Formations au son, à la vidéo et à la photo, à l\'infographie, à la régie et à la lumière de spectacle, au Grand Théâtre National de Dakar. Candidature en ligne.',
         ]);
     }
 
-    /** @return array<string, Room> */
-    private function rooms(): array
+    /** @return array<string, Room> Les univers de l'école (anciennes « salles » du musée reprises). */
+    private function universes(): array
     {
-        $rooms = [
-            'son' => ['Salle du Son', '#F5B83D', 'Écouter le geste technique : captations, mixages, créations sonores.'],
-            'lumiere' => ['Salle de la Lumière', '#5CC8FF', 'La lumière comme matière : ambiances, scénographies, conduites de spectacle.'],
-            'image' => ['Salle de l\'Image', '#FF5A4E', 'Cadrer, capter, réaliser : l\'image en direct et en mouvement.'],
-            'visuel' => ['Salle du Visuel', '#C084FC', 'Motion design, habillage, création graphique pour la scène et l\'écran.'],
+        $universes = [
+            'son' => ['Son', 'salle-du-son', '#8B6CFF', 'sound', false,
+                'Capter, mixer, diffuser : donner corps au son, du studio à la grande scène.',
+                'Prise de son, mixage live et studio, sonorisation d\'événements : l\'univers du Son forme les techniciens qui font entendre les artistes, sur des consoles et des systèmes de diffusion professionnels.'],
+            'image' => ["Image\u{00A0}: vidéo & photo", 'salle-de-limage', '#3FD0FF', 'image', false,
+                'Cadrer, filmer, photographier : raconter en images, en direct comme en différé.',
+                'Vidéographie, cadrage, photographie et régie vidéo : l\'univers de l\'Image apprend à composer un plan, à suivre l\'action en direct et à travailler avec une régie.'],
+            'design' => ['Infographie & design', 'salle-du-visuel', '#FF4FA3', 'design', false,
+                'Graphisme, motion design, 3D : inventer les images qui habillent les écrans et les scènes.',
+                'Identité visuelle, habillage d\'émission, motion design et modélisation 3D : l\'univers de l\'Infographie & design forme les créateurs des images qui accompagnent les programmes et les événements.'],
+            'scene' => ["Scène\u{00A0}: régie & lumière", 'salle-de-la-lumiere', '#FFB020', 'stage', false,
+                'Éclairer, coordonner, conduire : faire exister le spectacle vivant.',
+                'Éclairage scénique, programmation lumière et régie générale : l\'univers de la Scène prépare aux métiers qui font tenir un spectacle, de la conception à la conduite en direct.'],
+            'cinema' => ['Cinéma', null, '#FF3B30', 'cinema', true,
+                'Bientôt à l\'EMSI : l\'art du cinéma rejoindra nos formations.',
+                'L\'EMSI prépare l\'arrivée du cinéma parmi ses formations. Laissez-nous vos coordonnées pour être informé de l\'ouverture.'],
         ];
 
         $models = [];
-        foreach ($rooms as $key => [$name, $color, $tagline]) {
-            $models[$key] = Room::updateOrCreate(['slug' => Str::slug($name)], [
-                'name' => $name, 'accent_color' => $color, 'tagline' => $tagline,
-                'position' => count($models), 'status' => PublicationStatus::PUBLISHED, 'published_at' => now(),
-            ]);
+        foreach ($universes as $slug => [$name, $legacySlug, $color, $visual, $upcoming, $tagline, $intro]) {
+            $room = Room::whereIn('slug', array_filter([$slug, $legacySlug]))->orderByRaw('slug = ? desc', [$slug])->first() ?? new Room;
+            $room->fill([
+                'name' => $name, 'slug' => $slug, 'accent_color' => $color, 'visual' => $visual, 'is_upcoming' => $upcoming,
+                'tagline' => $tagline, 'intro' => $intro, 'position' => count($models),
+                'status' => PublicationStatus::PUBLISHED, 'published_at' => $room->published_at ?? now(),
+            ])->save();
+            $models[$slug] = $room;
         }
 
         return $models;
@@ -78,15 +118,15 @@ class ContentSeeder extends Seeder
                 'Ingénierie audio avancée : calage de systèmes Line Array, consoles numériques professionnelles, mixage live, réseaux audio Dante et MADI, mastering studio.',
                 ['Calage d\'un système Line Array', 'Exploitation de consoles numériques (Yamaha, Allen & Heath, DiGiCo, Midas)', 'Mixage live en conditions réelles', 'Réseaux audio Dante et MADI', 'Architecture sonore d\'événements complexes'],
                 ['Ingénieur du son live', 'Technicien système', 'Concepteur sonore']],
-            'lumiere' => ['Technicien Lumière', 'Lumière', 'lumiere',
+            'lumiere' => ['Technicien Lumière', 'Lumière', 'scene',
                 'Éclairage scénique et conception lumineuse : programmation sur consoles professionnelles, réseaux DMX/Art-Net/sACN, dimensionnement d\'un parc projecteurs, conduite de spectacle en direct.',
                 ['Programmation GrandMA, Chamsys, Avolites', 'Réseaux DMX, Art-Net, sACN', 'Calage et dimensionnement d\'un parc projecteurs', 'Synchronisation lumière-son-vidéo', 'Conduite d\'un spectacle en direct'],
                 ['Régisseur lumière', 'Concepteur lumière (Lighting Designer)', 'Chef électricien de spectacle', 'Programmateur lumière']],
-            'regie' => ['Régie Générale Spectacle', 'Régie générale', 'lumiere',
+            'regie' => ['Régie Générale Spectacle', 'Régie générale', 'scene',
                 'Management technique d\'un événement : cahier des charges, dimensionnement matériel et humain, coordination des équipes son, lumière, vidéo et sécurité, conduite du spectacle en direct.',
                 ['Lecture et rédaction de cahiers des charges', 'Dimensionnement d\'un parc matériel complet', 'Coordination d\'équipes techniques', 'Planning de montage et démontage', 'Sécurité des spectacles et gestion des flux de publics'],
                 ['Régisseur général spectacle', 'Régisseur adjoint', 'Chef de projet événementiel', 'Coordinateur technique de festivals']],
-            'infographie' => ['Infographie et Création Numérique', 'Infographie', 'visuel',
+            'infographie' => ['Infographie et Création Numérique', 'Infographie', 'design',
                 'Création visuelle et habillage de programmes : motion design, modélisation 3D, incrustation Chroma Key en temps réel, identité visuelle événementielle.',
                 ['Motion design (After Effects, Cinema 4D)', 'Habillage d\'émission', 'Modélisation 3D', 'Incrustation Chroma Key en temps réel', 'Diffusion multi-canal'],
                 ['Infographiste / motion designer', 'Directeur artistique graphique', 'Community manager événementiel']],
@@ -189,32 +229,72 @@ class ContentSeeder extends Seeder
         }
     }
 
-    private function pages(): void
+    private function pages(bool $overwrite = false): void
     {
         $cta = ['label' => 'Candidater', 'url' => '/candidater', 'style' => 'primary'];
+        $venue = ['venue', [
+            'eyebrow' => 'Notre adresse',
+            'title' => 'Au cœur du Grand Théâtre National Doudou Ndiaye Coumba Rose',
+            'text' => 'L\'EMSI est installée dans les locaux du Grand Théâtre National, à Dakar. Nos apprenants se forment là où le spectacle se fabrique : sur les plateaux, dans les salles et en régie.',
+            'facts' => [
+                ['value' => '2016', 'label' => 'année de création de l\'école'],
+                ['value' => '154 m²', 'label' => 'de studio'],
+                ['value' => 'Live', 'label' => 'une scène pour s\'exercer en conditions réelles'],
+            ],
+            'buttons' => [['label' => 'Découvrir l\'école', 'url' => '/ecole', 'style' => 'secondary']],
+        ]];
+        $equipment = ['equipment', [
+            'title' => 'Sur quoi vous vous formez',
+            'text' => 'Le matériel des grandes scènes et des plateaux de télévision, en conditions réelles.',
+            'groups' => [
+                ['category' => 'Consoles son', 'items' => ['Yamaha', 'Allen & Heath', 'DiGiCo', 'Midas']],
+                ['category' => 'Diffusion et réseaux audio', 'items' => ['Systèmes Line Array', 'Dante', 'MADI']],
+                ['category' => 'Lumière de spectacle', 'items' => ['GrandMA', 'Chamsys', 'Avolites', 'DMX, Art-Net, sACN']],
+                ['category' => 'Image et broadcast', 'items' => ['Caméras broadcast (fibre, HF)', 'Super Slow Motion', 'Intercom de régie']],
+                ['category' => 'Création numérique', 'items' => ['After Effects', 'Cinema 4D', 'Chroma Key en temps réel']],
+            ],
+        ]];
 
         $this->page('accueil', 'Accueil', 'home', true, [
-            ['hero', ['eyebrow' => 'Dakar · Son · Lumière · Image', 'title' => 'Le musée vivant des métiers du son et de l\'image', 'subtitle' => 'Entrez dans les salles de l\'EMSI : les réalisations de nos apprenants, les métiers qu\'elles révèlent et les formations qui y mènent.', 'layout' => 'full', 'buttons' => [['label' => 'Entrer dans le musée', 'url' => '/musee', 'style' => 'primary'], ['label' => 'Candidater', 'url' => '/candidater', 'style' => 'secondary']]]],
-            ['rooms', ['title' => 'Entrez dans les salles', 'text' => 'Chaque salle réunit les œuvres d\'une discipline, éclairées par sa propre lumière.']],
-            ['artworks', ['title' => 'Œuvres à la une', 'source' => 'featured', 'limit' => 6]],
+            ['hero', [
+                'eyebrow' => 'Dakar · Grand Théâtre National',
+                'title' => 'Apprenez à faire vibrer',
+                'words' => ['le son', 'l\'image', 'la lumière', 'le design', 'la scène'],
+                'subtitle' => 'L\'EMSI forme les techniciens et les créateurs du son, de l\'image et du spectacle vivant, sur du matériel professionnel, au cœur du Grand Théâtre National Doudou Ndiaye Coumba Rose.',
+                'layout' => 'stage',
+                'buttons' => [['label' => 'Choisir mon univers', 'url' => '/univers', 'style' => 'primary'], ['label' => 'Candidater', 'url' => '/candidater', 'style' => 'secondary']],
+            ]],
+            ['marquee', ['words' => ['Son', 'Image', 'Lumière', 'Design', 'Scène', 'Cinéma']]],
+            ['rooms', ['eyebrow' => 'Cinq univers, une école', 'title' => 'Choisissez votre univers', 'text' => 'Chaque univers a sa lumière, ses outils et ses métiers. Explorez-les, puis trouvez la formation qui vous ressemble.']],
+            $venue,
+            $equipment,
+            ['timeline', ['title' => 'Rejoindre l\'EMSI', 'layout' => 'steps', 'steps' => [
+                ['period' => '01', 'title' => 'Choisir son univers', 'text' => 'Explorez les univers et les filières pour trouver votre voie.'],
+                ['period' => '02', 'title' => 'Candidater en ligne', 'text' => 'Un formulaire en quelques minutes, sans vous déplacer.'],
+                ['period' => '03', 'title' => 'Entretien de motivation', 'text' => 'L\'équipe pédagogique vous rencontre pour parler de votre projet.'],
+                ['period' => '04', 'title' => 'Entrer en scène', 'text' => 'Vous rejoignez les plateaux et les régies de l\'école.'],
+            ]]],
+            ['artworks', ['title' => 'Réalisations des étudiants', 'source' => 'latest', 'limit' => 6]],
             ['programs', ['title' => 'Nos formations', 'audience' => 'school', 'limit' => 6]],
-            ['professional_space', ['title' => 'Espace Professionnels', 'text' => 'Techniciens titulaires d\'un CPS ou d\'un CS : découvrez le programme EMSI × Grand Théâtre, perfectionnement intensif et certification de niveau BTS par la VAE.', 'button_label' => 'Découvrir le programme']],
+            ['professional_space', ['title' => 'Vous êtes déjà technicien ?', 'text' => 'Titulaires d\'un CPS ou d\'un CS : perfectionnement intensif et certification de niveau BTS par la VAE, avec le Grand Théâtre National.', 'button_label' => 'Découvrir l\'Espace Pro']],
             ['news', ['title' => 'Actualités', 'limit' => 3]],
             ['partners', ['title' => 'Ils accompagnent l\'école']],
-            ['cta', ['title' => 'Votre parcours commence ici', 'text' => 'Déposez votre candidature en ligne en quelques minutes.', 'buttons' => [$cta]]],
-        ]);
+            ['cta', ['title' => 'Votre place est sur scène', 'text' => 'Candidatez en ligne en quelques minutes : l\'équipe de l\'EMSI vous répond.', 'buttons' => [$cta, ['label' => 'Nous contacter', 'url' => '/contact', 'style' => 'secondary']]]],
+        ], $overwrite);
 
         $this->page('ecole', 'L\'école', 'system', true, [
             ['hero', ['eyebrow' => 'L\'école', 'title' => 'École des Métiers du Son et de l\'Image', 'subtitle' => 'Former des techniciens et des créateurs par la pratique, au plus près des scènes et des plateaux.', 'layout' => 'full']],
             ['text', ['title' => 'Notre histoire', 'body' => '<p>Créée en 2016, l\'EMSI est une école de formations technico-artistiques. Elle a développé des Certificats de Spécialité (CS) et des BTS dans les métiers du spectacle vivant, et met à la disposition de ses apprenants un parc matériel professionnel, dont un studio de 154 m² et une scène live.</p>']],
+            $venue,
             ['cards', ['title' => 'Notre pédagogie', 'items' => [
                 ['icon' => 'sparkles', 'title' => 'La pratique d\'abord', 'text' => 'Les apprenants sont placés en situation réelle, sur du matériel professionnel.'],
                 ['icon' => 'users', 'title' => 'Un suivi individualisé', 'text' => 'Chaque parcours est accompagné par l\'équipe pédagogique de l\'EMSI.'],
                 ['icon' => 'award', 'title' => 'Des certifications', 'text' => 'CS, BTS et, pour les professionnels, certification de niveau BTS par la VAE.'],
             ]]],
+            $equipment,
             ['partners', ['title' => 'Nos partenaires']],
             ['cta', ['title' => 'Venez nous rencontrer', 'text' => 'Une question sur nos formations ? Écrivez-nous ou candidatez en ligne.', 'buttons' => [['label' => 'Nous contacter', 'url' => '/contact', 'style' => 'secondary'], $cta]]],
-        ]);
+        ], $overwrite);
 
         $this->page('contact', 'Contact', 'system', true, [
             ['contact', ['title' => 'Nous contacter', 'text' => 'Information, partenariat, presse ou visite de l\'école : écrivez-nous, nous vous répondrons.']],
@@ -231,7 +311,7 @@ class ContentSeeder extends Seeder
                 ['value' => '5', 'label' => 'filières', 'detail' => 'Son, Lumière, Régie générale, Infographie, Cadrage'],
                 ['value' => '30 %', 'label' => 'de femmes visées', 'detail' => 'par cohorte'],
             ]]],
-            ['timeline', ['title' => 'Calendrier', 'steps' => [
+            ['timeline', ['title' => 'Calendrier', 'layout' => 'list', 'steps' => [
                 ['period' => 'Septembre – novembre 2026', 'title' => 'Formation intensive', 'tag' => 'Volet 1', 'text' => '12 semaines sur les plateaux du Grand Théâtre.'],
                 ['period' => 'Novembre 2026', 'title' => 'Évaluation et certification', 'tag' => 'Volet 1'],
                 ['period' => 'Janvier 2027', 'title' => 'Recrutement des 60 apprenants', 'tag' => 'Volet 2', 'text' => 'Sélection sur dossier et entretien de motivation.'],
@@ -255,41 +335,59 @@ class ContentSeeder extends Seeder
         ]);
     }
 
-    private function page(string $slug, string $title, string $type, bool $publish, array $blocks): void
+    /**
+     * Crée la page, ou avec $overwrite la republie avec les nouveaux blocs : la version
+     * précédente reste dans l'historique et l'image (ou la vidéo) du premier bloc héros est reprise.
+     */
+    private function page(string $slug, string $title, string $type, bool $publish, array $blocks, bool $overwrite = false): void
     {
         $page = Page::firstOrNew(['slug' => $slug]);
-        if ($page->exists) {
+        if ($page->exists && ! $overwrite) {
             return;
         }
 
-        $page->fill([
-            'title' => $title, 'type' => $type, 'is_locked' => $type !== 'free',
-            'draft_blocks' => array_map(fn (array $block) => ['type' => $block[0], 'data' => $block[1]], $blocks),
-        ])->save();
+        $blocks = array_map(fn (array $block) => ['type' => $block[0], 'data' => $block[1]], $blocks);
+
+        if ($page->exists) {
+            $previousHero = collect($page->blocks ?? $page->draft_blocks ?? [])->firstWhere('type', 'hero')['data'] ?? [];
+            $heroIndex = collect($blocks)->search(fn (array $block) => $block['type'] === 'hero');
+            if ($heroIndex !== false) {
+                $blocks[$heroIndex]['data'] += array_filter(array_intersect_key($previousHero, array_flip(['image', 'image_alt', 'video_loop'])));
+            }
+        }
+
+        $page->fill(['title' => $title, 'type' => $type, 'is_locked' => $type !== 'free', 'draft_blocks' => $blocks])->save();
 
         if ($publish) {
             $page->publish();
         }
     }
 
-    private function menus(): void
+    private function menus(bool $hideOthers = false): void
     {
         $items = [
-            ['main', 'Le Musée', '/musee', false], ['main', 'Formations', '/formations', false], ['main', 'L\'École', '/ecole', false],
-            ['main', 'Actualités', '/actualites', false], ['main', 'Espace Pro', '/professionnels', false], ['main', 'Candidater', '/candidater', true],
-            ['footer', 'Contact', '/contact', false], ['footer', 'Espace Professionnels', '/professionnels', false],
-            ['legal', 'Mentions légales', '/mentions-legales', false], ['legal', 'Protection des données', '/confidentialite', false],
+            'main' => [['Univers', '/univers', false], ['Formations', '/formations', false], ['L\'École', '/ecole', false],
+                ['Réalisations', '/realisations', false], ['Espace Pro', '/professionnels', false], ['Candidater', '/candidater', true]],
+            'footer' => [['Actualités', '/actualites', false], ['Contact', '/contact', false]],
+            'legal' => [['Mentions légales', '/mentions-legales', false], ['Protection des données', '/confidentialite', false]],
         ];
 
-        foreach ($items as $position => [$location, $label, $url, $button]) {
-            MenuItem::updateOrCreate(['location' => $location, 'url' => $url], ['label' => $label, 'is_button' => $button, 'position' => $position]);
+        foreach ($items as $location => $links) {
+            foreach ($links as $position => [$label, $url, $button]) {
+                MenuItem::updateOrCreate(['location' => $location, 'url' => $url], ['label' => $label, 'is_button' => $button, 'position' => $position, 'is_visible' => true]);
+            }
+
+            // Les anciennes entrées sont masquées, jamais supprimées : on peut les réafficher dans l'admin.
+            if ($hideOthers) {
+                MenuItem::where('location', $location)->whereNotIn('url', array_column($links, 1))->update(['is_visible' => false]);
+            }
         }
     }
 
     private function redirects(): void
     {
         foreach ([
-            '/projet' => '/professionnels', '/vae' => '/professionnels/bts-vae', '/galerie' => '/musee',
+            '/projet' => '/professionnels', '/vae' => '/professionnels/bts-vae', '/galerie' => '/realisations',
             '/admission' => '/candidater', '/admission/succes' => '/candidater',
         ] as $from => $to) {
             Redirect::updateOrCreate(['from_path' => $from], ['to_path' => $to, 'status_code' => 301]);

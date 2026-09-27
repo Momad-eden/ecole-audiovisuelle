@@ -18,7 +18,7 @@ export function PlayerBar() {
       role="region"
       aria-label="Lecteur audio"
       className="fixed inset-x-0 bottom-0 z-50 border-t border-line bg-night-2/95 backdrop-blur"
-      style={{ ["--accent" as string]: track.accent ?? "var(--color-amber)" }}
+      style={{ ["--accent" as string]: track.accent ?? "var(--color-brand)" }}
     >
       <div className="mx-auto flex max-w-7xl items-center gap-4 px-4 py-3 sm:px-6">
         <button

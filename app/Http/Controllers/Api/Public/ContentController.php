@@ -96,14 +96,23 @@ class ContentController extends Controller
 
     public function rooms(): AnonymousResourceCollection
     {
-        return RoomResource::collection(Room::published()->withCount(['artworks' => fn ($q) => $q->published()])->orderBy('position')->get());
+        return RoomResource::collection(Room::published()->withCount(['artworks' => fn ($q) => $q->published()])
+            ->with(['tracks' => fn ($q) => $q->where('is_active', true)])->orderBy('position')->get());
     }
 
     public function room(string $slug): RoomResource
     {
         $room = Room::published()->where('slug', $slug)
-            ->with(['artworks' => fn ($q) => $q->published()->with(['room', 'track'])])
+            ->with([
+                'artworks' => fn ($q) => $q->published()->with(['room', 'track']),
+                'tracks' => fn ($q) => $q->where('is_active', true),
+            ])
             ->firstOrFail();
+
+        // Les formations publiées qui enseignent au moins une filière de l'univers.
+        $room->setRelation('programs', Program::published()
+            ->whereHas('cohorts.offerings', fn (Builder $q) => $q->whereIn('track_id', $room->tracks->pluck('id')))
+            ->orderBy('position')->get());
 
         return new RoomResource($room);
     }
@@ -216,8 +225,8 @@ class ContentController extends Controller
 
         return response()->json(['data' => collect()
             ->merge(Page::published()->get(['slug', 'type', 'updated_at'])->map(fn (Page $p) => $entry($p->type === 'home' ? '/' : '/'.$p->slug, $p->updated_at)))
-            ->merge(Room::published()->get(['slug', 'updated_at'])->map(fn (Room $r) => $entry('/musee/'.$r->slug, $r->updated_at)))
-            ->merge(Artwork::published()->get(['slug', 'updated_at'])->map(fn (Artwork $a) => $entry('/musee/oeuvres/'.$a->slug, $a->updated_at)))
+            ->merge(Room::published()->get(['slug', 'updated_at'])->map(fn (Room $r) => $entry('/univers/'.$r->slug, $r->updated_at)))
+            ->merge(Artwork::published()->get(['slug', 'updated_at'])->map(fn (Artwork $a) => $entry('/realisations/'.$a->slug, $a->updated_at)))
             ->merge(Exhibition::published()->get(['slug', 'updated_at'])->map(fn (Exhibition $e) => $entry('/expositions/'.$e->slug, $e->updated_at)))
             ->merge(Program::published()->get(['slug', 'audience', 'updated_at'])->map(fn (Program $p) => $entry(
                 ($p->audience?->value === 'professional' ? '/professionnels/' : '/formations/').$p->slug, $p->updated_at)))

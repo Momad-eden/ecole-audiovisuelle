@@ -1,25 +1,33 @@
 @import "tailwindcss";
 
-/* Direction artistique « Salle obscure » : noir chaud, lumière comme matière. */
+/*
+ * Direction artistique « Plein feux » : une scène plongée dans le noir qui s'allume
+ * au fil de la visite. Couleurs de marque tirées du logo EMSI (orange projecteur, violet nuit) ;
+ * chaque univers apporte sa propre lumière via la variable --accent.
+ */
 @theme {
-  --color-night: #0b0b0e;
-  --color-night-2: #131318;
-  --color-night-3: #1c1c22;
-  --color-ink: #f2eee6;
-  --color-ink-muted: #a8a29e;
-  --color-line: rgb(242 238 230 / 0.12);
-  --color-amber: #f5b83d;
-  --color-hmi: #5cc8ff;
-  --color-rec: #ff5a4e;
-  --color-led: #c084fc;
+  --color-night: #07070a;
+  --color-night-2: #0f0f14;
+  --color-night-3: #17171e;
+  --color-ink: #f5f2ec;
+  --color-ink-muted: #a7a3b2;
+  --color-line: rgb(245 242 236 / 0.12);
+  --color-brand: #ff7a1a;
+  --color-violet: #8b6cff;
+  --color-hmi: #3fd0ff;
+  --color-magenta: #ff4fa3;
+  --color-gold: #ffb020;
+  --color-rec: #ff3b30;
 
-  --font-display: var(--font-fraunces), ui-serif, Georgia, serif;
+  --font-display: var(--font-archivo), ui-sans-serif, system-ui, sans-serif;
   --font-sans: var(--font-inter), ui-sans-serif, system-ui, sans-serif;
   --font-mono: var(--font-jetbrains), ui-monospace, monospace;
+
+  --animate-marquee: marquee 38s linear infinite;
 }
 
 :root {
-  --accent: var(--color-amber);
+  --accent: var(--color-brand);
   color-scheme: dark;
 }
 
@@ -32,10 +40,22 @@ body {
   color: var(--color-ink);
   font-family: var(--font-sans);
   -webkit-font-smoothing: antialiased;
+  overflow-x: clip;
+}
+
+/* Grain de pellicule, très léger, sur toute la page. */
+body::after {
+  content: "";
+  position: fixed;
+  inset: 0;
+  z-index: 70;
+  pointer-events: none;
+  opacity: 0.045;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
 }
 
 ::selection {
-  background: color-mix(in oklab, var(--accent) 45%, transparent);
+  background: color-mix(in oklab, var(--accent) 55%, transparent);
   color: var(--color-ink);
 }
 
@@ -45,18 +65,39 @@ body {
   border-radius: 4px;
 }
 
-/* Faisceau de lumière : halo radial dans la couleur de la salle. */
-.beam {
-  background:
-    radial-gradient(60% 50% at 50% 0%, color-mix(in oklab, var(--accent) 28%, transparent) 0%, transparent 70%),
-    radial-gradient(40% 30% at 80% 20%, color-mix(in oklab, var(--accent) 12%, transparent) 0%, transparent 70%);
+/* Titres d'affiche : Archivo en largeur étendue. */
+.display {
+  font-family: var(--font-display);
+  font-variation-settings: "wdth" 125;
+  font-weight: 800;
+  letter-spacing: -0.035em;
+  line-height: 0.92;
+}
+.display-condensed {
+  font-family: var(--font-display);
+  font-variation-settings: "wdth" 75;
+  font-weight: 700;
+  letter-spacing: -0.01em;
 }
 
-/* Cartel de musée : petites capitales espacées. */
+/* Contour lumineux (grands mots décoratifs). */
+.text-outline {
+  color: transparent;
+  -webkit-text-stroke: 1px color-mix(in oklab, var(--color-ink) 35%, transparent);
+}
+
+/* Faisceau : halo dans la couleur de l'univers. */
+.beam {
+  background:
+    radial-gradient(60% 50% at 50% 0%, color-mix(in oklab, var(--accent) 26%, transparent) 0%, transparent 70%),
+    radial-gradient(40% 30% at 85% 15%, color-mix(in oklab, var(--accent) 12%, transparent) 0%, transparent 70%);
+}
+
+/* Cartel technique : capitales espacées en police mono. */
 .cartel {
   font-family: var(--font-mono);
   font-size: 0.72rem;
-  letter-spacing: 0.14em;
+  letter-spacing: 0.16em;
   text-transform: uppercase;
   color: var(--color-ink-muted);
 }
@@ -67,14 +108,121 @@ body {
   color: color-mix(in oklab, var(--color-ink) 88%, transparent);
 }
 .rich-text > * + * { margin-top: 1.1em; }
-.rich-text h2 { font-family: var(--font-display); font-size: 1.75rem; line-height: 1.2; color: var(--color-ink); margin-top: 2em; }
-.rich-text h3 { font-family: var(--font-display); font-size: 1.35rem; color: var(--color-ink); margin-top: 1.6em; }
+.rich-text h2 { font-family: var(--font-display); font-weight: 700; font-size: 1.75rem; line-height: 1.15; color: var(--color-ink); margin-top: 2em; }
+.rich-text h3 { font-family: var(--font-display); font-weight: 700; font-size: 1.3rem; color: var(--color-ink); margin-top: 1.6em; }
 .rich-text a { color: var(--accent); text-decoration: underline; text-underline-offset: 3px; }
 .rich-text ul { list-style: disc; padding-left: 1.25rem; }
 .rich-text ol { list-style: decimal; padding-left: 1.25rem; }
-.rich-text blockquote { border-left: 2px solid var(--accent); padding-left: 1rem; font-family: var(--font-display); font-style: italic; font-size: 1.2rem; }
+.rich-text blockquote { border-left: 2px solid var(--accent); padding-left: 1rem; font-size: 1.2rem; }
 .rich-text strong { color: var(--color-ink); }
 .rich-text img { border-radius: 0.75rem; }
+
+/* Apparition au défilement : masquée seulement si JavaScript tourne (Reveal ajoute .is-in). */
+@media (scripting: enabled) and (prefers-reduced-motion: no-preference) {
+  [data-reveal]:not(.is-in) {
+    opacity: 0;
+    transform: translateY(28px);
+  }
+}
+[data-reveal] {
+  transition: opacity 0.9s cubic-bezier(0.2, 0.7, 0.2, 1), transform 0.9s cubic-bezier(0.2, 0.7, 0.2, 1);
+  transition-delay: var(--reveal-delay, 0ms);
+}
+
+/* Animations continues suspendues hors écran (voir InView). */
+[data-paused="true"],
+[data-paused="true"] * {
+  animation-play-state: paused !important;
+}
+
+@keyframes marquee {
+  to { transform: translateX(-50%); }
+}
+
+/* ——— Hero « scène » : faisceaux de projecteurs ——— */
+.stage-beam {
+  position: absolute;
+  top: -10%;
+  width: 55vmax;
+  height: 130%;
+  transform-origin: 50% 0;
+  /* Bords adoucis par le dégradé lui-même : pas de flou, la rotation reste composée par le GPU. */
+  background: conic-gradient(from 180deg at 50% 0%, transparent 164deg, color-mix(in oklab, var(--beam, var(--accent)) 14%, transparent) 172deg, color-mix(in oklab, var(--beam, var(--accent)) 30%, transparent) 180deg, color-mix(in oklab, var(--beam, var(--accent)) 14%, transparent) 188deg, transparent 196deg);
+  will-change: transform;
+  animation: sweep var(--sweep, 11s) ease-in-out infinite alternate;
+}
+@keyframes sweep {
+  from { transform: rotate(var(--from, -18deg)); }
+  to { transform: rotate(var(--to, 18deg)); }
+}
+.follow-spot {
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(22rem 22rem at var(--spot-x, 50%) var(--spot-y, 40%), color-mix(in oklab, var(--color-ink) 9%, transparent), transparent 70%);
+  transition: background-position 0.2s;
+}
+@keyframes blink {
+  50% { opacity: 0.15; }
+}
+.rec-dot { animation: blink 1.2s steps(1) infinite; }
+
+@keyframes word-in {
+  from { opacity: 0; transform: translateY(0.35em); filter: blur(8px); }
+  to { opacity: 1; transform: none; filter: none; }
+}
+.word-in { animation: word-in 0.7s cubic-bezier(0.2, 0.7, 0.2, 1) both; }
+
+/* ——— Signatures animées des univers (SVG + CSS) ——— */
+@keyframes bar {
+  0%, 100% { transform: scaleY(0.25); }
+  50% { transform: scaleY(1); }
+}
+.uv-bar { transform-origin: 50% 100%; transform-box: fill-box; animation: bar 1.1s ease-in-out infinite; }
+
+@keyframes wave-shift {
+  to { transform: translateX(-50%); }
+}
+.uv-wave { animation: wave-shift 3.5s linear infinite; }
+
+@keyframes iris {
+  to { transform: rotate(360deg); }
+}
+.uv-iris { transform-origin: center; transform-box: fill-box; animation: iris 18s linear infinite; }
+
+@keyframes focus-pulse {
+  0%, 100% { transform: scale(1); opacity: 0.9; }
+  50% { transform: scale(0.9); opacity: 0.55; }
+}
+.uv-focus { transform-origin: center; transform-box: fill-box; animation: focus-pulse 2.6s ease-in-out infinite; }
+
+@keyframes draw {
+  0% { stroke-dashoffset: 1; }
+  55%, 100% { stroke-dashoffset: 0; }
+}
+.uv-draw { stroke-dasharray: 1; stroke-dashoffset: 1; animation: draw 5s cubic-bezier(0.6, 0, 0.2, 1) infinite; }
+
+@keyframes handle {
+  0%, 100% { transform: translate(0, 0); }
+  50% { transform: translate(6px, -8px); }
+}
+.uv-handle { animation: handle 4s ease-in-out infinite; transform-box: fill-box; }
+
+@keyframes fader {
+  0%, 100% { transform: translateY(var(--f-from, 0px)); }
+  50% { transform: translateY(var(--f-to, -40px)); }
+}
+.uv-fader { animation: fader var(--f-dur, 3s) ease-in-out infinite; }
+
+@keyframes beam-swing {
+  from { transform: rotate(-14deg); }
+  to { transform: rotate(14deg); }
+}
+.uv-beam { transform-origin: 50% 0; transform-box: fill-box; animation: beam-swing 5s ease-in-out infinite alternate; }
+
+@keyframes film {
+  to { transform: translateX(-50%); }
+}
+.uv-film { animation: film 6s linear infinite; }
 
 @media (prefers-reduced-motion: reduce) {
   html { scroll-behavior: auto; }
@@ -83,4 +231,24 @@ body {
     animation-iteration-count: 1 !important;
     transition-duration: 0.01ms !important;
   }
+  .uv-draw { stroke-dashoffset: 0; }
+}
+
+/* Toute police d'affichage garde une légère extension de largeur. */
+.font-display {
+  font-variation-settings: "wdth" 112;
+}
+
+/* Univers en défilement horizontal épinglé (activé par UniversesShowcase sur ordinateur). */
+.universe-track.is-horizontal {
+  display: flex;
+  flex-wrap: nowrap;
+  width: max-content;
+  gap: 1.5rem;
+  padding-right: 8vw;
+}
+.universe-track.is-horizontal > .universe-panel {
+  width: min(76vw, 1040px);
+  height: clamp(380px, calc(100svh - 390px), 540px);
+  flex: none;
 }

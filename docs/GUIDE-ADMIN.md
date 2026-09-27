@@ -12,7 +12,7 @@ Mot de passe oublié : lien « Mot de passe oublié ? » sur la page de connexio
 | **Directeur** | Tout, y compris les comptes et les paramètres du site |
 | **Gestionnaire** | Candidatures (y compris la décision), étudiants, caisse et clôtures, formations et sessions |
 | **Secrétaire** | Candidatures (sans la décision finale), étudiants, encaissements et reçus |
-| **Communication** | Pages du site, actualités, musée (salles, expositions, œuvres), partenaires, FAQ, menus, messages reçus, paramètres du site |
+| **Communication** | Pages du site, actualités, univers et réalisations (univers, expositions, réalisations des étudiants), partenaires, FAQ, menus, messages reçus, paramètres du site |
 
 Le menu de gauche n'affiche que ce que votre rôle permet d'ouvrir.
 
@@ -33,21 +33,33 @@ Le menu de gauche n'affiche que ce que votre rôle permet d'ouvrir.
 4. Cochez **Publiée sur le site**. Une date dans le futur programme la publication.
 5. **Créer**. L'actualité apparaît sur le site et sur l'accueil.
 
-## 2. Ajouter une œuvre au musée
+## 2. Ajouter une réalisation d'étudiant
 
-1. Menu **Musée › Œuvres** › **Ajouter une œuvre**.
+1. Menu **Univers & réalisations › Réalisations** › **Ajouter une réalisation**.
 2. Onglet **1. Médias** : choisissez le type (son, vidéo, image…), ajoutez l'image principale et sa description, puis le **fichier son** (MP3, 50 Mo maximum) ou le **lien YouTube/Vimeo** de la vidéo. La forme d'onde du son est calculée automatiquement.
 3. Onglet **2. Description** : titre, année, présentation courte, **récit de création**, matériel utilisé.
-4. Onglet **3. Classement et crédits** : salle, filière, promotion ; ajoutez chaque personne créditée avec son rôle. Vérifiez que chacune a donné son accord pour la diffusion.
+4. Onglet **3. Classement et crédits** : univers, filière, promotion ; ajoutez chaque personne créditée avec son rôle. Vérifiez que chacune a donné son accord pour la diffusion.
 5. Onglet **4. Publication** : « Publié ». Cochez **Mettre à la une** pour la montrer sur l'accueil.
 
 ## 3. Modifier la page d'accueil (ou une autre page)
 
 1. Menu **Site › Pages du site** › **Accueil** › **Modifier**.
-2. Chaque bloc (grand titre, salles, œuvres à la une…) se déplie, se modifie, se déplace (flèches) ou se duplique. **Ajouter un bloc** propose le catalogue complet.
+2. Chaque bloc (grand titre animé, bandeau défilant, univers, le lieu, le matériel, étapes, réalisations…) se déplie, se modifie, se déplace (flèches) ou se duplique. **Ajouter un bloc** propose le catalogue complet.
 3. **Enregistrer** garde vos changements en **brouillon**. Le bouton **Aperçu** montre le résultat sans le publier.
 4. **Publier** met la nouvelle version en ligne.
 5. Une erreur ? Menu « ⋮ » › **Revenir à une version précédente**, puis Publier.
+
+### Les blocs propres au site « Plein feux »
+
+- **Grand titre (héros)**, mise en page « Scène animée » : faisceaux de lumière ; les **mots qui défilent** terminent le titre (« Apprenez à faire vibrer… le son, l'image… »). Ajoutez une photo de fond quand vous en avez une.
+- **Bandeau défilant** : quelques mots courts en très grand.
+- **Le lieu (Grand Théâtre)** : titre, texte, jusqu'à 4 repères chiffrés (ex. « 154 m² — de studio ») et une photo du lieu (sinon, un dessin de scène s'affiche).
+- **Le matériel** : des catégories (ex. « Consoles son ») et leur liste de matériel ; une photo par catégorie dès que possible.
+- **Chronologie / étapes**, présentation « Étapes numérotées » : le parcours pour rejoindre l'école.
+
+### Les univers
+
+Menu **Univers & réalisations › Univers** : nom, couleur de lumière, **animation** (son, image, design, scène, cinéma), accroche et texte. « Bientôt à l'EMSI » annonce un univers en préparation (ex. Cinéma). Les filières se rattachent à un univers depuis **Formations › Filières**.
 
 ## 4. Ouvrir (ou fermer) les candidatures d'une session
 
