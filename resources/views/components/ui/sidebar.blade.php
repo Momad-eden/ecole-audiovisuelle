@@ -341,47 +341,7 @@
     {{-- ===================================================== --}}
 
     @elseif(auth()->user()->role === 'secretaire')
-
-
-        {{-- Étudiants --}}
-
-        <a
-            href="{{ route('students.index') }}"
-            class="{{ request()->routeIs('students.*')
-                ? 'bg-primary text-white'
-                : 'text-white/70 hover:bg-white/10 hover:text-white' }}
-                flex items-center gap-3 rounded-xl px-4 py-3 transition">
-
-            <x-lucide-users class="w-5 h-5 flex-shrink-0" />
-
-            <span>
-                Étudiants
-            </span>
-
-        </a>
-
-
-        {{-- Admissions --}}
-
-        <a
-            href="{{ route('admissions.index') }}"
-            class="{{ request()->routeIs('admissions.*')
-                ? 'bg-primary text-white'
-                : 'text-white/70 hover:bg-white/10 hover:text-white' }}
-                flex items-center gap-3 rounded-xl px-4 py-3 transition">
-
-            <x-lucide-user-plus class="w-5 h-5 flex-shrink-0" />
-
-            <span>
-                Admissions
-            </span>
-
-        </a>
-
-
-    {{-- ===================================================== --}}
-    {{-- COMMUNICATION --}}
-    {{-- ===================================================== --}}
+        {{-- Les modules de la secrétaire (candidatures, encaissements) arrivent en Phase 3 avec les Policies. --}}
 
     @elseif(auth()->user()->role === 'communication')
 

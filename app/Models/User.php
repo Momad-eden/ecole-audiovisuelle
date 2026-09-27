@@ -3,6 +3,7 @@
 namespace App\Models;
 
 // use Illuminate\Contracts\Auth\MustVerifyEmail;
+use App\Enums\UserRole;
 use Database\Factories\UserFactory;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
@@ -30,6 +31,14 @@ class User extends Authenticatable
      *
      * @var list<string>
      */
+    /**
+     * Libellé français du rôle (« Directeur », « Secrétaire »…).
+     */
+    public function getRoleLabelAttribute(): string
+    {
+        return UserRole::tryFrom((string) $this->role)?->label() ?? 'Sans rôle';
+    }
+
     protected $hidden = [
         'password',
         'remember_token',

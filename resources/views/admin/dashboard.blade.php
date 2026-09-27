@@ -34,6 +34,7 @@
             </div>
 
             <div class="flex flex-wrap items-center gap-3">
+                @can('manage-admissions')
                 <a
                     href="{{ route('admissions.index') }}"
                     class="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl bg-[#F5B800] hover:bg-white text-black font-bold text-xs uppercase tracking-wider transition shadow-lg"
@@ -42,7 +43,8 @@
                     <span>Admissions ({{ $pendingAdmissions }} en attente)</span>
                 </a>
 
-                @if(in_array(auth()->user()->role, ['directeur', 'gestionnaire']))
+                @endcan
+                @can('view-finances')
                     <a
                         href="{{ route('payments.create', ['type' => 'inflow']) }}"
                         class="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs uppercase tracking-wider transition shadow-lg shadow-emerald-600/20"
@@ -58,7 +60,7 @@
                         <x-lucide-calculator class="w-4 h-4" />
                         <span>Bilan Comptable</span>
                     </a>
-                @endif
+                @endcan
             </div>
         </div>
     </div>
@@ -69,6 +71,7 @@
     ========================================================== --}}
     <div class="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-5">
 
+        @can('manage-admissions')
         {{-- Candidatures Totales --}}
         <div class="p-6 rounded-2xl bg-white border border-gray-100 shadow-sm hover:shadow-md transition flex flex-col justify-between">
             <div class="flex items-start justify-between">
@@ -115,7 +118,9 @@
                 </a>
             </div>
         </div>
+        @endcan
 
+        @can('view-finances')
         {{-- Trésorerie / Solde Net --}}
         <div class="p-6 rounded-2xl bg-white border border-gray-100 shadow-sm hover:shadow-md transition flex flex-col justify-between">
             <div class="flex items-start justify-between">
@@ -156,6 +161,7 @@
                 </div>
             </div>
         </div>
+        @endcan
 
     </div>
 
@@ -163,10 +169,10 @@
     {{-- =========================================================
          3. SECTION ALERTES & ACTIONS PRIORITAIRES
     ========================================================== --}}
-    @if($pendingAdmissions > 0 || count($unpaidStudentsAlert) > 0)
+    @if(($pendingAdmissions > 0 && auth()->user()->can('manage-admissions')) || (count($unpaidStudentsAlert) > 0 && auth()->user()->can('view-finances')))
         <div class="grid grid-cols-1 lg:grid-cols-2 gap-5">
             {{-- Alerte Candidatures en attente --}}
-            @if($pendingAdmissions > 0)
+            @if($pendingAdmissions > 0 && auth()->user()->can('manage-admissions'))
                 <div class="p-5 rounded-2xl bg-amber-50/80 border border-amber-200/80 flex items-start justify-between gap-4">
                     <div class="flex items-start gap-3.5">
                         <div class="w-10 h-10 rounded-xl bg-amber-100 text-amber-800 flex items-center justify-center shrink-0">
@@ -193,7 +199,7 @@
             @endif
 
             {{-- Alerte Reliquats de scolarité --}}
-            @if(count($unpaidStudentsAlert) > 0 && in_array(auth()->user()->role, ['directeur', 'gestionnaire']))
+            @if(count($unpaidStudentsAlert) > 0 && auth()->user()->can('view-finances'))
                 <div class="p-5 rounded-2xl bg-orange-50/80 border border-orange-200/80 flex items-start justify-between gap-4">
                     <div class="flex items-start gap-3.5">
                         <div class="w-10 h-10 rounded-xl bg-orange-100 text-orange-800 flex items-center justify-center shrink-0">
@@ -225,6 +231,7 @@
     {{-- =========================================================
          4. FILIÈRES OFFICIELLES & OCCUPATION DES EFFECTIFS
     ========================================================== --}}
+    @can('manage-admissions')
     <x-ui.card
         title="Filières Métiers du Projet Officiel"
         subtitle="Effectifs inscrits et candidatures reçues par formation"
@@ -272,6 +279,7 @@
             @endforelse
         </div>
     </x-ui.card>
+    @endcan
 
 
     {{-- =========================================================
@@ -280,6 +288,7 @@
     <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
 
         {{-- 5.A DERNIÈRES CANDIDATURES --}}
+        @can('manage-admissions')
         <x-ui.card
             title="Dernières candidatures reçues"
             subtitle="Demandes d'admission récentes du projet"
@@ -361,10 +370,11 @@
                 </div>
             @endif
         </x-ui.card>
+        @endcan
 
 
         {{-- 5.B DERNIERS MOUVEMENTS DE CAISSE --}}
-        @if(in_array(auth()->user()->role, ['directeur', 'gestionnaire']))
+        @can('view-finances')
             <x-ui.card
                 title="Derniers mouvements de caisse"
                 subtitle="Encaissements et décaissements récents"
@@ -442,7 +452,7 @@
                     </div>
                 @endif
             </x-ui.card>
-        @else
+        @elsecan('manage-content')
             <x-ui.card
                 title="Accès rapides & Communication"
                 subtitle="Gestion de contenu et partenariats"
@@ -465,7 +475,7 @@
                     </a>
                 </div>
             </x-ui.card>
-        @endif
+        @endcan
 
     </div>
 
@@ -475,6 +485,7 @@
     ========================================================== --}}
     <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
 
+        @can('manage-admissions')
         <a
             href="{{ route('admissions.index') }}"
             class="group bg-white border border-gray-200/80 rounded-2xl p-6 hover:shadow-lg hover:border-primary/40 transition flex flex-col justify-between"
@@ -534,6 +545,7 @@
                 Voir les programmes →
             </span>
         </a>
+        @endcan
 
         @if(auth()->user()->role === 'directeur')
             <a
@@ -555,7 +567,7 @@
                     Configurer l'école →
                 </span>
             </a>
-        @else
+        @elseif(auth()->user()->can('view-finances'))
             <a
                 href="{{ route('accounting.index') }}"
                 class="group bg-white border border-gray-200/80 rounded-2xl p-6 hover:shadow-lg hover:border-primary/40 transition flex flex-col justify-between"

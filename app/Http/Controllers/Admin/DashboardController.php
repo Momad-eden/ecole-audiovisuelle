@@ -7,6 +7,7 @@ use App\Models\Admission;
 use App\Models\Course;
 use App\Models\Payment;
 use App\Models\Student;
+use Illuminate\Support\Facades\Gate;
 
 class DashboardController extends Controller
 {
@@ -34,37 +35,45 @@ class DashboardController extends Controller
             ? round(($approvedAdmissions / $admissionsCount) * 100, 1)
             : 0;
 
-        // 3. Statistiques Financières & Trésorerie
-        $totalInflows = (float) Payment::inflows()->sum('amount');
-        $totalOutflows = (float) Payment::outflows()->sum('amount');
-        $cashBalance = $totalInflows - $totalOutflows;
+        // 3. Statistiques Financières & Trésorerie (réservées aux rôles habilités)
+        $totalInflows = $totalOutflows = $cashBalance = 0.0;
+        $monthInflows = $monthOutflows = $monthNet = 0.0;
+        $totalTuitionExpected = $totalTuitionCollected = $totalTuitionUnpaid = 0.0;
+        $globalTuitionRecoveryRate = 100;
+        $unpaidStudentsAlert = collect();
 
-        $monthInflows = (float) Payment::inflows()
-            ->whereMonth('payment_date', now()->month)
-            ->whereYear('payment_date', now()->year)
-            ->sum('amount');
+        if (Gate::allows('view-finances')) {
+            $totalInflows = (float) Payment::inflows()->sum('amount');
+            $totalOutflows = (float) Payment::outflows()->sum('amount');
+            $cashBalance = $totalInflows - $totalOutflows;
 
-        $monthOutflows = (float) Payment::outflows()
-            ->whereMonth('payment_date', now()->month)
-            ->whereYear('payment_date', now()->year)
-            ->sum('amount');
+            $monthInflows = (float) Payment::inflows()
+                ->whereMonth('payment_date', now()->month)
+                ->whereYear('payment_date', now()->year)
+                ->sum('amount');
 
-        $monthNet = $monthInflows - $monthOutflows;
+            $monthOutflows = (float) Payment::outflows()
+                ->whereMonth('payment_date', now()->month)
+                ->whereYear('payment_date', now()->year)
+                ->sum('amount');
 
-        // Suivi Global des Scolarités Étudiants
-        $allStudents = Student::with(['course', 'payments'])->get();
-        $totalTuitionExpected = (float) $allStudents->sum(fn($s) => (float) ($s->course?->price ?? 0));
-        $totalTuitionCollected = (float) $allStudents->sum(fn($s) => $s->total_paid);
-        $totalTuitionUnpaid = max(0, $totalTuitionExpected - $totalTuitionCollected);
-        $globalTuitionRecoveryRate = $totalTuitionExpected > 0
-            ? round(($totalTuitionCollected / $totalTuitionExpected) * 100, 1)
-            : 100;
+            $monthNet = $monthInflows - $monthOutflows;
 
-        // Étudiants avec reliquat de scolarité à régulariser (top 5)
-        $unpaidStudentsAlert = $allStudents
-            ->filter(fn($s) => $s->remaining_due > 0 && ($s->course?->price ?? 0) > 0)
-            ->sortByDesc('remaining_due')
-            ->take(5);
+            // Suivi Global des Scolarités Étudiants
+            $allStudents = Student::with(['course', 'payments'])->get();
+            $totalTuitionExpected = (float) $allStudents->sum(fn ($s) => (float) ($s->course?->price ?? 0));
+            $totalTuitionCollected = (float) $allStudents->sum(fn ($s) => $s->total_paid);
+            $totalTuitionUnpaid = max(0, $totalTuitionExpected - $totalTuitionCollected);
+            $globalTuitionRecoveryRate = $totalTuitionExpected > 0
+                ? round(($totalTuitionCollected / $totalTuitionExpected) * 100, 1)
+                : 100;
+
+            // Étudiants avec reliquat de scolarité à régulariser (top 5)
+            $unpaidStudentsAlert = $allStudents
+                ->filter(fn ($s) => $s->remaining_due > 0 && ($s->course?->price ?? 0) > 0)
+                ->sortByDesc('remaining_due')
+                ->take(5);
+        }
 
         // 4. Flux Récents
         $recentAdmissions = Admission::with('course')
@@ -72,11 +81,13 @@ class DashboardController extends Controller
             ->take(6)
             ->get();
 
-        $recentPayments = Payment::with(['student.course', 'creator'])
-            ->latest('payment_date')
-            ->latest('id')
-            ->take(6)
-            ->get();
+        $recentPayments = Gate::allows('view-finances')
+            ? Payment::with(['student.course', 'creator'])
+                ->latest('payment_date')
+                ->latest('id')
+                ->take(6)
+                ->get()
+            : collect();
 
         return view('admin.dashboard', compact(
             'studentsCount',
