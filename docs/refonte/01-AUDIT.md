@@ -184,3 +184,27 @@
 | A8 | Messages de validation et dates en anglais | 5.6 | 🟠 |
 | A9 | Formulaire « Nouvel étudiant » sans affichage d'erreurs | 5.8 | 🟡 |
 | A10 | Dépense catégorisée « scolarité », date future, montant hors limite acceptés | D11, D6 | 🟠 |
+
+## 7. Suivi des corrections — Phase 1 (27/09/2026)
+
+Plan : [`04-PHASE1-PLAN.md`](04-PHASE1-PLAN.md). Suite de tests : **105 tests verts sur SQLite et sur MySQL 8.4** (`php artisan test`, `composer test:mysql`).
+
+| Constat | Statut | Correctif |
+|---|---|---|
+| S1 inscription publique | ✅ corrigé | `/register` supprimé ; `users.role` sans valeur par défaut ; tableau de bord et profil exigent un rôle valide |
+| S2 mot de passe par défaut | ✅ corrigé | le seeder ne crée aucun compte ; `emsi:create-admin` (alias `make:admin`) sans option `--password` |
+| S3 spam du formulaire | ✅ corrigé | 5 envois / 10 min / IP, champ piège, téléphone et volet validés |
+| S5 défauts `.env.example` | ✅ corrigé | `APP_NAME=EMSI`, `APP_DEBUG=false`, locales `fr` (le `.env` local reste à ajuster à la main) |
+| S6 tableau de bord non cloisonné | ✅ corrigé | Gates `view-finances`, `manage-admissions`, `manage-content` ; plus aucun lien vers une 403 |
+| S7 rôle invalide | ✅ corrigé | un rôle nul ou inconnu n'ouvre plus l'administration (le compte `admin` de la base locale doit être recréé via `emsi:create-admin`) |
+| S8 comptes | ✅ corrigé | pas d'auto-rétrogradation du directeur ; auto-suppression du profil retirée |
+| S4 Policies | ⏳ Phase 3 | — |
+| D1 cascades | ✅ corrigé | `restrictOnDelete` + suppression douce (formations, étudiants, paiements) |
+| D2 / D3 numérotation | ✅ corrigé | table `sequences` verrouillée ; REC et DEP indépendants ; reprise des numéros existants |
+| D11 caisse | ✅ partiel | catégorie cohérente avec le type, montant borné, date non future, type figé ; contre-écritures et clôture en Phase 2 |
+| D13 slug d'actualité | ✅ corrigé | slug unique et stable |
+| A7 recherche de la caisse | ✅ corrigé | recherche sur `student_number` ; vérifiée sur MySQL |
+| A5 / A8 / A9 | ✅ corrigé | français partout (validation, dates, profil lisible), erreurs visibles sur « Nouvel étudiant » |
+| §5.2 / §5.4 affirmations et coordonnées | ✅ corrigé | formulations du PDF, simulateur VAE limité aux CPS/CS, reçu relié aux paramètres ; test de non-régression `PublicContentIntegrityTest` |
+| D4–D10, D12, D14 | ⏳ Phase 2 | modèle de données |
+| Performance (§4), admin mobile, poids des pages | ⏳ Phases 3 à 5 | — |
