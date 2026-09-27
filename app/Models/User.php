@@ -7,6 +7,7 @@ use Database\Factories\UserFactory;
 use Filament\Models\Contracts\FilamentUser;
 use Filament\Panel;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 
@@ -15,11 +16,12 @@ class User extends Authenticatable implements FilamentUser
     /** @use HasFactory<UserFactory> */
     use HasFactory, Notifiable;
 
-    protected $fillable = ['name', 'email', 'password', 'role', 'is_active'];
+    protected $fillable = ['name', 'email', 'password', 'role', 'is_active', 'place_id'];
 
     protected $hidden = ['password', 'remember_token'];
 
-    protected $attributes = ['is_active' => true];
+    protected $attributes = [
+        'place_id' => null, 'is_active' => true];
 
     protected function casts(): array
     {
@@ -63,5 +65,11 @@ class User extends Authenticatable implements FilamentUser
     public function canAccessPanel(Panel $panel): bool
     {
         return $this->is_active && $this->roleEnum() !== null;
+    }
+
+    /** Campus de rattachement ; vide = tous les campus (direction, administration centrale). */
+    public function place(): BelongsTo
+    {
+        return $this->belongsTo(Place::class);
     }
 }

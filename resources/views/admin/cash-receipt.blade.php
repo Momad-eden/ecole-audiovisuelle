@@ -52,8 +52,10 @@
         <header>
             <div class="school">
                 <strong>{{ $settings->school_name }}</strong>
-                @if ($settings->address)<span>{{ $settings->address }}</span><br>@endif
-                <span>{{ collect([$settings->phone ? 'Tél. '.$settings->phone : null, $settings->email])->filter()->implode(' · ') }}</span>
+                @php($campus = $transaction->place)
+                @if ($campus)<span>{{ $campus->name }}</span><br>@endif
+                @if ($campus?->address || $settings->address)<span>{{ collect([$campus?->address ?? $settings->address, $campus?->city])->filter()->implode(', ') }}</span><br>@endif
+                <span>{{ collect([($campus?->phone ?? $settings->phone) ? 'Tél. '.($campus?->phone ?? $settings->phone) : null, $campus?->email ?? $settings->email])->filter()->implode(' · ') }}</span>
             </div>
             <div>
                 <h1>{{ $isIn ? 'Reçu d\'encaissement' : 'Bon de décaissement' }}</h1>

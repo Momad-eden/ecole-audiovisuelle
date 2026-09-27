@@ -1,4 +1,5 @@
 import { Fragment } from "react";
+import { cn } from "@/lib/utils";
 import { ButtonLink } from "@/components/ui/ButtonLink";
 import { MediaImage } from "@/components/ui/MediaImage";
 import { Container, Section, SectionTitle } from "@/components/ui/Section";
@@ -38,7 +39,7 @@ export function VenueBlock({ data }: { data: VenueData }) {
   const facts = data.facts ?? [];
   return (
     <section className="relative isolate overflow-hidden py-24 sm:py-32" style={{ ["--accent" as string]: "var(--color-gold)" }}>
-      <p className="display text-outline pointer-events-none absolute -top-4 left-0 -z-10 whitespace-nowrap text-[clamp(5rem,16vw,15rem)] opacity-60" aria-hidden>
+      <p className="display text-outline pointer-events-none absolute inset-x-0 -top-2 -z-10 overflow-hidden whitespace-nowrap text-center text-[clamp(3rem,8.4vw,9rem)] opacity-50" aria-hidden>
         Grand Théâtre
       </p>
       <Container>
@@ -67,7 +68,7 @@ export function VenueBlock({ data }: { data: VenueData }) {
         </div>
 
         {facts.length > 0 && (
-          <dl className="mt-16 grid gap-px overflow-hidden rounded-3xl border border-line bg-line sm:grid-cols-3">
+          <dl className={cn("mt-16 grid gap-px overflow-hidden rounded-3xl border border-line bg-line", facts.length === 2 && "sm:grid-cols-2", facts.length === 3 && "sm:grid-cols-3", facts.length >= 4 && "sm:grid-cols-2 lg:grid-cols-4")}>
             {facts.map((fact, i) => (
               <Reveal key={fact.label} delay={i * 100} className="bg-night p-8">
                 <dt className="sr-only">{fact.label}</dt>

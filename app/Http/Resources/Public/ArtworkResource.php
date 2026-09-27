@@ -36,7 +36,13 @@ class ArtworkResource extends JsonResource
             'hasVideo' => filled($this->video_url),
             'room' => $this->whenLoaded('room', fn () => $this->room ? ['name' => $this->room->name, 'slug' => $this->room->slug, 'accentColor' => $this->room->accent_color] : null),
             'track' => $this->whenLoaded('track', fn () => $this->track ? ['name' => $this->track->name, 'slug' => $this->track->slug] : null),
+            'origin' => $this->origin,
         ];
+
+        // Les productions du studio s'écoutent directement depuis la liste (lecteur et forme d'onde).
+        if ($this->origin === 'studio') {
+            $summary['audio'] = $this->audio_file ? ['url' => Media::url($this->audio_file), 'peaks' => $this->audio_peaks, 'durationSeconds' => $this->duration_seconds] : null;
+        }
 
         if (! $this->full) {
             return $summary;

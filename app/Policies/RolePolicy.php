@@ -2,6 +2,7 @@
 
 namespace App\Policies;
 
+use App\Models\Concerns\BelongsToCampus;
 use App\Models\User;
 use Illuminate\Database\Eloquent\Model;
 
@@ -35,7 +36,13 @@ abstract class RolePolicy
 
     public function view(User $user, Model $model): bool
     {
-        return $this->allows($user, $this->view);
+        return $this->allows($user, $this->view) && $this->sameCampus($user, $model);
+    }
+
+    /** Données d'un campus (caisse, étudiants, candidatures) : invisibles du personnel d'un autre campus. */
+    protected function sameCampus(User $user, Model $model): bool
+    {
+        return ! in_array(BelongsToCampus::class, class_uses_recursive($model), true) || $model->isVisibleTo($user);
     }
 
     public function create(User $user): bool
@@ -45,12 +52,12 @@ abstract class RolePolicy
 
     public function update(User $user, Model $model): bool
     {
-        return $this->allows($user, $this->edit);
+        return $this->allows($user, $this->edit) && $this->sameCampus($user, $model);
     }
 
     public function delete(User $user, Model $model): bool
     {
-        return $this->allows($user, $this->delete);
+        return $this->allows($user, $this->delete) && $this->sameCampus($user, $model);
     }
 
     public function deleteAny(User $user): bool

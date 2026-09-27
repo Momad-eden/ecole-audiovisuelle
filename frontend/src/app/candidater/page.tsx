@@ -3,8 +3,9 @@ import { ApplicationPage } from "@/components/ApplicationPage";
 
 export const metadata: Metadata = { title: "Candidater", description: "Déposez votre candidature en ligne à l'EMSI." };
 
-type Props = { searchParams: Promise<{ formation?: string }> };
+type Props = { searchParams: Promise<{ formation?: string; campus?: string }> };
 
 export default async function ApplyPage({ searchParams }: Props) {
-  return <ApplicationPage audience="school" formation={(await searchParams).formation} />;
+  const { formation, campus } = await searchParams;
+  return <ApplicationPage audience="school" formation={formation} campus={campus} />;
 }

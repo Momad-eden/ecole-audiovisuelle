@@ -1,31 +1,45 @@
-import Link from "next/link";
 import { ApplicationForm } from "@/components/forms/ApplicationForm";
+import { ButtonLink } from "@/components/ui/ButtonLink";
+import { PageHeader } from "@/components/ui/PageHeader";
 import { api } from "@/lib/api";
 
-export async function ApplicationPage({ audience, formation }: { audience: "school" | "professional"; formation?: string }) {
-  const offerings = await api.offerings(audience);
+type Props = { audience: "school" | "professional"; formation?: string; campus?: string };
+
+export async function ApplicationPage({ audience, formation, campus }: Props) {
+  const [offerings, site] = await Promise.all([api.offerings(audience), api.site()]);
+  const campuses = site.places.filter((place) => place.kind === "campus");
   const program = formation ? await api.program(formation) : null;
   const preselected = program?.cohorts?.flatMap((c) => c.offerings ?? []).find((o) => offerings.some((open) => open.id === o.id))?.id;
+  const preselectedCampus = campuses.find((place) => place.slug === campus)?.id;
+  const professional = audience === "professional";
+  const whatsapp = site.settings.whatsapp?.replace(/[^0-9]/g, "");
 
   return (
-    <div className="mx-auto max-w-4xl px-4 pb-16 pt-36 sm:px-6">
-      <p className="cartel mb-4">{audience === "professional" ? "Espace Professionnels" : "Candidature"}</p>
-      <h1 className="font-display text-4xl font-medium sm:text-6xl">{audience === "professional" ? "Candidature professionnelle" : "Candidater à l'EMSI"}</h1>
-      {offerings.length === 0 ? (
-        <div className="mt-10 rounded-3xl border border-line bg-night-2 p-8">
-          <p className="text-lg">Aucune candidature n&apos;est ouverte pour le moment.</p>
-          <p className="mt-2 text-ink-muted">
-            {audience === "professional" ? "Le recrutement du Volet 2 est prévu en janvier 2027. " : ""}
-            Consultez le calendrier des sessions ou écrivez-nous pour être prévenu de l&apos;ouverture.
-          </p>
-          <div className="mt-6 flex flex-wrap gap-3">
-            <Link href={audience === "professional" ? "/professionnels" : "/formations"} className="rounded-full border border-line px-5 py-2">Voir les formations</Link>
-            <Link href="/contact" className="rounded-full bg-brand px-5 py-2 font-semibold text-on-accent">Nous contacter</Link>
+    <>
+      <PageHeader
+        eyebrow={professional ? "Espace Professionnels" : "Candidature"}
+        title={professional ? "Candidature professionnelle" : "Candidater à l'EMSI"}
+        text={offerings.length > 0 ? "Quelques minutes suffisent. Votre saisie est gardée sur cet appareil si vous devez vous interrompre." : null}
+        accent={professional ? "var(--color-hmi)" : undefined}
+      />
+      <div className="mx-auto max-w-4xl px-4 pb-24 sm:px-6">
+        {offerings.length === 0 ? (
+          <div className="rounded-[2rem] border border-line bg-night-2 p-8 sm:p-12">
+            <p className="display text-2xl sm:text-3xl">Aucune candidature n&apos;est ouverte pour le moment.</p>
+            <p className="mt-4 max-w-2xl text-ink-muted">
+              {professional ? "Le recrutement du Volet 2 est prévu en janvier 2027. " : "Les prochaines sessions seront annoncées ici. "}
+              Écrivez-nous : nous vous préviendrons dès l&apos;ouverture{campuses.length > 1 ? ", à Dakar comme à Saint-Louis" : ""}.
+            </p>
+            <div className="mt-8 flex flex-wrap gap-3">
+              {whatsapp && <ButtonLink href={`https://wa.me/${whatsapp}`}>Nous écrire sur WhatsApp</ButtonLink>}
+              <ButtonLink href="/contact" variant={whatsapp ? "secondary" : "primary"}>Nous contacter</ButtonLink>
+              <ButtonLink href={professional ? "/professionnels" : "/formations"} variant="secondary">Voir les formations</ButtonLink>
+            </div>
           </div>
-        </div>
-      ) : (
-        <div className="mt-10"><ApplicationForm offerings={offerings} audience={audience} preselected={preselected ? String(preselected) : undefined} /></div>
-      )}
-    </div>
+        ) : (
+          <ApplicationForm offerings={offerings} audience={audience} campuses={campuses} preselected={preselected ? String(preselected) : undefined} preselectedCampus={preselectedCampus ? String(preselectedCampus) : undefined} />
+        )}
+      </div>
+    </>
   );
 }

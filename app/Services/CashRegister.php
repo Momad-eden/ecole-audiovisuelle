@@ -9,6 +9,7 @@ use App\Exceptions\BusinessRuleException;
 use App\Models\CashClosing;
 use App\Models\CashTransaction;
 use App\Models\Enrollment;
+use App\Models\Place;
 use App\Models\User;
 use Carbon\CarbonInterface;
 use Illuminate\Support\Carbon;
@@ -17,6 +18,8 @@ use Illuminate\Support\Facades\DB;
 /**
  * Caisse de l'école : écritures inaltérables, numérotées par année,
  * annulées par contre-écriture et verrouillées par les clôtures.
+ * Chaque campus (Dakar, Saint-Louis) tient sa propre caisse : numérotation
+ * (REC-DKR-2026-00001), solde et clôtures séparés.
  */
 class CashRegister
 {
@@ -43,19 +46,21 @@ class CashRegister
         if ($occurredOn->isAfter(today())) {
             throw new BusinessRuleException('La date de l\'opération ne peut pas être dans le futur.');
         }
-        $this->ensureNotClosed($occurredOn);
-
         $enrollment = isset($data['enrollment_id']) ? Enrollment::with('student')->find($data['enrollment_id']) : null;
         if ($category->requiresEnrollment() && ! $enrollment) {
             throw new BusinessRuleException('Un paiement de scolarité ou d\'inscription doit être rattaché à une inscription.');
         }
+
+        $place = $this->resolvePlace($data['place_id'] ?? null, $by, $enrollment);
+        $this->ensureNotClosed($occurredOn, $place);
 
         $label = filled($data['label'] ?? null)
             ? $data['label']
             : $category->getLabel().($enrollment ? ' — '.$enrollment->student->full_name : '');
 
         return DB::transaction(fn () => CashTransaction::create([
-            'number' => $this->nextNumber($direction, $occurredOn),
+            'place_id' => $place?->id,
+            'number' => $this->nextNumber($direction, $occurredOn, $place),
             'direction' => $direction,
             'category' => $category,
             'amount' => $amount,
@@ -82,13 +87,18 @@ class CashRegister
         if (blank($reason)) {
             throw new BusinessRuleException('Indiquez le motif de l\'annulation.');
         }
-        $this->ensureNotClosed(today());
+        if (! $transaction->isVisibleTo($by)) {
+            throw new BusinessRuleException('Cette écriture appartient à la caisse d\'un autre campus.');
+        }
+        $place = $transaction->place;
+        $this->ensureNotClosed(today(), $place);
 
-        return DB::transaction(function () use ($transaction, $by, $reason) {
+        return DB::transaction(function () use ($transaction, $by, $reason, $place) {
             $direction = $transaction->direction === CashDirection::IN ? CashDirection::OUT : CashDirection::IN;
 
             $reversal = CashTransaction::create([
-                'number' => $this->nextNumber($direction, today()),
+                'place_id' => $place?->id,
+                'number' => $this->nextNumber($direction, today(), $place),
                 'direction' => $direction,
                 'category' => $transaction->category,
                 'amount' => $transaction->amount,
@@ -108,13 +118,17 @@ class CashRegister
         });
     }
 
-    /** Clôture la période qui suit la dernière clôture, jusqu'à `$periodEnd` inclus. */
-    public function close(CarbonInterface $periodEnd, ?int $countedCash, User $by, ?string $notes = null): CashClosing
+    /** Clôture la caisse d'un campus, de la dernière clôture jusqu'à `$periodEnd` inclus. */
+    public function close(?Place $place, CarbonInterface $periodEnd, ?int $countedCash, User $by, ?string $notes = null): CashClosing
     {
-        $last = CashClosing::orderByDesc('period_end')->first();
+        if ($by->place_id && $place?->id !== $by->place_id) {
+            throw new BusinessRuleException('Vous ne pouvez clôturer que la caisse de votre campus.');
+        }
+
+        $last = $this->forPlace(CashClosing::query(), $place)->orderByDesc('period_end')->first();
         $periodStart = $last
             ? $last->period_end->copy()->addDay()
-            : Carbon::parse((string) (CashTransaction::min('occurred_on') ?? $periodEnd->toDateString()));
+            : Carbon::parse((string) ($this->forPlace(CashTransaction::query(), $place)->min('occurred_on') ?? $periodEnd->toDateString()));
 
         if ($periodEnd->lt($periodStart)) {
             throw new BusinessRuleException('Cette période est déjà clôturée.');
@@ -124,11 +138,12 @@ class CashRegister
         }
 
         $opening = $last?->closing_balance ?? 0;
-        $inPeriod = CashTransaction::whereBetween('occurred_on', [$periodStart->toDateString(), $periodEnd->toDateString()]);
+        $inPeriod = $this->forPlace(CashTransaction::query(), $place)->whereBetween('occurred_on', [$periodStart->toDateString(), $periodEnd->toDateString()]);
         $totalIn = (int) (clone $inPeriod)->where('direction', CashDirection::IN)->sum('amount');
         $totalOut = (int) (clone $inPeriod)->where('direction', CashDirection::OUT)->sum('amount');
 
         return CashClosing::create([
+            'place_id' => $place?->id,
             'period_start' => $periodStart->toDateString(),
             'period_end' => $periodEnd->toDateString(),
             'opening_balance' => $opening,
@@ -141,30 +156,70 @@ class CashRegister
         ]);
     }
 
-    /** Solde de caisse (toutes écritures, contre-écritures incluses) jusqu'à une date. */
-    public function balance(?CarbonInterface $until = null): int
+    /** Solde de caisse d'un campus (ou de tous les campus), contre-écritures incluses, jusqu'à une date. */
+    public function balance(?Place $place = null, ?CarbonInterface $until = null): int
     {
-        $query = CashTransaction::query()->when($until, fn ($q) => $q->where('occurred_on', '<=', $until->toDateString()));
+        $query = CashTransaction::query()
+            ->when($place, fn ($q) => $q->where('place_id', $place->id))
+            ->when($until, fn ($q) => $q->where('occurred_on', '<=', $until->toDateString()));
 
         return (int) (clone $query)->where('direction', CashDirection::IN)->sum('amount')
             - (int) (clone $query)->where('direction', CashDirection::OUT)->sum('amount');
     }
 
-    private function ensureNotClosed(CarbonInterface $date): void
+    /**
+     * Campus de l'écriture : celui de l'étudiant pour une scolarité, sinon celui choisi,
+     * sinon celui de l'agent ; obligatoire dès que l'école a plusieurs campus.
+     */
+    private function resolvePlace(mixed $placeId, User $by, ?Enrollment $enrollment): ?Place
     {
-        $lastEnd = CashClosing::max('period_end');
+        $placeId = filled($placeId) ? (int) $placeId : null;
+        $studentPlace = $enrollment?->student?->place_id;
+
+        if ($studentPlace && $placeId && $placeId !== (int) $studentPlace) {
+            throw new BusinessRuleException('Cet étudiant est inscrit dans un autre campus : le paiement va dans la caisse de son campus.');
+        }
+        $placeId = $studentPlace ?? $placeId;
+
+        if ($by->place_id) {
+            if ($placeId && $placeId !== (int) $by->place_id) {
+                throw new BusinessRuleException('Vous ne pouvez saisir que dans la caisse de votre campus.');
+            }
+            $placeId = (int) $by->place_id;
+        }
+
+        if (! $placeId) {
+            $campuses = Place::campuses()->pluck('id');
+            if ($campuses->count() > 1) {
+                throw new BusinessRuleException('Choisissez le campus (la caisse) de cette opération.');
+            }
+            $placeId = $campuses->first();
+        }
+
+        return $placeId ? Place::find($placeId) : null;
+    }
+
+    private function forPlace($query, ?Place $place)
+    {
+        return $place ? $query->where('place_id', $place->id) : $query->whereNull('place_id');
+    }
+
+    private function ensureNotClosed(CarbonInterface $date, ?Place $place): void
+    {
+        $lastEnd = $this->forPlace(CashClosing::query(), $place)->max('period_end');
         if ($lastEnd && $date->lte(Carbon::parse($lastEnd))) {
             throw new BusinessRuleException('Cette date appartient à une période de caisse déjà clôturée.');
         }
     }
 
-    private function nextNumber(CashDirection $direction, CarbonInterface $date): string
+    private function nextNumber(CashDirection $direction, CarbonInterface $date, ?Place $place = null): string
     {
         $prefix = $direction === CashDirection::IN ? 'REC' : 'DEP';
         $year = $date->year;
-        $base = "{$prefix}-{$year}-";
+        $code = $place?->code;
+        $base = $code ? "{$prefix}-{$code}-{$year}-" : "{$prefix}-{$year}-";
         $number = $this->sequences->next(
-            "cash:{$prefix}:{$year}",
+            $code ? "cash:{$prefix}:{$code}:{$year}" : "cash:{$prefix}:{$year}",
             fn () => SequenceService::maxSuffix('cash_transactions', 'number', $base)
         );
 

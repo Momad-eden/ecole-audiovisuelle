@@ -6,6 +6,7 @@ import { ArrowRight } from "lucide-react";
 import type { ScrollTrigger } from "gsap/ScrollTrigger";
 import { InView } from "@/components/motion/InView";
 import type { RoomSummary } from "@/lib/types";
+import { frenchSpacing } from "@/lib/utils";
 import { UniverseVisual } from "./UniverseVisual";
 
 const DESKTOP_MOTION =
@@ -131,7 +132,7 @@ export function UniversesShowcase({ universes, eyebrow, title, text }: Props) {
                                 )}
                                 {title && (
                                     <h2 className="display text-[clamp(2.2rem,4.6vw,4rem)] text-balance">
-                                        {title}
+                                        {frenchSpacing(title)}
                                     </h2>
                                 )}
                                 {text && (

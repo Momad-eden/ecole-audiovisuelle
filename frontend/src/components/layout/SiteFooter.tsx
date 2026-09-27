@@ -9,7 +9,7 @@ const SOCIAL_LABELS: Record<string, string> = {
 export function SiteFooter({ site }: { site: Site }) {
   const { settings, menus } = site;
   const whatsapp = settings.whatsapp?.replace(/[^0-9]/g, "");
-  const explore = [...menus.main.filter((l) => !l.isButton), ...menus.footer];
+  const explore = [...menus.main.filter((l) => !l.isButton), ...menus.footer].filter((link, index, all) => all.findIndex((l) => l.url === link.url) === index);
 
   return (
     <footer className="relative overflow-hidden border-t border-line bg-night-2">
@@ -63,7 +63,13 @@ export function SiteFooter({ site }: { site: Site }) {
         <div>
           <p className="cartel mb-5">Nous joindre</p>
           <address className="space-y-3 text-sm not-italic text-ink/80">
-            <p>{settings.address || "Grand Théâtre National Doudou Ndiaye Coumba Rose, Dakar"}</p>
+            {site.places.length > 0 ? (
+              site.places.map((place) => (
+                <p key={place.id}><span className="block font-medium text-ink">{place.name}</span>{[place.address, place.city].filter(Boolean).join(", ")}</p>
+              ))
+            ) : (
+              <p>{settings.address || "Grand Théâtre National Doudou Ndiaye Coumba Rose, Dakar"}</p>
+            )}
             {settings.phone && <p><a href={`tel:${settings.phone.replace(/[^0-9+]/g, "")}`} className="hover:text-brand">{settings.phone}</a></p>}
             {settings.email && <p><a href={`mailto:${settings.email}`} className="hover:text-brand">{settings.email}</a></p>}
             {whatsapp && <p><a href={`https://wa.me/${whatsapp}`} target="_blank" rel="noopener noreferrer" className="hover:text-brand">Écrire sur WhatsApp</a></p>}

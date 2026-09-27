@@ -113,6 +113,7 @@ class ApplicationWorkflow
             ->first();
 
         return $existing ?? Student::create([
+            'place_id' => $application->place_id,
             'first_name' => $application->first_name,
             'last_name' => $application->last_name,
             'gender' => $application->gender,

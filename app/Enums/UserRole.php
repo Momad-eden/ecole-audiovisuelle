@@ -10,6 +10,7 @@ enum UserRole: string implements HasLabel
     case GESTIONNAIRE = 'gestionnaire';
     case SECRETAIRE = 'secretaire';
     case COMMUNICATION = 'communication';
+    case COMMERCIAL = 'commercial';
 
     public function getLabel(): string
     {
@@ -23,6 +24,7 @@ enum UserRole: string implements HasLabel
             self::GESTIONNAIRE => 'Gestionnaire',
             self::SECRETAIRE => 'Secrétaire',
             self::COMMUNICATION => 'Communication',
+            self::COMMERCIAL => 'Commercial (Impact Live)',
         };
     }
 
@@ -38,6 +40,7 @@ enum UserRole: string implements HasLabel
             self::GESTIONNAIRE->value => self::GESTIONNAIRE->label(),
             self::SECRETAIRE->value => self::SECRETAIRE->label(),
             self::COMMUNICATION->value => self::COMMUNICATION->label(),
+            self::COMMERCIAL->value => self::COMMERCIAL->label(),
         ];
     }
 }

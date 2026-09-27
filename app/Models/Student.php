@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use App\Enums\Gender;
+use App\Models\Concerns\BelongsToCampus;
 use App\Services\StudentNumberService;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
@@ -11,10 +12,12 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 
 class Student extends Model
 {
-    use HasFactory, SoftDeletes;
+    use BelongsToCampus, HasFactory, SoftDeletes;
+
+    protected $attributes = ['place_id' => null];
 
     protected $fillable = [
-        'student_number', 'first_name', 'last_name', 'gender', 'birth_date', 'birth_place',
+        'place_id', 'student_number', 'first_name', 'last_name', 'gender', 'birth_date', 'birth_place',
         'nationality', 'phone', 'email', 'address', 'photo', 'notes',
     ];
 

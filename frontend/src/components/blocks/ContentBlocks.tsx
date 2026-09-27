@@ -6,7 +6,7 @@ import { RichText } from "@/components/ui/RichText";
 import { Section, SectionTitle } from "@/components/ui/Section";
 import { VideoEmbed } from "@/components/ui/VideoEmbed";
 import { Reveal } from "@/components/motion/Reveal";
-import { cn } from "@/lib/utils";
+import { cn, frenchSpacing } from "@/lib/utils";
 import type { CardsData, CtaData, FaqData, GalleryData, QuoteData, StatsData, TextData, TextImageData, TimelineData, VideoData } from "./types";
 
 const ICONS = { "audio-lines": AudioLines, lightbulb: Lightbulb, video: Video, palette: Palette, clapperboard: Clapperboard, "graduation-cap": GraduationCap, users: Users, award: Award, calendar: Calendar, "map-pin": MapPin, briefcase: Briefcase, sparkles: Sparkles } as const;
@@ -82,7 +82,7 @@ export function StatsBlock({ data }: { data: StatsData }) {
   return (
     <Section>
       <SectionTitle title={data.title} />
-      <dl className="grid gap-px overflow-hidden rounded-3xl border border-line bg-line sm:grid-cols-2 lg:grid-cols-3">
+      <dl className={cn("grid gap-px overflow-hidden rounded-3xl border border-line bg-line sm:grid-cols-2", (data.items ?? []).length === 3 && "lg:grid-cols-3", (data.items ?? []).length >= 4 && "lg:grid-cols-4")}>
         {(data.items ?? []).map((item, i) => (
           <Reveal key={item.label} delay={i * 100} className="bg-night p-8 sm:p-10">
             <dt className="cartel">{item.label}</dt>
@@ -129,7 +129,7 @@ export function CtaBlock({ data }: { data: CtaData }) {
         <div className="absolute inset-x-0 bottom-0 h-1/2 bg-gradient-to-t from-night to-transparent" />
       </div>
       <Reveal className="mx-auto max-w-5xl text-center">
-        <h2 className="display text-[clamp(2.6rem,8vw,6.5rem)] text-balance">{data.title}</h2>
+        <h2 className="display text-[clamp(2.6rem,8vw,6.5rem)] text-balance">{frenchSpacing(data.title)}</h2>
         {data.text && <p className="mx-auto mt-6 max-w-2xl text-lg text-ink/80 sm:text-xl">{data.text}</p>}
         <div className="mt-12 flex flex-wrap justify-center gap-3">
           {(data.buttons ?? []).map((button) => (

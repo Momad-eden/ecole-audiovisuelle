@@ -6,6 +6,7 @@ import { PlayButton } from "@/components/audio/PlayButton";
 import { ArtworkWaveform } from "@/components/museum/ArtworkWaveform";
 import { MediaImage } from "@/components/ui/MediaImage";
 import { RichText } from "@/components/ui/RichText";
+import { ShareButtons } from "@/components/ui/ShareButtons";
 import { VideoEmbed } from "@/components/ui/VideoEmbed";
 import { api } from "@/lib/api";
 import { formatDuration, siteUrl } from "@/lib/utils";
@@ -121,6 +122,8 @@ export default async function ArtworkPage({ params }: Props) {
               <RichText html={artwork.creationStory} />
             </div>
           )}
+
+          <div className="mt-10"><ShareButtons path={href} title={artwork.title} /></div>
 
           {artwork.track && (
             <Link href={learnHref} className="mt-12 flex items-center justify-between gap-4 rounded-3xl border border-line bg-night-2 p-6 transition hover:border-[var(--accent)]">

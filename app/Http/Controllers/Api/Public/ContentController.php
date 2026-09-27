@@ -7,6 +7,7 @@ use App\Http\Resources\Public\ArtworkResource;
 use App\Http\Resources\Public\ExhibitionResource;
 use App\Http\Resources\Public\NewsResource;
 use App\Http\Resources\Public\OfferingResource;
+use App\Http\Resources\Public\PlaceResource;
 use App\Http\Resources\Public\ProgramResource;
 use App\Http\Resources\Public\RoomResource;
 use App\Models\Artwork;
@@ -17,6 +18,7 @@ use App\Models\News;
 use App\Models\Offering;
 use App\Models\Page;
 use App\Models\Partner;
+use App\Models\Place;
 use App\Models\Program;
 use App\Models\Redirect;
 use App\Models\Room;
@@ -61,6 +63,7 @@ class ContentController extends Controller
                 ->map(fn ($items) => $items->map(fn (MenuItem $i) => ['label' => $i->label, 'url' => $i->url, 'isButton' => $i->is_button])->values())
                 ->all() + ['main' => [], 'footer' => [], 'legal' => []],
             'rooms' => RoomResource::collection(Room::published()->orderBy('position')->get())->resolve(),
+            'places' => PlaceResource::collection(Place::published()->orderBy('position')->get())->resolve(),
             'hasSchoolPrograms' => Program::published()->where('audience', 'school')->exists(),
         ]]);
     }
@@ -120,6 +123,8 @@ class ContentController extends Controller
     public function artworks(Request $request): AnonymousResourceCollection
     {
         $artworks = Artwork::published()->with(['room', 'track'])
+            // Réalisations des étudiants par défaut ; ?origin=studio pour les productions d'Impact Live Studio.
+            ->where('origin', $request->query('origin') === 'studio' ? 'studio' : 'school')
             ->when($request->query('room'), fn (Builder $q, $slug) => $q->whereHas('room', fn ($r) => $r->where('slug', $slug)))
             ->when($request->query('track'), fn (Builder $q, $slug) => $q->whereHas('track', fn ($t) => $t->where('slug', $slug)))
             ->when($request->query('kind'), fn (Builder $q, $kind) => $q->where('kind', $kind))

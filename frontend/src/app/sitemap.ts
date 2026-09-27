@@ -4,7 +4,7 @@ import { siteUrl } from "@/lib/utils";
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const entries = await api.sitemap();
-  const fixed = ["/univers", "/formations", "/realisations", "/expositions", "/actualites", "/candidater"];
+  const fixed = ["/univers", "/formations", "/realisations", "/events/materiel", "/agenda", "/expositions", "/actualites", "/candidater"];
 
   return [
     ...fixed.map((path) => ({ url: `${siteUrl}${path}` })),

@@ -5,6 +5,7 @@ namespace App\Models;
 use App\Enums\ApplicationStatus;
 use App\Enums\Audience;
 use App\Enums\Gender;
+use App\Models\Concerns\BelongsToCampus;
 use App\Services\SequenceService;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
@@ -17,10 +18,12 @@ use Illuminate\Support\Str;
 /** Candidature à une offre (école ou programme professionnel). */
 class Application extends Model
 {
-    use HasFactory, SoftDeletes;
+    use BelongsToCampus, HasFactory, SoftDeletes;
+
+    protected $attributes = ['place_id' => null];
 
     protected $fillable = [
-        'uuid', 'offering_id', 'audience', 'first_name', 'last_name', 'birth_date', 'birth_place', 'gender', 'nationality',
+        'uuid', 'offering_id', 'place_id', 'audience', 'first_name', 'last_name', 'birth_date', 'birth_place', 'gender', 'nationality',
         'phone', 'whatsapp', 'email', 'address', 'guardian', 'education', 'experience', 'documents', 'motivation',
         'portfolio_url', 'status', 'source', 'interview_at', 'interview_location', 'consent_at', 'consent_version',
         'submitted_at', 'decided_at', 'decided_by', 'student_id', 'ip_hash',

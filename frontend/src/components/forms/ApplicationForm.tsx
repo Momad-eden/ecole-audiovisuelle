@@ -6,7 +6,7 @@ import { useEffect, useState } from "react";
 import { useFieldArray, useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
-import type { Offering } from "@/lib/types";
+import type { Offering, Place } from "@/lib/types";
 import { fcfa, cn } from "@/lib/utils";
 import { Field, Honeypot, inputClass } from "./Field";
 
@@ -16,6 +16,7 @@ const DOCUMENT_TYPES = { diploma: "Diplôme (CPS, CS…)", id_card: "Pièce d'id
 
 const schema = z.object({
   offeringId: z.string().min(1, "Choisissez une formation."),
+  placeId: z.string().optional(),
   firstName: z.string().trim().min(1, "Indiquez votre prénom.").max(100),
   lastName: z.string().trim().min(1, "Indiquez votre nom.").max(100),
   gender: z.enum(["female", "male", ""]).optional(),
@@ -41,7 +42,7 @@ type Values = z.infer<typeof schema>;
 
 const STEPS = ["Formation", "Identité", "Coordonnées", "Parcours", "Envoi"];
 
-export function ApplicationForm({ offerings, audience, preselected }: { offerings: Offering[]; audience: "school" | "professional"; preselected?: string }) {
+export function ApplicationForm({ offerings, audience, preselected, campuses = [], preselectedCampus }: { offerings: Offering[]; audience: "school" | "professional"; preselected?: string; campuses?: Place[]; preselectedCampus?: string }) {
   const router = useRouter();
   const draftKey = `emsi-candidature-${audience}`;
   const [step, setStep] = useState(0);
@@ -53,6 +54,7 @@ export function ApplicationForm({ offerings, audience, preselected }: { offering
     mode: "onTouched",
     defaultValues: {
       offeringId: preselected ?? (offerings.length === 1 ? String(offerings[0].id) : ""),
+      placeId: preselectedCampus ?? (campuses.length === 1 ? String(campuses[0].id) : ""),
       nationality: "Sénégalaise", gender: "", whatsapp: "", email: "", portfolioUrl: "",
       experience: [], documents: professional ? [{ type: "diploma", file: undefined as unknown as FileList }, { type: "id_card", file: undefined as unknown as FileList }] : [],
     },
@@ -91,7 +93,13 @@ export function ApplicationForm({ offerings, audience, preselected }: { offering
   ];
 
   const next = async () => {
-    if (await trigger(stepFields[step])) setStep((s) => Math.min(s + 1, STEPS.length - 1));
+    const valid = await trigger(stepFields[step]);
+    // Plusieurs campus : le candidat choisit le sien (mêmes formations à Dakar et à Saint-Louis).
+    if (step === 0 && campuses.length > 1 && !watch("placeId")) {
+      setError("placeId", { message: "Choisissez votre campus." });
+      return;
+    }
+    if (valid) setStep((s) => Math.min(s + 1, STEPS.length - 1));
   };
 
   const onSubmit = async (values: Values) => {
@@ -105,6 +113,7 @@ export function ApplicationForm({ offerings, audience, preselected }: { offering
     const body = new FormData();
     const append = (key: string, value: string | undefined | null) => value && body.append(key, value);
     append("offeringId", values.offeringId);
+    append("placeId", values.placeId);
     append("firstName", values.firstName);
     append("lastName", values.lastName);
     append("gender", values.gender);
@@ -169,7 +178,7 @@ export function ApplicationForm({ offerings, audience, preselected }: { offering
       <div className="rounded-3xl border border-line bg-night-2 p-6 sm:p-10">
         {step === 0 && (
           <fieldset className="space-y-4">
-            <legend className="mb-6 font-display text-3xl">Quelle formation vous intéresse ?</legend>
+            <legend className="display mb-6 text-2xl sm:text-3xl">Quelle formation vous intéresse ?</legend>
             {errors.offeringId && <p role="alert" className="text-sm text-rec">{errors.offeringId.message}</p>}
             {offerings.map((offering) => (
               <label key={offering.id} className="flex cursor-pointer items-start gap-4 rounded-2xl border border-line p-5 has-[:checked]:border-brand">
@@ -183,12 +192,26 @@ export function ApplicationForm({ offerings, audience, preselected }: { offering
                 </span>
               </label>
             ))}
+            {campuses.length > 1 && (
+              <div className="pt-6">
+                <p className="display mb-4 text-xl sm:text-2xl">Dans quel campus ?</p>
+                {errors.placeId && <p role="alert" className="mb-3 text-sm text-rec">{errors.placeId.message}</p>}
+                <div className="grid gap-3 sm:grid-cols-2">
+                  {campuses.map((campus) => (
+                    <label key={campus.id} className="flex cursor-pointer items-start gap-4 rounded-2xl border border-line p-5 has-[:checked]:border-brand">
+                      <input type="radio" value={String(campus.id)} className="mt-1 size-4 accent-brand" {...register("placeId")} />
+                      <span><span className="block font-medium">{campus.city ?? campus.name}</span><span className="text-sm text-ink-muted">{campus.address ?? campus.name}</span></span>
+                    </label>
+                  ))}
+                </div>
+              </div>
+            )}
           </fieldset>
         )}
 
         {step === 1 && (
           <fieldset className="grid gap-6 sm:grid-cols-2">
-            <legend className="mb-6 font-display text-3xl">Votre identité</legend>
+            <legend className="display mb-6 text-2xl sm:text-3xl">Votre identité</legend>
             <Field id="firstName" label="Prénom" required error={errors.firstName?.message}><input id="firstName" autoComplete="given-name" className={inputClass} aria-invalid={!!errors.firstName} {...register("firstName")} /></Field>
             <Field id="lastName" label="Nom" required error={errors.lastName?.message}><input id="lastName" autoComplete="family-name" className={inputClass} aria-invalid={!!errors.lastName} {...register("lastName")} /></Field>
             <Field id="gender" label="Genre"><select id="gender" className={inputClass} {...register("gender")}><option value="">Préfère ne pas répondre</option><option value="female">Femme</option><option value="male">Homme</option></select></Field>
@@ -200,7 +223,7 @@ export function ApplicationForm({ offerings, audience, preselected }: { offering
 
         {step === 2 && (
           <fieldset className="grid gap-6 sm:grid-cols-2">
-            <legend className="mb-6 font-display text-3xl">Comment vous joindre ?</legend>
+            <legend className="display mb-6 text-2xl sm:text-3xl">Comment vous joindre ?</legend>
             <Field id="phone" label="Téléphone" required error={errors.phone?.message} hint="Ex. +221 77 123 45 67"><input id="phone" type="tel" autoComplete="tel" className={inputClass} aria-invalid={!!errors.phone} {...register("phone")} /></Field>
             <Field id="whatsapp" label="WhatsApp (si différent)" error={errors.whatsapp?.message}><input id="whatsapp" type="tel" className={inputClass} {...register("whatsapp")} /></Field>
             <Field id="email" label="E-mail" error={errors.email?.message} hint="Pour recevoir l'accusé de réception."><input id="email" type="email" autoComplete="email" className={inputClass} aria-invalid={!!errors.email} {...register("email")} /></Field>
@@ -211,7 +234,7 @@ export function ApplicationForm({ offerings, audience, preselected }: { offering
         {step === 3 && (
           <div className="space-y-10">
             <fieldset className="grid gap-6 sm:grid-cols-3">
-              <legend className="mb-6 font-display text-3xl">Votre parcours</legend>
+              <legend className="display mb-6 text-2xl sm:text-3xl">Votre parcours</legend>
               <Field id="lastDiploma" label="Dernier diplôme" required={professional}><select id="lastDiploma" className={inputClass} {...register("lastDiploma")}><option value="">Choisir</option>{Object.entries(DIPLOMAS).map(([v, l]) => <option key={v} value={v}>{l}</option>)}</select></Field>
               <Field id="diplomaYear" label="Année d'obtention"><input id="diplomaYear" inputMode="numeric" className={inputClass} {...register("diplomaYear")} /></Field>
               <Field id="school" label="Établissement"><input id="school" className={inputClass} {...register("school")} /></Field>
@@ -256,7 +279,7 @@ export function ApplicationForm({ offerings, audience, preselected }: { offering
 
         {step === 4 && (
           <div className="space-y-8">
-            <h2 className="font-display text-3xl">Dernière étape</h2>
+            <h2 className="display text-2xl sm:text-3xl">Dernière étape</h2>
             <Field id="motivation" label="Pourquoi cette formation ? (facultatif)"><textarea id="motivation" rows={6} maxLength={3000} className={inputClass} {...register("motivation")} /></Field>
             {selected && <p className="rounded-2xl border border-line p-4 text-sm"><span className="cartel block">Formation choisie</span>{selected.label}</p>}
             <Field id="consent" label="" error={errors.consent?.message}>

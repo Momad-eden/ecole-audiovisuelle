@@ -39,3 +39,9 @@ export function videoEmbed(url: string): { provider: "youtube" | "vimeo"; id: st
   }
   return null;
 }
+
+/** Typographie française : espace insécable avant « : ; ! ? » et à l'intérieur des guillemets, pour éviter les retours à la ligne orphelins. */
+export function frenchSpacing<T extends string | null | undefined>(text: T): T {
+  if (!text) return text;
+  return text.replace(/ ([:;!?»])/g, " $1").replace(/« /g, "« ") as T;
+}

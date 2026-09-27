@@ -1,4 +1,4 @@
-import { cn } from "@/lib/utils";
+import { cn, frenchSpacing } from "@/lib/utils";
 
 export function Container({ children, className }: { children: React.ReactNode; className?: string }) {
   return <div className={cn("mx-auto w-full max-w-7xl px-4 sm:px-6 lg:px-8", className)}>{children}</div>;
@@ -22,7 +22,7 @@ export function SectionTitle({ eyebrow, title, text, className }: { eyebrow?: st
           {eyebrow}
         </p>
       )}
-      {title && <h2 className="display text-[clamp(2rem,4.6vw,3.8rem)] text-balance">{title}</h2>}
+      {title && <h2 className="display text-[clamp(2rem,4.6vw,3.8rem)] text-balance">{frenchSpacing(title)}</h2>}
       {text && <p className="mt-5 text-lg text-ink-muted">{text}</p>}
     </header>
   );

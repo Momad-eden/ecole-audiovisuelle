@@ -37,7 +37,7 @@ export function ContactForm() {
   };
 
   if (status === "sent") {
-    return <div role="status" className="rounded-3xl border border-line bg-night-2 p-10 text-center"><p className="font-display text-3xl">Merci !</p><p className="mt-3 text-ink-muted">Votre message a bien été envoyé. Nous vous répondrons rapidement.</p></div>;
+    return <div role="status" className="rounded-3xl border border-line bg-night-2 p-10 text-center"><p className="display text-3xl">Merci !</p><p className="mt-3 text-ink-muted">Votre message a bien été envoyé. Nous vous répondrons rapidement.</p></div>;
   }
 
   return (

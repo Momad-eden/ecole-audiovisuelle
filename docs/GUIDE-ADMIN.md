@@ -12,6 +12,7 @@ Mot de passe oublié : lien « Mot de passe oublié ? » sur la page de connexio
 | **Directeur** | Tout, y compris les comptes et les paramètres du site |
 | **Gestionnaire** | Candidatures (y compris la décision), étudiants, caisse et clôtures, formations et sessions |
 | **Secrétaire** | Candidatures (sans la décision finale), étudiants, encaissements et reçus |
+| **Commercial (Impact Live)** | Demandes de devis et de réservation, matériel, packs, services, agenda, productions du studio |
 | **Communication** | Pages du site, actualités, univers et réalisations (univers, expositions, réalisations des étudiants), partenaires, FAQ, menus, messages reçus, paramètres du site |
 
 Le menu de gauche n'affiche que ce que votre rôle permet d'ouvrir.
@@ -51,6 +52,8 @@ Le menu de gauche n'affiche que ce que votre rôle permet d'ouvrir.
 
 ### Les blocs propres au site « Plein feux »
 
+- **Grand titre (héros)** : dix mises en page au choix. *Scène animée*, *Studio animé* et *Événementiel animé* (décors lumineux, mots qui défilent) ; *Projecteur* (titre centré) ; *Éditorial* (grand titre et portrait) ; *Affiche de concert* (titre géant sur aplat de couleur, idéal pour un événement) ; *Mosaïque* (collage de 3 ou 4 photos) ; *Plein écran* ; *Texte et image côte à côte* ; *Sobre* (pages secondaires). La taille du titre s'adapte à sa longueur.
+- **Nos campus** : Dakar et Saint-Louis côte à côte, avec photo, accroche, points forts, adresse et un bouton « Candidater à … » qui présélectionne le campus. Ces informations se saisissent une fois dans Administration › Lieux.
 - **Grand titre (héros)**, mise en page « Scène animée » : faisceaux de lumière ; les **mots qui défilent** terminent le titre (« Apprenez à faire vibrer… le son, l'image… »). Ajoutez une photo de fond quand vous en avez une.
 - **Bandeau défilant** : quelques mots courts en très grand.
 - **Le lieu (Grand Théâtre)** : titre, texte, jusqu'à 4 repères chiffrés (ex. « 154 m² — de studio ») et une photo du lieu (sinon, un dessin de scène s'affiche).
@@ -85,6 +88,16 @@ Menu **Univers & réalisations › Univers** : nom, couleur de lumière, **anima
 
 Une **dépense** se saisit au même endroit (« Décaissement »).
 
+### Une caisse par campus (Dakar, Saint-Louis)
+
+Chaque école tient sa propre caisse : ses reçus sont numérotés à part (`REC-DKR-2026-00001` à Dakar, `REC-STL-2026-00001` à Saint-Louis), avec son solde, ses clôtures et son export.
+
+- Un paiement de scolarité va automatiquement dans la caisse du campus de l'étudiant.
+- Une autre opération : choisissez la **Caisse (campus)** en haut du formulaire.
+- **Personnel d'un seul campus** : dans Administration › Comptes utilisateurs, renseignez son **Campus de rattachement**. Il ne verra alors que la caisse, les étudiants et les candidatures de son campus. Laissez vide pour la direction, qui voit tout.
+- Le tableau de bord affiche le solde de chaque caisse.
+- Le code de chaque campus (DKR, STL) se règle dans Administration › Lieux ; ne le changez plus après la première opération.
+
 ### Corriger une erreur de caisse
 
 On ne modifie jamais une opération enregistrée. Ouvrez-la › **Annuler cette opération** › indiquez le motif (gestionnaire ou directeur). Une opération inverse est créée ; l'originale reste visible, marquée « Annulée ». Saisissez ensuite la bonne opération.
@@ -94,6 +107,29 @@ On ne modifie jamais une opération enregistrée. Ouvrez-la › **Annuler cette 
 **Caisse › Clôtures de caisse** › **Clôturer une période** : choisissez la date de fin (souvent le dernier jour du mois) et, si vous l'avez compté, le montant d'espèces en caisse. L'écart s'affiche. Après la clôture, plus aucune opération ne peut être saisie à une date de la période.
 
 **Exporter le journal** : Journal de caisse › **Exporter le journal** (fichier CSV qui s'ouvre dans Excel).
+
+---
+
+## Impact Live : studio, événementiel, Espace Habib Faye
+
+Menu **Impact Live** (rôles Directeur et Commercial ; la Communication peut aussi mettre à jour la vitrine).
+
+### Traiter une demande de devis ou de réservation
+
+1. **Impact Live › Demandes** : le chiffre à côté du menu indique les nouvelles demandes. Chaque demande a une référence (ex. `DEM-2026-00012`), le matériel choisi par le client, ses dates, son lieu et son message.
+2. Rappelez le client (bouton WhatsApp ou téléphone sur la fiche). Consignez l'échange avec **⋮ › Ajouter une note**.
+3. **Devis envoyé** : indiquez le montant. Puis **Confirmer**, et après l'événement **Marquer réalisée**. Une demande abandonnée : **⋮ › Annuler la demande** (motif obligatoire).
+4. Une demande reçue par téléphone se saisit avec **Saisir une demande (téléphone)**.
+
+### Mettre à jour la vitrine
+
+- **Matériel** : nom, marque, catégorie, photos, caractéristiques (ex. « Puissance — 2 × 1 000 W »), quantité et **prix « à partir de »** par jour. Laissez le prix vide pour afficher « Sur devis ». « Usage » : *à louer* (catalogue Impact Live Events) ou *équipement du studio* (fiche technique de la page Studio).
+- **Packs** : un nom, « pour qui » (ex. jusqu'à 500 personnes), le contenu et un prix indicatif.
+- **Services** : les services du studio (enregistrement, mixage, mastering…), les prestations événementielles et la location de l'Espace Habib Faye, avec leur prix indicatif.
+- **Agenda et références** : les prochains événements (dates, lieu, billetterie) et, en cochant « Référence », les prestations réalisées (ex. Festival de Saint-Louis) qui s'affichent dans « Ils nous ont fait confiance ».
+- **Productions du studio** : dans Univers & réalisations › Réalisations, choisissez « Réalisée par : Impact Live Studio » et ajoutez le fichier son ; elle s'écoute sur la page Studio.
+- **Pages Studio, Events et Espace Habib Faye** : Site › Pages du site, comme la page d'accueil (titres, textes, ordre des blocs).
+- **Lieux** (Administration › Lieux) : adresses, téléphones, horaires et photos des campus de Dakar et de Saint-Louis, du studio et de l'Espace Habib Faye.
 
 ---
 

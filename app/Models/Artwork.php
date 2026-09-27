@@ -20,7 +20,7 @@ class Artwork extends Model
     use HasFactory, HasPublication, HasUniqueSlug, RevalidatesFrontend, SoftDeletes;
 
     protected $fillable = [
-        'title', 'slug', 'year', 'room_id', 'track_id', 'cohort_id', 'kind', 'summary', 'creation_story', 'equipment',
+        'title', 'slug', 'year', 'room_id', 'track_id', 'cohort_id', 'kind', 'origin', 'summary', 'creation_story', 'equipment',
         'cover_image', 'cover_alt', 'gallery', 'audio_file', 'audio_peaks', 'video_url', 'duration_seconds', 'transcript',
         'is_featured', 'position', 'status', 'published_at',
     ];

@@ -2,13 +2,16 @@
 
 namespace App\Models;
 
+use App\Models\Concerns\BelongsToCampus;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 /** Clôture de caisse : après clôture, aucune écriture ne peut être datée dans la période. */
 class CashClosing extends Model
 {
-    protected $fillable = ['period_start', 'period_end', 'opening_balance', 'total_in', 'total_out', 'closing_balance', 'counted_cash', 'notes', 'closed_by'];
+    use BelongsToCampus;
+
+    protected $fillable = ['place_id', 'period_start', 'period_end', 'opening_balance', 'total_in', 'total_out', 'closing_balance', 'counted_cash', 'notes', 'closed_by'];
 
     protected $casts = [
         'period_start' => 'date',

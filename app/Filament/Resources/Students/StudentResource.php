@@ -8,6 +8,7 @@ use App\Filament\Resources\Students\Pages\EditStudent;
 use App\Filament\Resources\Students\Pages\ListStudents;
 use App\Filament\Resources\Students\Pages\ViewStudent;
 use App\Filament\Resources\Students\RelationManagers\EnrollmentsRelationManager;
+use App\Filament\Support\Fields;
 use App\Filament\Support\FrenchLabels;
 use App\Models\Student;
 use BackedEnum;
@@ -22,6 +23,7 @@ use Filament\Schemas\Components\Section;
 use Filament\Schemas\Schema;
 use Filament\Support\Icons\Heroicon;
 use Filament\Tables\Columns\TextColumn;
+use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Filters\TrashedFilter;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
@@ -54,6 +56,7 @@ class StudentResource extends Resource
     {
         return $schema->columns(1)->components([
             Section::make('Identité')->columns(3)->schema([
+                Fields::campus('place_id', 'Campus')->columnSpanFull(),
                 TextInput::make('first_name')->label('Prénom')->required()->maxLength(100),
                 TextInput::make('last_name')->label('Nom')->required()->maxLength(100),
                 Select::make('gender')->label('Genre')->options(Gender::class),
@@ -94,6 +97,7 @@ class StudentResource extends Resource
             ->defaultSort('created_at', 'desc')
             ->columns([
                 TextColumn::make('student_number')->label('Matricule')->searchable()->sortable(),
+                TextColumn::make('place.city')->label('Campus')->placeholder('—')->visible(fn () => ! auth()->user()?->place_id)->toggleable(),
                 TextColumn::make('last_name')->label('Nom')
                     ->formatStateUsing(fn (Student $record) => $record->full_name)
                     ->searchable(['first_name', 'last_name'])->sortable(),
@@ -101,7 +105,11 @@ class StudentResource extends Resource
                 TextColumn::make('email')->label('E-mail')->searchable()->toggleable(isToggledHiddenByDefault: true),
                 TextColumn::make('enrollments_count')->label('Inscriptions')->alignCenter(),
             ])
-            ->filters([TrashedFilter::make()])
+            ->filters([
+                SelectFilter::make('place_id')->label('Campus')->relationship('place', 'name', fn (Builder $query) => $query->where('kind', 'campus'))
+                    ->visible(fn () => ! auth()->user()?->place_id),
+                TrashedFilter::make(),
+            ])
             ->recordActions([ViewAction::make()->label('Ouvrir')]);
     }
 
@@ -123,5 +131,11 @@ class StudentResource extends Resource
             'view' => ViewStudent::route('/{record}'),
             'edit' => EditStudent::route('/{record}/edit'),
         ];
+    }
+
+    /** Le personnel rattaché à un campus ne voit que les données de son campus. */
+    public static function getEloquentQuery(): Builder
+    {
+        return parent::getEloquentQuery()->visibleTo(auth()->user());
     }
 }

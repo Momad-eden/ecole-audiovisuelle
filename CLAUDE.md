@@ -10,6 +10,7 @@
   - **Volet 2** — Cycle BTS par la VAE (60 jeunes, 9 mois, démarrage 2027)
   - 5 filières : Son, Technicien Lumière, Régie Générale Spectacle, Infographie & Création Numérique, Cadrage Sportif & Régie Vidéo
   - Document source : `Copie de PROJET_EMSI_DAKAR_GRAND_THEATRE_FESTIVALS_EVENEMENTS.pdf` (racine du repo) = **référence de contenu**.
+- **Écosystème** (depuis le 27/09/2026) : fondé par Boubacar Tall, ingénieur du son sénégalais basé à Saint-Louis : l'EMSI (campus de Dakar au Grand Théâtre et de Saint-Louis, mêmes formations), **Impact Live Studio** (studio d'enregistrement), **Impact Live Events** (location de sono, lumières, podiums et prestations) et l'**Espace Habib Faye** (centre culturel privé). Spec : `docs/superpowers/specs/2026-09-27-impact-live-design.md`.
 - **Développeur / décideur** : Momar Diop (Halal Techno).
 
 ## 2. Objectif de la refonte
@@ -54,6 +55,10 @@
 | Données du site | `fetch` serveur étiqueté `content`, régénéré par Laravel à chaque publication (`FrontendRevalidator`) |
 | Formulaires publics | react-hook-form + zod côté Next ; FormRequest Laravel font foi |
 
+Comptabilité : **une caisse par campus** (`place_id`, code DKR/STL dans la numérotation, soldes, clôtures et exports séparés) ; personnel rattachable à un campus (`users.place_id`, requêtes et Policies filtrées via `BelongsToCampus`).
+
+Impact Live : lieux (`places`), services à prix « à partir de », matériel à louer et packs, agenda et références, demandes de devis/réservation (`BookingWorkflow` : nouvelle → devis envoyé → confirmée → réalisée / annulée), rôle `commercial`.
+
 Domaine : filières → programmes (école / professionnels) → sessions → offres ; candidatures (`ApplicationWorkflow`) → étudiants → inscriptions ; caisse inaltérable (`CashRegister` : contre-écritures, clôtures). Univers (table `rooms`) → filières ; réalisations (`artworks`) et expositions. Contenu : pages à blocs (brouillon → publication → révisions), actualités, FAQ, menus, redirections.
 
 ## 4. Méthode de travail
@@ -92,6 +97,8 @@ php artisan test                 # SQLite en mémoire (rapide)
 composer test:mysql              # même suite sur MySQL 8.4 (conteneur Docker jetable, port 33306)
 php artisan emsi:create-admin    # créer un compte (aucun compte par défaut)
 php artisan emsi:site-v2         # mettre à niveau une base existante vers le site « Plein feux » (relançable)
+php artisan emsi:impact-live     # ajouter Impact Live et le campus de Saint-Louis à une base existante (relançable)
+php artisan emsi:site-v3         # page L'École à deux campus, chiffres clés et agenda sur l'accueil (relançable)
 ./vendor/bin/pint
 
 # Frontend
