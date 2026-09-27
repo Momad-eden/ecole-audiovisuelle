@@ -2,18 +2,27 @@
 
 namespace App\Enums;
 
+use Filament\Support\Contracts\HasColor;
 use Filament\Support\Contracts\HasLabel;
 
-enum Gender: string implements HasLabel
+enum CashDirection: string implements HasColor, HasLabel
 {
-    case FEMALE = 'female';
-    case MALE = 'male';
+    case IN = 'in';
+    case OUT = 'out';
 
     public function getLabel(): string
     {
         return match ($this) {
-            self::FEMALE => 'Femme',
-            self::MALE => 'Homme',
+            self::IN => 'Encaissement',
+            self::OUT => 'Décaissement',
+        };
+    }
+
+    public function getColor(): string
+    {
+        return match ($this) {
+            self::IN => 'success',
+            self::OUT => 'danger',
         };
     }
 

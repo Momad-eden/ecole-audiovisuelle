@@ -2,8 +2,11 @@
 
 namespace App\Models;
 
+use App\Enums\Gender;
+use App\Services\StudentNumberService;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
 class Student extends Model
@@ -11,85 +14,36 @@ class Student extends Model
     use HasFactory, SoftDeletes;
 
     protected $fillable = [
-        'student_number',
-        'photo',
-        'first_name',
-        'last_name',
-        'gender',
-        'birth_date',
-        'birth_place',
-        'nationality',
-        'phone',
-        'email',
-        'address',
-        'course_id',
-        'registration_date',
-        'status',
-        'notes',
+        'student_number', 'first_name', 'last_name', 'gender', 'birth_date', 'birth_place',
+        'nationality', 'phone', 'email', 'address', 'photo', 'notes',
     ];
+
+    protected $casts = [
+        'gender' => Gender::class,
+        'birth_date' => 'date',
+    ];
+
+    protected static function booted(): void
+    {
+        static::creating(function (Student $student) {
+            if (blank($student->student_number)) {
+                $student->student_number = app(StudentNumberService::class)->generate();
+            }
+        });
+    }
 
     public function getFullNameAttribute(): string
     {
         return trim("{$this->first_name} {$this->last_name}");
     }
 
-    public function getMatriculeAttribute(): ?string
+    public function enrollments(): HasMany
     {
-        return $this->student_number;
+        return $this->hasMany(Enrollment::class);
     }
 
-    public function getTotalPaidAttribute(): float
+    public function applications(): HasMany
     {
-        if ($this->relationLoaded('payments')) {
-            return (float) $this->payments->where('type', 'inflow')->sum('amount');
-        }
-
-        return (float) $this->payments()->where('type', 'inflow')->sum('amount');
-    }
-
-    public function getRemainingDueAttribute(): float
-    {
-        $price = (float) ($this->course?->price ?? 0);
-
-        return max(0, $price - $this->total_paid);
-    }
-
-    public function getPaymentPercentageAttribute(): float
-    {
-        $price = (float) ($this->course?->price ?? 0);
-        if ($price <= 0) {
-            return 100.0;
-        }
-
-        return min(100.0, round(($this->total_paid / $price) * 100, 1));
-    }
-
-    public function getPaymentStatusAttribute(): string
-    {
-        $price = (float) ($this->course?->price ?? 0);
-        $paid = $this->total_paid;
-
-        if ($price > 0 && $paid >= $price) {
-            return 'paid'; // Soldé
-        } elseif ($paid > 0) {
-            return 'partial'; // Partiel
-        }
-
-        return 'unpaid'; // Non payé
-    }
-
-    public function course()
-    {
-        return $this->belongsTo(Course::class)->withTrashed();
-    }
-
-    public function admission()
-    {
-        return $this->hasOne(Admission::class);
-    }
-
-    public function payments()
-    {
-        return $this->hasMany(Payment::class);
+        return $this->hasMany(Application::class);
     }
 }

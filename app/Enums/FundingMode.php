@@ -4,16 +4,20 @@ namespace App\Enums;
 
 use Filament\Support\Contracts\HasLabel;
 
-enum Gender: string implements HasLabel
+enum FundingMode: string implements HasLabel
 {
-    case FEMALE = 'female';
-    case MALE = 'male';
+    case PAID = 'paid';
+    case SPONSORED = 'sponsored';
+    case SCHOLARSHIP = 'scholarship';
+    case MIXED = 'mixed';
 
     public function getLabel(): string
     {
         return match ($this) {
-            self::FEMALE => 'Femme',
-            self::MALE => 'Homme',
+            self::PAID => 'Payant',
+            self::SPONSORED => 'Pris en charge',
+            self::SCHOLARSHIP => 'Bourse',
+            self::MIXED => 'Mixte',
         };
     }
 

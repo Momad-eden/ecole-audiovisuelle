@@ -4,16 +4,22 @@ namespace App\Enums;
 
 use Filament\Support\Contracts\HasLabel;
 
-enum Gender: string implements HasLabel
+enum ArtworkKind: string implements HasLabel
 {
-    case FEMALE = 'female';
-    case MALE = 'male';
+    case AUDIO = 'audio';
+    case VIDEO = 'video';
+    case IMAGE = 'image';
+    case SERIES = 'series';
+    case LIVE = 'live';
 
     public function getLabel(): string
     {
         return match ($this) {
-            self::FEMALE => 'Femme',
-            self::MALE => 'Homme',
+            self::AUDIO => 'Son',
+            self::VIDEO => 'Vidéo',
+            self::IMAGE => 'Image',
+            self::SERIES => 'Série',
+            self::LIVE => 'Spectacle / captation live',
         };
     }
 

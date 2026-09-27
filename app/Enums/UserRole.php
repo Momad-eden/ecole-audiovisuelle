@@ -2,12 +2,19 @@
 
 namespace App\Enums;
 
-enum UserRole: string
+use Filament\Support\Contracts\HasLabel;
+
+enum UserRole: string implements HasLabel
 {
     case DIRECTEUR = 'directeur';
     case GESTIONNAIRE = 'gestionnaire';
     case SECRETAIRE = 'secretaire';
     case COMMUNICATION = 'communication';
+
+    public function getLabel(): string
+    {
+        return $this->label();
+    }
 
     public function label(): string
     {

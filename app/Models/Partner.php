@@ -11,13 +11,23 @@ class Partner extends Model
 
     protected $fillable = [
         'name',
+        'category',
         'website',
         'logo',
         'description',
         'is_active',
+        'position',
     ];
 
     protected $casts = [
         'is_active' => 'boolean',
+    ];
+
+    public const CATEGORIES = [
+        'co_organizer' => 'Porteur du programme',
+        'institutional' => 'Partenaire institutionnel',
+        'technical' => 'Partenaire technique',
+        'media' => 'Média',
+        'venue' => 'Lieu',
     ];
 }
