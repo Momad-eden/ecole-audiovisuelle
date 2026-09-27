@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use App\Enums\ArtworkKind;
+use App\Jobs\ComputeArtworkAudioPeaks;
 use App\Models\Concerns\HasPublication;
 use App\Models\Concerns\HasUniqueSlug;
 use App\Models\Concerns\RevalidatesFrontend;
@@ -31,6 +32,15 @@ class Artwork extends Model
         'audio_peaks' => 'array',
         'is_featured' => 'boolean',
     ];
+
+    protected static function booted(): void
+    {
+        static::saved(function (Artwork $artwork) {
+            if ($artwork->wasChanged('audio_file') || ($artwork->wasRecentlyCreated && $artwork->audio_file)) {
+                ComputeArtworkAudioPeaks::dispatch($artwork);
+            }
+        });
+    }
 
     public function room(): BelongsTo
     {
