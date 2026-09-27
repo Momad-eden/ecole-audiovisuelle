@@ -60,7 +60,7 @@ FRONTEND_REVALIDATE_SECRET=<chaîne aléatoire longue>
 
 ```bash
 php artisan migrate --force
-php artisan db:seed --force              # contenu de référence (salles, filières, programmes, pages…)
+php artisan db:seed --force              # contenu de référence (univers, filières, programmes, pages…)
 php artisan storage:link
 php artisan emsi:create-admin            # premier directeur (mot de passe saisi de façon masquée)
 php artisan filament:assets
@@ -179,6 +179,7 @@ Copier ensuite `/var/backups/emsi` hors du serveur (stockage distant). Tester un
 cd /var/www/emsi && git pull
 composer install --no-dev --optimize-autoloader
 php artisan migrate --force
+php artisan emsi:site-v2                 # une seule fois, pour une base installée avant le site « Plein feux »
 php artisan optimize && php artisan filament:optimize && php artisan filament:assets
 sudo systemctl restart emsi-queue
 cd frontend && npm ci && npm run build && sudo systemctl restart emsi-web

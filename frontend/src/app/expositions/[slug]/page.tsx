@@ -20,7 +20,7 @@ export default async function ExhibitionPage({ params }: Props) {
 
   return (
     <>
-      <section className="relative isolate overflow-hidden pb-16 pt-28">
+      <section className="relative isolate overflow-hidden pb-16 pt-40">
         <div className="absolute inset-0 -z-10">
           <MediaImage image={exhibition.cover} sizes="100vw" priority className="opacity-35" />
           <div className="absolute inset-0 bg-gradient-to-b from-night/30 to-night" />

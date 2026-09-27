@@ -25,7 +25,7 @@ export function ProgramDetail({ program, applyHref }: { program: Program; applyH
 
   return (
     <>
-      <section className="beam relative isolate overflow-hidden pb-16 pt-24">
+      <section className="beam relative isolate overflow-hidden pb-16 pt-40">
         <div className="absolute inset-0 -z-10">
           <MediaImage image={program.cover} sizes="100vw" priority className="opacity-25" />
           <div className="absolute inset-0 bg-gradient-to-b from-night/30 to-night" />

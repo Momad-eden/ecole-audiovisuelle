@@ -133,6 +133,6 @@ class PublicContentApiTest extends TestCase
         $this->getJson('/api/v1/public/sitemap')
             ->assertOk()
             ->assertJsonFragment(['path' => '/ecole'])
-            ->assertJsonFragment(['path' => '/musee/salle-du-son']);
+            ->assertJsonFragment(['path' => '/univers/salle-du-son']);
     }
 }

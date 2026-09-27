@@ -28,19 +28,19 @@
 - Les anciennes pages dispersées (`/projet`, `/vae`, parties de l'accueil et de `/ecole`) sont fusionnées dans cette rubrique.
 
 ### B. Tout est administrable par un non-informaticien
-- **Aucun contenu visible ne doit nécessiter de modifier du code** : textes, images, vidéos, sons, menus, pied de page, blocs de l'accueil, chiffres clés, FAQ, SEO, coordonnées, réseaux sociaux, couleurs d'accent des « salles ».
+- **Aucun contenu visible ne doit nécessiter de modifier du code** : textes, images, vidéos, sons, menus, pied de page, blocs de l'accueil, chiffres clés, FAQ, SEO, coordonnées, réseaux sociaux, couleurs d'accent des « univers ».
 - Pages construites par **blocs (sections) réorganisables** depuis l'admin (glisser-déposer), à partir d'une bibliothèque de blocs prédéfinis et testés (héros, texte + image, galerie, lecteur audio, vidéo, chiffres clés, citation, appel à l'action, liste de formations, etc.). Pas d'éditeur HTML libre.
 - **Médiathèque** centrale (images, vidéos, fichiers audio, PDF) avec recadrage, texte alternatif, crédits.
 - **Brouillon / aperçu / publication** pour chaque contenu, historique des versions, restauration.
 - Interface admin en français simple, sans jargon technique (« Publier », « Masquer du site », pas « is_active »), aides contextuelles, messages de confirmation clairs, impossibilité de casser la mise en page (champs limités, formats imposés, compression automatique des médias).
-- Critère de recette : **une personne de l'administration de l'école, sans formation technique, doit pouvoir réaliser seule** : publier une actualité, ajouter une œuvre au musée, modifier la page d'accueil, ouvrir une session de candidature, traiter une candidature, encaisser un paiement.
+- Critère de recette : **une personne de l'administration de l'école, sans formation technique, doit pouvoir réaliser seule** : publier une actualité, ajouter une réalisation d'étudiant, modifier la page d'accueil, ouvrir une session de candidature, traiter une candidature, encaisser un paiement.
 
-### C. Le site public est un « musée numérique »
-- Le site doit **faire ressentir l'art du son, de la lumière et de l'image** — comme la visite d'un musée numérique, pas une plaquette institutionnelle.
-- Organisation en **salles / expositions** : Salle du Son, Salle de la Lumière, Salle de l'Image (cadrage, vidéo), Salle du Visuel (infographie, motion design), + expositions temporaires (ex. un festival, une promotion).
-- Chaque **œuvre** (réalisation d'apprenant ou de l'école) a une fiche : médias (vidéo, photo, **audio avec lecteur et forme d'onde**), titre, auteurs/crédits, filière, promotion, matériel utilisé, récit de création.
-- Direction artistique : fond sombre de salle d'exposition, la lumière comme élément de design (halos, faisceaux, dégradés), typographie éditoriale, grands médias plein écran, transitions douces, réactivité au son (visualisation audio). Toujours **sobre, lisible et performant** : respecter `prefers-reduced-motion`, chargement progressif des médias, aucun son en lecture automatique.
-- Les formations, l'école, les actualités et l'Espace Professionnels s'intègrent dans cette expérience (même langage visuel), mais la navigation reste simple et classique en surface (menu clair, CTA « Candidater » visible).
+### C. Le site public est une œuvre visuelle au service du choix de l'école
+- **Objectif premier** : faire découvrir l'EMSI et ses formations, et donner envie de la **choisir** (précision de Momar du 27/09/2026 : le « musée » était une image pour dire « beau comme un musée », pas une arborescence).
+- Le site doit **faire ressentir l'art du son, de la lumière et de l'image** et être à la hauteur d'une école installée au **Grand Théâtre National Doudou Ndiaye Coumba Rose**, équipée de matériel de dernière génération : une œuvre qui attire l'œil, pas une plaquette institutionnelle.
+- Organisation en **univers** (disciplines) : Son · Image (vidéo & photo) · Infographie & design · Scène (régie & lumière) · Cinéma (bientôt). Chaque univers présente ses filières, ce qu'on y apprend, les métiers, les formations et les **réalisations** des étudiants (fiche : médias, **audio avec forme d'onde**, crédits, filière, promotion, matériel, récit de création).
+- Direction artistique **« Plein feux »** (spec : `docs/superpowers/specs/2026-09-27-site-public-v2-design.md`) : scène dans le noir qui s'allume au défilement, couleurs du logo (orange projecteur, violet), une lumière par univers, titres Archivo étendus, signatures animées en SVG. Toujours **lisible et performant** : `prefers-reduced-motion` respecté, animations suspendues hors écran, aucun son en lecture automatique.
+- Navigation simple : Univers · Formations · L'École · Réalisations · Espace Pro, CTA « Candidater » toujours visible.
 
 ## 3. Architecture en place (depuis le 27/09/2026)
 
@@ -49,11 +49,11 @@
 | Administration | **Filament 5** dans Laravel (`/admin`), rôles appliqués par des **Policies** (`app/Policies`) |
 | Backend / API | Laravel 13 ; API publique en lecture seule `/api/v1/public` (+ dépôt de candidature, contact) |
 | Base de données | **MySQL 8.4** (PostgreSQL écarté : aucun bénéfice décisif pour ce projet) |
-| Site public | **Next.js 16** (App Router, TypeScript strict, Tailwind 4) dans `frontend/`, direction artistique « Salle obscure » |
+| Site public | **Next.js 16** (App Router, TypeScript strict, Tailwind 4) dans `frontend/`, direction artistique « Plein feux » |
 | Données du site | `fetch` serveur étiqueté `content`, régénéré par Laravel à chaque publication (`FrontendRevalidator`) |
 | Formulaires publics | react-hook-form + zod côté Next ; FormRequest Laravel font foi |
 
-Domaine : filières → programmes (école / professionnels) → sessions → offres ; candidatures (`ApplicationWorkflow`) → étudiants → inscriptions ; caisse inaltérable (`CashRegister` : contre-écritures, clôtures). Musée : salles, expositions, œuvres. Contenu : pages à blocs (brouillon → publication → révisions), actualités, FAQ, menus, redirections.
+Domaine : filières → programmes (école / professionnels) → sessions → offres ; candidatures (`ApplicationWorkflow`) → étudiants → inscriptions ; caisse inaltérable (`CashRegister` : contre-écritures, clôtures). Univers (table `rooms`) → filières ; réalisations (`artworks`) et expositions. Contenu : pages à blocs (brouillon → publication → révisions), actualités, FAQ, menus, redirections.
 
 ## 4. Méthode de travail
 
@@ -90,6 +90,7 @@ composer install && php artisan migrate && php artisan db:seed
 php artisan test                 # SQLite en mémoire (rapide)
 composer test:mysql              # même suite sur MySQL 8.4 (conteneur Docker jetable, port 33306)
 php artisan emsi:create-admin    # créer un compte (aucun compte par défaut)
+php artisan emsi:site-v2         # mettre à niveau une base existante vers le site « Plein feux » (relançable)
 ./vendor/bin/pint
 
 # Frontend

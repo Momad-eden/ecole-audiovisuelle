@@ -47,7 +47,7 @@ class TrackResource extends Resource
             Section::make()->columns(2)->schema([
                 TextInput::make('name')->label('Nom de la filière')->required()->maxLength(120),
                 TextInput::make('short_name')->label('Nom court')->placeholder('Ex. Son'),
-                Select::make('room_id')->label('Salle du musée associée')->relationship('room', 'name')->preload(),
+                Select::make('room_id')->label('Univers')->relationship('room', 'name')->preload(),
                 Toggle::make('is_active')->label('Active')->default(true)->inline(false),
                 Textarea::make('summary')->label('Résumé')->rows(2)->maxLength(300)->columnSpanFull(),
                 RichEditor::make('description')->label('Description')
@@ -67,7 +67,7 @@ class TrackResource extends Resource
             ->modifyQueryUsing(fn ($query) => $query->with('room'))
             ->columns([
                 TextColumn::make('name')->label('Filière')->searchable()->weight('bold'),
-                TextColumn::make('room.name')->label('Salle')->placeholder('—'),
+                TextColumn::make('room.name')->label('Univers')->placeholder('—'),
                 IconColumn::make('is_active')->label('Active')->boolean(),
             ])
             ->recordActions([EditAction::make()]);

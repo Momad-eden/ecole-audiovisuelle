@@ -20,7 +20,7 @@ export default async function NewsItemPage({ params }: Props) {
   if (!news) notFound();
 
   return (
-    <article className="mx-auto max-w-3xl px-4 pt-16 sm:px-6">
+    <article className="mx-auto max-w-3xl px-4 pt-36 sm:px-6">
       <Link href="/actualites" className="cartel inline-flex items-center gap-2 hover:text-ink"><ArrowLeft className="size-4" aria-hidden /> Actualités</Link>
       {news.publishedAt && <time dateTime={news.publishedAt} className="cartel mt-8 block">{formatDate(news.publishedAt)}</time>}
       <h1 className="mt-3 font-display text-4xl leading-tight text-balance sm:text-5xl">{news.title}</h1>

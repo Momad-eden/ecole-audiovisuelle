@@ -12,6 +12,6 @@ class ListRooms extends ListRecords
 
     protected function getHeaderActions(): array
     {
-        return [CreateAction::make()->label('Nouvelle salle')];
+        return [CreateAction::make()->label('Nouvel univers')];
     }
 }

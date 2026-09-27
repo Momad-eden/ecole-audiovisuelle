@@ -64,12 +64,12 @@ export function ContactForm() {
       </Field>
       <Field id="consent" label="" error={errors.consent?.message}>
         <label className="flex items-start gap-3 text-sm text-ink-muted">
-          <input id="consent" type="checkbox" className="mt-1 size-4 accent-amber" {...register("consent")} />
+          <input id="consent" type="checkbox" className="mt-1 size-4 accent-brand" {...register("consent")} />
           J&apos;accepte que l&apos;EMSI utilise ces informations pour répondre à ma demande.
         </label>
       </Field>
       {status === "error" && <p role="alert" className="text-sm text-rec">L&apos;envoi a échoué. Réessayez dans quelques minutes.</p>}
-      <button type="submit" disabled={isSubmitting} className="inline-flex min-h-12 items-center rounded-full bg-amber px-8 font-semibold text-night disabled:opacity-60">
+      <button type="submit" disabled={isSubmitting} className="inline-flex min-h-12 items-center rounded-full bg-brand px-8 font-semibold text-night disabled:opacity-60">
         {isSubmitting ? "Envoi…" : "Envoyer"}
       </button>
     </form>

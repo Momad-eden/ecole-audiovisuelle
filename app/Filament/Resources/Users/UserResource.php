@@ -48,7 +48,7 @@ class UserResource extends Resource
                 TextInput::make('email')->label('Adresse e-mail')->email()->required()->unique(ignoreRecord: true),
                 Select::make('role')->label('Rôle')->options(UserRole::class)->required()
                     ->disabled(fn (?User $record) => $record?->is(auth()->user()))
-                    ->helperText('Directeur : tout. Gestionnaire : scolarité, caisse, formations. Secrétaire : candidatures, étudiants, encaissements. Communication : site et musée.'),
+                    ->helperText('Directeur : tout. Gestionnaire : scolarité, caisse, formations. Secrétaire : candidatures, étudiants, encaissements. Communication : site, univers et réalisations.'),
                 Toggle::make('is_active')->label('Compte actif')->default(true)->inline(false)
                     ->disabled(fn (?User $record) => $record?->is(auth()->user())),
                 TextInput::make('password')->label(fn (string $operation) => $operation === 'create' ? 'Mot de passe' : 'Nouveau mot de passe (laisser vide pour ne pas changer)')
