@@ -52,6 +52,8 @@ Le menu de gauche n'affiche que ce que votre rôle permet d'ouvrir.
 
 ### Les blocs propres au site « Plein feux »
 
+- **Grand titre (héros)** : dix mises en page au choix. *Scène animée*, *Studio animé* et *Événementiel animé* (décors lumineux, mots qui défilent) ; *Projecteur* (titre centré) ; *Éditorial* (grand titre et portrait) ; *Affiche de concert* (titre géant sur aplat de couleur, idéal pour un événement) ; *Mosaïque* (collage de 3 ou 4 photos) ; *Plein écran* ; *Texte et image côte à côte* ; *Sobre* (pages secondaires). La taille du titre s'adapte à sa longueur.
+- **Nos campus** : Dakar et Saint-Louis côte à côte, avec photo, accroche, points forts, adresse et un bouton « Candidater à … » qui présélectionne le campus. Ces informations se saisissent une fois dans Administration › Lieux.
 - **Grand titre (héros)**, mise en page « Scène animée » : faisceaux de lumière ; les **mots qui défilent** terminent le titre (« Apprenez à faire vibrer… le son, l'image… »). Ajoutez une photo de fond quand vous en avez une.
 - **Bandeau défilant** : quelques mots courts en très grand.
 - **Le lieu (Grand Théâtre)** : titre, texte, jusqu'à 4 repères chiffrés (ex. « 154 m² — de studio ») et une photo du lieu (sinon, un dessin de scène s'affiche).
@@ -85,6 +87,16 @@ Menu **Univers & réalisations › Univers** : nom, couleur de lumière, **anima
 **Depuis la caisse** : **Caisse › Journal de caisse** › **Nouvelle opération** › « Encaissement », catégorie « Paiement de scolarité », puis cherchez l'étudiant par son nom ou son matricule.
 
 Une **dépense** se saisit au même endroit (« Décaissement »).
+
+### Une caisse par campus (Dakar, Saint-Louis)
+
+Chaque école tient sa propre caisse : ses reçus sont numérotés à part (`REC-DKR-2026-00001` à Dakar, `REC-STL-2026-00001` à Saint-Louis), avec son solde, ses clôtures et son export.
+
+- Un paiement de scolarité va automatiquement dans la caisse du campus de l'étudiant.
+- Une autre opération : choisissez la **Caisse (campus)** en haut du formulaire.
+- **Personnel d'un seul campus** : dans Administration › Comptes utilisateurs, renseignez son **Campus de rattachement**. Il ne verra alors que la caisse, les étudiants et les candidatures de son campus. Laissez vide pour la direction, qui voit tout.
+- Le tableau de bord affiche le solde de chaque caisse.
+- Le code de chaque campus (DKR, STL) se règle dans Administration › Lieux ; ne le changez plus après la première opération.
 
 ### Corriger une erreur de caisse
 

@@ -29,6 +29,14 @@ class ImpactLiveApiTest extends TestCase
         $this->assertTrue(Schema::hasColumn('artworks', 'origin'));
         $this->assertTrue(Schema::hasColumn('applications', 'place_id'));
 
+        // Retour arrière dans l'ordre réel : d'abord les migrations plus récentes qui dépendent des lieux.
+        $later = [
+            require database_path('migrations/2026_09_28_100000_add_presentation_to_places.php'),
+            require database_path('migrations/2026_09_28_090000_add_campus_to_accounting.php'),
+        ];
+        foreach ($later as $step) {
+            $step->down();
+        }
         $migration = require database_path('migrations/2026_09_27_120000_create_impact_live_tables.php');
         $migration->down();
         foreach ($tables as $table) {
@@ -38,6 +46,9 @@ class ImpactLiveApiTest extends TestCase
         $this->assertFalse(Schema::hasColumn('applications', 'place_id'));
 
         $migration->up();
+        foreach (array_reverse($later) as $step) {
+            $step->up();
+        }
         $this->assertTrue(Schema::hasTable('booking_requests'));
     }
 

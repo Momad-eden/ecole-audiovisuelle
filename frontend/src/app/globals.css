@@ -296,6 +296,17 @@ body::after {
 @keyframes sub-pulse { 50% { transform: scale(1.12); } }
 .sub-cone { transform-origin: center; transform-box: fill-box; animation: sub-pulse 0.48s ease-in-out infinite; }
 
+/* ——— Héros « Projecteur » ——— */
+.spotlight-cone {
+  background: conic-gradient(from 180deg at 50% 0%, transparent 160deg, color-mix(in oklab, var(--accent) 16%, transparent) 172deg, color-mix(in oklab, var(--color-ink) 14%, transparent) 180deg, color-mix(in oklab, var(--accent) 16%, transparent) 188deg, transparent 200deg);
+  animation: spot-breathe 6s ease-in-out infinite;
+  transform-origin: 50% 0;
+}
+@keyframes spot-breathe {
+  50% { transform: translateX(-50%) scaleX(1.12); opacity: 0.8; }
+  0%, 100% { transform: translateX(-50%) scaleX(1); opacity: 1; }
+}
+
 @media (prefers-reduced-motion: reduce) {
   html { scroll-behavior: auto; }
   *, *::before, *::after {

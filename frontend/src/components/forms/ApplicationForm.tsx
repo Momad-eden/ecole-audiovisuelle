@@ -42,7 +42,7 @@ type Values = z.infer<typeof schema>;
 
 const STEPS = ["Formation", "Identité", "Coordonnées", "Parcours", "Envoi"];
 
-export function ApplicationForm({ offerings, audience, preselected, campuses = [] }: { offerings: Offering[]; audience: "school" | "professional"; preselected?: string; campuses?: Place[] }) {
+export function ApplicationForm({ offerings, audience, preselected, campuses = [], preselectedCampus }: { offerings: Offering[]; audience: "school" | "professional"; preselected?: string; campuses?: Place[]; preselectedCampus?: string }) {
   const router = useRouter();
   const draftKey = `emsi-candidature-${audience}`;
   const [step, setStep] = useState(0);
@@ -54,7 +54,7 @@ export function ApplicationForm({ offerings, audience, preselected, campuses = [
     mode: "onTouched",
     defaultValues: {
       offeringId: preselected ?? (offerings.length === 1 ? String(offerings[0].id) : ""),
-      placeId: campuses.length === 1 ? String(campuses[0].id) : "",
+      placeId: preselectedCampus ?? (campuses.length === 1 ? String(campuses[0].id) : ""),
       nationality: "Sénégalaise", gender: "", whatsapp: "", email: "", portfolioUrl: "",
       experience: [], documents: professional ? [{ type: "diploma", file: undefined as unknown as FileList }, { type: "id_card", file: undefined as unknown as FileList }] : [],
     },
@@ -178,7 +178,7 @@ export function ApplicationForm({ offerings, audience, preselected, campuses = [
       <div className="rounded-3xl border border-line bg-night-2 p-6 sm:p-10">
         {step === 0 && (
           <fieldset className="space-y-4">
-            <legend className="mb-6 font-display text-3xl">Quelle formation vous intéresse ?</legend>
+            <legend className="display mb-6 text-2xl sm:text-3xl">Quelle formation vous intéresse ?</legend>
             {errors.offeringId && <p role="alert" className="text-sm text-rec">{errors.offeringId.message}</p>}
             {offerings.map((offering) => (
               <label key={offering.id} className="flex cursor-pointer items-start gap-4 rounded-2xl border border-line p-5 has-[:checked]:border-brand">
@@ -194,7 +194,7 @@ export function ApplicationForm({ offerings, audience, preselected, campuses = [
             ))}
             {campuses.length > 1 && (
               <div className="pt-6">
-                <p className="mb-4 font-display text-2xl">Dans quel campus ?</p>
+                <p className="display mb-4 text-xl sm:text-2xl">Dans quel campus ?</p>
                 {errors.placeId && <p role="alert" className="mb-3 text-sm text-rec">{errors.placeId.message}</p>}
                 <div className="grid gap-3 sm:grid-cols-2">
                   {campuses.map((campus) => (
@@ -211,7 +211,7 @@ export function ApplicationForm({ offerings, audience, preselected, campuses = [
 
         {step === 1 && (
           <fieldset className="grid gap-6 sm:grid-cols-2">
-            <legend className="mb-6 font-display text-3xl">Votre identité</legend>
+            <legend className="display mb-6 text-2xl sm:text-3xl">Votre identité</legend>
             <Field id="firstName" label="Prénom" required error={errors.firstName?.message}><input id="firstName" autoComplete="given-name" className={inputClass} aria-invalid={!!errors.firstName} {...register("firstName")} /></Field>
             <Field id="lastName" label="Nom" required error={errors.lastName?.message}><input id="lastName" autoComplete="family-name" className={inputClass} aria-invalid={!!errors.lastName} {...register("lastName")} /></Field>
             <Field id="gender" label="Genre"><select id="gender" className={inputClass} {...register("gender")}><option value="">Préfère ne pas répondre</option><option value="female">Femme</option><option value="male">Homme</option></select></Field>
@@ -223,7 +223,7 @@ export function ApplicationForm({ offerings, audience, preselected, campuses = [
 
         {step === 2 && (
           <fieldset className="grid gap-6 sm:grid-cols-2">
-            <legend className="mb-6 font-display text-3xl">Comment vous joindre ?</legend>
+            <legend className="display mb-6 text-2xl sm:text-3xl">Comment vous joindre ?</legend>
             <Field id="phone" label="Téléphone" required error={errors.phone?.message} hint="Ex. +221 77 123 45 67"><input id="phone" type="tel" autoComplete="tel" className={inputClass} aria-invalid={!!errors.phone} {...register("phone")} /></Field>
             <Field id="whatsapp" label="WhatsApp (si différent)" error={errors.whatsapp?.message}><input id="whatsapp" type="tel" className={inputClass} {...register("whatsapp")} /></Field>
             <Field id="email" label="E-mail" error={errors.email?.message} hint="Pour recevoir l'accusé de réception."><input id="email" type="email" autoComplete="email" className={inputClass} aria-invalid={!!errors.email} {...register("email")} /></Field>
@@ -234,7 +234,7 @@ export function ApplicationForm({ offerings, audience, preselected, campuses = [
         {step === 3 && (
           <div className="space-y-10">
             <fieldset className="grid gap-6 sm:grid-cols-3">
-              <legend className="mb-6 font-display text-3xl">Votre parcours</legend>
+              <legend className="display mb-6 text-2xl sm:text-3xl">Votre parcours</legend>
               <Field id="lastDiploma" label="Dernier diplôme" required={professional}><select id="lastDiploma" className={inputClass} {...register("lastDiploma")}><option value="">Choisir</option>{Object.entries(DIPLOMAS).map(([v, l]) => <option key={v} value={v}>{l}</option>)}</select></Field>
               <Field id="diplomaYear" label="Année d'obtention"><input id="diplomaYear" inputMode="numeric" className={inputClass} {...register("diplomaYear")} /></Field>
               <Field id="school" label="Établissement"><input id="school" className={inputClass} {...register("school")} /></Field>
@@ -279,7 +279,7 @@ export function ApplicationForm({ offerings, audience, preselected, campuses = [
 
         {step === 4 && (
           <div className="space-y-8">
-            <h2 className="font-display text-3xl">Dernière étape</h2>
+            <h2 className="display text-2xl sm:text-3xl">Dernière étape</h2>
             <Field id="motivation" label="Pourquoi cette formation ? (facultatif)"><textarea id="motivation" rows={6} maxLength={3000} className={inputClass} {...register("motivation")} /></Field>
             {selected && <p className="rounded-2xl border border-line p-4 text-sm"><span className="cartel block">Formation choisie</span>{selected.label}</p>}
             <Field id="consent" label="" error={errors.consent?.message}>

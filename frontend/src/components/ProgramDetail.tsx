@@ -32,7 +32,7 @@ export function ProgramDetail({ program, applyHref }: { program: Program; applyH
         </div>
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
           <p className="cartel">{[program.kindLabel, program.durationLabel].filter(Boolean).join(" · ")}</p>
-          <h1 className="mt-4 max-w-4xl font-display text-4xl leading-tight font-medium text-balance sm:text-6xl">{program.title}</h1>
+          <h1 className="display mt-5 max-w-5xl text-[clamp(2.2rem,5vw,4.4rem)] text-balance">{program.title}</h1>
           {program.levelLabel && <p className="mt-4 text-lg text-[var(--accent-ink)]">{program.levelLabel}</p>}
           {program.summary && <p className="mt-6 max-w-3xl text-lg text-ink/80">{program.summary}</p>}
           <div className="mt-10 flex flex-wrap gap-3">
@@ -61,12 +61,12 @@ export function ProgramDetail({ program, applyHref }: { program: Program; applyH
 
       {cohorts.length > 0 && (
         <Section>
-          <h2 className="mb-8 font-display text-3xl">Sessions</h2>
+          <h2 className="display mb-8 text-[clamp(1.8rem,3.4vw,2.6rem)]">Sessions</h2>
           <div className="space-y-6">
             {cohorts.map((cohort) => (
               <article key={cohort.id} className="rounded-3xl border border-line bg-night-2 p-6 sm:p-8">
                 <div className="flex flex-wrap items-baseline justify-between gap-4">
-                  <h3 className="font-display text-2xl">{cohort.name}</h3>
+                  <h3 className="display text-xl">{cohort.name}</h3>
                   <span className="rounded-full border border-line px-3 py-1 text-sm">{cohort.statusLabel}</span>
                 </div>
                 <p className="mt-2 text-ink-muted">

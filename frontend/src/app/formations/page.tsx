@@ -38,7 +38,7 @@ export default async function ProgramsPage() {
               </div>
               <ul className="grid gap-5 md:grid-cols-2">
                 {(universe.tracks ?? []).map((track, i) => (
-                  <Reveal as="li" key={track.id} delay={i * 100}>
+                  <Reveal as="li" key={track.id} delay={i * 100} className={(universe.tracks ?? []).length === 1 ? "md:col-span-2" : undefined}>
                     <Link href={`/univers/${universe.slug}#filieres`} className="group flex h-full flex-col rounded-3xl border border-line bg-night-2 p-7 transition duration-500 hover:-translate-y-1 hover:border-[var(--accent)]">
                       <p className="cartel text-[var(--accent-ink)]">Filière</p>
                       <h3 className="display mt-3 text-2xl">{track.name}</h3>

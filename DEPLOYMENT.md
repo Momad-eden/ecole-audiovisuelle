@@ -181,6 +181,7 @@ composer install --no-dev --optimize-autoloader
 php artisan migrate --force
 php artisan emsi:site-v2                 # une seule fois, pour une base installée avant le site « Plein feux »
 php artisan emsi:impact-live             # une seule fois, pour ajouter Impact Live et le campus de Saint-Louis
+php artisan emsi:site-v3                 # une seule fois : page L'École à deux campus, chiffres clés et agenda sur l'accueil
 php artisan optimize && php artisan filament:optimize && php artisan filament:assets
 sudo systemctl restart emsi-queue
 cd frontend && npm ci && npm run build && sudo systemctl restart emsi-web

@@ -9,7 +9,7 @@ const SOCIAL_LABELS: Record<string, string> = {
 export function SiteFooter({ site }: { site: Site }) {
   const { settings, menus } = site;
   const whatsapp = settings.whatsapp?.replace(/[^0-9]/g, "");
-  const explore = [...menus.main.filter((l) => !l.isButton), ...menus.footer];
+  const explore = [...menus.main.filter((l) => !l.isButton), ...menus.footer].filter((link, index, all) => all.findIndex((l) => l.url === link.url) === index);
 
   return (
     <footer className="relative overflow-hidden border-t border-line bg-night-2">

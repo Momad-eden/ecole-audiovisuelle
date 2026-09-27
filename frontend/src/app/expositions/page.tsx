@@ -1,6 +1,9 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { MediaImage } from "@/components/ui/MediaImage";
+import { ButtonLink } from "@/components/ui/ButtonLink";
+import { EmptyState } from "@/components/ui/EmptyState";
+import { PageHeader } from "@/components/ui/PageHeader";
 import { Section, SectionTitle } from "@/components/ui/Section";
 import { api } from "@/lib/api";
 import { formatDate } from "@/lib/utils";
@@ -18,7 +21,7 @@ function ExhibitionList({ items }: { items: Exhibition[] }) {
             <div className="absolute inset-0 bg-gradient-to-t from-night to-transparent" />
             <div className="relative">
               <p className="cartel">{[formatDate(e.startsOn), formatDate(e.endsOn)].filter(Boolean).join(" – ")}</p>
-              <h3 className="mt-2 font-display text-3xl">{e.title}</h3>
+              <h3 className="display mt-2 text-3xl">{e.title}</h3>
               {e.venue && <p className="mt-1 text-ink/75">{e.venue}</p>}
             </div>
           </Link>
@@ -35,14 +38,13 @@ export default async function ExhibitionsPage() {
 
   return (
     <>
-      <section className="beam pb-4 pt-40">
-        <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-          <p className="cartel mb-4">Musée numérique</p>
-          <h1 className="font-display text-5xl font-medium sm:text-7xl">Expositions</h1>
-        </div>
-      </section>
-      <Section>
-        {exhibitions.length === 0 && <p className="text-ink-muted">Aucune exposition pour le moment.</p>}
+      <PageHeader eyebrow="Réalisations" title="Expositions" text="Festivals, fins de promotion, projets collectifs : les réalisations des étudiants rassemblées autour d'un thème." />
+      <Section className="pt-0 sm:pt-0">
+        {exhibitions.length === 0 && (
+          <EmptyState title="La prochaine exposition se prépare." text="En attendant, découvrez les réalisations des étudiants, univers par univers." visual="design">
+            <ButtonLink href="/realisations">Voir les réalisations</ButtonLink>
+          </EmptyState>
+        )}
         {current.length > 0 && (<><SectionTitle title="En cours et à venir" /><ExhibitionList items={current} /></>)}
         {past.length > 0 && (<div className="mt-16"><SectionTitle title="Expositions passées" /><ExhibitionList items={past} /></div>)}
       </Section>

@@ -135,4 +135,16 @@ class PublicContentApiTest extends TestCase
             ->assertJsonFragment(['path' => '/ecole'])
             ->assertJsonFragment(['path' => '/univers/salle-du-son']);
     }
+
+    public function test_mosaic_hero_images_are_resolved(): void
+    {
+        Page::create(['title' => 'École', 'slug' => 'ecole', 'draft_blocks' => [
+            ['type' => 'hero', 'data' => ['title' => 'Deux écoles', 'layout' => 'mosaic', 'images' => ['pages/a.jpg', 'pages/b.jpg'], 'caption' => 'Studio de Saint-Louis']],
+        ]])->publish();
+
+        $this->getJson('/api/v1/public/pages/ecole')->assertOk()
+            ->assertJsonPath('data.blocks.0.data.images.0.url', url('/storage/pages/a.jpg'))
+            ->assertJsonPath('data.blocks.0.data.images.1.alt', 'Deux écoles')
+            ->assertJsonPath('data.blocks.0.data.caption', 'Studio de Saint-Louis');
+    }
 }

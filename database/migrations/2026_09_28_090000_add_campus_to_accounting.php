@@ -44,9 +44,11 @@ return new class extends Migration
 
     public function down(): void
     {
+        // MySQL : la clé étrangère s'appuie sur l'index unique, elle doit partir en premier.
         Schema::table('cash_closings', function (Blueprint $table) {
+            $table->dropForeign(['place_id']);
             $table->dropUnique(['place_id', 'period_end']);
-            $table->dropConstrainedForeignId('place_id');
+            $table->dropColumn('place_id');
             $table->unique('period_end');
         });
 

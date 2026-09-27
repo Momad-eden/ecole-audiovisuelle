@@ -36,7 +36,7 @@ final class PageBlocks
             self::timeline(), self::faq(), self::programs(), self::artworks(), self::rooms(), self::news(),
             self::partners(), self::professionalSpace(), self::contact(),
             self::ecosystem(), self::services(), self::equipmentList(), self::packs(), self::productions(),
-            self::agenda(), self::bookingForm(), self::places(),
+            self::agenda(), self::bookingForm(), self::places(), self::campuses(),
         ];
     }
 
@@ -115,6 +115,16 @@ final class PageBlocks
         ]);
     }
 
+    private static function campuses(): Block
+    {
+        return Block::make('campuses')->label('Nos campus (Dakar, Saint-Louis)')->icon('heroicon-o-academic-cap')->schema([
+            TextInput::make('eyebrow')->label('Surtitre')->maxLength(60),
+            TextInput::make('title')->label('Titre')->maxLength(90)->default('Choisissez votre campus'),
+            Textarea::make('text')->label('Texte')->rows(2)->maxLength(300)
+                ->helperText('Photos, accroches, points forts et adresses se gèrent dans Administration › Lieux.'),
+        ]);
+    }
+
     private static function places(): Block
     {
         return Block::make('places')->label('Nos lieux (adresses)')->icon('heroicon-o-map-pin')->schema([
@@ -164,12 +174,22 @@ final class PageBlocks
                 'stage' => 'Scène animée (faisceaux de lumière)',
                 'studio' => 'Studio animé (console de mixage)',
                 'events' => 'Événementiel animé (sonorisation et lumières)',
+                'spotlight' => 'Projecteur (titre centré sous une poursuite)',
+                'editorial' => 'Éditorial (grand titre et portrait, façon magazine)',
+                'poster' => 'Affiche de concert (titre géant sur aplat de couleur)',
+                'mosaic' => 'Mosaïque (titre et collage de photos)',
+                'compact' => 'Sobre (en-tête court, pages secondaires)',
                 'full' => 'Plein écran',
                 'split' => 'Texte et image côte à côte',
             ])->default('stage')->inline()->live(),
             TagsInput::make('words')->label('Mots qui défilent à la fin du titre')->placeholder('Ex. le son')
                 ->helperText('Scène animée uniquement : le titre se termine par ces mots, l\'un après l\'autre. Laissez vide pour un titre fixe.')
                 ->visible(fn ($get) => in_array($get('layout'), ['stage', 'studio', 'events'], true)),
+            FileUpload::make('images')->label('Photos de la mosaïque (3 ou 4)')->image()->multiple()->reorderable()->maxFiles(4)
+                ->disk('public')->directory('pages')->maxSize(8192)
+                ->visible(fn ($get) => $get('layout') === 'mosaic'),
+            TextInput::make('caption')->label('Légende de la photo')->maxLength(120)
+                ->visible(fn ($get) => in_array($get('layout'), ['editorial', 'mosaic', 'poster'], true)),
             ColorPicker::make('accent')->label('Couleur de lumière (facultatif)'),
             self::buttons(),
         ]);

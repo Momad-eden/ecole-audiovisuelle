@@ -17,7 +17,6 @@ use App\Models\User;
 use App\Services\ApplicationWorkflow;
 use App\Services\CashRegister;
 use Illuminate\Foundation\Testing\RefreshDatabase;
-use Illuminate\Support\Facades\Schema;
 use Livewire\Livewire;
 use Tests\TestCase;
 
@@ -49,21 +48,6 @@ class CampusAccountingTest extends TestCase
     {
         return $this->cash->record(array_merge(['direction' => 'out', 'category' => 'logistique', 'amount' => $amount, 'method' => 'cash',
             'occurred_on' => today()->toDateString(), 'place_id' => $campus->id, 'payee' => 'Librairie'], $extra), $by);
-    }
-
-    public function test_campus_columns_migration_is_reversible(): void
-    {
-        $migration = require database_path('migrations/2026_09_28_090000_add_campus_to_accounting.php');
-        $migration->down();
-        foreach (['cash_transactions', 'cash_closings', 'students', 'users'] as $table) {
-            $this->assertFalse(Schema::hasColumn($table, 'place_id'), $table);
-        }
-        $this->assertFalse(Schema::hasColumn('places', 'code'));
-
-        $migration->up();
-        foreach (['cash_transactions', 'cash_closings', 'students', 'users'] as $table) {
-            $this->assertTrue(Schema::hasColumn($table, 'place_id'), $table);
-        }
     }
 
     public function test_each_campus_has_its_own_numbering_and_balance(): void

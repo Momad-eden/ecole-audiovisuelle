@@ -326,7 +326,12 @@ export function PlaceCard({ place }: { place: Place }) {
   const whatsapp = place.whatsapp?.replace(/[^0-9]/g, "");
   return (
     <article className="flex h-full flex-col overflow-hidden rounded-3xl border border-line bg-night-2">
-      {place.image && <div className="relative aspect-[16/9] border-b border-line"><MediaImage image={place.image} sizes="(min-width: 1024px) 33vw, 100vw" /></div>}
+      <div className="relative aspect-[16/9] border-b border-line" style={{ background: "radial-gradient(80% 70% at 60% 30%, color-mix(in oklab, var(--accent) 22%, transparent), transparent 70%)" }}>
+        {place.image ? <MediaImage image={place.image} sizes="(min-width: 1024px) 33vw, 100vw" /> : (
+          <InView className="absolute inset-5 opacity-80"><UniverseVisual kind={place.kind === "studio" ? "sound" : place.kind === "cultural_center" ? "design" : "stage"} /></InView>
+        )}
+        <span className="display absolute bottom-3 left-5 text-3xl text-ink drop-shadow-[0_2px_16px_rgb(0_0_0/0.6)]">{place.city}</span>
+      </div>
       <div className="flex flex-1 flex-col p-7">
         <p className="cartel text-[var(--accent-ink)]">{KIND_LABEL[place.kind]}{place.city ? ` · ${place.city}` : ""}</p>
         <h3 className="display mt-2 text-2xl">{place.name}</h3>
@@ -346,14 +351,16 @@ export function PlaceCard({ place }: { place: Place }) {
   );
 }
 
+const PLACE_ACCENT: Record<Place["kind"], string> = { campus: "var(--color-brand)", studio: "var(--color-rec)", cultural_center: "var(--color-violet)" };
+
 export function PlacesBlock({ data }: { data: { title?: string; items?: Place[] } }) {
   const items = data.items ?? [];
   if (items.length === 0) return null;
   return (
     <Section>
       <SectionTitle eyebrow="Adresses" title={data.title} />
-      <ul className={cn("grid gap-5", items.length > 1 ? "md:grid-cols-2" : "max-w-xl", items.length > 2 && "lg:grid-cols-3")}>
-        {items.map((place, index) => <Reveal as="li" key={place.id} delay={(index % 3) * 100}><PlaceCard place={place} /></Reveal>)}
+      <ul className={cn("grid gap-5", items.length > 1 ? "md:grid-cols-2" : "max-w-xl", items.length > 2 && items.length !== 4 && "lg:grid-cols-3", items.length === 4 && "lg:grid-cols-4")}>
+        {items.map((place, index) => <Reveal as="li" key={place.id} delay={(index % 3) * 100} className="h-full"><div className="h-full" style={{ ["--accent" as string]: PLACE_ACCENT[place.kind] }}><PlaceCard place={place} /></div></Reveal>)}
       </ul>
     </Section>
   );

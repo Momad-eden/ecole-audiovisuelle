@@ -14,9 +14,9 @@ class Place extends Model
 {
     use HasPublication, HasUniqueSlug, RevalidatesFrontend;
 
-    protected $fillable = ['name', 'slug', 'code', 'kind', 'city', 'address', 'phone', 'whatsapp', 'email', 'map_url', 'opening_hours', 'description', 'image', 'image_alt', 'position', 'status', 'published_at'];
+    protected $fillable = ['name', 'slug', 'code', 'kind', 'city', 'address', 'phone', 'whatsapp', 'email', 'map_url', 'opening_hours', 'tagline', 'description', 'highlights', 'image', 'image_alt', 'position', 'status', 'published_at'];
 
-    protected $casts = ['kind' => PlaceKind::class];
+    protected $casts = ['kind' => PlaceKind::class, 'highlights' => 'array'];
 
     protected static function slugSource(): string
     {

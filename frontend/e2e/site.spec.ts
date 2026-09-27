@@ -115,3 +115,10 @@ test("l'Espace Habib Faye et l'agenda sont accessibles depuis le pied de page", 
   await page.goto("/agenda");
   await expect(page.getByRole("heading", { level: 1, name: "Les prochains rendez-vous" })).toBeVisible();
 });
+
+test("la page L'École présente les deux campus et oriente vers la candidature", async ({ page }) => {
+  await page.goto("/ecole");
+  await expect(page.getByRole("heading", { level: 1 })).toContainText("Deux écoles");
+  await expect(page.getByRole("link", { name: "Candidater à Dakar" })).toHaveAttribute("href", "/candidater?campus=emsi-dakar");
+  await expect(page.getByRole("link", { name: "Candidater à Saint-Louis" })).toHaveAttribute("href", "/candidater?campus=emsi-saint-louis");
+});

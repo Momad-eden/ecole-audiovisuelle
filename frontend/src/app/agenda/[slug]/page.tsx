@@ -6,6 +6,7 @@ import { ACTIVITY_ACCENT } from "@/components/blocks/ImpactBlocks";
 import { ButtonLink } from "@/components/ui/ButtonLink";
 import { MediaImage } from "@/components/ui/MediaImage";
 import { RichText } from "@/components/ui/RichText";
+import { ShareButtons } from "@/components/ui/ShareButtons";
 import { api } from "@/lib/api";
 import { siteUrl } from "@/lib/utils";
 
@@ -47,6 +48,7 @@ export default async function AgendaEventPage({ params }: Props) {
       {event.image && <div className="relative mt-12 aspect-[16/9] overflow-hidden rounded-[2rem] border border-line"><MediaImage image={event.image} sizes="(min-width: 1024px) 64rem, 100vw" priority /></div>}
       {event.summary && <p className="mt-10 text-xl text-ink/85">{event.summary}</p>}
       {event.content && <RichText html={event.content} className="mt-8 text-lg" />}
+      <div className="mt-14 border-t border-line pt-8"><ShareButtons path={`/agenda/${event.slug}`} title={event.title} /></div>
       {jsonLd && <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd).replace(/</g, "\\u003c") }} />}
     </article>
   );

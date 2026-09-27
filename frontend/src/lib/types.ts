@@ -191,7 +191,9 @@ export type Place = {
   email: string | null;
   mapUrl: string | null;
   openingHours: string | null;
+  tagline: string | null;
   description: string | null;
+  highlights: string[];
   image: Image | null;
 };
 

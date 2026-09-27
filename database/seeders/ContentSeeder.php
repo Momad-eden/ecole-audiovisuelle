@@ -45,8 +45,15 @@ class ContentSeeder extends Seeder
         $this->partners();
         $this->pages();
         $this->impactLive();
+        $this->siteV3();
         $this->menus();
         $this->redirects();
+    }
+
+    /** Site v3 : L'École présente les deux campus, l'accueil gagne chiffres clés, campus et agenda. */
+    public function refreshSiteV3(): void
+    {
+        $this->siteV3();
     }
 
     /** Ajoute Impact Live (studio, événementiel, Espace Habib Faye) et le campus de Saint-Louis à un site existant. */
@@ -479,6 +486,82 @@ class ContentSeeder extends Seeder
         ]], after: 'venue');
         $this->insertBlock('ecole', ['places', ['title' => 'Deux campus, les mêmes formations', 'kind' => 'campus']], after: 'venue');
         $this->insertBlock('contact', ['places', ['title' => 'Nos lieux']]);
+    }
+
+    private function siteV3(): void
+    {
+        // Accroches et points forts des campus, seulement s'ils sont encore vides (l'école a pu les saisir).
+        $campuses = [
+            'emsi-dakar' => ['Au cœur du Grand Théâtre National Doudou Ndiaye Coumba Rose', [
+                'Des formations sur les plateaux et dans les salles du Grand Théâtre',
+                'Les univers Son, Image, Infographie & design et Scène',
+                'Le programme professionnel EMSI × Grand Théâtre',
+            ]],
+            'emsi-saint-louis' => ['À Saint-Louis, aux côtés d\'Impact Live Studio et de l\'Espace Habib Faye', [
+                'Les mêmes formations qu\'à Dakar',
+                'Un studio d\'enregistrement et un centre culturel à proximité',
+                'Au contact des artistes et des événements de Saint-Louis',
+            ]],
+        ];
+        foreach ($campuses as $slug => [$tagline, $highlights]) {
+            $place = Place::where('slug', $slug)->first();
+            if ($place) {
+                $place->fill(array_filter([
+                    'tagline' => $place->tagline ? null : $tagline,
+                    'highlights' => $place->highlights ? null : $highlights,
+                ]))->save();
+            }
+        }
+
+        $school = Page::where('slug', 'ecole')->first();
+        if (! $school || ! collect($school->draft_blocks ?? [])->contains('type', 'campuses')) {
+            $cta = ['label' => 'Candidater', 'url' => '/candidater', 'style' => 'primary'];
+            $this->page('ecole', 'L\'école', 'system', true, [
+                ['hero', ['eyebrow' => 'L\'école', 'title' => 'Deux écoles, une même passion',
+                    'subtitle' => 'L\'EMSI forme aux métiers du son, de l\'image et du spectacle vivant à Dakar, au Grand Théâtre National, et à Saint-Louis. Les mêmes formations, la même exigence, le même matériel professionnel.',
+                    'layout' => 'editorial', 'caption' => 'EMSI · Dakar · Saint-Louis',
+                    'buttons' => [$cta, ['label' => 'Voir les formations', 'url' => '/formations', 'style' => 'secondary']]]],
+                ['campuses', ['eyebrow' => 'Nos campus', 'title' => 'Choisissez votre campus', 'text' => 'À Dakar comme à Saint-Louis, vous suivez le même programme et passez les mêmes certifications.']],
+                ['stats', ['title' => 'L\'EMSI en quelques repères', 'items' => [
+                    ['value' => '2016', 'label' => 'année de création'],
+                    ['value' => '2', 'label' => 'campus', 'detail' => 'Dakar et Saint-Louis'],
+                    ['value' => '5', 'label' => 'filières techniques', 'detail' => 'Son, lumière, régie, infographie, cadrage'],
+                ]]],
+                ['text', ['title' => 'Notre histoire', 'body' => '<p>Créée en 2016, l\'EMSI est une école de formations technico-artistiques. Elle a développé des Certificats de Spécialité (CS) et des BTS dans les métiers du spectacle vivant, et met à la disposition de ses apprenants un parc matériel professionnel, dont un studio de 154 m² et une scène live.</p><p>Fondée par Boubacar Tall, ingénieur du son sénégalais basé à Saint-Louis, l\'EMSI grandit aux côtés d\'Impact Live Studio, d\'Impact Live Events et de l\'Espace Habib Faye.</p>']],
+                ['cards', ['title' => 'Notre pédagogie', 'items' => [
+                    ['icon' => 'sparkles', 'title' => 'La pratique d\'abord', 'text' => 'Les apprenants sont placés en situation réelle, sur du matériel professionnel.'],
+                    ['icon' => 'users', 'title' => 'Un suivi individualisé', 'text' => 'Chaque parcours est accompagné par l\'équipe pédagogique de l\'EMSI.'],
+                    ['icon' => 'award', 'title' => 'Des certifications', 'text' => 'CS, BTS et, pour les professionnels, certification de niveau BTS par la VAE.'],
+                ]]],
+                ['venue', [
+                    'eyebrow' => 'Campus de Dakar',
+                    'title' => 'Au cœur du Grand Théâtre National Doudou Ndiaye Coumba Rose',
+                    'text' => 'À Dakar, nos apprenants se forment là où le spectacle se fabrique : sur les plateaux, dans les salles et en régie.',
+                    'facts' => [['value' => '154 m²', 'label' => 'de studio'], ['value' => 'Live', 'label' => 'une scène pour s\'exercer en conditions réelles']],
+                ]],
+                ['equipment', [
+                    'title' => 'Sur quoi vous vous formez',
+                    'text' => 'Le matériel des grandes scènes et des plateaux de télévision, en conditions réelles.',
+                    'groups' => [
+                        ['category' => 'Consoles son', 'items' => ['Yamaha', 'Allen & Heath', 'DiGiCo', 'Midas']],
+                        ['category' => 'Diffusion et réseaux audio', 'items' => ['Systèmes Line Array', 'Dante', 'MADI']],
+                        ['category' => 'Lumière de spectacle', 'items' => ['GrandMA', 'Chamsys', 'Avolites', 'DMX, Art-Net, sACN']],
+                        ['category' => 'Image et broadcast', 'items' => ['Caméras broadcast (fibre, HF)', 'Super Slow Motion', 'Intercom de régie']],
+                        ['category' => 'Création numérique', 'items' => ['After Effects', 'Cinema 4D', 'Chroma Key en temps réel']],
+                    ],
+                ]],
+                ['partners', ['title' => 'Nos partenaires']],
+                ['cta', ['title' => 'Venez nous rencontrer', 'text' => 'À Dakar ou à Saint-Louis : une question sur nos formations ? Écrivez-nous ou candidatez en ligne.', 'buttons' => [$cta, ['label' => 'Nous contacter', 'url' => '/contact', 'style' => 'secondary']]]],
+            ], overwrite: true);
+        }
+
+        $this->insertBlock('accueil', ['stats', ['title' => 'L\'EMSI en quelques repères', 'items' => [
+            ['value' => '2', 'label' => 'campus', 'detail' => 'Dakar et Saint-Louis'],
+            ['value' => '5', 'label' => 'univers', 'detail' => 'Son, Image, Design, Scène, et bientôt le Cinéma'],
+            ['value' => '2016', 'label' => 'année de création'],
+        ]]], after: 'marquee');
+        $this->insertBlock('accueil', ['campuses', ['eyebrow' => 'Deux écoles', 'title' => 'Dakar ou Saint-Louis ?', 'text' => 'Les mêmes formations dans nos deux campus : choisissez le plus proche de chez vous.']], after: 'rooms');
+        $this->insertBlock('accueil', ['agenda', ['title' => 'Prochains rendez-vous', 'scope' => 'upcoming', 'limit' => 4]], after: 'professional_space');
     }
 
     /**

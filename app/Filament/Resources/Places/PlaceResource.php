@@ -12,6 +12,7 @@ use App\Models\Place;
 use BackedEnum;
 use Filament\Actions\EditAction;
 use Filament\Forms\Components\Select;
+use Filament\Forms\Components\TagsInput;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
 use Filament\Resources\Resource;
@@ -56,7 +57,11 @@ class PlaceResource extends Resource
                 TextInput::make('email')->label('E-mail')->email(),
                 TextInput::make('opening_hours')->label('Horaires')->maxLength(255),
                 TextInput::make('map_url')->label('Lien Google Maps')->url()->maxLength(500)->columnSpanFull(),
+                TextInput::make('tagline')->label('Accroche')->maxLength(200)->columnSpanFull()
+                    ->placeholder('Ex. Au cœur du Grand Théâtre National'),
                 Textarea::make('description')->label('Présentation')->rows(3)->maxLength(1200)->columnSpanFull(),
+                TagsInput::make('highlights')->label('Points forts')->placeholder('Ex. Studio d\'enregistrement sur place')->columnSpanFull()
+                    ->helperText('Quelques atouts courts, affichés en liste sur la page L\'École.'),
                 ...Fields::image('image', 'places', 'Photo du lieu', '4:3'),
             ]),
             Fields::publication(),

@@ -2,6 +2,8 @@ import Link from "next/link";
 import { AudioLines, Film } from "lucide-react";
 import type { ArtworkSummary } from "@/lib/types";
 import { MediaImage } from "@/components/ui/MediaImage";
+import { ButtonLink } from "@/components/ui/ButtonLink";
+import { EmptyState } from "@/components/ui/EmptyState";
 
 export function ArtworkCard({ artwork }: { artwork: ArtworkSummary }) {
   const accent = artwork.room?.accentColor ?? "var(--color-brand)";
@@ -36,7 +38,11 @@ export function ArtworkCard({ artwork }: { artwork: ArtworkSummary }) {
 
 export function ArtworkGrid({ artworks, empty }: { artworks: ArtworkSummary[]; empty?: string }) {
   if (artworks.length === 0) {
-    return <p className="rounded-2xl border border-dashed border-line p-10 text-center text-ink-muted">{empty ?? "Les premières réalisations des étudiants seront bientôt publiées."}</p>;
+    return (
+      <EmptyState title={empty ?? "Les premières réalisations des étudiants seront bientôt publiées."} text="Films, photos, mixages, affiches, créations lumière : chaque promotion viendra exposer ici son travail." visual="image">
+        <ButtonLink href="/univers">Découvrir les univers</ButtonLink>
+      </EmptyState>
+    );
   }
   return (
     <div className="grid gap-x-6 gap-y-12 sm:grid-cols-2 lg:grid-cols-3">

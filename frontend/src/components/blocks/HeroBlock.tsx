@@ -1,12 +1,23 @@
 import { ButtonLink } from "@/components/ui/ButtonLink";
 import { MediaImage } from "@/components/ui/MediaImage";
-import { cn } from "@/lib/utils";
+import { cn, frenchSpacing } from "@/lib/utils";
 import { HeroVideo } from "./HeroVideo";
 import { StageHero } from "./StageHero";
+import { CompactHero, EditorialHero, MosaicHero, PosterHero, SpotlightHero, heroTitleSize } from "./HeroLayouts";
 import type { HeroData } from "./types";
 
 export function HeroBlock({ data, first }: { data: HeroData; first: boolean }) {
-  if (data.layout === "stage" || data.layout === "studio" || data.layout === "events") return <StageHero data={data} first={first} variant={data.layout} />;
+  switch (data.layout) {
+    case "stage":
+    case "studio":
+    case "events":
+      return <StageHero data={data} first={first} variant={data.layout} />;
+    case "spotlight": return <SpotlightHero data={data} first={first} />;
+    case "editorial": return <EditorialHero data={data} first={first} />;
+    case "poster": return <PosterHero data={data} first={first} />;
+    case "mosaic": return <MosaicHero data={data} first={first} />;
+    case "compact": return <CompactHero data={data} first={first} />;
+  }
   const split = data.layout === "split" && data.image;
   const Heading = first ? "h1" : "h2";
 
@@ -25,9 +36,9 @@ export function HeroBlock({ data, first }: { data: HeroData; first: boolean }) {
       <div className="beam absolute inset-0 -z-10" aria-hidden />
 
       <div className={cn("mx-auto w-full max-w-7xl px-4 sm:px-6 lg:px-8", split && "grid items-center gap-12 lg:grid-cols-2")}>
-        <div className="max-w-3xl">
+        <div className={cn(split ? "max-w-3xl" : "max-w-5xl")}>
           {data.eyebrow && <p className="cartel mb-5 flex items-center gap-3 text-[var(--accent-ink)]"><span className="h-px w-10 bg-[var(--accent-ink)]" aria-hidden />{data.eyebrow}</p>}
-          <Heading className="display text-[clamp(2.4rem,6.5vw,5.8rem)] text-balance">{data.title}</Heading>
+          <Heading className={cn("display text-balance", heroTitleSize(data.title))}>{frenchSpacing(data.title)}</Heading>
           {data.subtitle && <p className="mt-6 max-w-2xl text-lg text-ink/80 sm:text-xl">{data.subtitle}</p>}
           {data.buttons && data.buttons.length > 0 && (
             <div className="mt-10 flex flex-wrap gap-3">

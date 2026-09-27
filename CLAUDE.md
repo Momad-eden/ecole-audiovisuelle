@@ -55,6 +55,8 @@
 | Données du site | `fetch` serveur étiqueté `content`, régénéré par Laravel à chaque publication (`FrontendRevalidator`) |
 | Formulaires publics | react-hook-form + zod côté Next ; FormRequest Laravel font foi |
 
+Comptabilité : **une caisse par campus** (`place_id`, code DKR/STL dans la numérotation, soldes, clôtures et exports séparés) ; personnel rattachable à un campus (`users.place_id`, requêtes et Policies filtrées via `BelongsToCampus`).
+
 Impact Live : lieux (`places`), services à prix « à partir de », matériel à louer et packs, agenda et références, demandes de devis/réservation (`BookingWorkflow` : nouvelle → devis envoyé → confirmée → réalisée / annulée), rôle `commercial`.
 
 Domaine : filières → programmes (école / professionnels) → sessions → offres ; candidatures (`ApplicationWorkflow`) → étudiants → inscriptions ; caisse inaltérable (`CashRegister` : contre-écritures, clôtures). Univers (table `rooms`) → filières ; réalisations (`artworks`) et expositions. Contenu : pages à blocs (brouillon → publication → révisions), actualités, FAQ, menus, redirections.
@@ -96,6 +98,7 @@ composer test:mysql              # même suite sur MySQL 8.4 (conteneur Docker j
 php artisan emsi:create-admin    # créer un compte (aucun compte par défaut)
 php artisan emsi:site-v2         # mettre à niveau une base existante vers le site « Plein feux » (relançable)
 php artisan emsi:impact-live     # ajouter Impact Live et le campus de Saint-Louis à une base existante (relançable)
+php artisan emsi:site-v3         # page L'École à deux campus, chiffres clés et agenda sur l'accueil (relançable)
 ./vendor/bin/pint
 
 # Frontend

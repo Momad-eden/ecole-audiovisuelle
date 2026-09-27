@@ -5,6 +5,7 @@ import { PlayerBar } from "@/components/audio/PlayerBar";
 import { SiteFooter } from "@/components/layout/SiteFooter";
 import { SiteHeader } from "@/components/layout/SiteHeader";
 import { QuoteBar } from "@/components/quote/QuoteBar";
+import { WhatsAppButton } from "@/components/layout/WhatsAppButton";
 import { themeInitScript } from "@/components/layout/ThemeToggle";
 import { api } from "@/lib/api";
 import { siteUrl } from "@/lib/utils";
@@ -63,6 +64,7 @@ export default async function RootLayout({ children }: Readonly<{ children: Reac
           <SiteFooter site={site} />
           <PlayerBar />
           <QuoteBar />
+          <WhatsAppButton number={settings.whatsapp} />
         </AudioProvider>
         <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd).replace(/</g, "\\u003c") }} />
       </body>

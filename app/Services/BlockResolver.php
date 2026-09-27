@@ -57,7 +57,8 @@ class BlockResolver
         $data = $this->withImages($data);
 
         $data = match ($type) {
-            'hero' => [...$data, 'video_loop' => Media::url($data['video_loop'] ?? null)],
+            'hero' => [...$data, 'video_loop' => Media::url($data['video_loop'] ?? null),
+                'images' => collect($data['images'] ?? [])->map(fn ($path) => Media::image($path, $data['title'] ?? null))->filter()->values()->all()],
             'gallery' => [...$data, 'images' => collect($data['images'] ?? [])->map(fn ($item) => [
                 ...$this->withImages($item),
             ])->values()->all()],
@@ -83,6 +84,7 @@ class BlockResolver
             'productions' => [...$data, 'items' => ArtworkResource::collection(Artwork::published()->where('origin', 'studio')->with(['room', 'track'])
                 ->latest('published_at')->limit((int) ($data['limit'] ?? 6))->get())->resolve()],
             'ecosystem' => [...$data, 'items' => collect($data['items'] ?? [])->map(fn ($item) => $this->withImages($item))->values()->all()],
+            'campuses' => [...$data, 'items' => PlaceResource::collection(Place::published()->campuses()->orderBy('position')->get())->resolve()],
             'places' => [...$data, 'items' => PlaceResource::collection(Place::published()
                 ->when($data['kind'] ?? null, fn ($q, $kind) => $q->where('kind', $kind))->orderBy('position')->get())->resolve()],
             'equipment' => [...$data, 'groups' => collect($data['groups'] ?? [])->map(fn ($group) => $this->withImages($group))->values()->all()],

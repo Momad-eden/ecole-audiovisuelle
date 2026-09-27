@@ -4,6 +4,7 @@ import { ArtworksBlock, NewsBlock, PartnersBlock, ProfessionalSpaceBlock, Progra
 import { ContactBlock } from "./ContactBlock";
 import { CardsBlock, CtaBlock, FaqBlock, GalleryBlock, QuoteBlock, StatsBlock, TextBlock, TextImageBlock, TimelineBlock, VideoBlock } from "./ContentBlocks";
 import { HeroBlock } from "./HeroBlock";
+import { CampusesBlock } from "./CampusesBlock";
 import { AgendaBlock, BookingFormBlock, EcosystemBlock, EquipmentListBlock, PacksBlock, PlacesBlock, ProductionsBlock, ServicesBlock } from "./ImpactBlocks";
 import { EquipmentBlock, MarqueeBlock, VenueBlock } from "./ShowcaseBlocks";
 import type * as T from "./types";
@@ -26,6 +27,7 @@ export function BlockRenderer({ blocks }: { blocks: Block[] }) {
           case "productions": return <ProductionsBlock key={block.id} data={d as never} />;
           case "agenda": return <AgendaBlock key={block.id} data={d as never} />;
           case "booking_form": return <BookingFormBlock key={block.id} data={d as never} />;
+          case "campuses": return <CampusesBlock key={block.id} data={d as never} />;
           case "places": return <PlacesBlock key={block.id} data={d as never} />;
           case "marquee": return <MarqueeBlock key={block.id} data={d as T.MarqueeData} />;
           case "venue": return <VenueBlock key={block.id} data={d as T.VenueData} />;

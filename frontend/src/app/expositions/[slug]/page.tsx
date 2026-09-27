@@ -27,7 +27,7 @@ export default async function ExhibitionPage({ params }: Props) {
         </div>
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
           <p className="cartel">{[formatDate(exhibition.startsOn), formatDate(exhibition.endsOn)].filter(Boolean).join(" – ")}{exhibition.venue && ` · ${exhibition.venue}`}</p>
-          <h1 className="mt-4 max-w-4xl font-display text-5xl font-medium text-balance sm:text-7xl">{exhibition.title}</h1>
+          <h1 className="display mt-5 max-w-5xl text-[clamp(2.4rem,6vw,5rem)] text-balance">{exhibition.title}</h1>
           {exhibition.subtitle && <p className="mt-4 max-w-2xl text-xl text-ink/80">{exhibition.subtitle}</p>}
         </div>
       </section>

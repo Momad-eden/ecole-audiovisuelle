@@ -82,7 +82,7 @@ export function StatsBlock({ data }: { data: StatsData }) {
   return (
     <Section>
       <SectionTitle title={data.title} />
-      <dl className="grid gap-px overflow-hidden rounded-3xl border border-line bg-line sm:grid-cols-2 lg:grid-cols-3">
+      <dl className={cn("grid gap-px overflow-hidden rounded-3xl border border-line bg-line sm:grid-cols-2", (data.items ?? []).length === 3 && "lg:grid-cols-3", (data.items ?? []).length >= 4 && "lg:grid-cols-4")}>
         {(data.items ?? []).map((item, i) => (
           <Reveal key={item.label} delay={i * 100} className="bg-night p-8 sm:p-10">
             <dt className="cartel">{item.label}</dt>

@@ -24,7 +24,9 @@ class PlaceResource extends JsonResource
             'email' => $this->email,
             'mapUrl' => $this->map_url,
             'openingHours' => $this->opening_hours,
+            'tagline' => $this->tagline,
             'description' => $this->description,
+            'highlights' => $this->highlights ?? [],
             'image' => Media::image($this->image, $this->image_alt ?: $this->name),
         ];
     }
