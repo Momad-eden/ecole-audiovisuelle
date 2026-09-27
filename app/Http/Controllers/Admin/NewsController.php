@@ -33,7 +33,7 @@ class NewsController extends Controller
     {
         $validated = $request->validated();
 
-        $validated['slug'] = Str::slug($validated['title']);
+        $validated['slug'] = $this->uniqueSlug($validated['title']);
 
         if ($request->hasFile('image')) {
             $validated['image'] = $this->fileUploadService->upload($request->file('image'), 'news');
@@ -66,7 +66,7 @@ class NewsController extends Controller
     {
         $validated = $request->validated();
 
-        $validated['slug'] = Str::slug($validated['title']);
+        // Le slug reste inchangé : les liens déjà partagés ne cassent pas.
 
         if ($request->hasFile('image')) {
             $validated['image'] = $this->fileUploadService->replace(
@@ -82,7 +82,7 @@ class NewsController extends Controller
             $validated['published_at'] = now();
         }
 
-        if (!$validated['is_published']) {
+        if (! $validated['is_published']) {
             $validated['published_at'] = null;
         }
 
@@ -104,5 +104,22 @@ class NewsController extends Controller
         return redirect()
             ->route('news.index')
             ->with('success', 'Actualité supprimée.');
+    }
+
+    /**
+     * Slug unique dérivé du titre : « titre », puis « titre-2 », « titre-3 »…
+     */
+    protected function uniqueSlug(string $title): string
+    {
+        $base = Str::slug($title) ?: 'actualite';
+        $slug = $base;
+        $suffix = 2;
+
+        while (News::where('slug', $slug)->exists()) {
+            $slug = "{$base}-{$suffix}";
+            $suffix++;
+        }
+
+        return $slug;
     }
 }
