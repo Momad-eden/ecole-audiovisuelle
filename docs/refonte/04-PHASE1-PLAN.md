@@ -29,7 +29,7 @@
 
 ---
 
-### Tâche 1 : Comptes et authentification (S1, S2, S7, S8)
+### Task 1 — Comptes et authentification (S1, S2, S7, S8)
 
 **Fichiers :** `routes/auth.php`, `routes/web.php`, suppression de `RegisteredUserController` et de la vue `auth/register`, nouvelle migration `…_remove_default_role_from_users_table.php`, `database/seeders/DatabaseSeeder.php`, `app/Console/Commands/CreateAdminCommand.php`, `app/Http/Controllers/Admin/UserController.php`, `app/Http/Requests/Admin/UpdateUserRequest.php`. Tests : `tests/Feature/Auth/RegistrationTest.php` (réécrit), `tests/Feature/AccountSecurityTest.php` (nouveau), `tests/Feature/ProfileTest.php`.
 
@@ -39,7 +39,7 @@
 - [ ] Vérifier que tous les tests passent.
 - [ ] Commit `fix(auth): close public registration, remove default role and password`.
 
-### Tâche 2 : Intégrité des suppressions (D1)
+### Task 2 — Intégrité des suppressions (D1)
 
 **Fichiers :** migration `…_restrict_deletes_and_add_soft_deletes.php`, modèles `Course`, `Student`, `Payment` (trait `SoftDeletes`). Tests : `tests/Feature/DeletionIntegrityTest.php`.
 
@@ -49,7 +49,7 @@
 - [ ] Vérifier le succès.
 - [ ] Commit `fix(data): restrict destructive cascades and add soft deletes`.
 
-### Tâche 3 : Séquences transactionnelles (D2, D3)
+### Task 3 — Séquences transactionnelles (D2, D3)
 
 **Fichiers :** migration `…_create_sequences_table.php`, `app/Services/SequenceService.php` (nouveau), `app/Models/Payment.php`, `app/Services/StudentNumberService.php`. Tests : `tests/Feature/SequenceServiceTest.php`.
 
@@ -61,7 +61,7 @@
 - [ ] Vérifier le succès.
 - [ ] Commit `fix(cash): transactional sequences for receipts and student numbers`.
 
-### Tâche 4 : Formulaire public de candidature (S3, D10 partiel)
+### Task 4 — Formulaire public de candidature (S3, D10 partiel)
 
 **Fichiers :** `routes/web.php`, `app/Providers/AppServiceProvider.php` (RateLimiter `admissions`), `app/Http/Requests/Public/StorePublicAdmissionRequest.php`, `app/Http/Controllers/Public/AdmissionController.php`, `resources/views/public/admissions/create.blade.php`. Tests : `tests/Feature/PublicAdmissionTest.php`.
 
@@ -71,7 +71,7 @@
 - [ ] Vérifier le succès.
 - [ ] Commit `fix(admission): rate limit, honeypot and stricter validation`.
 
-### Tâche 5 : Caisse (A7, D11)
+### Task 5 — Caisse (A7, D11)
 
 **Fichiers :** `app/Http/Controllers/Admin/PaymentController.php`, `app/Http/Requests/Admin/StorePaymentRequest.php`, `UpdatePaymentRequest.php`. Tests : `tests/Feature/CashRegisterAndAccountingTest.php`.
 
@@ -81,7 +81,7 @@
 - [ ] Vérifier le succès.
 - [ ] Commit `fix(cash): search by student number, coherent categories and bounds`.
 
-### Tâche 6 : Tableau de bord et menu par rôle (S6)
+### Task 6 — Tableau de bord et menu par rôle (S6)
 
 **Fichiers :** `app/Providers/AppServiceProvider.php` (Gates `view-finances`, `manage-admissions`, `manage-content`), `app/Http/Controllers/Admin/DashboardController.php`, `resources/views/admin/dashboard.blade.php`, `resources/views/components/ui/sidebar.blade.php`, `resources/views/components/ui/header.blade.php`. Tests : `tests/Feature/DashboardVisibilityTest.php`.
 
@@ -91,7 +91,7 @@
 - [ ] Vérifier le succès.
 - [ ] Commit `fix(admin): scope dashboard and navigation to user role`.
 
-### Tâche 7 : Actualités — slug unique et stable (D13)
+### Task 7 — Actualités — slug unique et stable (D13)
 
 **Fichiers :** `app/Http/Controllers/Admin/NewsController.php`. Tests : `tests/Feature/NewsSlugTest.php`.
 
@@ -99,7 +99,7 @@
 - [ ] Vérifier l'échec, implémenter `uniqueSlug(string $title): string`, vérifier le succès.
 - [ ] Commit `fix(news): unique and stable slugs`.
 
-### Tâche 8 : Français partout (A8, A5, S5)
+### Task 8 — Français partout (A8, A5, S5)
 
 **Fichiers :** `config/app.php`, `.env.example`, `lang/fr/{validation,auth,passwords,pagination}.php`, `lang/fr.json` (chaînes Breeze), `resources/views/components/text-input.blade.php`, layouts `guest` et `app` (titre « EMSI »), `resources/views/admin/students/create.blade.php` (affichage des erreurs, A9). Tests : `tests/Feature/FrenchLocaleTest.php`.
 
@@ -109,7 +109,7 @@
 - [ ] Vérifier le succès.
 - [ ] Commit `fix(i18n): French locale, translations and readable profile form`.
 
-### Tâche 9 : Contenus fictifs et affirmations non sourcées (01-AUDIT §5.2, §5.4)
+### Task 9 — Contenus fictifs et affirmations non sourcées (01-AUDIT §5.2, §5.4)
 
 **Fichiers :** vues `public/{home,vae,project,about,admissions/create,admissions/success,courses/index}`, `components/public/{header,footer}`, `layouts/public`, `admin/payments/receipt`, `admin/settings/index`. Tests : `tests/Feature/PublicContentIntegrityTest.php`.
 
@@ -119,7 +119,7 @@
 - [ ] Vérifier le succès.
 - [ ] Commit `fix(content): remove fake contacts and unsourced legal claims`.
 
-### Tâche 10 : Tests sur MySQL et bruit de dépréciation
+### Task 10 — Tests sur MySQL et bruit de dépréciation
 
 **Fichiers :** `config/database.php` (constante `Pdo\Mysql::ATTR_SSL_CA` sous PHP ≥ 8.5), `phpunit.mysql.xml`, `scripts/test-mysql.sh`, `composer.json` (script `test:mysql`), `CLAUDE.md` §7.
 
