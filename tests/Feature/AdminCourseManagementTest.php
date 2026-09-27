@@ -221,6 +221,6 @@ class AdminCourseManagementTest extends TestCase
 
         $response->assertRedirect(route('courses.index'));
         $response->assertSessionHas('success');
-        $this->assertDatabaseMissing('courses', ['id' => $course->id]);
+        $this->assertSoftDeleted($course);
     }
 }

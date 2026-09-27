@@ -4,10 +4,11 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\SoftDeletes;
 
 class Course extends Model
 {
-    use HasFactory;
+    use HasFactory, SoftDeletes;
 
     protected $fillable = [
         'title',
@@ -59,6 +60,7 @@ class Course extends Model
         if ($this->relationLoaded('students')) {
             return $this->students->count();
         }
+
         return $this->students()->count();
     }
 
@@ -72,6 +74,7 @@ class Course extends Model
             return 0.0;
         }
         $enrolled = $this->enrolled_students_count;
+
         return min(100.0, round(($enrolled / $cap) * 100, 1));
     }
 
@@ -81,6 +84,7 @@ class Course extends Model
     public function getTotalExpectedRevenueAttribute(): float
     {
         $enrolled = $this->enrolled_students_count;
+
         return (float) ($this->price * $enrolled);
     }
 
@@ -92,6 +96,7 @@ class Course extends Model
         if ($this->relationLoaded('payments')) {
             return (float) $this->payments->where('type', 'inflow')->sum('amount');
         }
+
         return (float) $this->payments()->where('type', 'inflow')->sum('amount');
     }
 }

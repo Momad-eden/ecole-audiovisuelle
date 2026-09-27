@@ -27,7 +27,7 @@ class Gallery extends Model
      */
     public function getYoutubeIdAttribute(): ?string
     {
-        if (!$this->youtube_url) {
+        if (! $this->youtube_url) {
             return null;
         }
 
@@ -46,6 +46,7 @@ class Gallery extends Model
     public function getYoutubeThumbnailAttribute(): ?string
     {
         $id = $this->youtube_id;
+
         return $id ? "https://img.youtube.com/vi/{$id}/hqdefault.jpg" : null;
     }
 
@@ -55,6 +56,7 @@ class Gallery extends Model
     public function getYoutubeEmbedUrlAttribute(): ?string
     {
         $id = $this->youtube_id;
+
         return $id ? "https://www.youtube-nocookie.com/embed/{$id}?autoplay=1&rel=0" : null;
     }
 
@@ -64,7 +66,7 @@ class Gallery extends Model
     public function getImageUrlAttribute(): ?string
     {
         if ($this->type === 'image' && $this->file_path) {
-            return asset('storage/' . $this->file_path);
+            return asset('storage/'.$this->file_path);
         }
 
         if ($this->type === 'video' && $this->youtube_thumbnail) {

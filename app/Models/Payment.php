@@ -7,10 +7,11 @@ use App\Enums\TransactionCategory;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\SoftDeletes;
 
 class Payment extends Model
 {
-    use HasFactory;
+    use HasFactory, SoftDeletes;
 
     protected $fillable = [
         'type',
@@ -55,7 +56,7 @@ class Payment extends Model
 
     public function student()
     {
-        return $this->belongsTo(Student::class);
+        return $this->belongsTo(Student::class)->withTrashed();
     }
 
     public function creator()
@@ -91,6 +92,7 @@ class Payment extends Model
                 return $catEnum->label();
             }
         }
+
         return $this->isInflow() ? 'Encaissement' : 'Décaissement';
     }
 
@@ -102,6 +104,7 @@ class Payment extends Model
                 return $methodEnum->label();
             }
         }
+
         return $this->payment_method ?? 'Non précisé';
     }
 }

@@ -4,10 +4,11 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\SoftDeletes;
 
 class Student extends Model
 {
-    use HasFactory;
+    use HasFactory, SoftDeletes;
 
     protected $fillable = [
         'student_number',
@@ -42,12 +43,14 @@ class Student extends Model
         if ($this->relationLoaded('payments')) {
             return (float) $this->payments->where('type', 'inflow')->sum('amount');
         }
+
         return (float) $this->payments()->where('type', 'inflow')->sum('amount');
     }
 
     public function getRemainingDueAttribute(): float
     {
         $price = (float) ($this->course?->price ?? 0);
+
         return max(0, $price - $this->total_paid);
     }
 
@@ -57,6 +60,7 @@ class Student extends Model
         if ($price <= 0) {
             return 100.0;
         }
+
         return min(100.0, round(($this->total_paid / $price) * 100, 1));
     }
 
@@ -70,12 +74,13 @@ class Student extends Model
         } elseif ($paid > 0) {
             return 'partial'; // Partiel
         }
+
         return 'unpaid'; // Non payé
     }
 
     public function course()
     {
-        return $this->belongsTo(Course::class);
+        return $this->belongsTo(Course::class)->withTrashed();
     }
 
     public function admission()

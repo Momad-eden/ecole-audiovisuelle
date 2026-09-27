@@ -11,6 +11,7 @@ use App\Services\FileUploadService;
 use App\Services\StudentNumberService;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\View\View;
 
 class StudentController extends Controller
@@ -47,12 +48,12 @@ class StudentController extends Controller
 
         if ($request->filled('payment_status') && in_array($request->payment_status, ['paid', 'partial', 'unpaid'])) {
             $desiredStatus = $request->payment_status;
-            $allStudents = $allStudents->filter(fn($student) => $student->payment_status === $desiredStatus);
+            $allStudents = $allStudents->filter(fn ($student) => $student->payment_status === $desiredStatus);
         }
 
         $page = (int) $request->input('page', 1);
         $perPage = 15;
-        $students = new \Illuminate\Pagination\LengthAwarePaginator(
+        $students = new LengthAwarePaginator(
             $allStudents->forPage($page, $perPage)->values(),
             $allStudents->count(),
             $perPage,
@@ -64,11 +65,11 @@ class StudentController extends Controller
 
         $allForStats = Student::with(['course', 'payments'])->get();
         $stats = [
-            'total'    => $allForStats->count(),
-            'active'   => $allForStats->where('status', 'Inscrit')->count(),
-            'paid'     => $allForStats->filter(fn($s) => $s->payment_status === 'paid')->count(),
-            'partial'  => $allForStats->filter(fn($s) => $s->payment_status === 'partial')->count(),
-            'unpaid'   => $allForStats->filter(fn($s) => $s->payment_status === 'unpaid')->count(),
+            'total' => $allForStats->count(),
+            'active' => $allForStats->where('status', 'Inscrit')->count(),
+            'paid' => $allForStats->filter(fn ($s) => $s->payment_status === 'paid')->count(),
+            'partial' => $allForStats->filter(fn ($s) => $s->payment_status === 'partial')->count(),
+            'unpaid' => $allForStats->filter(fn ($s) => $s->payment_status === 'unpaid')->count(),
         ];
 
         return view('admin.students.index', compact('students', 'courses', 'stats'));
@@ -133,10 +134,7 @@ class StudentController extends Controller
 
     public function destroy(Student $student): RedirectResponse
     {
-        if ($student->photo) {
-            $this->fileUploadService->delete($student->photo);
-        }
-
+        // Suppression douce : la fiche, la photo et les paiements sont conservés.
         $student->delete();
 
         return redirect()

@@ -32,9 +32,9 @@ class CourseController extends Controller
             $search = $request->search;
             $query->where(function ($q) use ($search) {
                 $q->where('title', 'like', "%{$search}%")
-                  ->orWhere('category', 'like', "%{$search}%")
-                  ->orWhere('level', 'like', "%{$search}%")
-                  ->orWhere('slug', 'like', "%{$search}%");
+                    ->orWhere('category', 'like', "%{$search}%")
+                    ->orWhere('level', 'like', "%{$search}%")
+                    ->orWhere('slug', 'like', "%{$search}%");
             });
         }
 
@@ -131,21 +131,21 @@ class CourseController extends Controller
         }
 
         $course = Course::create([
-            'title'          => $validated['title'],
-            'slug'           => $slug,
-            'category'       => $validated['category'] ?? null,
-            'level'          => $validated['level'] ?? null,
-            'duration'       => $validated['duration'] ?? null,
+            'title' => $validated['title'],
+            'slug' => $slug,
+            'category' => $validated['category'] ?? null,
+            'level' => $validated['level'] ?? null,
+            'duration' => $validated['duration'] ?? null,
             'students_count' => $validated['students_count'] ?? 0,
-            'price'          => $validated['price'] ?? 0,
-            'description'    => $validated['description'] ?? null,
-            'image'          => $imagePath,
-            'is_active'      => $request->boolean('is_active', true),
+            'price' => $validated['price'] ?? 0,
+            'description' => $validated['description'] ?? null,
+            'image' => $imagePath,
+            'is_active' => $request->boolean('is_active', true),
         ]);
 
         return redirect()
             ->route('courses.show', $course)
-            ->with('success', 'La formation « ' . $course->title . ' » a été créée avec succès.');
+            ->with('success', 'La formation « '.$course->title.' » a été créée avec succès.');
     }
 
     /**
@@ -155,8 +155,8 @@ class CourseController extends Controller
     {
         // Chargement des relations avec données financières et admissions
         $course->load([
-            'students' => fn($q) => $q->with(['payments'])->latest(),
-            'admissions' => fn($q) => $q->latest(),
+            'students' => fn ($q) => $q->with(['payments'])->latest(),
+            'admissions' => fn ($q) => $q->latest(),
         ]);
 
         // Données d'effectifs
@@ -245,21 +245,21 @@ class CourseController extends Controller
         }
 
         $course->update([
-            'title'          => $validated['title'],
-            'slug'           => $slug,
-            'category'       => $validated['category'] ?? null,
-            'level'          => $validated['level'] ?? null,
-            'duration'       => $validated['duration'] ?? null,
+            'title' => $validated['title'],
+            'slug' => $slug,
+            'category' => $validated['category'] ?? null,
+            'level' => $validated['level'] ?? null,
+            'duration' => $validated['duration'] ?? null,
             'students_count' => $validated['students_count'] ?? 0,
-            'price'          => $validated['price'] ?? 0,
-            'description'    => $validated['description'] ?? null,
-            'image'          => $imagePath,
-            'is_active'      => $request->boolean('is_active'),
+            'price' => $validated['price'] ?? 0,
+            'description' => $validated['description'] ?? null,
+            'image' => $imagePath,
+            'is_active' => $request->boolean('is_active'),
         ]);
 
         return redirect()
             ->route('courses.show', $course)
-            ->with('success', 'La formation « ' . $course->title . ' » a été mise à jour avec succès.');
+            ->with('success', 'La formation « '.$course->title.' » a été mise à jour avec succès.');
     }
 
     /**
@@ -276,10 +276,7 @@ class CourseController extends Controller
 
         $title = $course->title;
 
-        if ($course->image) {
-            $this->fileUploadService->delete($course->image);
-        }
-
+        // Suppression douce : l'image est conservée pour permettre une restauration.
         $course->delete();
 
         return redirect()
@@ -296,8 +293,8 @@ class CourseController extends Controller
         $originalSlug = $slug;
         $counter = 1;
 
-        while (Course::where('slug', $slug)->when($ignoreId, fn($q) => $q->where('id', '!=', $ignoreId))->exists()) {
-            $slug = $originalSlug . '-' . $counter;
+        while (Course::where('slug', $slug)->when($ignoreId, fn ($q) => $q->where('id', '!=', $ignoreId))->exists()) {
+            $slug = $originalSlug.'-'.$counter;
             $counter++;
         }
 
