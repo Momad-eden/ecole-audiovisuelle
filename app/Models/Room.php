@@ -9,12 +9,25 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 
-/** Salle permanente du musée (Son, Lumière, Image, Visuel…). */
+/** Univers de l'école (Son, Image, Infographie & design, Scène, Cinéma…), anciennement « salle » du musée. */
 class Room extends Model
 {
     use HasFactory, HasPublication, HasUniqueSlug, RevalidatesFrontend;
 
-    protected $fillable = ['name', 'slug', 'tagline', 'intro', 'accent_color', 'cover_image', 'cover_alt', 'position', 'status', 'published_at'];
+    /** Signature visuelle animée de chaque univers sur le site. */
+    public const VISUALS = [
+        'sound' => 'Son (spectre sonore)',
+        'image' => 'Image (viseur de caméra)',
+        'design' => 'Design (tracé vectoriel)',
+        'stage' => 'Scène (faisceaux de lumière)',
+        'cinema' => 'Cinéma (pellicule)',
+    ];
+
+    protected $fillable = ['name', 'slug', 'tagline', 'intro', 'accent_color', 'visual', 'is_upcoming', 'cover_image', 'cover_alt', 'position', 'status', 'published_at'];
+
+    protected $casts = [
+        'is_upcoming' => 'boolean',
+    ];
 
     protected static function slugSource(): string
     {
@@ -28,6 +41,6 @@ class Room extends Model
 
     public function tracks(): HasMany
     {
-        return $this->hasMany(Track::class);
+        return $this->hasMany(Track::class)->orderBy('position');
     }
 }

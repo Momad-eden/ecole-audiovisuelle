@@ -96,14 +96,23 @@ class ContentController extends Controller
 
     public function rooms(): AnonymousResourceCollection
     {
-        return RoomResource::collection(Room::published()->withCount(['artworks' => fn ($q) => $q->published()])->orderBy('position')->get());
+        return RoomResource::collection(Room::published()->withCount(['artworks' => fn ($q) => $q->published()])
+            ->with(['tracks' => fn ($q) => $q->where('is_active', true)])->orderBy('position')->get());
     }
 
     public function room(string $slug): RoomResource
     {
         $room = Room::published()->where('slug', $slug)
-            ->with(['artworks' => fn ($q) => $q->published()->with(['room', 'track'])])
+            ->with([
+                'artworks' => fn ($q) => $q->published()->with(['room', 'track']),
+                'tracks' => fn ($q) => $q->where('is_active', true),
+            ])
             ->firstOrFail();
+
+        // Les formations publiées qui enseignent au moins une filière de l'univers.
+        $room->setRelation('programs', Program::published()
+            ->whereHas('cohorts.offerings', fn (Builder $q) => $q->whereIn('track_id', $room->tracks->pluck('id')))
+            ->orderBy('position')->get());
 
         return new RoomResource($room);
     }

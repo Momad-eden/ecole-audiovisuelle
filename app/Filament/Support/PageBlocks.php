@@ -13,6 +13,7 @@ use Filament\Forms\Components\Radio;
 use Filament\Forms\Components\Repeater;
 use Filament\Forms\Components\RichEditor;
 use Filament\Forms\Components\Select;
+use Filament\Forms\Components\TagsInput;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
 
@@ -26,10 +27,10 @@ final class PageBlocks
     public static function all(): array
     {
         return [
-            self::hero(), self::text(), self::textImage(), self::gallery(), self::video(), self::audio(),
-            self::stats(), self::quote(), self::cta(), self::cards(), self::timeline(), self::faq(),
-            self::programs(), self::artworks(), self::rooms(), self::news(), self::partners(),
-            self::professionalSpace(), self::contact(),
+            self::hero(), self::marquee(), self::text(), self::textImage(), self::venue(), self::equipment(),
+            self::gallery(), self::video(), self::audio(), self::stats(), self::quote(), self::cta(), self::cards(),
+            self::timeline(), self::faq(), self::programs(), self::artworks(), self::rooms(), self::news(),
+            self::partners(), self::professionalSpace(), self::contact(),
         ];
     }
 
@@ -71,9 +72,54 @@ final class PageBlocks
             FileUpload::make('video_loop')->label('Boucle vidéo muette (facultatif)')->disk('public')->directory('pages/video')
                 ->acceptedFileTypes(['video/mp4', 'video/webm'])->maxSize(20480)
                 ->helperText('MP4 court et léger (moins de 20 Mo). Remplacé par l\'image si l\'internaute limite les animations.'),
-            Radio::make('layout')->label('Mise en page')->options(['full' => 'Plein écran', 'split' => 'Texte et image côte à côte'])->default('full')->inline(),
+            Radio::make('layout')->label('Mise en page')->options([
+                'stage' => 'Scène animée (faisceaux de lumière)',
+                'full' => 'Plein écran',
+                'split' => 'Texte et image côte à côte',
+            ])->default('stage')->inline()->live(),
+            TagsInput::make('words')->label('Mots qui défilent à la fin du titre')->placeholder('Ex. le son')
+                ->helperText('Scène animée uniquement : le titre se termine par ces mots, l\'un après l\'autre. Laissez vide pour un titre fixe.')
+                ->visible(fn ($get) => $get('layout') === 'stage'),
             ColorPicker::make('accent')->label('Couleur de lumière (facultatif)'),
             self::buttons(),
+        ]);
+    }
+
+    private static function marquee(): Block
+    {
+        return Block::make('marquee')->label('Bandeau défilant')->icon('heroicon-o-arrows-right-left')->schema([
+            TagsInput::make('words')->label('Mots')->required()->placeholder('Ex. Son')
+                ->helperText('Quelques mots courts qui défilent en grand (ils restent immobiles si l\'internaute limite les animations).'),
+        ]);
+    }
+
+    private static function venue(): Block
+    {
+        return Block::make('venue')->label('Le lieu (Grand Théâtre)')->icon('heroicon-o-building-office-2')->schema([
+            TextInput::make('eyebrow')->label('Surtitre')->maxLength(60),
+            TextInput::make('title')->label('Titre')->required()->maxLength(90),
+            Textarea::make('text')->label('Texte')->rows(3)->maxLength(500),
+            ...self::image('image', 'Photo du lieu (facultatif)'),
+            Repeater::make('facts')->label('Repères')->maxItems(4)->defaultItems(0)->columns(2)->addActionLabel('Ajouter un repère')
+                ->schema([
+                    TextInput::make('value')->label('Valeur')->required()->maxLength(14)->placeholder('Ex. 154 m²'),
+                    TextInput::make('label')->label('Libellé')->required()->maxLength(60)->placeholder('Ex. de studio'),
+                ]),
+            self::buttons(1),
+        ]);
+    }
+
+    private static function equipment(): Block
+    {
+        return Block::make('equipment')->label('Le matériel')->icon('heroicon-o-cpu-chip')->schema([
+            TextInput::make('title')->label('Titre')->maxLength(80)->default('Sur quoi vous vous formez'),
+            Textarea::make('text')->label('Texte')->rows(2)->maxLength(300),
+            Repeater::make('groups')->label('Catégories')->minItems(1)->maxItems(8)->addActionLabel('Ajouter une catégorie')
+                ->schema([
+                    TextInput::make('category')->label('Catégorie')->required()->maxLength(40)->placeholder('Ex. Consoles son'),
+                    TagsInput::make('items')->label('Matériel et logiciels')->required()->placeholder('Ex. DiGiCo'),
+                    ...self::image('image', 'Photo (facultatif)'),
+                ]),
         ]);
     }
 
@@ -183,8 +229,9 @@ final class PageBlocks
 
     private static function timeline(): Block
     {
-        return Block::make('timeline')->label('Chronologie / calendrier')->icon('heroicon-o-calendar')->schema([
+        return Block::make('timeline')->label('Chronologie / étapes')->icon('heroicon-o-calendar')->schema([
             TextInput::make('title')->label('Titre')->maxLength(80),
+            Radio::make('layout')->label('Présentation')->options(['list' => 'Chronologie verticale', 'steps' => 'Étapes numérotées côte à côte'])->default('list')->inline(),
             Repeater::make('steps')->label('Étapes')->minItems(2)->maxItems(20)->columns(3)->addActionLabel('Ajouter une étape')
                 ->schema([
                     TextInput::make('period')->label('Période')->required()->maxLength(40)->placeholder('Ex. Février 2027'),
@@ -215,10 +262,10 @@ final class PageBlocks
 
     private static function artworks(): Block
     {
-        return Block::make('artworks')->label('Œuvres du musée')->icon('heroicon-o-photo')->schema([
+        return Block::make('artworks')->label('Réalisations des étudiants')->icon('heroicon-o-photo')->schema([
             TextInput::make('title')->label('Titre')->maxLength(80),
-            Radio::make('source')->label('Œuvres affichées')->options(['featured' => 'Œuvres à la une', 'room' => 'Œuvres d\'une salle', 'latest' => 'Dernières œuvres'])->default('featured')->required()->live(),
-            Select::make('room_id')->label('Salle')->options(fn () => Room::orderBy('position')->pluck('name', 'id')->all())
+            Radio::make('source')->label('Réalisations affichées')->options(['featured' => 'À la une', 'room' => 'D\'un univers', 'latest' => 'Les plus récentes'])->default('featured')->required()->live(),
+            Select::make('room_id')->label('Univers')->options(fn () => Room::orderBy('position')->pluck('name', 'id')->all())
                 ->visible(fn ($get) => $get('source') === 'room')->required(fn ($get) => $get('source') === 'room'),
             TextInput::make('limit')->label('Nombre maximum')->integer()->minValue(1)->maxValue(24)->default(6),
         ]);
@@ -226,8 +273,9 @@ final class PageBlocks
 
     private static function rooms(): Block
     {
-        return Block::make('rooms')->label('Salles du musée')->icon('heroicon-o-building-library')->schema([
-            TextInput::make('title')->label('Titre')->maxLength(80)->default('Entrez dans les salles'),
+        return Block::make('rooms')->label('Univers de l\'école')->icon('heroicon-o-building-library')->schema([
+            TextInput::make('eyebrow')->label('Surtitre')->maxLength(60),
+            TextInput::make('title')->label('Titre')->maxLength(80)->default('Choisissez votre univers'),
             Textarea::make('text')->label('Texte')->rows(2)->maxLength(200),
         ]);
     }
