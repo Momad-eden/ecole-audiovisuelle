@@ -3,10 +3,13 @@
 namespace Tests\Feature\Admin;
 
 use App\Filament\Pages\SiteSettings;
+use App\Filament\Resources\AgendaEvents\AgendaEventResource;
 use App\Filament\Resources\Applications\ApplicationResource;
 use App\Filament\Resources\Artworks\ArtworkResource;
+use App\Filament\Resources\BookingRequests\BookingRequestResource;
 use App\Filament\Resources\CashClosings\CashClosingResource;
 use App\Filament\Resources\CashTransactions\CashTransactionResource;
+use App\Filament\Resources\EquipmentItems\EquipmentItemResource;
 use App\Filament\Resources\Pages\PageResource;
 use App\Filament\Resources\Programs\ProgramResource;
 use App\Filament\Resources\Students\StudentResource;
@@ -21,18 +24,21 @@ class RoleAccessTest extends TestCase
     use RefreshDatabase;
 
     private const MATRIX = [
-        //                        directeur gestionnaire secretaire communication
-        ApplicationResource::class => [true, true, true, false],
-        StudentResource::class => [true, true, true, false],
-        CashTransactionResource::class => [true, true, true, false],
-        CashClosingResource::class => [true, true, false, false],
-        ProgramResource::class => [true, true, true, false],
-        ArtworkResource::class => [true, false, false, true],
-        PageResource::class => [true, false, false, true],
-        UserResource::class => [true, false, false, false],
+        //                        directeur gestionnaire secretaire communication commercial
+        ApplicationResource::class => [true, true, true, false, false],
+        StudentResource::class => [true, true, true, false, false],
+        CashTransactionResource::class => [true, true, true, false, false],
+        CashClosingResource::class => [true, true, false, false, false],
+        ProgramResource::class => [true, true, true, false, false],
+        ArtworkResource::class => [true, false, false, true, true],
+        PageResource::class => [true, false, false, true, false],
+        UserResource::class => [true, false, false, false, false],
+        BookingRequestResource::class => [true, false, false, false, true],
+        EquipmentItemResource::class => [true, false, false, true, true],
+        AgendaEventResource::class => [true, false, false, true, true],
     ];
 
-    private const ROLES = ['directeur', 'gestionnaire', 'secretaire', 'communication'];
+    private const ROLES = ['directeur', 'gestionnaire', 'secretaire', 'communication', 'commercial'];
 
     public function test_each_role_reaches_exactly_its_screens(): void
     {

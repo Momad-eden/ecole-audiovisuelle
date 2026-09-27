@@ -5,9 +5,13 @@ namespace App\Http\Controllers\Api\Public;
 use App\Enums\ApplicationStatus;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Api\StoreApplicationRequest;
+use App\Http\Requests\Api\StoreBookingRequest;
 use App\Models\Application;
+use App\Models\BookingRequest;
 use App\Models\ContactMessage;
+use App\Models\Setting;
 use App\Notifications\ApplicationReceived;
+use App\Notifications\BookingRequestReceived;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -41,6 +45,7 @@ class FormController extends Controller
             $application = Application::create([
                 'uuid' => $uuid,
                 'offering_id' => $data['offeringId'],
+                'place_id' => $data['placeId'] ?? null,
                 'first_name' => $data['firstName'],
                 'last_name' => $data['lastName'],
                 'birth_date' => $data['birthDate'] ?? null,
@@ -110,5 +115,42 @@ class FormController extends Controller
         ]);
 
         return response()->json(['data' => ['ok' => true]], 201);
+    }
+
+    public function booking(StoreBookingRequest $request): JsonResponse
+    {
+        if ($request->filled('website')) {
+            return response()->json(['data' => ['reference' => null]], 201);
+        }
+
+        $data = $request->validated();
+        $booking = BookingRequest::create([
+            'type' => $data['type'],
+            'name' => $data['name'],
+            'organization' => $data['organization'] ?? null,
+            'phone' => $data['phone'],
+            'email' => $data['email'] ?? null,
+            'starts_on' => $data['startsOn'] ?? null,
+            'ends_on' => $data['endsOn'] ?? null,
+            'location' => $data['location'] ?? null,
+            'attendees' => $data['attendees'] ?? null,
+            'message' => $data['message'] ?? null,
+            'items' => $request->items(),
+            'ip_hash' => hash_hmac('sha256', (string) $request->ip(), (string) config('app.key')),
+        ]);
+
+        // Alerte à l'équipe et accusé au client : un serveur de mail en panne ne fait jamais perdre la demande.
+        try {
+            if ($team = Setting::current()->email) {
+                Notification::route('mail', $team)->notify(BookingRequestReceived::team($booking));
+            }
+            if ($booking->email) {
+                Notification::route('mail', $booking->email)->notify(new BookingRequestReceived($booking));
+            }
+        } catch (Throwable $e) {
+            report($e);
+        }
+
+        return response()->json(['data' => ['reference' => $booking->reference]], 201);
     }
 }

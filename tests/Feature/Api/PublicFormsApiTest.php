@@ -3,9 +3,11 @@
 namespace Tests\Feature\Api;
 
 use App\Enums\CohortStatus;
+use App\Enums\PublicationStatus;
 use App\Models\Application;
 use App\Models\ContactMessage;
 use App\Models\Offering;
+use App\Models\Place;
 use App\Notifications\ApplicationReceived;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Testing\RefreshDatabase;
@@ -115,5 +117,20 @@ class PublicFormsApiTest extends TestCase
 
         Notification::assertSentOnDemand(ApplicationReceived::class);
         $this->assertInstanceOf(ShouldQueue::class, new ApplicationReceived(Application::firstOrFail()));
+    }
+
+    public function test_the_candidate_chooses_a_campus_when_the_school_has_several(): void
+    {
+        $offering = Offering::factory()->create();
+        $dakar = Place::create(['name' => 'EMSI Dakar', 'kind' => 'campus', 'city' => 'Dakar', 'status' => PublicationStatus::PUBLISHED]);
+        $saintLouis = Place::create(['name' => 'EMSI Saint-Louis', 'kind' => 'campus', 'city' => 'Saint-Louis', 'status' => PublicationStatus::PUBLISHED]);
+        $studio = Place::create(['name' => 'Impact Live Studio', 'kind' => 'studio', 'city' => 'Saint-Louis', 'status' => PublicationStatus::PUBLISHED]);
+
+        $this->postJson('/api/v1/public/applications', $this->payload($offering))->assertUnprocessable()->assertJsonValidationErrors('placeId');
+        $this->postJson('/api/v1/public/applications', $this->payload($offering, ['placeId' => $studio->id]))->assertUnprocessable()->assertJsonValidationErrors('placeId');
+
+        $reference = $this->postJson('/api/v1/public/applications', $this->payload($offering, ['placeId' => $saintLouis->id]))->assertCreated()->json('data.reference');
+        $this->assertSame($saintLouis->id, Application::where('reference', $reference)->value('place_id'));
+        $this->assertNotSame($dakar->id, $saintLouis->id);
     }
 }

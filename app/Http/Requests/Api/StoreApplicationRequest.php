@@ -5,6 +5,7 @@ namespace App\Http\Requests\Api;
 use App\Enums\DocumentType;
 use App\Enums\Gender;
 use App\Models\Offering;
+use App\Models\Place;
 use Closure;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rule;
@@ -19,6 +20,9 @@ class StoreApplicationRequest extends FormRequest
     public function rules(): array
     {
         return [
+            // Dès que l'école a plusieurs campus publiés, le candidat choisit le sien.
+            'placeId' => [Rule::requiredIf(fn () => Place::published()->campuses()->count() > 1), 'nullable', 'integer',
+                Rule::exists('places', 'id')->where('kind', 'campus')->where('status', 'published')],
             'offeringId' => ['required', 'integer', function (string $attribute, mixed $value, Closure $fail) {
                 if (! Offering::openForApplications()->whereKey($value)->exists()) {
                     $fail('Cette formation n\'accepte pas de candidature pour le moment.');

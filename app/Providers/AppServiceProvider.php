@@ -35,6 +35,7 @@ class AppServiceProvider extends ServiceProvider
             ->allowAttribute('data-size', allowedElements: 'span'));
 
         // Formulaires publics : 5 envois par tranche de 10 minutes et par adresse IP.
+        RateLimiter::for('bookings', fn (Request $request) => Limit::perMinutes(10, 5)->by($request->ip()));
         RateLimiter::for('applications', fn (Request $request) => Limit::perMinutes(10, 5)->by($request->ip()));
         RateLimiter::for('contact', fn (Request $request) => Limit::perMinutes(10, 5)->by($request->ip()));
         RateLimiter::for('public-api', fn (Request $request) => Limit::perMinute(120)->by($request->ip()));

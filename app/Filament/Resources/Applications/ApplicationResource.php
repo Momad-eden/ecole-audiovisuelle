@@ -82,12 +82,15 @@ class ApplicationResource extends Resource
     public static function form(Schema $schema): Schema
     {
         return $schema->columns(1)->components([
-            Section::make('Formation demandée')->schema([
+            Section::make('Formation demandée')->columns(2)->schema([
                 Select::make('offering_id')
                     ->label('Offre (formation, session, filière)')
                     ->options(fn () => static::offeringOptions())
                     ->searchable()
                     ->required(),
+                Select::make('place_id')->label('Campus')
+                    ->relationship('place', 'name', fn (Builder $query) => $query->where('kind', 'campus'))
+                    ->preload(),
             ]),
             Section::make('Identité')->columns(3)->schema([
                 TextInput::make('first_name')->label('Prénom')->required()->maxLength(100),
@@ -138,6 +141,7 @@ class ApplicationResource extends Resource
                     TextEntry::make('reference')->label('Numéro'),
                     TextEntry::make('status')->label('Étape')->badge(),
                     TextEntry::make('offering.label')->label('Formation demandée')->columnSpanFull(),
+                    TextEntry::make('place.name')->label('Campus')->placeholder('—'),
                     TextEntry::make('audience')->label('Public')->badge(),
                     TextEntry::make('submitted_at')->label('Reçue le')->dateTime('d/m/Y à H:i'),
                     TextEntry::make('interview_at')->label('Entretien')->dateTime('d/m/Y à H:i')->placeholder('Non planifié'),
@@ -196,11 +200,13 @@ class ApplicationResource extends Resource
                     ->description(fn (Application $record) => $record->phone)
                     ->searchable(['first_name', 'last_name', 'phone', 'email']),
                 TextColumn::make('offering.label')->label('Formation')->wrap(),
+                TextColumn::make('place.city')->label('Campus')->placeholder('—')->toggleable(),
                 TextColumn::make('audience')->label('Public')->badge()->toggleable(),
                 TextColumn::make('status')->label('Étape')->badge()->sortable(),
                 TextColumn::make('submitted_at')->label('Reçue le')->date('d/m/Y')->sortable(),
             ])
             ->filters([
+                SelectFilter::make('place_id')->label('Campus')->relationship('place', 'name', fn (Builder $query) => $query->where('kind', 'campus')),
                 SelectFilter::make('status')->label('Étape')->options(ApplicationStatus::class)->multiple(),
                 SelectFilter::make('audience')->label('Public')->options(Audience::class),
                 SelectFilter::make('program')->label('Formation')
@@ -232,7 +238,7 @@ class ApplicationResource extends Resource
     {
         return parent::getRecordRouteBindingEloquentQuery()
             ->withoutGlobalScopes([SoftDeletingScope::class])
-            ->with(['offering.cohort.program', 'offering.track', 'student', 'decider', 'events.user']);
+            ->with(['offering.cohort.program', 'offering.track', 'place', 'student', 'decider', 'events.user']);
     }
 
     public static function getPages(): array

@@ -59,6 +59,8 @@ class ArtworkResource extends Resource
             Tabs::make()->columnSpanFull()->persistTabInQueryString()->tabs([
                 Tab::make('1. Médias')->icon('heroicon-o-photo')->schema([
                     Select::make('kind')->label('Type de réalisation')->options(ArtworkKind::class)->required()->live(),
+                    Select::make('origin')->label('Réalisée par')->options(['school' => 'Des étudiants de l\'EMSI', 'studio' => 'Impact Live Studio (production du studio)'])
+                        ->default('school')->required()->helperText('Les productions du studio s\'écoutent sur la page du studio.'),
                     Section::make('Image principale')->columns(2)->schema(Fields::image('cover_image', 'artworks', 'Image principale (vignette, affiche, photo)')),
                     FileUpload::make('audio_file')->label('Fichier son')
                         ->disk('public')->directory('artworks/audio')->visibility('public')

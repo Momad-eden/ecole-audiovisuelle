@@ -58,7 +58,7 @@ class SiteV2UpgradeTest extends TestCase
         $this->assertSame('Écrivez-nous', Page::where('slug', 'contact')->first()->blocks[0]['data']['title']);
 
         $main = MenuItem::where('location', 'main')->where('is_visible', true)->orderBy('position')->pluck('url')->all();
-        $this->assertSame(['/univers', '/formations', '/ecole', '/realisations', '/professionnels', '/candidater'], $main);
+        $this->assertSame(['/univers', '/formations', '/studio', '/events', '/ecole', '/professionnels', '/candidater'], $main);
         $this->assertFalse(MenuItem::where('location', 'footer')->where('url', '/professionnels')->value('is_visible'));
         $this->assertSame('/realisations', Redirect::where('from_path', '/galerie')->value('to_path'));
 

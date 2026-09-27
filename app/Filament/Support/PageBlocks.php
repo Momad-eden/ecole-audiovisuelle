@@ -3,6 +3,8 @@
 namespace App\Filament\Support;
 
 use App\Enums\Audience;
+use App\Enums\BookingType;
+use App\Enums\PlaceKind;
 use App\Filament\Support\RichText\TypographyPlugin;
 use App\Models\Faq;
 use App\Models\Partner;
@@ -17,6 +19,7 @@ use Filament\Forms\Components\Select;
 use Filament\Forms\Components\TagsInput;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
+use Filament\Forms\Components\Toggle;
 
 /**
  * Catalogue des blocs de page. Chaque bloc a des champs limités (aucun HTML libre) ;
@@ -32,7 +35,92 @@ final class PageBlocks
             self::gallery(), self::video(), self::audio(), self::stats(), self::quote(), self::cta(), self::cards(),
             self::timeline(), self::faq(), self::programs(), self::artworks(), self::rooms(), self::news(),
             self::partners(), self::professionalSpace(), self::contact(),
+            self::ecosystem(), self::services(), self::equipmentList(), self::packs(), self::productions(),
+            self::agenda(), self::bookingForm(), self::places(),
         ];
+    }
+
+    private static function ecosystem(): Block
+    {
+        return Block::make('ecosystem')->label('Écosystème (nos activités)')->icon('heroicon-o-globe-europe-africa')->schema([
+            TextInput::make('eyebrow')->label('Surtitre')->maxLength(60),
+            TextInput::make('title')->label('Titre')->required()->maxLength(90),
+            Textarea::make('text')->label('Texte')->rows(3)->maxLength(500),
+            Repeater::make('items')->label('Activités')->minItems(1)->maxItems(6)->addActionLabel('Ajouter une activité')
+                ->schema([
+                    TextInput::make('name')->label('Nom')->required()->maxLength(60),
+                    Select::make('activity')->label('Couleur / animation')->options(['school' => 'EMSI (école)', ...['studio' => 'Impact Live Studio', 'events' => 'Impact Live Events', 'space' => 'Espace Habib Faye']])->required(),
+                    Textarea::make('text')->label('Présentation courte')->rows(2)->maxLength(200),
+                    TextInput::make('url')->label('Lien')->regex('#^(/|https?://)#')->placeholder('/studio'),
+                    ...self::image('image', 'Photo (facultatif)'),
+                ]),
+        ]);
+    }
+
+    private static function services(): Block
+    {
+        return Block::make('services')->label('Services et tarifs')->icon('heroicon-o-wrench-screwdriver')->schema([
+            TextInput::make('title')->label('Titre')->maxLength(80)->default('Nos services'),
+            Textarea::make('text')->label('Texte')->rows(2)->maxLength(300),
+            Select::make('activity')->label('Services de')->options(['studio' => 'Impact Live Studio', 'events' => 'Impact Live Events', 'space' => 'Espace Habib Faye'])->required()->default('studio')
+                ->helperText('Les services se gèrent dans Impact Live › Services.'),
+        ]);
+    }
+
+    private static function equipmentList(): Block
+    {
+        return Block::make('equipment_list')->label('Catalogue de matériel')->icon('heroicon-o-speaker-wave')->schema([
+            TextInput::make('title')->label('Titre')->maxLength(80),
+            Textarea::make('text')->label('Texte')->rows(2)->maxLength(300),
+            Radio::make('usage')->label('Matériel')->options(['rental' => 'À louer', 'studio' => 'Équipement du studio'])->default('rental')->inline(),
+            Toggle::make('featured_only')->label('Seulement le matériel mis en avant'),
+            TextInput::make('limit')->label('Nombre maximum')->numeric()->minValue(1)->maxValue(48)->default(12),
+        ]);
+    }
+
+    private static function packs(): Block
+    {
+        return Block::make('packs')->label('Packs de location')->icon('heroicon-o-cube')->schema([
+            TextInput::make('title')->label('Titre')->maxLength(80)->default('Nos packs'),
+            Textarea::make('text')->label('Texte')->rows(2)->maxLength(300),
+        ]);
+    }
+
+    private static function productions(): Block
+    {
+        return Block::make('productions')->label('Productions du studio (écoute)')->icon('heroicon-o-musical-note')->schema([
+            TextInput::make('title')->label('Titre')->maxLength(80)->default('Sorti de nos consoles'),
+            TextInput::make('limit')->label('Nombre')->numeric()->minValue(1)->maxValue(24)->default(6)
+                ->helperText('Réalisations marquées « Impact Live Studio » dans Univers & réalisations › Réalisations.'),
+        ]);
+    }
+
+    private static function agenda(): Block
+    {
+        return Block::make('agenda')->label('Agenda ou références')->icon('heroicon-o-calendar-days')->schema([
+            TextInput::make('title')->label('Titre')->maxLength(80),
+            Radio::make('scope')->label('Afficher')->options(['upcoming' => 'Les prochains événements', 'references' => 'Nos références (prestations réalisées)'])->default('upcoming')->inline(),
+            Select::make('activity')->label('Activité (facultatif)')->options(['school' => 'EMSI', ...['studio' => 'Impact Live Studio', 'events' => 'Impact Live Events', 'space' => 'Espace Habib Faye']]),
+            TextInput::make('limit')->label('Nombre')->numeric()->minValue(1)->maxValue(24)->default(6),
+        ]);
+    }
+
+    private static function bookingForm(): Block
+    {
+        return Block::make('booking_form')->label('Formulaire de demande (devis, réservation)')->icon('heroicon-o-inbox-arrow-down')->schema([
+            TextInput::make('title')->label('Titre')->maxLength(80)->default('Demander un devis'),
+            Textarea::make('text')->label('Texte')->rows(2)->maxLength(300),
+            Select::make('booking_type')->label('Type de demande')->options(BookingType::class)->required()->default('equipment_rental')
+                ->helperText('Les demandes arrivent dans Impact Live › Demandes.'),
+        ]);
+    }
+
+    private static function places(): Block
+    {
+        return Block::make('places')->label('Nos lieux (adresses)')->icon('heroicon-o-map-pin')->schema([
+            TextInput::make('title')->label('Titre')->maxLength(80)->default('Nous trouver'),
+            Select::make('kind')->label('Lieux affichés')->options(PlaceKind::class)->placeholder('Tous les lieux'),
+        ]);
     }
 
     private static function richText(string $name = 'body', string $label = 'Texte'): RichEditor
@@ -74,12 +162,14 @@ final class PageBlocks
                 ->helperText('MP4 court et léger (moins de 20 Mo). Remplacé par l\'image si l\'internaute limite les animations.'),
             Radio::make('layout')->label('Mise en page')->options([
                 'stage' => 'Scène animée (faisceaux de lumière)',
+                'studio' => 'Studio animé (console de mixage)',
+                'events' => 'Événementiel animé (sonorisation et lumières)',
                 'full' => 'Plein écran',
                 'split' => 'Texte et image côte à côte',
             ])->default('stage')->inline()->live(),
             TagsInput::make('words')->label('Mots qui défilent à la fin du titre')->placeholder('Ex. le son')
                 ->helperText('Scène animée uniquement : le titre se termine par ces mots, l\'un après l\'autre. Laissez vide pour un titre fixe.')
-                ->visible(fn ($get) => $get('layout') === 'stage'),
+                ->visible(fn ($get) => in_array($get('layout'), ['stage', 'studio', 'events'], true)),
             ColorPicker::make('accent')->label('Couleur de lumière (facultatif)'),
             self::buttons(),
         ]);
