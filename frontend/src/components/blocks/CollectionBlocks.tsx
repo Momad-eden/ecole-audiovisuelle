@@ -74,7 +74,7 @@ export function PartnersBlock({ data }: { data: PartnersData }) {
           const content = (
             <>
               {partner.logo ? (
-                <span className="relative block h-16 w-full"><MediaImage image={partner.logo} sizes="200px" className="object-contain" /></span>
+                <span className="relative block h-16 w-full"><MediaImage image={partner.logo} sizes="200px" fit="contain" /></span>
               ) : null}
               <span className="block text-sm font-medium">{partner.name}</span>
             </>

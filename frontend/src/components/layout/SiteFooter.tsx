@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { MediaImage } from "@/components/ui/MediaImage";
 import type { Site } from "@/lib/types";
 
 const SOCIAL_LABELS: Record<string, string> = {
@@ -13,6 +14,11 @@ export function SiteFooter({ site }: { site: Site }) {
     <footer className="mt-24 border-t border-line bg-night-2">
       <div className="mx-auto grid max-w-7xl gap-12 px-4 py-16 sm:px-6 md:grid-cols-3 lg:px-8">
         <div>
+          {settings.logo && (
+            <span className="relative mb-4 block h-24 w-40">
+              <MediaImage image={settings.logo} sizes="160px" fit="contain" className="object-left" />
+            </span>
+          )}
           <p className="font-display text-2xl">{settings.schoolName}</p>
           {settings.description && <p className="mt-3 max-w-sm text-sm text-ink-muted">{settings.description}</p>}
           {Object.keys(settings.social).length > 0 && (
