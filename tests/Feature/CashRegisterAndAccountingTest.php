@@ -17,9 +17,13 @@ class CashRegisterAndAccountingTest extends TestCase
     use RefreshDatabase;
 
     protected User $directeur;
+
     protected User $gestionnaire;
+
     protected User $communication;
+
     protected Course $course;
+
     protected Student $student;
 
     protected function setUp(): void
@@ -206,5 +210,70 @@ class CashRegisterAndAccountingTest extends TestCase
         $this->actingAs($this->communication)
             ->get(route('accounting.index'))
             ->assertStatus(403);
+    }
+
+    private function cashPayload(array $overrides = []): array
+    {
+        return array_merge([
+            'type' => 'outflow',
+            'category' => 'maintenance',
+            'title' => 'Réparation console',
+            'amount' => 50000,
+            'payment_method' => 'cash',
+            'payment_date' => now()->toDateString(),
+        ], $overrides);
+    }
+
+    public function test_cash_register_search_finds_payments_by_student_number(): void
+    {
+        Payment::create([
+            'type' => 'inflow', 'category' => 'scolarite', 'student_id' => $this->student->id,
+            'amount' => 75000, 'payment_method' => 'wave', 'payment_date' => now()->toDateString(),
+        ]);
+
+        $this->actingAs($this->gestionnaire)
+            ->get(route('payments.index', ['search' => 'ETU-2026-001']))
+            ->assertOk()
+            ->assertSee('Amadou')
+            ->assertSee('75 000');
+    }
+
+    public function test_outflow_cannot_use_an_inflow_category(): void
+    {
+        $this->actingAs($this->gestionnaire)
+            ->post(route('payments.store'), $this->cashPayload(['category' => 'scolarite', 'student_id' => $this->student->id]))
+            ->assertSessionHasErrors('category');
+    }
+
+    public function test_inflow_cannot_use_an_outflow_category(): void
+    {
+        $this->actingAs($this->gestionnaire)
+            ->post(route('payments.store'), $this->cashPayload(['type' => 'inflow', 'category' => 'maintenance']))
+            ->assertSessionHasErrors('category');
+    }
+
+    public function test_amount_is_bounded(): void
+    {
+        $this->actingAs($this->gestionnaire)
+            ->post(route('payments.store'), $this->cashPayload(['amount' => 100000000]))
+            ->assertSessionHasErrors('amount');
+    }
+
+    public function test_operation_date_cannot_be_in_the_future(): void
+    {
+        $this->actingAs($this->gestionnaire)
+            ->post(route('payments.store'), $this->cashPayload(['payment_date' => now()->addDay()->toDateString()]))
+            ->assertSessionHasErrors('payment_date');
+    }
+
+    public function test_type_of_a_recorded_operation_cannot_be_changed(): void
+    {
+        $payment = Payment::create($this->cashPayload());
+
+        $this->actingAs($this->gestionnaire)
+            ->put(route('payments.update', $payment), $this->cashPayload(['type' => 'inflow', 'category' => 'autre_recette']))
+            ->assertSessionHasErrors('type');
+
+        $this->assertSame('outflow', $payment->fresh()->type);
     }
 }

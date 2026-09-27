@@ -33,7 +33,7 @@ class PaymentController extends Controller
                     ->orWhereHas('student', function ($sq) use ($search) {
                         $sq->where('first_name', 'like', "%{$search}%")
                             ->orWhere('last_name', 'like', "%{$search}%")
-                            ->orWhere('matricule', 'like', "%{$search}%");
+                            ->orWhere('student_number', 'like', "%{$search}%");
                     });
             });
         }
@@ -130,6 +130,7 @@ class PaymentController extends Controller
                 $remainingDue = max(0, $coursePrice - $totalPaid);
                 $student->total_paid = $totalPaid;
                 $student->remaining_due = $remainingDue;
+
                 return $student;
             });
 
@@ -161,9 +162,9 @@ class PaymentController extends Controller
             }
         } else {
             if (empty($data['title'])) {
-                if (!empty($data['student_id'])) {
+                if (! empty($data['student_id'])) {
                     $student = Student::find($data['student_id']);
-                    $data['title'] = 'Scolarité - ' . ($student ? $student->full_name : 'Étudiant');
+                    $data['title'] = 'Scolarité - '.($student ? $student->full_name : 'Étudiant');
                 } else {
                     $data['title'] = TransactionCategory::tryFrom($data['category'] ?? '')?->label() ?? 'Encaissement';
                 }
@@ -174,7 +175,7 @@ class PaymentController extends Controller
 
         return redirect()
             ->route('payments.show', $payment)
-            ->with('success', 'Opération de caisse enregistrée avec succès sous la référence ' . $payment->receipt_number . '.');
+            ->with('success', 'Opération de caisse enregistrée avec succès sous la référence '.$payment->receipt_number.'.');
     }
 
     /**
@@ -192,7 +193,7 @@ class PaymentController extends Controller
 
             $studentStats = [
                 'course_price' => $coursePrice,
-                'total_paid'   => $totalPaid,
+                'total_paid' => $totalPaid,
                 'remaining_due' => $remainingDue,
             ];
         }
@@ -214,8 +215,8 @@ class PaymentController extends Controller
             $remainingDue = max(0, $coursePrice - $totalPaid);
 
             $studentStats = [
-                'course_price'  => $coursePrice,
-                'total_paid'    => $totalPaid,
+                'course_price' => $coursePrice,
+                'total_paid' => $totalPaid,
                 'remaining_due' => $remainingDue,
             ];
         }
@@ -283,7 +284,7 @@ class PaymentController extends Controller
         if ($dateTo) {
             $query->whereDate('payment_date', '<=', $dateTo);
         }
-        if (!$dateFrom && !$dateTo) {
+        if (! $dateFrom && ! $dateTo) {
             if ($year && $year !== 'all') {
                 $query->whereYear('payment_date', $year);
             }
@@ -301,6 +302,7 @@ class PaymentController extends Controller
             $outflow = $tx->isOutflow() ? (float) $tx->amount : 0;
             $runningBalance += ($inflow - $outflow);
             $tx->running_balance = $runningBalance;
+
             return $tx;
         });
 
@@ -340,14 +342,14 @@ class PaymentController extends Controller
             }
 
             return [
-                'student'     => $student,
-                'course'      => $student->course?->title ?? 'Filière non assignée',
-                'course_id'   => $student->course_id,
-                'price'       => $coursePrice,
-                'total_paid'  => $totalPaid,
-                'remaining'   => $remaining,
-                'status'      => $status,
-                'rate'        => $coursePrice > 0 ? round(($totalPaid / $coursePrice) * 100, 1) : 100,
+                'student' => $student,
+                'course' => $student->course?->title ?? 'Filière non assignée',
+                'course_id' => $student->course_id,
+                'price' => $coursePrice,
+                'total_paid' => $totalPaid,
+                'remaining' => $remaining,
+                'status' => $status,
+                'rate' => $coursePrice > 0 ? round(($totalPaid / $coursePrice) * 100, 1) : 100,
             ];
         });
 
@@ -363,6 +365,7 @@ class PaymentController extends Controller
             $filteredStudents = $filteredStudents->filter(function ($item) use ($search) {
                 $fullName = strtolower($item['student']->full_name);
                 $mat = strtolower($item['student']->student_number ?? '');
+
                 return str_contains($fullName, $search) || str_contains($mat, $search);
             });
         }
@@ -414,7 +417,7 @@ class PaymentController extends Controller
         if ($dateTo) {
             $query->whereDate('payment_date', '<=', $dateTo);
         }
-        if (!$dateFrom && !$dateTo) {
+        if (! $dateFrom && ! $dateTo) {
             if ($year && $year !== 'all') {
                 $query->whereYear('payment_date', $year);
             }
@@ -425,7 +428,7 @@ class PaymentController extends Controller
 
         $transactions = $query->orderBy('payment_date', 'asc')->orderBy('id', 'asc')->get();
 
-        $filename = 'grand-livre-comptable-emsi-' . date('Ymd_His') . '.csv';
+        $filename = 'grand-livre-comptable-emsi-'.date('Ymd_His').'.csv';
 
         $headers = [
             'Content-Type' => 'text/csv; charset=UTF-8',
@@ -438,7 +441,7 @@ class PaymentController extends Controller
         $callback = function () use ($transactions) {
             $file = fopen('php://output', 'w');
             // En-tête BOM UTF-8 pour ouverture correcte dans Excel
-            fputs($file, "\xEF\xBB\xBF");
+            fwrite($file, "\xEF\xBB\xBF");
 
             // En-tête des colonnes
             fputcsv($file, [
@@ -465,7 +468,7 @@ class PaymentController extends Controller
 
                 fputcsv($file, [
                     $tx->payment_date ? $tx->payment_date->format('d/m/Y') : '',
-                    $tx->receipt_number ?? ('REC-' . $tx->id),
+                    $tx->receipt_number ?? ('REC-'.$tx->id),
                     $tx->reference ?? '',
                     $tx->isInflow() ? 'Recette' : 'Dépense',
                     $tx->category_label,

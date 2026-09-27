@@ -17,15 +17,45 @@ class UpdatePaymentRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'type'           => ['required', 'in:inflow,outflow'],
-            'category'       => ['nullable', 'string', Rule::in(TransactionCategory::values())],
-            'title'          => ['nullable', 'string', 'max:255'],
-            'student_id'     => ['nullable', 'exists:students,id'],
-            'amount'         => ['required', 'numeric', 'min:1'],
+            'type' => [
+                'required',
+                'in:inflow,outflow',
+                Rule::in([$this->route('payment')?->type]),
+            ],
+            'category' => ['nullable', 'string', Rule::in($this->allowedCategories())],
+            'title' => ['nullable', 'string', 'max:255'],
+            'student_id' => ['nullable', 'exists:students,id'],
+            'amount' => ['required', 'integer', 'min:1', 'max:99999999'],
             'payment_method' => ['required', Rule::in(PaymentMethod::values())],
-            'reference'      => ['nullable', 'string', 'max:255'],
-            'payment_date'   => ['required', 'date'],
-            'notes'          => ['nullable', 'string'],
+            'reference' => ['nullable', 'string', 'max:255'],
+            'payment_date' => ['required', 'date', 'before_or_equal:today'],
+            'notes' => ['nullable', 'string'],
+        ];
+    }
+
+    /**
+     * Catégories autorisées selon la nature de l'opération (recette ou dépense).
+     *
+     * @return array<int, string>
+     */
+    protected function allowedCategories(): array
+    {
+        return array_keys(match ($this->input('type')) {
+            'inflow' => TransactionCategory::inflowOptions(),
+            'outflow' => TransactionCategory::outflowOptions(),
+            default => TransactionCategory::allOptions(),
+        });
+    }
+
+    /**
+     * @return array<string, string>
+     */
+    public function messages(): array
+    {
+        return [
+            'category.in' => 'Cette catégorie ne correspond pas à la nature de l\'opération (recette ou dépense).',
+            'type.in' => 'La nature d\'une opération enregistrée ne peut pas être modifiée.',
+            'payment_date.before_or_equal' => 'La date de l\'opération ne peut pas être dans le futur.',
         ];
     }
 }
