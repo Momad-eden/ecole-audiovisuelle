@@ -186,6 +186,11 @@ final class PageBlocks
             TagsInput::make('words')->label('Mots qui défilent à la fin du titre')->placeholder('Ex. le son')
                 ->helperText('Scène animée uniquement : le titre se termine par ces mots, l\'un après l\'autre. Laissez vide pour un titre fixe.')
                 ->visible(fn ($get) => in_array($get('layout'), ['stage', 'studio', 'events'], true)),
+            FileUpload::make('sound')->label('Son de l\'œuvre (facultatif)')
+                ->disk('public')->directory('pages/audio')->visibility('public')
+                ->acceptedFileTypes(['audio/mpeg', 'audio/mp4', 'audio/x-m4a', 'audio/wav', 'audio/x-wav', 'audio/ogg'])->maxSize(20480)
+                ->helperText('Joué en boucle quand le visiteur clique « Écouter l\'œuvre » ; sa main le déplace entre les enceintes et le rend plus ou moins brillant. Idéal : une nappe ou un extrait de 20 à 60 secondes, qui boucle sans coupure (MP3, 20 Mo maximum). Sans fichier, un son synthétique suit la main.')
+                ->visible(fn ($get) => $get('layout') === 'masterpiece'),
             FileUpload::make('images')->label('Photos de la mosaïque (3 ou 4)')->image()->multiple()->reorderable()->maxFiles(4)
                 ->disk('public')->directory('pages')->maxSize(8192)
                 ->visible(fn ($get) => $get('layout') === 'mosaic'),

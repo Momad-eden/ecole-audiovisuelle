@@ -18,7 +18,7 @@ function notify() {
 }
 
 /** Même origine que la page (/storage passe par le site), sinon le navigateur refuse la lecture du fichier. */
-function sameOrigin(src: string): string {
+export function sameOrigin(src: string): string {
   try {
     const url = new URL(src, window.location.href);
     return url.pathname.startsWith("/storage/") ? url.pathname : url.href;

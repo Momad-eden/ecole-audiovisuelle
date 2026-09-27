@@ -57,7 +57,7 @@ class BlockResolver
         $data = $this->withImages($data);
 
         $data = match ($type) {
-            'hero' => [...$data, 'video_loop' => Media::url($data['video_loop'] ?? null),
+            'hero' => [...$data, 'video_loop' => Media::url($data['video_loop'] ?? null), 'sound' => Media::url($data['sound'] ?? null),
                 'images' => collect($data['images'] ?? [])->map(fn ($path) => Media::image($path, $data['title'] ?? null))->filter()->values()->all()],
             'gallery' => [...$data, 'images' => collect($data['images'] ?? [])->map(fn ($item) => [
                 ...$this->withImages($item),
