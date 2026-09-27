@@ -42,30 +42,26 @@
 - Direction artistique : fond sombre de salle d'exposition, la lumière comme élément de design (halos, faisceaux, dégradés), typographie éditoriale, grands médias plein écran, transitions douces, réactivité au son (visualisation audio). Toujours **sobre, lisible et performant** : respecter `prefers-reduced-motion`, chargement progressif des médias, aucun son en lecture automatique.
 - Les formations, l'école, les actualités et l'Espace Professionnels s'intègrent dans cette expérience (même langage visuel), mais la navigation reste simple et classique en surface (menu clair, CTA « Candidater » visible).
 
-## 3. Stack cible
+## 3. Architecture en place (depuis le 27/09/2026)
 
 | Couche | Choix |
 |---|---|
-| Backend | Laravel 12 (API only) + Sanctum (auth SPA par cookie) + API Resources + Policies |
-| Base de données | **PostgreSQL** (remplace SQLite) |
-| Frontend | Next.js (App Router) + TypeScript strict, dans `frontend/` |
-| UI | Tailwind CSS + shadcn/ui, icônes lucide-react |
-| Données client | TanStack Query (admin), fetch serveur + ISR/revalidate (public) |
-| Formulaires | react-hook-form + zod (schémas alignés sur les FormRequest Laravel) |
-| Tableaux admin | TanStack Table (tri, filtre, pagination serveur) |
+| Administration | **Filament 5** dans Laravel (`/admin`), rôles appliqués par des **Policies** (`app/Policies`) |
+| Backend / API | Laravel 13 ; API publique en lecture seule `/api/v1/public` (+ dépôt de candidature, contact) |
+| Base de données | **MySQL 8.4** (PostgreSQL écarté : aucun bénéfice décisif pour ce projet) |
+| Site public | **Next.js 16** (App Router, TypeScript strict, Tailwind 4) dans `frontend/`, direction artistique « Salle obscure » |
+| Données du site | `fetch` serveur étiqueté `content`, régénéré par Laravel à chaque publication (`FrontendRevalidator`) |
+| Formulaires publics | react-hook-form + zod côté Next ; FormRequest Laravel font foi |
 
-Organisation : repo unique — Laravel reste à la racine, Next.js dans `frontend/`. Les vues Blade restent en place **jusqu'à parité validée**, puis sont supprimées.
+Domaine : filières → programmes (école / professionnels) → sessions → offres ; candidatures (`ApplicationWorkflow`) → étudiants → inscriptions ; caisse inaltérable (`CashRegister` : contre-écritures, clôtures). Musée : salles, expositions, œuvres. Contenu : pages à blocs (brouillon → publication → révisions), actualités, FAQ, menus, redirections.
 
-## 4. Méthode de travail (OBLIGATOIRE)
+## 4. Méthode de travail
 
-Momar travaille en **phases à validation** : conception/audit séparés de l'implémentation.
-
-- Travailler sur une branche git dédiée : `refonte/nextjs`. Commits petits et explicites.
-- **Ne jamais passer à la phase suivante sans validation explicite de Momar.** À la fin de chaque phase : livrable + résumé + questions ouvertes, puis STOP.
-- Phases : voir `docs/refonte/02-PLAN-MIGRATION.md`.
-- Audit initial déjà réalisé : `docs/refonte/01-AUDIT.md` — le vérifier, le compléter, ne pas le recopier aveuglément.
+- Les phases de `docs/refonte/` ne sont plus suivies (décision de Momar) : ces documents restent comme historique de l'audit et de la conception.
+- Branche de travail dédiée, commits petits et explicites, TDD pour toute logique métier.
 - Ne jamais toucher à `.env`, ni supprimer de données, ni lancer `migrate:fresh` sur une base contenant des données réelles sans accord.
-- Toute migration de schéma doit être **réversible** (`down()` correct) et accompagnée d'un test.
+- Toute migration de schéma est **réversible** (`down()` correct) et accompagnée d'un test.
+- Tests sur SQLite **et** MySQL (`composer test:mysql`) avant tout jalon.
 
 ## 5. Skills
 

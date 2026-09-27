@@ -1,30 +1,26 @@
 #!/bin/bash
-set -e
+# Mise à jour de production (voir DEPLOYMENT.md). À lancer depuis /var/www/emsi.
+set -euo pipefail
 
-echo "🚀 Début du déploiement EMSI..."
+echo "Mise à jour EMSI…"
 
-# Passer en mode maintenance avec écran élégant
-php artisan down --render="errors::500" --secret="emsi-secret-bypass" || true
+php artisan down --retry=30 || true
+trap 'php artisan up' ERR
 
-# Récupérer la dernière version du code
-git pull origin main
+git pull --ff-only origin main
 
-# Mettre à jour les dépendances PHP & JS
 composer install --no-dev --no-interaction --prefer-dist --optimize-autoloader
-npm ci
-npm run build
-
-# Exécuter les nouvelles migrations
 php artisan migrate --force
-
-# Recréer les caches de performance
 php artisan optimize:clear
 php artisan optimize
+php artisan filament:assets
+php artisan filament:optimize
+php artisan queue:restart
 
-# Redémarrer les workers de queue si configurés
-php artisan queue:restart || true
-
-# Désactiver le mode maintenance
+# Laravel remis en ligne avant le build : Next.js interroge l'API pendant la génération.
 php artisan up
 
-echo "✅ Déploiement terminé avec succès !"
+(cd frontend && npm ci && npm run build)
+sudo systemctl restart emsi-web
+
+echo "Déploiement terminé."
