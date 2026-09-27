@@ -14,6 +14,7 @@ return Application::configure(basePath: dirname(__DIR__))
     ->withMiddleware(function (Middleware $middleware): void {
         // Derrière Nginx (même serveur) : l'IP réelle du visiteur sert aux limites de débit.
         $middleware->trustProxies(at: ['127.0.0.1', '::1']);
+        $middleware->redirectGuestsTo('/admin/login');
     })
     ->withExceptions(function (Exceptions $exceptions): void {
         //
