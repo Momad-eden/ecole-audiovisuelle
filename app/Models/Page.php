@@ -5,6 +5,7 @@ namespace App\Models;
 use App\Enums\PublicationStatus;
 use App\Models\Concerns\HasPublication;
 use App\Models\Concerns\HasUniqueSlug;
+use App\Models\Concerns\RevalidatesFrontend;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
@@ -15,7 +16,7 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
  */
 class Page extends Model
 {
-    use HasFactory, HasPublication, HasUniqueSlug;
+    use HasFactory, HasPublication, HasUniqueSlug, RevalidatesFrontend;
 
     protected $fillable = ['title', 'slug', 'type', 'blocks', 'draft_blocks', 'seo', 'is_locked', 'status', 'published_at'];
 

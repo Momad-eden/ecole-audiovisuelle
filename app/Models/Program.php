@@ -6,6 +6,7 @@ use App\Enums\Audience;
 use App\Enums\ProgramKind;
 use App\Models\Concerns\HasPublication;
 use App\Models\Concerns\HasUniqueSlug;
+use App\Models\Concerns\RevalidatesFrontend;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
@@ -15,7 +16,7 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 /** Formation de l'école ou programme professionnel (Volet 1, BTS par la VAE…). */
 class Program extends Model
 {
-    use HasFactory, HasPublication, HasUniqueSlug, SoftDeletes;
+    use HasFactory, HasPublication, HasUniqueSlug, RevalidatesFrontend, SoftDeletes;
 
     protected $fillable = [
         'title', 'slug', 'audience', 'kind', 'level_label', 'duration_label', 'summary', 'description',

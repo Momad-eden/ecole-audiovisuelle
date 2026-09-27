@@ -12,6 +12,8 @@ class DatabaseSeeder extends Seeder
      */
     public function run(): void
     {
+        $this->call(ContentSeeder::class);
+
         $this->command?->info('Aucun compte créé. Utilisez « php artisan emsi:create-admin » pour créer le premier directeur.');
     }
 }

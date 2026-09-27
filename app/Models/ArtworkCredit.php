@@ -2,11 +2,14 @@
 
 namespace App\Models;
 
+use App\Models\Concerns\RevalidatesFrontend;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class ArtworkCredit extends Model
 {
+    use RevalidatesFrontend;
+
     public $timestamps = false;
 
     protected $fillable = ['artwork_id', 'student_id', 'person_name', 'role', 'position'];

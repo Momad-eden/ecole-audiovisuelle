@@ -2,12 +2,13 @@
 
 namespace App\Models;
 
+use App\Models\Concerns\RevalidatesFrontend;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
 class Setting extends Model
 {
-    use HasFactory;
+    use HasFactory, RevalidatesFrontend;
 
     protected $fillable = [
         'school_name',

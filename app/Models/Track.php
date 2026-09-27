@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use App\Models\Concerns\HasUniqueSlug;
+use App\Models\Concerns\RevalidatesFrontend;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -11,7 +12,7 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 /** Filière technique (Son, Technicien Lumière, Régie Générale…). */
 class Track extends Model
 {
-    use HasFactory, HasUniqueSlug;
+    use HasFactory, HasUniqueSlug, RevalidatesFrontend;
 
     protected $fillable = ['name', 'slug', 'short_name', 'summary', 'description', 'skills', 'outcomes', 'room_id', 'position', 'is_active'];
 

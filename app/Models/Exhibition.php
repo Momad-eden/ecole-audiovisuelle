@@ -4,6 +4,7 @@ namespace App\Models;
 
 use App\Models\Concerns\HasPublication;
 use App\Models\Concerns\HasUniqueSlug;
+use App\Models\Concerns\RevalidatesFrontend;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
@@ -11,7 +12,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 /** Exposition temporaire (festival, promotion, atelier). */
 class Exhibition extends Model
 {
-    use HasFactory, HasPublication, HasUniqueSlug;
+    use HasFactory, HasPublication, HasUniqueSlug, RevalidatesFrontend;
 
     protected $fillable = ['title', 'slug', 'subtitle', 'starts_on', 'ends_on', 'venue', 'curatorial_text', 'cover_image', 'cover_alt', 'status', 'published_at'];
 

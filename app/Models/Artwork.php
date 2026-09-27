@@ -5,6 +5,7 @@ namespace App\Models;
 use App\Enums\ArtworkKind;
 use App\Models\Concerns\HasPublication;
 use App\Models\Concerns\HasUniqueSlug;
+use App\Models\Concerns\RevalidatesFrontend;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -15,7 +16,7 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 /** Œuvre d'apprenant ou de l'école exposée dans le musée. */
 class Artwork extends Model
 {
-    use HasFactory, HasPublication, HasUniqueSlug, SoftDeletes;
+    use HasFactory, HasPublication, HasUniqueSlug, RevalidatesFrontend, SoftDeletes;
 
     protected $fillable = [
         'title', 'slug', 'year', 'room_id', 'track_id', 'cohort_id', 'kind', 'summary', 'creation_story', 'equipment',

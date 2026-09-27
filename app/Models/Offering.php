@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use App\Enums\FundingMode;
+use App\Models\Concerns\RevalidatesFrontend;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
@@ -12,7 +13,7 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 /** Offre à laquelle on candidate : programme × filière × session, avec places et frais. */
 class Offering extends Model
 {
-    use HasFactory;
+    use HasFactory, RevalidatesFrontend;
 
     protected $fillable = ['cohort_id', 'track_id', 'capacity', 'fee_amount', 'registration_fee_amount', 'funding_mode', 'funding_note', 'is_open'];
 

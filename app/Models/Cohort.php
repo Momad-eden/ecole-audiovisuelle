@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use App\Enums\CohortStatus;
+use App\Models\Concerns\RevalidatesFrontend;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -11,7 +12,7 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 /** Session d'un programme (ex. « Volet 1 — 2026 »). */
 class Cohort extends Model
 {
-    use HasFactory;
+    use HasFactory, RevalidatesFrontend;
 
     protected $fillable = ['program_id', 'name', 'starts_on', 'ends_on', 'applications_open_at', 'applications_close_at', 'status', 'notes'];
 
