@@ -164,7 +164,7 @@
 
 ## 6. Priorités recommandées (mises à jour)
 
-1. 🔴 **Immédiat, si le site est en ligne** : fermer `/register` (S1), neutraliser le compte `password` (S2). C'est une modification de 2 lignes à faire en Phase 1, mais à appliquer dès maintenant en production si nécessaire.
+1. 🔴 S1 et S2 en tête de Phase 1. Le site n'est pas en ligne (réponse de Momar du 27/09/2026) : pas de correctif d'urgence.
 2. 🔴 Phase 1 : S1–S3, S6, D1, D2, D11 (verrouillage caisse), D13, bug de recherche de la caisse (A7 ci-dessous), locale FR et messages de validation, retrait des coordonnées et affirmations fausses les plus graves (5.2, 5.4).
 3. 🔴 Phase 2 : D4–D10 (modèle de données, sessions, volets, pièces jointes), PostgreSQL.
 4. 🟠 Phase 3 : API, Policies, agrégats SQL, tests sur le **même moteur que la production**.

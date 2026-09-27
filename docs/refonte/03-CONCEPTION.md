@@ -2,7 +2,7 @@
 
 > Livrable de Phase 0, à valider par Momar. Aucun code applicatif n'est écrit avant validation.
 > Sources : `CLAUDE.md` (§2 bis, principes non négociables), `01-AUDIT.md` (v2), `02-PLAN-MIGRATION.md`, PDF du projet EMSI × Grand Théâtre.
-> Les points marqués **[À valider]** dépendent d'une décision listée en §12.
+> **Mise à jour du 27/09/2026** : toutes les décisions sont prises (§12, réponses de Momar et arbitrages délégués). Il ne reste aucun point « À valider ».
 
 ## 0. Résumé en une page
 
@@ -56,7 +56,7 @@
 │   └── /actualites/[slug]
 ├── /candidater                     Candidature école (multi-étapes)
 │   └── /candidater/confirmation    (accessible seulement après envoi)
-├── /suivi/[jeton]                  Suivi de candidature par le candidat (lien reçu par e-mail) [À valider]
+├── /suivi/[jeton]                  Suivi de candidature par le candidat (lien reçu par e-mail)
 ├── /contact                        Formulaire + coordonnées + plan d'accès
 ├── /mentions-legales · /confidentialite   (loi 2008-12, CDP)
 └── /[slug]                         Pages libres créées dans l'admin
@@ -135,7 +135,7 @@ Page composée de blocs (§6), ordre par défaut proposé :
 |---|---|
 | Média principal | Vidéo (YouTube ou Vimeo en différé, ou fichier court), image plein écran (zoom), ou **audio avec lecteur et forme d'onde** |
 | Cartel | Titre, année, salle, filière, promotion, durée, type |
-| Crédits | Personnes et rôles (ex. « Mixage façade — Awa Ndiaye, promo 2026 ») ; lien vers d'autres œuvres de la même personne [À valider : pages personnes] |
+| Crédits | Personnes et rôles (ex. « Mixage façade — Awa Ndiaye, promo 2026 ») ; pas de page personne au lancement (Q-16) |
 | Matériel utilisé | Liste libre structurée (ex. « Console DiGiCo SD12 ») |
 | Récit de création | Texte court et rich-text limité (intertitres, gras, liens) |
 | Galerie | Images secondaires, making-of |
@@ -161,7 +161,7 @@ Page composée de blocs (§6), ordre par défaut proposé :
 |---|---|---|
 | `/formations` | Catalogue des formations **de l'école** (audience = école) : filtres par filière, niveau et durée ; carte = visuel, filière, durée, niveau, prochaine session, statut des candidatures (ouvertes, fermées, bientôt). | Données « programmes » |
 | `/formations/[slug]` | Héros, présentation, **compétences visées**, **programme par modules**, **débouchés**, prérequis, durée et rythme, lieu, **équipements**, **œuvres des apprenants liées**, sessions et calendrier, frais et financement, FAQ, CTA « Candidater à cette formation » (pré-rempli). | Programme + blocs + liaisons |
-| `/ecole` | Histoire (créée en 2016), mission, pédagogie, **lieux et équipements réels** (studio de 154 m², scène live…), équipe [À valider], partenaires, chiffres clés **de l'école**, plan d'accès. | Page à blocs |
+| `/ecole` | Histoire (créée en 2016), mission, pédagogie, **lieux et équipements réels** (studio de 154 m², scène live…), équipe (si fournie par l'école), partenaires, chiffres clés **de l'école**, plan d'accès. | Page à blocs |
 | `/actualites` | Liste paginée, catégories (vie de l'école, événements, Espace Pro…), recherche. | Actualités |
 | `/actualites/[slug]` | Titre, date (en français), image, **texte riche limité**, galerie, partage, actualités liées. | Actualités |
 | `/contact` | Formulaire (motif : information, partenariat, presse, visite), coordonnées, horaires, carte, WhatsApp. Les messages arrivent dans l'admin. | Paramètres + `contact_messages` |
@@ -178,7 +178,7 @@ Rubrique unique qui regroupe tout le projet EMSI × Grand Théâtre National Dou
 ### 5.1 `/professionnels` — le programme
 
 1. Héros : « Programme intégré de formation et de certification — métiers techniques de l'audiovisuel et de l'événementiel », porteurs (EMSI et Grand Théâtre).
-2. **À qui s'adresse le programme** : techniciens titulaires d'un CPS/CS [À valider : sigle unique], 18–30 ans, objectif de 30 % de femmes, première expérience appréciée.
+2. **À qui s'adresse le programme** : techniciens titulaires d'un **CPS** (Certificat de Professionnalisation Spécialisée) **ou d'un CS** (Certificat de Spécialité), comme au PDF §4.1, 18–30 ans, objectif de 30 % de femmes, première expérience appréciée.
 3. **Les deux volets** (cartes comparatives, reprise du Tableau 1 corrigé) :
    - Volet 1 — Perfectionnement intensif · 12 semaines · ~360 h · 40 places (4 × 10) · sept.–nov. 2026 · **statut : en cours**.
    - Volet 2 — Cycle de certification de niveau BTS par la VAE · 9 mois · 1 080 h (30 h/semaine) · 60 places · démarrage février 2027 · **statut : recrutement en janvier 2027**.
@@ -190,11 +190,11 @@ Rubrique unique qui regroupe tout le projet EMSI × Grand Théâtre National Dou
 
 ### 5.2 `/professionnels/perfectionnement` (Volet 1)
 
-Objectifs, public (CPS EMSI, équipe technique du festival), 4 spécialités et effectifs, méthode (10 % théorie / 90 % pratique, plateaux du Grand Théâtre), encadrement (EMSI et experts internationaux [À valider : nom du partenaire]), certifications (**Diplôme d'École** en partenariat avec la Direction des Concours et **Certificat de compétences techniques avancées** co-signé ; à trancher avec le Tableau 1), déploiement sur les événements, galerie et œuvres produites (lien vers l'exposition du Volet 1).
+Objectifs, public (CPS EMSI, équipe technique du festival), 4 spécialités et effectifs, méthode (10 % théorie / 90 % pratique, plateaux du Grand Théâtre), encadrement (EMSI et « experts techniques internationaux mobilisés par l'EMSI », sans nom tant que l'école n'en fournit pas), certifications (**Diplôme d'École** en partenariat avec la Direction des Concours et **Certificat de compétences techniques avancées** co-signé par les deux porteurs ; formulation du texte du PDF §5.1 et §13.1, le « Diplôme d'État » du Tableau 1 étant l'exception), déploiement sur les événements, galerie et œuvres produites (lien vers l'exposition du Volet 1).
 
 ### 5.3 `/professionnels/bts-vae` (Volet 2)
 
-Principe de la VAE, public, rythme (30 h/semaine, alternance), **Livret de compétences VAE** (un seul livret, alimenté en continu, avec un tuteur), jury (composition), soutenance, certification délivrée, **formulation juridique validée** [À valider : « Certification de niveau BTS (Bac+2) » et non « BTS d'État »], pièces à fournir, FAQ.
+Principe de la VAE, public, rythme (30 h/semaine, alternance), **Livret de compétences VAE** (un seul livret, alimenté en continu, avec un tuteur), jury (composition), soutenance, certification délivrée, formulation du PDF : « **Certification de niveau BTS (équivalent Bac+2) par la VAE** » (jamais « BTS d'État »), pièces à fournir, FAQ.
 Le simulateur d'éligibilité actuel est **supprimé** ; il est remplacé par une **check-list d'éligibilité** fidèle au PDF (CPS/CS, âge, expérience), qui oriente sans promettre.
 
 ### 5.4 `/professionnels/filieres/[slug]`
@@ -260,7 +260,7 @@ Formulaire multi-étapes, brouillon sauvegardé localement, reprise possible.
 4. **Parcours** : dernier diplôme (liste incluant **CS/CPS**, CAP, BFEM, Bac, BTS…), année, établissement, série ou filière, expériences (facultatif).
 5. **Motivation** : texte (≤ 3 000), lien vers un portfolio ou une réalisation (facultatif), pièces facultatives.
 6. **Vérification et consentement** : récapitulatif, case de consentement (finalité, durée de conservation, droits CDP), honeypot et limite de débit.
-7. **Confirmation** : numéro de dossier (ex. `CAND-2026-00042`), e-mail et WhatsApp [À valider] de confirmation, lien de suivi.
+7. **Confirmation** : numéro de dossier (ex. `CAND-2026-00042`), e-mail de confirmation, lien de suivi, bouton WhatsApp vers l'école (lien simple, sans envoi automatique).
 
 ### 7.2 Candidat « professionnel » (`/professionnels/candidater`)
 
@@ -307,10 +307,10 @@ stateDiagram-v2
 |---|:-:|:-:|:-:|:-:|
 | Tableau de bord | complet | pédagogie et finances | candidatures et étudiants | contenus |
 | Candidatures (lire, traiter) | ✔ | ✔ | ✔ | — |
-| Candidatures (décider : accepter, refuser) | ✔ | ✔ | [À valider] | — |
+| Candidatures (décider : accepter, refuser) | ✔ | ✔ | — (prépare, propose) | — |
 | Étudiants et inscriptions | ✔ | ✔ | ✔ (sans suppression) | — |
-| Caisse : encaisser, imprimer un reçu | ✔ | ✔ | [À valider] | — |
-| Caisse : dépenses, annulations, clôture | ✔ | ✔ (annulation : [À valider]) | — | — |
+| Caisse : encaisser, imprimer un reçu | ✔ | ✔ | ✔ | — |
+| Caisse : dépenses, annulations, clôture | ✔ | ✔ (annulation motivée) | — | — |
 | Comptabilité et exports | ✔ | ✔ | — | — |
 | Programmes, sessions, offres ; ouvrir/fermer les candidatures | ✔ | ✔ | — | — |
 | Pages, blocs, menus, pied de page | ✔ | — | — | ✔ |
@@ -329,7 +329,7 @@ Le menu latéral et le tableau de bord n'affichent **que** ce que le rôle peut 
 - **Tableau de bord** par rôle : à traiter aujourd'hui (candidatures en attente, entretiens du jour, pièces à vérifier, contenus en brouillon), KPI (candidatures par statut, remplissage par offre, encaissé vs attendu, solde de caisse du jour), raccourcis.
 - **Candidatures** : tableau (TanStack Table, filtres : session, programme, filière, statut, audience ; tri ; pagination serveur), fiche candidat (onglets : dossier, pièces avec aperçu, historique, messages, entretien), actions.
 - **Étudiants** : liste, fiche (identité, inscriptions, paiements, documents, œuvres créditées), export.
-- **Caisse** : « Encaisser » en 3 champs visibles (étudiant et inscription, montant, moyen) et le reste replié, puis impression du reçu. Journal du jour, dépenses, **annulation motivée** (contre-écriture), clôture de caisse journalière ou mensuelle [À valider], exports CSV et Excel à montants numériques.
+- **Caisse** : « Encaisser » en 3 champs visibles (étudiant et inscription, montant, moyen) et le reste replié, puis impression du reçu. Journal du jour, dépenses, **annulation motivée** (contre-écriture), clôture de caisse mensuelle (arrêté du solde, écart de comptage), exports CSV et Excel à montants numériques.
 - **Formations** : programmes → sessions → offres, avec l'interrupteur « Candidatures ouvertes » et les dates.
 - **Contenus** : pages (constructeur de blocs à glisser-déposer, aperçu bureau et mobile, historique, planification), menus, actualités, FAQ, partenaires, événements.
 - **Musée** : salles (couleur, ambiance, ordre), expositions, œuvres (**assistant pas à pas**).
@@ -346,7 +346,7 @@ Le menu latéral et le tableau de bord n'affichent **que** ce que le rôle peut 
 | **Modifier la page d'accueil** | Communication | Pages → Accueil → glisser un bloc, modifier un texte ou une image → « Aperçu » → « Publier ». Historique pour revenir en arrière. |
 | **Ouvrir une session de candidature** | Gestionnaire | Formations → programme → « Nouvelle session » (dates, places, frais) → interrupteur « Candidatures ouvertes ». Le site se met à jour seul. |
 | **Traiter une candidature** | Secrétaire ou gestionnaire | Tableau de bord « À traiter » → fiche → vérifier les pièces → planifier l'entretien → « Accepter » → « Inscrire ». Message au candidat proposé à chaque étape. |
-| **Encaisser un paiement** | Gestionnaire [ou secrétaire] | « Encaisser » (tableau de bord ou fiche étudiant) → montant, moyen → « Valider » → reçu PDF imprimé ou envoyé. |
+| **Encaisser un paiement** | Secrétaire ou gestionnaire | « Encaisser » (tableau de bord ou fiche étudiant) → montant, moyen → « Valider » → reçu PDF imprimé ou envoyé. |
 
 Chaque tâche fera l'objet d'un **test e2e Playwright** (Phase 6) et d'une fiche du `docs/GUIDE-ADMIN.md`.
 
@@ -462,19 +462,21 @@ erDiagram
 | `activity_log` | `user_id`, `action`, `subject_type`, `subject_id`, `changes` jsonb, `ip`, `created_at` |
 | `users` | `name`, `email`, `password`, `role` (enum castée), `is_active`, `last_login_at`, `invited_at` |
 
-### 9.5 Reprise des données existantes (Phase 2)
+### 9.5 Données initiales (Phase 2)
 
-| Existant | Cible |
+Il n'existe **aucune donnée de production** (réponse Q-2) : pas de script de reprise. Le schéma PostgreSQL est créé à neuf et alimenté par des **seeders de référence**, idempotents et testés :
+
+| Seeder | Contenu |
 |---|---|
-| `courses` (5 filières du projet) | `tracks` (5) + `programs` « Volet 1 » et « BTS par la VAE » (audience `professional`) + `cohorts` 2026 et 2027 + `offerings` (4 × 10, puis 5 × 12 [À valider]) |
-| `courses` (formations de l'école) | `programs` (audience `school`) + une `cohort` et une `offering` par formation |
-| `admissions` | `applications` (statuts `pending` → `submitted`, `approved` → `accepted` ou `enrolled` si un étudiant est lié ; volet déduit du texte vers l'offre ; genre `M`/`F` → `male`/`female`) |
-| `students` | `students` + un `enrollment` par étudiant (frais = prix actuel de la formation, statut FR → enum) |
-| `payments` | `cash_transactions` (montants → entiers ; numéros existants conservés tels quels ; séquences initialisées au maximum existant) |
-| `galleries` | `media` (images, embeds YouTube) ; les œuvres sont créées à la main ensuite |
-| `news`, `partners`, `settings` | tables équivalentes (settings → clés et valeurs) |
+| Filières | les 5 filières du PDF (§4.2), liées aux 4 salles |
+| Salles | Son, Lumière, Image, Visuel (textes d'intention en brouillon, couleurs de la piste A) |
+| Programmes professionnels | « Volet 1 — Perfectionnement intensif » et « Cycle de certification de niveau BTS par la VAE » (audience `professional`), contenus corrigés du PDF |
+| Sessions et offres | Volet 1 · sept.–nov. 2026 · statut `running` · 4 offres × 10 places (Son, Lumière, Infographie, Cadrage) · candidatures fermées ; Volet 2 · févr.–oct. 2027 · statut `planned` · candidatures ouvertes en janvier 2027 · 5 offres × 12 places |
+| Pages système | accueil, école, Espace Professionnels (4 pages), contact, légales : blocs pré-remplis **en brouillon** |
+| Référentiels | FAQ VAE, événements (Biennale de Dakar, ECOFES, JOJ Dakar 2026), partenaires du PDF (Grand Théâtre, Direction des Concours) |
+| Comptes | aucun mot de passe par défaut : premier directeur créé par la commande `make:admin` existante (renommée `emsi:create-admin` et sans option `--password` en Phase 1) |
 
-Script de migration idempotent **MySQL → PostgreSQL**, avec rapport de contrôle (comptes par table, somme des montants avant et après).
+Les formations de l'école (Q-3) et la formation de test « Réalisation Audiovisuelle & Cinéma » ne sont **pas** reprises.
 
 ---
 
@@ -511,7 +513,7 @@ Script de migration idempotent **MySQL → PostgreSQL**, avec rapport de contrô
 | GET | `/sitemap` | Données du sitemap |
 | POST | `/applications` | Dépôt de candidature (multipart ; honeypot ; `throttle:5,60` par IP ; consentement obligatoire) → `{ reference, trackingUrl }` |
 | POST | `/applications/{uuid}/documents` | Ajout de pièce (jeton de suivi) |
-| GET | `/applications/track/{token}` | Suivi de candidature [À valider] |
+| GET | `/applications/track/{token}` | Suivi de candidature |
 | POST | `/pre-registrations` | Pré-inscription (« prévenez-moi à l'ouverture ») |
 | POST | `/contact-messages` | Formulaire de contact (limite de débit et honeypot) |
 
@@ -541,7 +543,7 @@ Tests Feature par endpoint, avec un **test d'autorisation par rôle** (matrice �
 
 Les trois pistes respectent les mêmes invariants : fond sombre de salle d'exposition, lumière comme matière (halos, faisceaux, dégradés doux), grands médias, typographie éditoriale, **contraste AA vérifié** (tous les textes et accents proposés dépassent 5:1 sur leur fond), `prefers-reduced-motion`, aucune lecture automatique, mobile d'abord. Chaque salle garde **sa** couleur d'accent, réglable dans l'admin.
 
-### Piste A — « Salle obscure » *(recommandée)*
+### Piste A — « Salle obscure » *(retenue, Q-7)*
 
 - **Idée** : la *black box* du spectacle vivant. Noir chaud, silence, et des **faisceaux de lumière** qui découpent les œuvres comme sur scène. Le design se retire ; seule la lumière désigne ce qu'il faut regarder. Les cartels rappellent ceux des musées (titre, crédits, matériel, en petites capitales).
 - **Palette**
@@ -582,30 +584,34 @@ Les trois pistes respectent les mêmes invariants : fond sombre de salle d'expos
 
 ---
 
-## 12. Décisions à prendre
+## 12. Décisions prises (27/09/2026)
 
-| # | Décision | Options / recommandation |
+Réponses de Momar pour Q-1 à Q-4 ; les autres points lui ont été délégués (« prends les meilleures décisions »). Chaque arbitrage reste révisable.
+
+| # | Sujet | Décision |
 |---|---|---|
-| Q-1 | **Urgence S1** : le site actuel est-il en ligne avec `/register` ouvert ? | Si oui, fermer `/register` et changer le mot de passe `admin@emsi.sn` **aujourd'hui** (hors phases). |
-| Q-2 | Existe-t-il une **base de production** avec des données réelles (candidats, paiements) ? Sur quel moteur (MySQL) ? | Nécessaire pour le script de reprise (Phase 2). |
-| Q-3 | **Catalogue réel des formations de l'école** (hors projet) : intitulés, niveaux (CS, BTS…), durées, frais, rentrées. | Indispensable : aujourd'hui le catalogue ne contient que le projet et une formation de test. |
-| Q-4 | **Formulation juridique du Volet 2** : « Certification de niveau BTS (Bac+2) par la VAE » (PDF) ou « BTS d'État » (site actuel) ? Qui délivre ? | Recommandation : la formulation du PDF, tant qu'un texte officiel n'est pas fourni. |
-| Q-5 | Certification du Volet 1 : « Diplôme d'École » ou « Diplôme d'État » ? Sigle **CPS ou CS** ? | À trancher avec l'EMSI (PDF contradictoire). |
-| Q-6 | **Adresse réelle de l'EMSI** et nom officiel exact (« École des Métiers du Son et de l'Image ») ; nom exact du lieu (« Grand Théâtre National Doudou Ndiaye Coumba Rose ») ; nom du **partenaire technique international** effacé du PDF. | — |
-| Q-7 | **Direction artistique** : A « Salle obscure », B « Spectre » ou C « Indigo & ocre » ; conserver le logo actuel ? | Recommandation : **A**. |
-| Q-8 | Répartition des **60 places du Volet 2** (5 × 12 ? 2 cohortes ?) et suites du Volet 1 (déjà en cours : candidatures fermées). | — |
-| Q-9 | Droits du rôle **secrétaire** : encaisser ? décider d'une candidature ? Le gestionnaire peut-il **annuler** une écriture de caisse ? Faut-il une **clôture de caisse** quotidienne ou mensuelle ? | Recommandation : la secrétaire encaisse et imprime, sans annuler ; annulation par le gestionnaire avec motif ; clôture mensuelle. |
-| Q-10 | Notifications aux candidats : e-mail seul, ou e-mail et **WhatsApp** (service payant, par ex. WhatsApp Business API) ? Suivi de candidature par lien (`/suivi/[jeton]`) ? | Recommandation : e-mail et lien de suivi d'abord ; WhatsApp plus tard. |
-| Q-11 | Stockage des blocs : **révisions JSON** (`content_revisions.data`, recommandé : brouillon, historique et restauration simples) ou table `page_blocks` (prévue dans le plan) ? Schémas de blocs en JSON Schema partagé (Laravel + zod générés) ? | Recommandation : révisions JSON et JSON Schema partagé. |
-| Q-12 | Hébergement des médias : vidéos longues sur **YouTube/Vimeo** et fichiers courts sur le serveur ; stockage objet (S3 compatible) ou disque local ? Budget serveur ? | Recommandation : embeds pour les vidéos longues, S3 compatible pour le reste. |
-| Q-13 | Next.js : hébergement **Vercel** ou **serveur Node** (même VPS que Laravel) ? Domaines (`emsi.sn` + `api.emsi.sn`) ? | Conditionne l'auth Sanctum par cookie (domaine parent commun). |
-| Q-14 | Projet voisin `~/EMSI` (Next 16 + API Laravel, août 2026) : l'ignorer, ou en récupérer des éléments (types, composants) ? | Recommandation : l'ignorer (modèle et conventions différents), sauf pièces précises. |
-| Q-15 | Contenus à fournir par l'école : photos et vidéos réelles, œuvres d'apprenants (avec **autorisation de diffusion** des personnes), équipe, chiffres clés vérifiés, partenaires confirmés (FOPICA, RTS, Canal+ sont-ils réels ?). | Un tableau de collecte sera fourni en Phase 4. |
-| Q-16 | Pages personnes (apprenants et anciens) dans le musée ? | Recommandation : non au lancement (données personnelles) ; crédits textuels seulement. |
-| Q-17 | Correction du PDF source (16 incohérences, 01-AUDIT §5.9, dont le **budget faux**) : l'EMSI corrige-t-elle le document, ou le site reprend-il seulement le contenu corrigé ? | Le budget n'a pas vocation à figurer sur le site. |
+| Q-1 | Site en ligne ? | **Non.** Pas de correctif d'urgence : S1 et S2 sont traités en Phase 1. |
+| Q-2 | Données de production ? | **Aucune.** Pas de script de reprise MySQL → PostgreSQL : schéma neuf et seeders de référence (§9.5). La base MySQL locale n'est pas modifiée ; elle pourra être abandonnée. |
+| Q-3 | Formations de l'école | **Pas encore disponibles.** Le modèle les prévoit (programmes `school`). Tant qu'aucune n'est publiée, l'entrée « Formations » et le bloc B10 **se masquent automatiquement** ; les 5 filières sont présentées dans l'Espace Professionnels et dans les salles du musée. Aucun contenu inventé. |
+| Q-4 / Q-5 | Formulations juridiques | **Le PDF fait foi.** Volet 2 : « Certification de niveau BTS (équivalent Bac+2) par la VAE ». Volet 1 : « Diplôme d'École (en partenariat avec la Direction des Concours du Sénégal) » et « Certificat de Compétences Techniques Avancées » co-signé. Public : « titulaires d'un CPS ou d'un CS ». Toutes les affirmations de 01-AUDIT §5.2 absentes du PDF sont retirées. |
+| Q-6 | Noms et adresse | « École des Métiers du Son et de l'Image (EMSI) » et « Grand Théâtre National Doudou Ndiaye Coumba Rose ». Partenaire international : « experts techniques internationaux mobilisés par l'EMSI ». L'adresse de l'école est un **paramètre obligatoire** de l'admin ; tant qu'elle est vide, le site affiche seulement « Dakar, Sénégal », sans valeur de repli inventée. |
+| Q-7 | Direction artistique | **Piste A « Salle obscure ».** Le logo actuel est conservé (il fonctionne sur fond noir) ; les accents de salle restent modifiables dans l'admin. |
+| Q-8 | Places du Volet 2 | **5 offres × 12 places**, une session février–octobre 2027 (calendrier du PDF). Les « 2 cohortes » du Tableau 1 se gèrent si besoin en créant une 2ᵉ session. Capacités modifiables dans l'admin. |
+| Q-9 | Droits | La secrétaire **traite** les candidatures (pièces, entretiens, proposition de décision) et **encaisse et imprime** les reçus ; la **décision** et l'**annulation** d'une écriture (avec motif) reviennent au gestionnaire ou au directeur. **Clôture de caisse mensuelle.** |
+| Q-10 | Notifications | **E-mail et lien de suivi.** WhatsApp limité à un lien « écrire à l'école » (pas d'API payante). |
+| Q-11 | Stockage des blocs | **Révisions JSON** (`content_revisions`) et **schémas JSON Schema** partagés, dont sont générés les règles Laravel et les schémas zod. |
+| Q-12 | Médias | Vidéos longues en **YouTube/Vimeo** (lecture différée, `youtube-nocookie`) ; images, audio et courtes vidéos sur le **disque du serveur** via l'abstraction `Storage` (public et privé), prêt pour un stockage S3 plus tard. |
+| Q-13 | Hébergement | Un **seul VPS** : Next.js (Node, service systemd) et Laravel (PHP-FPM) derrière **Nginx, sur le même domaine** (`/api` et `/sanctum` routés vers Laravel). Les cookies Sanctum sont ainsi simples (même origine) et il n'y a pas de CORS. |
+| Q-14 | Projet `~/EMSI` | **Ignoré.** |
+| Q-15 | Contenus de l'école | **Tableau de collecte** remis en Phase 4 (photos, œuvres avec autorisation de diffusion, équipe, chiffres vérifiés, partenaires confirmés). En attendant, les pages sont livrées **en brouillon** avec des emplacements explicites dans l'admin, jamais publiées avec du faux contenu. |
+| Q-16 | Pages personnes | **Non** au lancement ; crédits textuels (et lien vers la fiche étudiant côté admin seulement). |
+| Q-17 | PDF source | Le site reprend le **contenu corrigé** (P1–P16) ; le budget n'est pas publié. La liste des corrections est remise à l'EMSI pour le document lui-même. |
 
-## 13. Ajustements proposés au plan de migration
+## 13. Ajustements apportés au plan de migration
 
-- **Phase 1** : ajouter à la liste A7 (recherche de la caisse, 500 sous MySQL), S6 (cloisonnement du tableau de bord), D13 (slug d'actualité), la locale FR (`lang/fr`, dates, validation), la suppression des coordonnées fictives (repli `+221 33 800 00 00`, reçu) et des affirmations juridiques non sourcées (5.2), et faire tourner les tests **sur MySQL** (moteur réel) en attendant PostgreSQL.
-- **Phase 2** : utiliser les noms `cohorts` / `offerings` (et non `sessions`, déjà pris par Laravel), `cash_transactions` avec contre-écritures, et un script de reprise **MySQL → PostgreSQL**.
-- **Phase 4** : commencer par la maquette de la piste artistique retenue et un **tableau de collecte des contenus** pour l'école.
+Reportés dans `02-PLAN-MIGRATION.md` :
+
+- **Phase 1** : ajout de A7 (recherche de la caisse), S6 (tableau de bord par rôle), D13 (slug d'actualité), la locale FR (`lang/fr`, dates, validation), la suppression des coordonnées fictives et des affirmations non sourcées ; tests exécutés sur le moteur réel (MySQL) en attendant PostgreSQL.
+- **Phase 2** : pas de reprise de données ; schéma PostgreSQL neuf et seeders de référence ; noms `cohorts` / `offerings` / `cash_transactions`.
+- **Phase 4** : maquette de la piste A, puis tableau de collecte des contenus.
+- **Phase 6** : déploiement sur un seul VPS (Nginx, PHP-FPM, Node), même domaine.

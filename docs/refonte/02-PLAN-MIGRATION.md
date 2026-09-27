@@ -31,16 +31,17 @@ Auth : Sanctum SPA (cookie `XSRF-TOKEN`, même domaine parent — ex. `emsi.sn` 
 - `restrictOnDelete` sur `students.course_id` et `payments.student_id` ; SoftDeletes sur `courses`, `students`, `payments`.
 - Générateur de séquences transactionnel (`sequences` table + `lockForUpdate`) pour reçus (`REC`, `DEP` séparés) et matricules.
 - Rate-limit + honeypot sur le formulaire de candidature.
+- *(ajouts Phase 0)* Recherche de la caisse en erreur 500 sous MySQL (A7), tableau de bord cloisonné par rôle (S6), slug d'actualité unique (D13), catégorie de caisse cohérente avec le type et montants bornés (D11), locale FR (`lang/fr`, dates, messages de validation), retrait des coordonnées fictives et des affirmations non sourcées (01-AUDIT §5.2 et §5.4), renommage de `make:admin` en `emsi:create-admin` sans option `--password`, tests exécutés aussi sur MySQL.
 - Tests Feature couvrant chaque correctif.
 - **STOP.**
 
 ## Phase 2 — Modèle de données & PostgreSQL
-- Passage à PostgreSQL (docker-compose ou instance locale), script de migration des données SQLite existantes.
+- Passage à PostgreSQL (docker-compose ou instance locale). **Aucune donnée de production** (décision Q-2) : schéma neuf et seeders de référence (03-CONCEPTION §9.5), sans script de reprise.
 - Nouvelles entités :
-  - **Formation** : `programs` (formations classiques de l'école **et** programmes professionnels Volet 1 / BTS-VAE, avec un champ `audience` : grand public / professionnels), `sessions`/`cohorts` (année, dates, capacité, candidatures ouvertes/fermées), `course_offerings` (filière × programme × session, capacité, frais, mode de financement), `admission_documents` (uploads), `admission_steps` (dossier → entretien → décision).
+  - **Formation** : `programs` (formations classiques de l'école **et** programmes professionnels Volet 1 / BTS-VAE, avec un champ `audience` : grand public / professionnels), `cohorts` (le nom `sessions` est déjà utilisé par Laravel) (année, dates, capacité, candidatures ouvertes/fermées), `offerings` (filière × programme × session, capacité, frais, mode de financement), `admission_documents` (uploads), `admission_steps` (dossier → entretien → décision).
   - **Musée numérique** : `rooms` (salles : Son, Lumière, Image, Visuel… créables depuis l'admin, avec couleur d'accent et ambiance), `exhibitions` (expositions temporaires), `artworks` (œuvres : médias, crédits, filière, promotion, matériel, récit), `artwork_credits`, pivot `artwork_exhibition`.
   - **Contenu administrable** : `media` (médiathèque : image/vidéo/audio/PDF, alt, crédits, variantes générées), `pages` + `page_blocks` (blocs ordonnés, type + données JSON validées par schéma), `menus` + `menu_items`, `content_revisions` (brouillon/publication/historique), `testimonials`, `faqs`, `events` (Biennale, ECOFES, JOJ…).
-- La galerie actuelle (`galleries`) est migrée vers `media` + `artworks`.
+- Caisse : `cash_transactions` inaltérables (annulation par contre-écriture), `cash_closings`, table `sequences`.
 - Normalisation des enums (voir `CLAUDE.md` §6), montants en entiers, `capacity` au lieu de `students_count`.
 - Casts Enum dans tous les modèles ; Policies par modèle.
 - **STOP.**
@@ -54,9 +55,9 @@ Auth : Sanctum SPA (cookie `XSRF-TOKEN`, même domaine parent — ex. `emsi.sn` 
 - **STOP.**
 
 ## Phase 4 — Site public Next.js (« musée numérique »)
-Commencer par une **maquette de direction artistique** (accueil + une salle + une fiche œuvre) à valider avant de développer le reste.
+Commencer par une **maquette de direction artistique** dans la piste retenue, **A « Salle obscure »** (accueil + une salle + une fiche œuvre), à valider avant de développer le reste, puis remettre le **tableau de collecte des contenus** à l'école.
 
-Arborescence proposée (à valider en Phase 0) :
+Arborescence (détaillée dans 03-CONCEPTION §2) :
 - `/` Accueil = **entrée du musée** : immersion visuelle et sonore (sans lecture auto), les salles, œuvres à la une, formations de l'école, actualités, **un seul bloc** vers l'Espace Professionnels, CTA « Candidater ». Composée de blocs gérés dans l'admin.
 - `/musee` (plan du musée), `/musee/[salle]` (Son, Lumière, Image, Visuel…), `/musee/oeuvres/[slug]`, `/expositions/[slug]`
 - `/formations` et `/formations/[slug]` (formations de l'école : compétences, débouchés, équipements, œuvres des apprenants liées, conditions, calendrier, FAQ)
@@ -88,6 +89,6 @@ Arborescence proposée (à valider en Phase 0) :
 ## Phase 6 — Bascule & nettoyage
 - Tests e2e Playwright (candidature, login, encaissement, publication d'actualité).
 - Suppression des vues Blade, d'Alpine et de Vite côté Laravel ; mise à jour de `DEPLOYMENT.md` (fusion avec `GUIDE_DEPLOIEMENT.md`).
-- Déploiement : API Laravel + Next.js (Node ou Vercel), PostgreSQL, stockage fichiers, sauvegardes.
+- Déploiement sur **un seul VPS** : Nginx + PHP-FPM (Laravel) + Node (Next.js, service systemd), **même domaine** (`/api` et `/sanctum` vers Laravel), PostgreSQL, stockage disque (public et privé), sauvegardes.
 - **Recette « non-informaticien »** : une personne de l'école réalise seule les tâches listées dans `CLAUDE.md` §2 bis-B ; chaque blocage devient un correctif.
 - **Livrable final** : recette avec Momar.
