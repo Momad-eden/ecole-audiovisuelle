@@ -1,3 +1,4 @@
+import { DEFAULT_SHARE_IMAGE } from "@/lib/metadata";
 import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
@@ -19,7 +20,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   return {
     title: artwork.title,
     description: artwork.summary ?? undefined,
-    openGraph: { title: artwork.title, description: artwork.summary ?? undefined, images: artwork.cover ? [{ url: artwork.cover.url, alt: artwork.cover.alt }] : undefined },
+    openGraph: { title: artwork.title, description: artwork.summary ?? undefined, images: artwork.cover ? [{ url: artwork.cover.url, alt: artwork.cover.alt }] : [DEFAULT_SHARE_IMAGE] },
   };
 }
 

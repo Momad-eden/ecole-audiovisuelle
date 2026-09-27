@@ -1,3 +1,4 @@
+import { DEFAULT_SHARE_IMAGE } from "@/lib/metadata";
 import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
@@ -13,7 +14,7 @@ type Props = { params: Promise<{ slug: string }> };
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const news = await api.newsItem((await params).slug);
   if (!news) return {};
-  return { title: news.title, description: news.excerpt ?? undefined, openGraph: { type: "article", publishedTime: news.publishedAt ?? undefined, images: news.image ? [{ url: news.image.url }] : undefined } };
+  return { title: news.title, description: news.excerpt ?? undefined, openGraph: { type: "article", publishedTime: news.publishedAt ?? undefined, images: news.image ? [{ url: news.image.url }] : [DEFAULT_SHARE_IMAGE] } };
 }
 
 export default async function NewsItemPage({ params }: Props) {

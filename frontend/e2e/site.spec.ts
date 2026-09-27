@@ -122,3 +122,12 @@ test("la page L'École présente les deux campus et oriente vers la candidature"
   await expect(page.getByRole("link", { name: "Candidater à Dakar" })).toHaveAttribute("href", "/candidater?campus=emsi-dakar");
   await expect(page.getByRole("link", { name: "Candidater à Saint-Louis" })).toHaveAttribute("href", "/candidater?campus=emsi-saint-louis");
 });
+
+test("les liens partagés affichent l'aperçu de l'EMSI", async ({ page, request }) => {
+  await page.goto("/studio");
+  const image = await page.locator('meta[property="og:image"]').first().getAttribute("content");
+  expect(image).toContain("/opengraph-image");
+  const response = await request.get("/opengraph-image");
+  expect(response.status()).toBe(200);
+  expect(response.headers()["content-type"]).toContain("image/png");
+});

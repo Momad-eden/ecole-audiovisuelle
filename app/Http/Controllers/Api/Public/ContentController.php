@@ -10,7 +10,9 @@ use App\Http\Resources\Public\OfferingResource;
 use App\Http\Resources\Public\PlaceResource;
 use App\Http\Resources\Public\ProgramResource;
 use App\Http\Resources\Public\RoomResource;
+use App\Models\AgendaEvent;
 use App\Models\Artwork;
+use App\Models\EquipmentItem;
 use App\Models\Exhibition;
 use App\Models\Faq;
 use App\Models\MenuItem;
@@ -41,6 +43,9 @@ class ContentController extends Controller
 
     public function site(): JsonResponse
     {
+        $published = Page::published()->pluck('slug')->all();
+        $unpublished = Page::whereNotIn('slug', $published)->pluck('slug')->all();
+
         $settings = Setting::current();
 
         return response()->json(['data' => [
@@ -59,6 +64,8 @@ class ContentController extends Controller
                 'social' => collect($settings->only(['facebook', 'instagram', 'youtube', 'tiktok', 'linkedin', 'twitter']))->filter()->all(),
             ],
             'menus' => MenuItem::where('is_visible', true)->orderBy('position')->get()
+                // Jamais de lien vers une page de l'admin encore en brouillon (ex. mentions légales à compléter).
+                ->reject(fn (MenuItem $i) => in_array(ltrim($i->url, '/'), $unpublished, true))
                 ->groupBy('location')
                 ->map(fn ($items) => $items->map(fn (MenuItem $i) => ['label' => $i->label, 'url' => $i->url, 'isButton' => $i->is_button])->values())
                 ->all() + ['main' => [], 'footer' => [], 'legal' => []],
@@ -236,6 +243,8 @@ class ContentController extends Controller
             ->merge(Program::published()->get(['slug', 'audience', 'updated_at'])->map(fn (Program $p) => $entry(
                 ($p->audience?->value === 'professional' ? '/professionnels/' : '/formations/').$p->slug, $p->updated_at)))
             ->merge(News::published()->get(['slug', 'updated_at'])->map(fn (News $n) => $entry('/actualites/'.$n->slug, $n->updated_at)))
+            ->merge(AgendaEvent::published()->get(['slug', 'updated_at'])->map(fn (AgendaEvent $e) => $entry('/agenda/'.$e->slug, $e->updated_at)))
+            ->merge(EquipmentItem::published()->where('usage', 'rental')->get(['slug', 'updated_at'])->map(fn (EquipmentItem $i) => $entry('/events/materiel/'.$i->slug, $i->updated_at)))
             ->values()]);
     }
 }

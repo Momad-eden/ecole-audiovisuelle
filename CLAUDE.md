@@ -101,7 +101,10 @@ php artisan emsi:impact-live     # ajouter Impact Live et le campus de Saint-Lou
 php artisan emsi:site-v3         # page L'École à deux campus, chiffres clés et agenda sur l'accueil (relançable)
 ./vendor/bin/pint
 
-# Frontend
+# Tout lancer en local (Laravel :8000, file d'attente, site :3000)
+composer dev
+
+# Frontend seul
 cd frontend && npm install && npm run dev
 npm run lint && npm run build
 ```

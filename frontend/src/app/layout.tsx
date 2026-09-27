@@ -8,6 +8,7 @@ import { QuoteBar } from "@/components/quote/QuoteBar";
 import { WhatsAppButton } from "@/components/layout/WhatsAppButton";
 import { themeInitScript } from "@/components/layout/ThemeToggle";
 import { api } from "@/lib/api";
+import { DEFAULT_SHARE_IMAGE } from "@/lib/metadata";
 import { siteUrl } from "@/lib/utils";
 import "./globals.css";
 
@@ -28,7 +29,7 @@ export async function generateMetadata(): Promise<Metadata> {
     metadataBase: new URL(siteUrl),
     title: { default: title, template: `%s — EMSI` },
     description,
-    openGraph: { type: "website", locale: "fr_SN", siteName: settings.schoolName, title, description },
+    openGraph: { type: "website", locale: "fr_SN", siteName: settings.schoolName, title, description, images: [DEFAULT_SHARE_IMAGE] },
     twitter: { card: "summary_large_image" },
   };
 }
