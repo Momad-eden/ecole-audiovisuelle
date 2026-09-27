@@ -6,8 +6,11 @@ use App\Enums\CohortStatus;
 use App\Models\Application;
 use App\Models\ContactMessage;
 use App\Models\Offering;
+use App\Notifications\ApplicationReceived;
+use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Http\UploadedFile;
+use Illuminate\Support\Facades\Notification;
 use Illuminate\Support\Facades\Storage;
 use Tests\TestCase;
 
@@ -97,7 +100,7 @@ class PublicFormsApiTest extends TestCase
     public function test_a_mail_failure_does_not_break_the_submission(): void
     {
         $offering = Offering::factory()->create();
-        \Illuminate\Support\Facades\Notification::shouldReceive('route')->andThrow(new \RuntimeException('SMTP injoignable'));
+        Notification::shouldReceive('route')->andThrow(new \RuntimeException('SMTP injoignable'));
 
         $this->postJson('/api/v1/public/applications', $this->payload($offering))->assertCreated();
         $this->assertDatabaseCount('applications', 1);
@@ -105,12 +108,12 @@ class PublicFormsApiTest extends TestCase
 
     public function test_acknowledgement_is_queued(): void
     {
-        \Illuminate\Support\Facades\Notification::fake();
+        Notification::fake();
         $offering = Offering::factory()->create();
 
         $this->postJson('/api/v1/public/applications', $this->payload($offering))->assertCreated();
 
-        \Illuminate\Support\Facades\Notification::assertSentOnDemand(\App\Notifications\ApplicationReceived::class);
-        $this->assertInstanceOf(\Illuminate\Contracts\Queue\ShouldQueue::class, new \App\Notifications\ApplicationReceived(Application::firstOrFail()));
+        Notification::assertSentOnDemand(ApplicationReceived::class);
+        $this->assertInstanceOf(ShouldQueue::class, new ApplicationReceived(Application::firstOrFail()));
     }
 }
