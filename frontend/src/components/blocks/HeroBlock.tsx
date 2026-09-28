@@ -1,5 +1,6 @@
 import { ButtonLink } from "@/components/ui/ButtonLink";
 import { MediaImage } from "@/components/ui/MediaImage";
+import { accentVars } from "@/lib/contrast";
 import { cn, frenchSpacing } from "@/lib/utils";
 import { HeroVideo } from "./HeroVideo";
 import { StageHero } from "./StageHero";
@@ -26,7 +27,7 @@ export function HeroBlock({ data, first }: { data: HeroData; first: boolean }) {
   return (
     <section
       className={cn("relative isolate overflow-hidden", split ? "py-16 sm:py-24" : "flex min-h-[72vh] items-end pb-16 pt-36 sm:pb-24")}
-      style={data.accent ? { ["--accent" as string]: data.accent } : undefined}
+      style={accentVars(data.accent)}
     >
       {!split && (
         <div className="absolute inset-0 -z-10">

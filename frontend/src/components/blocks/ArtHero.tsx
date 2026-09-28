@@ -5,6 +5,7 @@ import { Volume2, VolumeX } from "lucide-react";
 import { ButtonLink } from "@/components/ui/ButtonLink";
 import { useReducedMotion } from "@/components/motion/useReducedMotion";
 import { sameOrigin } from "@/components/audio/peaks";
+import { accentVars } from "@/lib/contrast";
 import { cn, frenchSpacing } from "@/lib/utils";
 import type { HeroData } from "./types";
 
@@ -222,7 +223,7 @@ export function ArtHero({ data, first }: { data: HeroData; first: boolean }) {
       ref={sectionRef}
       onPointerMove={follow}
       className="art-hero relative isolate flex min-h-[92svh] flex-col overflow-hidden bg-night"
-      style={data.accent ? { ["--accent" as string]: data.accent } : undefined}
+      style={accentVars(data.accent)}
     >
       <canvas ref={canvasRef} className="absolute inset-0 -z-10 h-full w-full" aria-hidden />
       <div className="absolute inset-0 -z-10 bg-[radial-gradient(70%_60%_at_50%_45%,transparent,var(--color-night)_92%)]" aria-hidden />
@@ -251,13 +252,11 @@ export function ArtHero({ data, first }: { data: HeroData; first: boolean }) {
               {(data.buttons ?? []).map((button) => (
                 <ButtonLink key={button.url + button.label} href={button.url} size="lg" variant={button.style === "secondary" ? "secondary" : "primary"}>{button.label}</ButtonLink>
               ))}
-              {!reducedMotion && (
-                <button type="button" onClick={() => void toggleSound()} aria-pressed={listening} disabled={loading} aria-busy={loading}
-                  className="inline-flex min-h-14 items-center gap-2 rounded-full border border-ink/25 px-6 text-sm font-semibold text-ink transition hover:border-brand hover:text-brand">
-                  {listening ? <VolumeX className="size-5" aria-hidden /> : <Volume2 className="size-5" aria-hidden />}
-                  {loading ? "Chargement du son…" : listening ? "Couper le son" : "Écouter l'œuvre"}
-                </button>
-              )}
+              <button type="button" onClick={() => void toggleSound()} aria-pressed={listening} disabled={loading} aria-busy={loading}
+                className="inline-flex min-h-14 items-center gap-2 rounded-full border border-ink/25 px-6 text-sm font-semibold text-ink transition hover:border-brand hover:text-brand">
+                {listening ? <VolumeX className="size-5" aria-hidden /> : <Volume2 className="size-5" aria-hidden />}
+                {loading ? "Chargement du son…" : listening ? "Couper le son" : "Écouter l'œuvre"}
+              </button>
             </div>
           </div>
 

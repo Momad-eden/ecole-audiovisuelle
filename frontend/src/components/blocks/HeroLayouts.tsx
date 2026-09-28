@@ -2,6 +2,7 @@ import { ButtonLink } from "@/components/ui/ButtonLink";
 import { MediaImage } from "@/components/ui/MediaImage";
 import { InView } from "@/components/motion/InView";
 import { UniverseVisual } from "@/components/universe/UniverseVisual";
+import { accentVars } from "@/lib/contrast";
 import { cn, frenchSpacing } from "@/lib/utils";
 import { HeroVideo } from "./HeroVideo";
 import type { HeroData } from "./types";
@@ -15,7 +16,8 @@ export function heroTitleSize(title: string, scale: "xl" | "lg" = "lg"): string 
   return length <= 28 ? "text-[clamp(2.6rem,7vw,6.4rem)]" : length <= 52 ? "text-[clamp(2.3rem,5.4vw,4.9rem)]" : "text-[clamp(2rem,4.2vw,3.8rem)]";
 }
 
-const accentStyle = (data: HeroData) => (data.accent ? { ["--accent" as string]: data.accent } : undefined);
+const accentStyle = (data: HeroData) => accentVars(data.accent);
+
 
 function Eyebrow({ text, className }: { text?: string; className?: string }) {
   if (!text) return null;
@@ -88,9 +90,9 @@ export function EditorialHero({ data, first }: Props) {
 export function PosterHero({ data, first }: Props) {
   const Heading = first ? "h1" : "h2";
   return (
-    <section className="relative isolate overflow-hidden bg-[var(--accent-ink)] pb-12 pt-32 text-on-accent sm:pt-36" style={accentStyle(data)}>
+    <section data-first={first || undefined} className="poster-hero relative isolate overflow-hidden bg-[var(--accent-ink)] pb-12 pt-32 text-on-accent sm:pt-36" style={accentStyle(data)}>
       {data.image && (
-        <div className="absolute inset-0 -z-10 opacity-30 mix-blend-multiply grayscale" aria-hidden>
+        <div className="absolute inset-0 -z-10 opacity-20 mix-blend-multiply grayscale" aria-hidden>
           <MediaImage image={data.image} sizes="100vw" priority={first} />
         </div>
       )}
@@ -107,7 +109,7 @@ export function PosterHero({ data, first }: Props) {
           {data.buttons?.length ? (
             <div className="flex flex-wrap gap-3">
               {data.buttons.map((button, i) => (
-                <a key={button.url + button.label} href={button.url} className={cn("inline-flex min-h-14 items-center rounded-full px-7 font-semibold transition", i === 0 ? "bg-night text-ink hover:brightness-125" : "border border-current/40 hover:bg-night/10")}>{button.label}</a>
+                <a key={button.url + button.label} href={button.url} className={cn("inline-flex min-h-14 items-center rounded-full px-7 font-semibold transition", i === 0 ? "bg-current hover:opacity-90" : "border border-current/50 hover:bg-current/10")}>{i === 0 ? <span className="text-[var(--accent-ink)]">{button.label}</span> : button.label}</a>
               ))}
             </div>
           ) : null}

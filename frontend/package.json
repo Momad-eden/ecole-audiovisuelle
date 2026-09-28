@@ -7,7 +7,8 @@
     "build": "next build",
     "start": "next start",
     "lint": "eslint",
-    "e2e": "playwright test"
+    "e2e": "playwright test --project=bureau --project=mobile",
+    "test": "playwright test --project=unitaire"
   },
   "dependencies": {
     "@hookform/resolvers": "^5.9.1",
