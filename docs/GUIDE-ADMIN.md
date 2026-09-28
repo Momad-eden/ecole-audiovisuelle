@@ -50,6 +50,17 @@ Le menu de gauche n'affiche que ce que votre rôle permet d'ouvrir.
 4. **Publier** met la nouvelle version en ligne.
 5. Une erreur ? Menu « ⋮ » › **Revenir à une version précédente**, puis Publier.
 
+### Choisir la destination d'un bouton ou d'un lien de menu
+
+Le champ **Destination** (boutons, cartes, menus) est une liste : tapez quelques lettres (« studio », « réserver », « Saint-Louis ») et choisissez.
+
+- **Pages du site** : une page entière (ex. *Formations*).
+- **Sections de page** : un endroit précis d'une page, par exemple *Studio › Réserver une session* ou *Studio › Écouter les productions*. Le visiteur arrive directement sur le formulaire ou la liste d'écoute.
+- **Candidater dans un campus**, **Univers**, **Formations**, **Événements** : les pages créées dans l'administration, toujours à jour.
+- Une autre adresse (site partenaire, `mailto:`, `tel:`) : collez-la dans la recherche puis choisissez « Utiliser l'adresse… ».
+
+Un bouton qui mène à une section vide est masqué automatiquement : « Écouter nos productions » n'apparaît qu'une fois un titre à écouter publié, « Voir la programmation » qu'une fois un événement à venir publié.
+
 ### Les blocs propres au site « Plein feux »
 
 - **Grand titre (héros)** : onze mises en page au choix, dont *Œuvre d'art* : des rubans de lumière qui réagissent à la souris ou au doigt, un titre rempli par votre photo (ou par la lumière), un cartel de musée (sa « légende ») et un bouton « Écouter l'œuvre ». Ajoutez dans **Son de l'œuvre** un fichier (une nappe ou un extrait de 20 à 60 secondes qui boucle sans coupure, MP3, 20 Mo maximum) : il est joué en boucle, et la main du visiteur le déplace entre les enceintes et le rend plus ou moins brillant. Sans fichier, un son synthétique suit la main. Les autres : *Scène animée*, *Studio animé* et *Événementiel animé* (décors lumineux, mots qui défilent) ; *Projecteur* (titre centré) ; *Éditorial* (grand titre et portrait) ; *Affiche de concert* (titre géant sur aplat de couleur, idéal pour un événement) ; *Mosaïque* (collage de 3 ou 4 photos) ; *Plein écran* ; *Texte et image côte à côte* ; *Sobre* (pages secondaires). La taille du titre s'adapte à sa longueur.

@@ -14,5 +14,5 @@ export default async function HomePage() {
   const page = await api.page("accueil");
   if (!page) notFound();
 
-  return <BlockRenderer blocks={page.blocks} />;
+  return <BlockRenderer blocks={page.blocks} path="/" />;
 }

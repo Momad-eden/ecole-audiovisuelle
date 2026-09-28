@@ -8,18 +8,23 @@ import { CampusesBlock } from "./CampusesBlock";
 import { AgendaBlock, BookingFormBlock, EcosystemBlock, EquipmentListBlock, PacksBlock, PlacesBlock, ProductionsBlock, ServicesBlock } from "./ImpactBlocks";
 import { EquipmentBlock, MarqueeBlock, VenueBlock } from "./ShowcaseBlocks";
 import type * as T from "./types";
+import { leadsSomewhere, pageAnchors } from "./anchors";
+
+const withReachableButtons = (data: T.HeroData, path: string, anchors: Set<string>): T.HeroData =>
+  data.buttons ? { ...data, buttons: data.buttons.filter((button) => leadsSomewhere(button.url, path, anchors)) } : data;
 
 /**
  * Un composant par type de bloc de l'administration (même nom). Un type inconnu est ignoré.
  * Une page qui ne s'ouvre pas sur un héros laisse la place de l'en-tête fixe.
  */
-export function BlockRenderer({ blocks }: { blocks: Block[] }) {
+export function BlockRenderer({ blocks, path = "" }: { blocks: Block[]; path?: string }) {
+  const anchors = pageAnchors(blocks);
   return (
     <div className={blocks[0]?.type === "hero" ? undefined : "pt-20"}>
       {blocks.map((block, index) => {
         const d = block.data as never;
         switch (block.type) {
-          case "hero": return <HeroBlock key={block.id} data={d as T.HeroData} first={index === 0} />;
+          case "hero": return <HeroBlock key={block.id} data={withReachableButtons(d as T.HeroData, path, anchors)} first={index === 0} />;
           case "ecosystem": return <EcosystemBlock key={block.id} data={d as never} />;
           case "services": return <ServicesBlock key={block.id} data={d as never} />;
           case "equipment_list": return <EquipmentListBlock key={block.id} data={d as never} />;

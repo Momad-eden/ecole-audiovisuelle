@@ -51,7 +51,7 @@ final class PageBlocks
                     TextInput::make('name')->label('Nom')->required()->maxLength(60),
                     Select::make('activity')->label('Couleur / animation')->options(['school' => 'EMSI (école)', ...['studio' => 'Impact Live Studio', 'events' => 'Impact Live Events', 'space' => 'Espace Habib Faye']])->required(),
                     Textarea::make('text')->label('Présentation courte')->rows(2)->maxLength(200),
-                    TextInput::make('url')->label('Lien')->regex('#^(/|https?://)#')->placeholder('/studio'),
+                    LinkTargets::field('url', 'Lien'),
                     ...self::image('image', 'Photo (facultatif)'),
                 ]),
         ]);
@@ -154,8 +154,7 @@ final class PageBlocks
             ->addActionLabel('Ajouter un bouton')
             ->schema([
                 TextInput::make('label')->label('Texte')->required()->maxLength(30),
-                TextInput::make('url')->label('Lien')->required()->placeholder('/candidater ou https://…')
-                    ->regex('#^(/|https?://)#')->maxLength(255),
+                LinkTargets::field('url', 'Lien')->required(),
                 Select::make('style')->label('Style')->options(['primary' => 'Principal (lumineux)', 'secondary' => 'Discret'])->default('primary')->required(),
             ]);
     }
@@ -339,7 +338,7 @@ final class PageBlocks
                     Select::make('icon')->label('Icône')->options(self::icons()),
                     TextInput::make('title')->label('Titre')->required()->maxLength(60),
                     Textarea::make('text')->label('Texte')->rows(2)->maxLength(200)->columnSpanFull(),
-                    TextInput::make('url')->label('Lien (facultatif)')->regex('#^(/|https?://)#')->columnSpanFull(),
+                    LinkTargets::field('url', 'Lien (facultatif)')->columnSpanFull(),
                 ]),
         ]);
     }

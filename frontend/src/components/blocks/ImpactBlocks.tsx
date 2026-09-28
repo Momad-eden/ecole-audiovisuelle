@@ -303,7 +303,7 @@ export function AgendaBlock({ data }: { data: { title?: string; scope?: "upcomin
 
 // ——— Formulaire de demande ———
 
-const FORM_ANCHOR: Record<BookingType, string> = { studio_session: "reserver", space_rental: "louer", equipment_rental: "devis", event_service: "devis" };
+export const FORM_ANCHOR: Record<BookingType, string> = { studio_session: "reserver", space_rental: "louer", equipment_rental: "devis", event_service: "devis" };
 const FORM_ACTIVITY: Record<BookingType, Activity> = { studio_session: "studio", space_rental: "space", equipment_rental: "events", event_service: "events" };
 
 export function BookingFormBlock({ data }: { data: { title?: string; text?: string; bookingType?: BookingType } }) {
