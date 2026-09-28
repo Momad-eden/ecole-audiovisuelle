@@ -15,7 +15,7 @@ export function HeaderShell({ children }: { children: ReactNode }) {
   }, []);
 
   return (
-    <header className={cn("fixed inset-x-0 top-0 z-50 transition-colors duration-500", scrolled ? "border-b border-line bg-night/85 backdrop-blur-md" : "border-b border-transparent")}>
+    <header className={cn("site-header fixed inset-x-0 top-0 z-50 transition-colors duration-500", scrolled ? "border-b border-line bg-night/85 backdrop-blur-md" : "border-b border-transparent")}>
       {children}
     </header>
   );

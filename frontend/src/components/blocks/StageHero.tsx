@@ -7,6 +7,7 @@ import { useReducedMotion } from "@/components/motion/useReducedMotion";
 import { HeroVideo } from "./HeroVideo";
 import { ConsoleArt, LineArrayArt } from "./HeroArt";
 import { InView } from "@/components/motion/InView";
+import { accentVars } from "@/lib/contrast";
 import type { HeroData } from "./types";
 
 type Variant = "stage" | "studio" | "events";
@@ -90,7 +91,7 @@ export function StageHero({ data, first, variant = "stage" }: { data: HeroData; 
       ref={sectionRef}
       onPointerMove={followSpot}
       className="relative isolate flex min-h-[100svh] flex-col justify-end overflow-hidden pb-10 pt-32"
-      style={data.accent || ACCENT[variant] ? { ["--accent" as string]: data.accent || ACCENT[variant] } : undefined}
+      style={accentVars(data.accent || ACCENT[variant])}
     >
       <div className="absolute inset-0 -z-10" aria-hidden>
         {data.image && <MediaImage image={data.image} sizes="100vw" priority={first} className="opacity-30 mix-blend-luminosity" />}
