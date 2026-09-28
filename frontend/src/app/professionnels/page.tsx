@@ -13,5 +13,5 @@ export default async function ProfessionalSpacePage() {
   const page = await api.page("professionnels");
   if (!page) notFound();
 
-  return <div style={{ ["--accent" as string]: "var(--color-hmi)" }}><BlockRenderer blocks={page.blocks} /></div>;
+  return <div style={{ ["--accent" as string]: "var(--color-hmi)" }}><BlockRenderer blocks={page.blocks} path="/professionnels" /></div>;
 }

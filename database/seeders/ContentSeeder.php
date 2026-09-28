@@ -279,8 +279,7 @@ class ContentSeeder extends Seeder
         $this->page('accueil', 'Accueil', 'home', true, [
             ['hero', [
                 'eyebrow' => 'Dakar · Grand Théâtre National',
-                'title' => 'Apprenez à faire vibrer',
-                'words' => ['le son', 'l\'image', 'la lumière', 'le design', 'la scène'],
+                'title' => 'Faites de votre passion un métier',
                 'subtitle' => 'L\'EMSI forme les techniciens et les créateurs du son, de l\'image et du spectacle vivant, sur du matériel professionnel, au cœur du Grand Théâtre National Doudou Ndiaye Coumba Rose.',
                 'layout' => 'stage',
                 'buttons' => [['label' => 'Choisir mon univers', 'url' => '/univers', 'style' => 'primary'], ['label' => 'Candidater', 'url' => '/candidater', 'style' => 'secondary']],

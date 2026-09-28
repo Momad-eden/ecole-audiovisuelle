@@ -147,4 +147,16 @@ class PublicContentApiTest extends TestCase
             ->assertJsonPath('data.blocks.0.data.images.1.alt', 'Deux écoles')
             ->assertJsonPath('data.blocks.0.data.caption', 'Studio de Saint-Louis');
     }
+
+    public function test_artwork_hero_sound_is_served_as_a_url(): void
+    {
+        Page::create(['title' => 'Accueil', 'slug' => 'accueil', 'type' => 'home', 'draft_blocks' => [
+            ['type' => 'hero', 'data' => ['title' => 'Faites vibrer le monde', 'layout' => 'masterpiece', 'sound' => 'pages/audio/nappe.mp3']],
+            ['type' => 'hero', 'data' => ['title' => 'Sans son', 'layout' => 'masterpiece']],
+        ]])->publish();
+
+        $this->getJson('/api/v1/public/pages/accueil')->assertOk()
+            ->assertJsonPath('data.blocks.0.data.sound', url('/storage/pages/audio/nappe.mp3'))
+            ->assertJsonPath('data.blocks.1.data.sound', null);
+    }
 }

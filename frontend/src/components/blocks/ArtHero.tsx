@@ -4,6 +4,7 @@ import { useEffect, useRef, useState } from "react";
 import { Volume2, VolumeX } from "lucide-react";
 import { ButtonLink } from "@/components/ui/ButtonLink";
 import { useReducedMotion } from "@/components/motion/useReducedMotion";
+import { sameOrigin } from "@/components/audio/peaks";
 import { cn, frenchSpacing } from "@/lib/utils";
 import type { HeroData } from "./types";
 
@@ -20,6 +21,22 @@ const RIBBONS = [
 type Pointer = { x: number; y: number; energy: number };
 
 /**
+ * Son de l'œuvre : le fichier choisi dans l'admin (joué en boucle), sinon trois oscillateurs
+ * (note, quinte, octave). La main du visiteur règle la place stéréo, le filtre et l'intensité.
+ */
+type SoundGraph = {
+  context: AudioContext;
+  gain: GainNode;
+  filter: BiquadFilterNode;
+  panner: StereoPannerNode;
+  oscillators: OscillatorNode[];
+  source?: AudioBufferSourceNode;
+};
+
+/** Fichiers déjà décodés : on ne retélécharge pas le son à chaque clic. */
+const decoded = new Map<string, Promise<ArrayBuffer>>();
+
+/**
  * « Œuvre » : un héros conçu comme une pièce d'exposition. Des rubans de lumière, comme des
  * ondes sonores devenues lumière, se déforment vers la main du visiteur ; le titre est rempli
  * par la photo (ou par la lumière) ; un cartel de musée indique la « fréquence » sous le pointeur.
@@ -31,8 +48,9 @@ export function ArtHero({ data, first }: { data: HeroData; first: boolean }) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const pointer = useRef<Pointer>({ x: 0.62, y: 0.55, energy: 0 });
   const readoutRef = useRef<HTMLSpanElement>(null);
-  const sound = useRef<{ context: AudioContext; gain: GainNode; oscillators: OscillatorNode[]; filter: BiquadFilterNode } | null>(null);
+  const sound = useRef<SoundGraph | null>(null);
   const [listening, setListening] = useState(false);
+  const [loading, setLoading] = useState(false);
   const Heading = first ? "h1" : "h2";
 
   // Rubans de lumière (canvas 2D, fusion additive), suspendus hors écran, figés en mouvement réduit.
@@ -128,39 +146,72 @@ export function ArtHero({ data, first }: { data: HeroData; first: boolean }) {
     if (s) {
       const now = s.context.currentTime;
       s.oscillators.forEach((osc, i) => osc.frequency.setTargetAtTime(frequency * [1, 1.5, 2.01][i], now, 0.08));
-      s.filter.frequency.setTargetAtTime(400 + (1 - y) * 3200, now, 0.1);
+      s.panner.pan.setTargetAtTime(x * 1.6 - 0.8, now, 0.12);
+      // Fichier : le haut de l'écran ouvre le filtre (son brillant), le bas l'étouffe.
+      s.filter.frequency.setTargetAtTime(s.source ? 300 * Math.pow(2, (1 - y) * 6) : 400 + (1 - y) * 3200, now, 0.1);
+      if (s.source) s.gain.gain.setTargetAtTime(0.55 + p.energy * 0.35, now, 0.2);
     }
   }
 
-  function toggleSound() {
+  async function toggleSound() {
     if (sound.current) {
       const s = sound.current;
       s.gain.gain.setTargetAtTime(0, s.context.currentTime, 0.15);
-      setTimeout(() => void s.context.close(), 500);
+      setTimeout(() => void s.context.close(), 600);
       sound.current = null;
       setListening(false);
       return;
     }
+
     const Context = window.AudioContext ?? (window as unknown as { webkitAudioContext: typeof AudioContext }).webkitAudioContext;
     const context = new Context();
     const gain = context.createGain();
     const filter = context.createBiquadFilter();
+    const panner = context.createStereoPanner();
     filter.type = "lowpass";
-    filter.frequency.value = 1400;
     gain.gain.value = 0;
-    filter.connect(gain).connect(context.destination);
-    const oscillators = (["sine", "triangle", "sine"] as OscillatorType[]).map((type, i) => {
-      const osc = context.createOscillator();
-      osc.type = type;
-      osc.frequency.value = 220 * [1, 1.5, 2.01][i];
-      const voice = context.createGain();
-      voice.gain.value = [0.5, 0.18, 0.12][i];
-      osc.connect(voice).connect(filter);
-      osc.start();
-      return osc;
-    });
-    gain.gain.setTargetAtTime(0.06, context.currentTime, 0.4);
-    sound.current = { context, gain, oscillators, filter };
+    filter.connect(panner).connect(gain).connect(context.destination);
+    const graph: SoundGraph = { context, gain, filter, panner, oscillators: [] };
+
+    let source: AudioBufferSourceNode | undefined;
+    if (data.sound) {
+      setLoading(true);
+      try {
+        if (!decoded.has(data.sound)) decoded.set(data.sound, fetch(sameOrigin(data.sound)).then((r) => r.arrayBuffer()));
+        const buffer = await context.decodeAudioData((await decoded.get(data.sound)!).slice(0));
+        source = context.createBufferSource();
+        source.buffer = buffer;
+        source.loop = true;
+        source.connect(filter);
+        filter.frequency.value = 6000;
+        source.start();
+      } catch {
+        decoded.delete(data.sound);
+        source = undefined;
+      }
+      setLoading(false);
+    }
+
+    if (source) {
+      graph.source = source;
+      gain.gain.setTargetAtTime(0.6, context.currentTime, 0.6);
+    } else {
+      // Pas de fichier (ou illisible) : trois oscillateurs, note, quinte et octave.
+      filter.frequency.value = 1400;
+      graph.oscillators = (["sine", "triangle", "sine"] as OscillatorType[]).map((type, i) => {
+        const osc = context.createOscillator();
+        osc.type = type;
+        osc.frequency.value = 220 * [1, 1.5, 2.01][i];
+        const voice = context.createGain();
+        voice.gain.value = [0.5, 0.18, 0.12][i];
+        osc.connect(voice).connect(filter);
+        osc.start();
+        return osc;
+      });
+      gain.gain.setTargetAtTime(0.06, context.currentTime, 0.4);
+    }
+
+    sound.current = graph;
     setListening(true);
   }
 
@@ -201,10 +252,10 @@ export function ArtHero({ data, first }: { data: HeroData; first: boolean }) {
                 <ButtonLink key={button.url + button.label} href={button.url} size="lg" variant={button.style === "secondary" ? "secondary" : "primary"}>{button.label}</ButtonLink>
               ))}
               {!reducedMotion && (
-                <button type="button" onClick={toggleSound} aria-pressed={listening}
+                <button type="button" onClick={() => void toggleSound()} aria-pressed={listening} disabled={loading} aria-busy={loading}
                   className="inline-flex min-h-14 items-center gap-2 rounded-full border border-ink/25 px-6 text-sm font-semibold text-ink transition hover:border-brand hover:text-brand">
                   {listening ? <VolumeX className="size-5" aria-hidden /> : <Volume2 className="size-5" aria-hidden />}
-                  {listening ? "Couper le son" : "Écouter l'œuvre"}
+                  {loading ? "Chargement du son…" : listening ? "Couper le son" : "Écouter l'œuvre"}
                 </button>
               )}
             </div>

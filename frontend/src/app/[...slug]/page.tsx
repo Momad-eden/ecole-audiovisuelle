@@ -27,5 +27,5 @@ export default async function CmsPage({ params }: Props) {
     notFound();
   }
 
-  return <BlockRenderer blocks={page.blocks} />;
+  return <BlockRenderer blocks={page.blocks} path={`/${path}`} />;
 }

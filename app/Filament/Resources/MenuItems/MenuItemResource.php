@@ -6,6 +6,7 @@ use App\Filament\Resources\MenuItems\Pages\CreateMenuItem;
 use App\Filament\Resources\MenuItems\Pages\EditMenuItem;
 use App\Filament\Resources\MenuItems\Pages\ListMenuItems;
 use App\Filament\Support\FrenchLabels;
+use App\Filament\Support\LinkTargets;
 use App\Models\MenuItem;
 use BackedEnum;
 use Filament\Actions\EditAction;
@@ -45,7 +46,7 @@ class MenuItemResource extends Resource
             Section::make()->columns(2)->schema([
                 Select::make('location')->label('Emplacement')->options(MenuItem::LOCATIONS)->default('main')->required(),
                 TextInput::make('label')->label('Texte du lien')->required()->maxLength(40),
-                TextInput::make('url')->label('Adresse')->required()->placeholder('/univers ou https://…')->regex('#^(/|https?://)#'),
+                LinkTargets::field('url', 'Destination')->required(),
                 Toggle::make('is_button')->label('Afficher comme bouton')->helperText('Ex. « Candidater »')->inline(false),
                 Toggle::make('is_visible')->label('Visible')->default(true)->inline(false),
             ]),

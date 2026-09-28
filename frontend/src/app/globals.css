@@ -71,6 +71,11 @@ html {
   scroll-behavior: smooth;
 }
 
+/* Une section atteinte par un lien « #… » ne se cache pas sous l'en-tête fixe. */
+[id] {
+  scroll-margin-top: 6rem;
+}
+
 body {
   background: var(--color-night);
   color: var(--color-ink);

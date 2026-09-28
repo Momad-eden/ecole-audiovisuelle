@@ -13,5 +13,5 @@ export async function cmsMetadata(slug: string): Promise<Metadata> {
 export async function CmsPageContent({ slug }: { slug: string }) {
   const page = await api.page(slug);
   if (!page) notFound();
-  return <BlockRenderer blocks={page.blocks} />;
+  return <BlockRenderer blocks={page.blocks} path={`/${slug}`} />;
 }

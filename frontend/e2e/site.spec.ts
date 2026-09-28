@@ -2,7 +2,7 @@ import { expect, test } from "@playwright/test";
 
 test("l'accueil présente l'école, ses univers et un appel à candidater", async ({ page }) => {
   await page.goto("/");
-  await expect(page.getByRole("heading", { level: 1 })).toContainText("Apprenez à faire vibrer");
+  await expect(page.getByRole("heading", { level: 1 })).toContainText("Faites de votre passion un métier");
   await expect(page.getByRole("heading", { name: "Choisissez votre univers" })).toBeVisible();
   await expect(page.locator('a[href="/univers/son"]').first()).toBeAttached();
   await expect(page.getByRole("link", { name: "Candidater" }).first()).toBeVisible();
