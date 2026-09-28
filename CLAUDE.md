@@ -108,3 +108,12 @@ composer dev
 cd frontend && npm install && npm run dev
 npm run lint && npm run build
 ```
+
+## 8. État du projet (au 28/09/2026)
+
+- **Code terminé** : PR #1 à #9 fusionnées dans `main` (site « Plein feux » avec thème clair, univers, Impact Live, deux campus et deux caisses, héros « Œuvre d'art » avec son, choix des liens dans l'admin, titres lisibles quelle que soit la couleur, guide de déploiement corrigé, PHP 8.4 minimum). Suites vertes : 104 tests Laravel (SQLite et MySQL), 6 tests unitaires (`npm test`), 26 parcours Playwright.
+- **Prochaine étape — mise en ligne** : l'EMSI réserve `emsi.sn` (bureau d'enregistrement accrédité NIC Sénégal) et commande un OVHcloud VPS-2 (Ubuntu 24.04). Ensuite installation selon `DEPLOYMENT.md`, en **transférant la base et `storage/app` locales** (le contenu y est déjà saisi), pas en repartant d'un `db:seed`.
+- **Attendu de l'école** : photos, tarifs du studio, matériel à louer, dates de rentrée, coordonnées des quatre lieux, mentions légales, comptes de l'équipe, boîtes mail.
+- **Documents** : présentation du site à Boubacar Tall et guide de mise en ligne (domaine, serveur, e-mails, budget), publiés comme pages privées claude.ai ; guide de l'équipe `docs/GUIDE-ADMIN.md`.
+- **Restes techniques** : fichiers front hérités à la racine (`package.json`, `vite.config.js`, `tailwind.config.js`, `resources/css`) sans usage par Filament ; le parcours e2e de l'accueil dépend du contenu de la base locale.
+- **Circuit de livraison** : branche dédiée → suites vertes → accord de Momar → push, PR, CI verte, fusion. Momar modifie souvent le contenu dans l'admin local : ne pas réécrire une page en base qu'il vient de modifier.
