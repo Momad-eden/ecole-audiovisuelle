@@ -9,7 +9,8 @@ type Props = { audience: "school" | "professional"; formation?: string; campus?:
 export async function ApplicationPage({ audience, formation, campus }: Props) {
   const [offerings, site] = await Promise.all([api.offerings(audience), api.site()]);
   const campuses = site.places.filter((place) => place.kind === "campus");
-  const program = formation ? await api.program(formation) : null;
+  // La formation demandée n'est qu'un indice : toute erreur revient à « pas de présélection ».
+  const program = formation ? await api.program(formation).catch(() => null) : null;
   const programOfferingIds = (program?.cohorts?.flatMap((c) => c.offerings ?? []) ?? []).map((o) => o.id);
   const { campusId, offeringId, notice } = resolvePreselection({ offerings, campuses, campusSlug: campus, programOfferingIds });
   const professional = audience === "professional";

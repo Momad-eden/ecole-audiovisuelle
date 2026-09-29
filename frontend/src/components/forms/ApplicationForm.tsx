@@ -71,9 +71,9 @@ export function ApplicationForm({ offerings, audience, preselected, campuses = [
     try {
       const saved = localStorage.getItem(draftKey);
       if (saved) {
-      const current = form.getValues();
-      // Les choix venus de l'adresse (campus, formation) priment sur le brouillon.
-      reset({ ...current, ...JSON.parse(saved), ...(preselectedCampus ? { placeId: preselectedCampus } : {}), ...(preselected ? { offeringId: preselected } : {}), documents: current.documents, consent: undefined as never });
+        const current = form.getValues();
+        // Les choix venus de l'adresse (campus, formation) priment sur le brouillon.
+        reset({ ...current, ...JSON.parse(saved), ...(preselectedCampus ? { placeId: preselectedCampus } : {}), ...(preselected ? { offeringId: preselected } : {}), documents: current.documents, consent: undefined as never });
       }
     } catch {}
     // eslint-disable-next-line react-hooks/exhaustive-deps
