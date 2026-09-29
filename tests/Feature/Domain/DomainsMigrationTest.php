@@ -38,7 +38,8 @@ class DomainsMigrationTest extends TestCase
     /** Classe sans données : sous MySQL une modification de structure validerait la transaction du test. */
     public function test_migration_rolls_back_cleanly(): void
     {
-        $this->artisan('migrate:rollback', ['--step' => 1])->assertSuccessful();
+        $path = 'database/migrations/2026_09_29_100000_add_domains_and_campus_availability.php';
+        $this->artisan('migrate:rollback', ['--path' => $path])->assertSuccessful();
 
         $this->assertFalse(Schema::hasColumn('pages', 'domain'));
         $this->assertFalse(Schema::hasColumn('menu_items', 'parent_id'));
@@ -46,7 +47,7 @@ class DomainsMigrationTest extends TestCase
         $this->assertFalse(Schema::hasColumn('contact_messages', 'organization'));
         $this->assertFalse(Schema::hasTable('place_program'));
 
-        $this->artisan('migrate')->assertSuccessful();
+        $this->artisan('migrate', ['--path' => $path])->assertSuccessful();
 
         $this->assertTrue(Schema::hasColumn('pages', 'domain'));
         $this->assertTrue(Schema::hasColumn('menu_items', 'parent_id'));
