@@ -17,7 +17,7 @@ export async function CmsPageContent({ slug }: { slug: string }) {
   return (
     <>
       <CurrentCrumb title={page.title} />
-      <BlockRenderer blocks={page.blocks} path={`/${slug}`} />
+      <BlockRenderer blocks={page.blocks} path={`/${slug}`} title={page.title} />
     </>
   );
 }

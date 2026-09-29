@@ -33,7 +33,7 @@ export default async function CmsPage({ params }: Props) {
   return (
     <DomainChrome domain={page.domain ?? "general"} site={{ menus, domains }} path={`/${path}`} title={page.title}>
       <CurrentCrumb title={page.title} />
-      <BlockRenderer blocks={page.blocks} path={`/${path}`} />
+      <BlockRenderer blocks={page.blocks} path={`/${path}`} title={page.title} />
     </DomainChrome>
   );
 }

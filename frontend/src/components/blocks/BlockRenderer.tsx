@@ -5,6 +5,10 @@ import { ContactBlock } from "./ContactBlock";
 import { CardsBlock, CtaBlock, FaqBlock, GalleryBlock, QuoteBlock, StatsBlock, TextBlock, TextImageBlock, TimelineBlock, VideoBlock } from "./ContentBlocks";
 import { HeroBlock } from "./HeroBlock";
 import { CampusesBlock } from "./CampusesBlock";
+import { CampusProgramsBlock } from "./CampusProgramsBlock";
+import { DomainsBlock } from "./DomainsBlock";
+import { DownloadsBlock } from "./DownloadsBlock";
+import { SupportFormBlock } from "./SupportFormBlock";
 import { AgendaBlock, BookingFormBlock, EcosystemBlock, EquipmentListBlock, PacksBlock, PlacesBlock, ProductionsBlock, ServicesBlock } from "./ImpactBlocks";
 import { EquipmentBlock, MarqueeBlock, VenueBlock } from "./ShowcaseBlocks";
 import type * as T from "./types";
@@ -13,14 +17,18 @@ import { leadsSomewhere, pageAnchors } from "./anchors";
 const withReachableButtons = (data: T.HeroData, path: string, anchors: Set<string>): T.HeroData =>
   data.buttons ? { ...data, buttons: data.buttons.filter((button) => leadsSomewhere(button.url, path, anchors)) } : data;
 
+/** Blocs d'ouverture plein écran, posés sous l'en-tête transparent. */
+const FULL_BLEED = new Set<string | undefined>(["hero", "domains"]);
+
 /**
  * Un composant par type de bloc de l'administration (même nom). Un type inconnu est ignoré.
- * Une page qui ne s'ouvre pas sur un héros laisse la place de l'en-tête fixe.
+ * Une page qui ne s'ouvre pas sur un héros (ou le triptyque, plein écran) laisse la place de l'en-tête fixe.
+ * `title` (titre de la page) sert de h1 invisible quand le bloc d'ouverture n'en fournit pas.
  */
-export function BlockRenderer({ blocks, path = "" }: { blocks: Block[]; path?: string }) {
+export function BlockRenderer({ blocks, path = "", title }: { blocks: Block[]; path?: string; title?: string }) {
   const anchors = pageAnchors(blocks);
   return (
-    <div className={blocks[0]?.type === "hero" ? undefined : "pt-20"}>
+    <div className={FULL_BLEED.has(blocks[0]?.type) ? undefined : "pt-20"}>
       {blocks.map((block, index) => {
         const d = block.data as never;
         switch (block.type) {
@@ -33,6 +41,10 @@ export function BlockRenderer({ blocks, path = "" }: { blocks: Block[]; path?: s
           case "agenda": return <AgendaBlock key={block.id} data={d as never} />;
           case "booking_form": return <BookingFormBlock key={block.id} data={d as never} />;
           case "campuses": return <CampusesBlock key={block.id} data={d as never} />;
+          case "domains": return <DomainsBlock key={block.id} data={d as T.DomainsData} first={index === 0} pageTitle={title} />;
+          case "campus_programs": return <CampusProgramsBlock key={block.id} id={block.id} data={d as T.CampusProgramsData} />;
+          case "downloads": return <DownloadsBlock key={block.id} data={d as T.DownloadsData} />;
+          case "support_form": return <SupportFormBlock key={block.id} data={d as T.SupportFormData} first={index === 0} />;
           case "places": return <PlacesBlock key={block.id} data={d as never} />;
           case "marquee": return <MarqueeBlock key={block.id} data={d as T.MarqueeData} />;
           case "venue": return <VenueBlock key={block.id} data={d as T.VenueData} />;

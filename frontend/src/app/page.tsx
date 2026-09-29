@@ -11,8 +11,8 @@ export async function generateMetadata(): Promise<Metadata> {
 }
 
 export default async function HomePage() {
-  const page = await api.page("accueil");
+  const [page, { settings }] = await Promise.all([api.page("accueil"), api.site()]);
   if (!page) notFound();
 
-  return <BlockRenderer blocks={page.blocks} path="/" />;
+  return <BlockRenderer blocks={page.blocks} path="/" title={settings.schoolName || page.title} />;
 }
