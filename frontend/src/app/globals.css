@@ -275,6 +275,13 @@ body::after {
 }
 .rec-dot { animation: blink 1.2s steps(1) infinite; }
 
+/* Cinéma : lent zoom sur la photo affichée, barre qui se remplit, titre qui apparaît. */
+.cinema-zoom { animation: cinema-zoom 9s ease-out both; }
+@keyframes cinema-zoom { from { transform: scale(1.02); } to { transform: scale(1.12) translate(-1%, -1%); } }
+.cinema-progress { width: 0; animation: cinema-progress linear forwards; }
+@keyframes cinema-progress { to { width: 100%; } }
+.cinema-caption { animation: art-rise 0.9s cubic-bezier(0.2, 0.7, 0.2, 1) both; }
+
 /* Studio : point posé sur le matériel, qui pulse doucement pour inviter à le survoler. */
 .hotspot-dot {
   box-shadow: 0 0 0 4px color-mix(in oklab, var(--accent) 35%, transparent);
