@@ -21,7 +21,7 @@ test("Studio : les points ont un nom et s'ouvrent au clavier", async ({ page, is
   await expect(point).toHaveAttribute("aria-expanded", "false");
   await point.focus();
   await expect(point).toHaveAttribute("aria-expanded", "true");
-  await expect(page.getByRole("tooltip").filter({ hasText: "Console 48 pistes" })).toBeVisible();
+  await expect(page.getByRole("tooltip").filter({ hasText: "Console 48 pistes" })).toHaveCSS("opacity", "1");
 });
 
 test("Studio : sur téléphone, le matériel est listé sous le titre", async ({ page, isMobile }) => {
@@ -79,4 +79,56 @@ test("aucun défilement horizontal à 360 px de large", async ({ page }) => {
     await page.goto(`/${slug}`);
     expect(await page.evaluate(() => document.documentElement.scrollWidth), slug).toBeLessThanOrEqual(360);
   }
+});
+
+test("Studio : la page ne télécharge ni les morceaux ni la photo d'origine avant qu'on les demande", async ({ page }) => {
+  const heavy: string[] = [];
+  page.on("request", (request) => {
+    const url = request.url();
+    if (url.endsWith(".wav") || url.includes("/storage/pages/essai-heros/studio_son.jpg")) heavy.push(url);
+  });
+  await page.goto("/essai-heros-studio");
+  await expect(page.getByTestId("studio-player")).toBeVisible();
+  await page.waitForTimeout(3000);
+  expect(heavy).toEqual([]);
+});
+
+test("Cinéma : le diaporama avance même si la souris reste posée sur la photo", async ({ page, isMobile }) => {
+  test.skip(isMobile, "Survol à la souris.");
+  await page.goto("/essai-heros-cinema");
+  const hero = page.getByTestId("cinema-hero");
+  await page.mouse.move(1250, 350);
+  await expect(hero.getByRole("button", { name: "Diapositive 2 sur 3" })).toHaveAttribute("aria-current", "true", { timeout: 9000 });
+});
+
+test("Cinéma : un titre avec un mot long n'est pas coupé à 360 px", async ({ page }) => {
+  await page.setViewportSize({ width: 360, height: 780 });
+  await page.goto("/essai-heros-cinema");
+  await page.getByTestId("cinema-hero").getByRole("button", { name: "Diapositive 3 sur 3" }).click();
+  const heading = page.getByRole("heading", { name: "Réalisez en régie audiovisuelle" });
+  await expect(heading).toBeVisible();
+  const [scroll, client] = await heading.evaluate((el) => [el.scrollWidth, el.clientWidth]);
+  expect(scroll).toBeLessThanOrEqual(client + 1);
+});
+
+test("Studio : cliquer sur un point survolé garde son libellé ouvert (même geste qu'un toucher sur tablette)", async ({ page, isMobile }) => {
+  test.skip(isMobile, "Points masqués sur téléphone.");
+  await page.goto("/essai-heros-studio");
+  const point = page.getByRole("button", { name: "Console 48 pistes" });
+  await point.hover();
+  await point.click();
+  await page.waitForTimeout(300);
+  await expect(point).toHaveAttribute("aria-expanded", "true");
+});
+
+test.describe("sur tablette tactile", () => {
+  test.use({ viewport: { width: 820, height: 1180 }, hasTouch: true, isMobile: true });
+
+  test("Studio : toucher un point affiche son libellé", async ({ page }) => {
+    await page.goto("/essai-heros-studio");
+    const point = page.getByRole("button", { name: "Console 48 pistes" });
+    await point.tap();
+    await page.waitForTimeout(400);
+    await expect(point).toHaveAttribute("aria-expanded", "true");
+  });
 });

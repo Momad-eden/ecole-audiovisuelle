@@ -38,7 +38,7 @@ export function StudioHero({ data, first }: { data: HeroData; first: boolean }) 
     >
       <div className="absolute inset-0 -z-10" aria-hidden>
         {data.image ? (
-          <div className="absolute inset-0 brightness-[0.68]">
+          <div data-studio-photo className="absolute inset-0 brightness-[0.68]">
             <MediaImage image={data.image} sizes="100vw" priority={first} />
           </div>
         ) : (
@@ -47,7 +47,7 @@ export function StudioHero({ data, first }: { data: HeroData; first: boolean }) 
         <div className="absolute inset-0 bg-[linear-gradient(90deg,var(--color-night)_0%,rgb(7_7_10/0.78)_34%,transparent_64%),linear-gradient(0deg,var(--color-night)_0%,transparent_34%)]" />
       </div>
 
-      {data.image && points.length > 0 && <Hotspots points={points} src={data.image.url} />}
+      {points.length > 0 && <Hotspots points={points} />}
 
       <div className="pointer-events-none relative z-20 mx-auto w-full max-w-7xl px-4 sm:px-6 lg:px-8">
         <div className="pointer-events-auto max-w-xl">

@@ -5,7 +5,7 @@ namespace App\Rules;
 use Closure;
 use Illuminate\Contracts\Validation\ValidationRule;
 
-/** Points posés sur la photo du héros Studio : six au maximum, libellé de 40 caractères au plus. */
+/** Points posés sur la photo du héros Studio : six au maximum, chacun avec un libellé de 40 caractères au plus. */
 class Hotspots implements ValidationRule
 {
     public const MAX_POINTS = 6;
@@ -22,8 +22,14 @@ class Hotspots implements ValidationRule
             return;
         }
 
-        foreach ($points as $point) {
-            if (mb_strlen(trim((string) ($point['label'] ?? ''))) > self::MAX_LABEL) {
+        foreach (array_values($points) as $index => $point) {
+            $label = trim((string) ($point['label'] ?? ''));
+            if ($label === '') {
+                $fail('Écrivez ce que montre le point '.($index + 1).' (ou supprimez-le).');
+
+                return;
+            }
+            if (mb_strlen($label) > self::MAX_LABEL) {
                 $fail('Chaque libellé fait '.self::MAX_LABEL.' caractères au maximum.');
 
                 return;

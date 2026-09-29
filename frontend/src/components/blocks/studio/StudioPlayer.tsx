@@ -20,10 +20,11 @@ export function StudioPlayer({ tracks, accent }: { tracks: HeroTrack[]; accent?:
   const [selected, setSelected] = useState(0);
   const audio = useAudio();
   const track = playable[Math.min(selected, playable.length - 1)];
-  const peaks = usePeaks(track?.url, null, Boolean(track));
+  const isCurrent = Boolean(track) && audio.track?.src === track.url;
+  // La forme d'onde n'est calculée qu'une fois le morceau lancé : pas de téléchargement avant le clic.
+  const peaks = usePeaks(track?.url, null, isCurrent);
   if (!track) return null;
 
-  const isCurrent = audio.track?.src === track.url;
   const isPlaying = isCurrent && audio.playing;
   const progress = isCurrent && audio.duration > 0 ? audio.currentTime / audio.duration : 0;
 

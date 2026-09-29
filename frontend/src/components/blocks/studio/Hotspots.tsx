@@ -11,16 +11,22 @@ import type { Hotspot } from "../types";
  * La photo est recadrée pour couvrir le héros (object-cover) : les points sont posés sur la zone
  * qu'occupe la photo entière, pour rester sur le matériel quel que soit le format de l'écran.
  */
-export function Hotspots({ points, src }: { points: Hotspot[]; src: string }) {
+export function Hotspots({ points }: { points: Hotspot[] }) {
   const [open, setOpen] = useState<number | null>(null);
   const rootRef = useRef<HTMLDivElement>(null);
-  const box = useCoverBox(rootRef, src);
+  const box = useCoverBox(rootRef);
 
+  // Un point ouvert se referme avec Échap ou en touchant ailleurs (sur tablette, pas de « survol quitté »).
   useEffect(() => {
     if (open === null) return;
-    const close = (event: KeyboardEvent) => event.key === "Escape" && setOpen(null);
-    window.addEventListener("keydown", close);
-    return () => window.removeEventListener("keydown", close);
+    const onKey = (event: KeyboardEvent) => event.key === "Escape" && setOpen(null);
+    const onPointer = (event: PointerEvent) => !(event.target as Element | null)?.closest("[data-hotspot]") && setOpen(null);
+    window.addEventListener("keydown", onKey);
+    window.addEventListener("pointerdown", onPointer);
+    return () => {
+      window.removeEventListener("keydown", onKey);
+      window.removeEventListener("pointerdown", onPointer);
+    };
   }, [open]);
 
   return (
@@ -30,13 +36,15 @@ export function Hotspots({ points, src }: { points: Hotspot[]; src: string }) {
         const isOpen = open === index;
         const toLeft = point.x > 62;
         return (
-          <div key={`${point.x}-${point.y}-${index}`} className="pointer-events-auto absolute -translate-x-1/2 -translate-y-1/2" style={{ left: `${point.x}%`, top: `${point.y}%` }}
-            onMouseEnter={() => setOpen(index)} onMouseLeave={() => setOpen((current) => (current === index ? null : current))}>
+          <div key={`${point.x}-${point.y}-${index}`} data-hotspot className="pointer-events-auto absolute -translate-x-1/2 -translate-y-1/2" style={{ left: `${point.x}%`, top: `${point.y}%` }}
+            onPointerEnter={(event) => event.pointerType === "mouse" && setOpen(index)}
+            onPointerLeave={(event) => event.pointerType === "mouse" && setOpen((current) => (current === index ? null : current))}>
             <button
               type="button"
               aria-label={point.label}
               aria-expanded={isOpen}
-              onClick={() => setOpen(isOpen ? null : index)}
+              // Ouvre toujours : sur tablette, le toucher déclenche aussi « survol » et focus avant le clic.
+              onClick={() => setOpen(index)}
               onFocus={() => setOpen(index)}
               onBlur={() => setOpen((current) => (current === index ? null : current))}
               className="hotspot-dot grid size-7 place-items-center rounded-full bg-[var(--accent-ink)] text-[0.7rem] font-bold text-on-accent sm:size-4 sm:text-[0]"
@@ -61,16 +69,23 @@ export function Hotspots({ points, src }: { points: Hotspot[]; src: string }) {
   );
 }
 
-/** Zone (en px, dans le conteneur) qu'occupe la photo entière quand elle le couvre en object-cover. */
-function useCoverBox(rootRef: React.RefObject<HTMLDivElement | null>, src: string) {
+/**
+ * Zone (en px, dans le conteneur) qu'occupe la photo entière quand elle le couvre en object-cover.
+ * Les proportions sont lues sur la photo déjà affichée par le héros ([data-studio-photo] img) :
+ * aucun téléchargement de plus.
+ */
+function useCoverBox(rootRef: React.RefObject<HTMLDivElement | null>) {
   const [ratio, setRatio] = useState<number | null>(null);
   const [box, setBox] = useState<{ left: number; top: number; width: number; height: number } | null>(null);
 
   useEffect(() => {
-    const image = new window.Image();
-    image.onload = () => image.naturalWidth && setRatio(image.naturalWidth / image.naturalHeight);
-    image.src = src;
-  }, [src]);
+    const image = rootRef.current?.parentElement?.querySelector<HTMLImageElement>("[data-studio-photo] img");
+    if (!image) return;
+    const read = () => image.naturalWidth && setRatio(image.naturalWidth / image.naturalHeight);
+    if (image.complete) read();
+    image.addEventListener("load", read);
+    return () => image.removeEventListener("load", read);
+  }, [rootRef]);
 
   useEffect(() => {
     const root = rootRef.current;

@@ -148,6 +148,7 @@ php artisan optimize && php artisan filament:optimize
 
 ```bash
 # Sur le poste local
+php artisan emsi:hero-showcase --remove   # retire les pages d'essai des tests, si un test a été interrompu
 mysqldump --single-transaction --no-tablespaces ecole_audiovisuelle | gzip > emsi-contenu.sql.gz
 tar czf emsi-medias.tgz -C storage/app public private
 scp emsi-contenu.sql.gz emsi-medias.tgz emsi@<ip-du-serveur>:/tmp/

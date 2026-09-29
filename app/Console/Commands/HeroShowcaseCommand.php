@@ -62,7 +62,7 @@ class HeroShowcaseCommand extends Command
             'slides' => [
                 ['image' => $images['grande_salle'], 'image_alt' => 'La grande salle', 'eyebrow' => 'Univers Scène', 'title' => 'Apprenez sur la plus grande scène du Sénégal', 'link_label' => 'Découvrir', 'link_url' => '/univers'],
                 ['image' => $images['studio_son'], 'image_alt' => 'Le studio', 'eyebrow' => 'Univers Son', 'title' => 'Enregistrez dans un vrai studio'],
-                ['image' => $images['regie_broadcast'], 'image_alt' => 'La régie vidéo', 'eyebrow' => 'Univers Image', 'title' => 'Réalisez en régie broadcast'],
+                ['image' => $images['regie_broadcast'], 'image_alt' => 'La régie vidéo', 'eyebrow' => 'Univers Image', 'title' => 'Réalisez en régie audiovisuelle'],
             ],
             'facts' => [
                 ['value' => '5', 'label' => 'filières'], ['value' => '2', 'label' => 'campus'],

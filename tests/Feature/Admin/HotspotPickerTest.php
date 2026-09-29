@@ -40,6 +40,17 @@ class HotspotPickerTest extends TestCase
         $this->assertSame('Chaque libellé fait 40 caractères au maximum.', $validator->errors()->first('hotspots'));
     }
 
+    public function test_a_point_without_label_is_rejected_with_its_number(): void
+    {
+        $validator = Validator::make(['hotspots' => [
+            ['x' => 10, 'y' => 10, 'label' => 'Console'],
+            ['x' => 20, 'y' => 20, 'label' => '  '],
+        ]], ['hotspots' => [new Hotspots]]);
+
+        $this->assertTrue($validator->fails());
+        $this->assertSame('Écrivez ce que montre le point 2 (ou supprimez-le).', $validator->errors()->first('hotspots'));
+    }
+
     public function test_six_valid_points_pass(): void
     {
         $points = array_fill(0, 6, ['x' => 99.9, 'y' => 0, 'label' => str_repeat('a', 40)]);

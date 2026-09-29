@@ -47,6 +47,12 @@ export function CinemaHero({ data, first }: { data: HeroData; first: boolean }) 
 
   const go = (next: number) => setIndex(((next % count) + count) % count);
 
+  // Pause au survol de la souris, limitée au titre et aux commandes (pas à toute la photo, ni au toucher).
+  const hoverPause = {
+    onPointerEnter: (event: React.PointerEvent) => event.pointerType === "mouse" && setHovered(true),
+    onPointerLeave: () => setHovered(false),
+  };
+
   function onKeyDown(event: React.KeyboardEvent<HTMLElement>) {
     if (count < 2) return;
     if (event.key === "ArrowRight") { event.preventDefault(); go(index + 1); }
@@ -65,9 +71,8 @@ export function CinemaHero({ data, first }: { data: HeroData; first: boolean }) 
       aria-roledescription={count > 1 ? "diaporama" : undefined}
       aria-label={data.title}
       onKeyDown={onKeyDown}
-      onMouseEnter={() => setHovered(true)}
-      onMouseLeave={() => setHovered(false)}
-      onFocus={() => setFocused(true)}
+      // Pause au focus seulement au clavier : un clic sur la photo ne doit pas figer le diaporama.
+      onFocus={(event) => event.target.matches(":focus-visible") && setFocused(true)}
       onBlur={(event) => !event.currentTarget.contains(event.relatedTarget) && setFocused(false)}
       className="scene-dark relative isolate flex min-h-[92svh] flex-col overflow-hidden bg-night outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-[var(--accent-ink)]"
       style={accentVars(data.accent)}
@@ -83,7 +88,7 @@ export function CinemaHero({ data, first }: { data: HeroData; first: boolean }) 
 
       <div className="mx-auto flex w-full max-w-7xl flex-1 flex-col px-4 pt-24 sm:px-6 lg:px-8">
         {count > 1 && (
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-2" {...hoverPause}>
             {slides.map((slide, i) => (
               <button key={slide.image.url + i} type="button" onClick={() => go(i)} aria-label={`Diapositive ${i + 1} sur ${count}`} aria-current={i === index ? "true" : undefined}
                 className="group h-6 flex-1 py-2.5">
@@ -101,6 +106,7 @@ export function CinemaHero({ data, first }: { data: HeroData; first: boolean }) 
         )}
 
         <div className="flex flex-1 flex-col justify-end pb-10 sm:pb-14">
+          <div className="self-start" {...hoverPause}>
           {count === 0 ? (
             <Heading className="display max-w-4xl text-balance text-[clamp(2.6rem,7vw,6.5rem)]">{frenchSpacing(data.title)}</Heading>
           ) : (
@@ -126,6 +132,7 @@ export function CinemaHero({ data, first }: { data: HeroData; first: boolean }) 
             })
           )}
           {data.subtitle && <p className="mt-5 max-w-2xl text-lg text-ink/85">{data.subtitle}</p>}
+          </div>
         </div>
       </div>
 
