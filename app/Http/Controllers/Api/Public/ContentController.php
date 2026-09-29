@@ -13,7 +13,6 @@ use App\Http\Resources\Public\ProgramResource;
 use App\Http\Resources\Public\RoomResource;
 use App\Models\AgendaEvent;
 use App\Models\Artwork;
-use App\Models\EquipmentItem;
 use App\Models\Exhibition;
 use App\Models\Faq;
 use App\Models\MenuItem;
@@ -277,14 +276,12 @@ class ContentController extends Controller
 
         return response()->json(['data' => collect()
             ->merge(Page::published()->get(['slug', 'type', 'updated_at'])->map(fn (Page $p) => $entry($p->type === 'home' ? '/' : '/'.$p->slug, $p->updated_at)))
-            ->merge(Room::published()->get(['slug', 'updated_at'])->map(fn (Room $r) => $entry('/univers/'.$r->slug, $r->updated_at)))
-            ->merge(Artwork::published()->get(['slug', 'updated_at'])->map(fn (Artwork $a) => $entry('/realisations/'.$a->slug, $a->updated_at)))
-            ->merge(Exhibition::published()->get(['slug', 'updated_at'])->map(fn (Exhibition $e) => $entry('/expositions/'.$e->slug, $e->updated_at)))
+            ->merge(Room::published()->get(['slug', 'updated_at'])->map(fn (Room $r) => $entry('/emsi/univers/'.$r->slug, $r->updated_at)))
+            ->merge(Artwork::published()->get(['slug', 'updated_at'])->map(fn (Artwork $a) => $entry('/emsi/realisations/'.$a->slug, $a->updated_at)))
             ->merge(Program::published()->get(['slug', 'audience', 'updated_at'])->map(fn (Program $p) => $entry(
-                ($p->audience?->value === 'professional' ? '/professionnels/' : '/formations/').$p->slug, $p->updated_at)))
+                ($p->audience?->value === 'professional' ? '/emsi/professionnels/' : '/emsi/formations/').$p->slug, $p->updated_at)))
             ->merge(News::published()->get(['slug', 'updated_at'])->map(fn (News $n) => $entry('/actualites/'.$n->slug, $n->updated_at)))
-            ->merge(AgendaEvent::published()->get(['slug', 'updated_at'])->map(fn (AgendaEvent $e) => $entry('/agenda/'.$e->slug, $e->updated_at)))
-            ->merge(EquipmentItem::published()->where('usage', 'rental')->get(['slug', 'updated_at'])->map(fn (EquipmentItem $i) => $entry('/events/materiel/'.$i->slug, $i->updated_at)))
+            ->merge(AgendaEvent::published()->get(['slug', 'updated_at'])->map(fn (AgendaEvent $e) => $entry('/maison-habib-faye/agenda/'.$e->slug, $e->updated_at)))
             ->values()]);
     }
 }

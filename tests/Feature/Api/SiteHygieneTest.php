@@ -30,16 +30,14 @@ class SiteHygieneTest extends TestCase
             ->assertJsonPath('data.menus.legal.1.url', '/formations');
     }
 
-    public function test_the_sitemap_lists_agenda_events_and_rental_equipment(): void
+    public function test_the_sitemap_lists_agenda_events_but_no_equipment(): void
     {
         AgendaEvent::create(['title' => 'Concert', 'activity' => 'space', 'starts_at' => now()->addWeek(), 'status' => PublicationStatus::PUBLISHED]);
         EquipmentItem::create(['name' => 'Line array', 'equipment_category_id' => EquipmentCategory::create(['name' => 'Son'])->id, 'usage' => 'rental', 'status' => PublicationStatus::PUBLISHED]);
-        EquipmentItem::create(['name' => 'Console du studio', 'equipment_category_id' => EquipmentCategory::create(['name' => 'Studio'])->id, 'usage' => 'studio', 'status' => PublicationStatus::PUBLISHED]);
 
         $this->getJson('/api/v1/public/sitemap')->assertOk()
-            ->assertJsonFragment(['path' => '/agenda/concert'])
-            ->assertJsonFragment(['path' => '/events/materiel/line-array'])
-            ->assertJsonMissing(['path' => '/events/materiel/console-du-studio']);
+            ->assertJsonFragment(['path' => '/maison-habib-faye/agenda/concert'])
+            ->assertJsonMissing(['path' => '/events/materiel/line-array']);
     }
 
     public function test_the_admin_accepts_audio_files_up_to_50_mb(): void

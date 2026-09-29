@@ -186,3 +186,16 @@ test.describe("nouveaux blocs", () => {
     await expect(page.locator('input[name="offeringId"]:checked')).toHaveCount(0);
   });
 });
+
+// activé après emsi:site-v4 (Task 10)
+test.fixme("les pages de campus et de la Maison exposent leurs données structurées", async ({ page }) => {
+  const jsonLd = async (path: string) => {
+    await page.goto(path);
+    const scripts = await page.locator('script[type="application/ld+json"]').allTextContents();
+    return scripts.map((text) => JSON.parse(text));
+  };
+  const campus = await jsonLd("/emsi/saint-louis");
+  expect(campus).toContainEqual(expect.objectContaining({ "@type": "EducationalOrganization", address: expect.objectContaining({ "@type": "PostalAddress", addressCountry: "SN" }) }));
+  const maison = await jsonLd("/maison-habib-faye");
+  expect(maison).toContainEqual(expect.objectContaining({ "@type": "Organization" }));
+});
