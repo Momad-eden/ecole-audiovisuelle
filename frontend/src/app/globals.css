@@ -275,6 +275,15 @@ body::after {
 }
 .rec-dot { animation: blink 1.2s steps(1) infinite; }
 
+/* Studio : point posé sur le matériel, qui pulse doucement pour inviter à le survoler. */
+.hotspot-dot {
+  box-shadow: 0 0 0 4px color-mix(in oklab, var(--accent) 35%, transparent);
+  animation: hotspot-pulse 2.4s ease-out infinite;
+}
+@keyframes hotspot-pulse {
+  70% { box-shadow: 0 0 0 12px color-mix(in oklab, var(--accent) 0%, transparent); }
+}
+
 @keyframes word-in {
   from { opacity: 0; transform: translateY(0.35em); filter: blur(8px); }
   to { opacity: 1; transform: none; filter: none; }
