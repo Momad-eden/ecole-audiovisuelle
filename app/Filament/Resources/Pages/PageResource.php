@@ -2,6 +2,7 @@
 
 namespace App\Filament\Resources\Pages;
 
+use App\Enums\SiteDomain;
 use App\Filament\Resources\Pages\Pages\CreatePage;
 use App\Filament\Resources\Pages\Pages\EditPage;
 use App\Filament\Resources\Pages\Pages\ListPages;
@@ -49,12 +50,14 @@ class PageResource extends Resource
     public static function form(Schema $schema): Schema
     {
         return $schema->columns(1)->components([
-            Section::make()->columns(3)->schema([
+            Section::make()->columns(4)->schema([
                 TextInput::make('title')->label('Titre de la page')->required()->maxLength(120),
                 TextInput::make('slug')->label('Adresse')->prefix('/')
                     ->helperText('Générée automatiquement si vide.')
                     ->unique(ignoreRecord: true)->regex('/^[a-z0-9]+(?:[-\/][a-z0-9]+)*$/')
                     ->disabled(fn (?Page $record) => $record?->is_locked),
+                Select::make('domain')->label('Domaine')->options(SiteDomain::class)->default(SiteDomain::GENERAL->value)->required()
+                    ->helperText('Donne sa couleur et son menu à la page'),
                 Select::make('type')->label('Type')->options(self::TYPES)->default('free')->required()
                     ->disabled(fn (?Page $record) => $record?->is_locked),
             ]),

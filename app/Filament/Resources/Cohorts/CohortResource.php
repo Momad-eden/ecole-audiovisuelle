@@ -52,6 +52,8 @@ class CohortResource extends Resource
             Section::make('Session')->columns(2)->schema([
                 Select::make('program_id')->label('Formation')->relationship('program', 'title')->searchable()->preload()->required()
                     ->visible(fn ($livewire) => ! $livewire instanceof RelationManager),
+                Select::make('place_id')->label('Campus')->relationship('place', 'name', fn (Builder $query) => $query->campuses()->published())
+                    ->placeholder('Les deux campus')->helperText('Laissez vide si la session a lieu sur les deux campus.'),
                 TextInput::make('name')->label('Nom de la session')->required()->placeholder('Ex. Volet 2 — 2027'),
                 DatePicker::make('starts_on')->label('Début des cours'),
                 DatePicker::make('ends_on')->label('Fin des cours')->afterOrEqual('starts_on'),
@@ -70,11 +72,12 @@ class CohortResource extends Resource
     public static function table(Table $table): Table
     {
         return $table
-            ->modifyQueryUsing(fn (Builder $query) => $query->with('program')->withCount(['offerings', 'offerings as open_offerings_count' => fn (Builder $q) => $q->where('is_open', true)]))
+            ->modifyQueryUsing(fn (Builder $query) => $query->with(['program', 'place'])->withCount(['offerings', 'offerings as open_offerings_count' => fn (Builder $q) => $q->where('is_open', true)]))
             ->defaultSort('starts_on', 'desc')
             ->columns([
                 TextColumn::make('program.title')->label('Formation')->searchable()->wrap(),
                 TextColumn::make('name')->label('Session')->searchable()->weight('bold'),
+                TextColumn::make('place.name')->label('Campus')->placeholder('Les deux campus'),
                 TextColumn::make('starts_on')->label('Début')->date('d/m/Y')->sortable(),
                 TextColumn::make('status')->label('Candidatures')->badge(),
                 TextColumn::make('applications_close_at')->label('Clôture des candidatures')->dateTime('d/m/Y')->placeholder('—'),

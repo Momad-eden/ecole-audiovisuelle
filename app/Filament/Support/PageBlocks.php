@@ -20,7 +20,6 @@ use Filament\Forms\Components\Select;
 use Filament\Forms\Components\TagsInput;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
-use Filament\Forms\Components\Toggle;
 
 /**
  * Catalogue des blocs de page. Chaque bloc a des champs limités (aucun HTML libre) ;
@@ -36,7 +35,7 @@ final class PageBlocks
             self::gallery(), self::video(), self::audio(), self::stats(), self::quote(), self::cta(), self::cards(),
             self::timeline(), self::faq(), self::programs(), self::artworks(), self::rooms(), self::news(),
             self::partners(), self::professionalSpace(), self::contact(),
-            self::ecosystem(), self::services(), self::equipmentList(), self::packs(), self::productions(),
+            self::ecosystem(), self::services(), self::productions(),
             self::agenda(), self::bookingForm(), self::places(), self::campuses(),
         ];
     }
@@ -68,25 +67,6 @@ final class PageBlocks
         ]);
     }
 
-    private static function equipmentList(): Block
-    {
-        return Block::make('equipment_list')->label('Catalogue de matériel')->icon('heroicon-o-speaker-wave')->schema([
-            TextInput::make('title')->label('Titre')->maxLength(80),
-            Textarea::make('text')->label('Texte')->rows(2)->maxLength(300),
-            Radio::make('usage')->label('Matériel')->options(['rental' => 'À louer', 'studio' => 'Équipement du studio'])->default('rental')->inline(),
-            Toggle::make('featured_only')->label('Seulement le matériel mis en avant'),
-            TextInput::make('limit')->label('Nombre maximum')->numeric()->minValue(1)->maxValue(48)->default(12),
-        ]);
-    }
-
-    private static function packs(): Block
-    {
-        return Block::make('packs')->label('Packs de location')->icon('heroicon-o-cube')->schema([
-            TextInput::make('title')->label('Titre')->maxLength(80)->default('Nos packs'),
-            Textarea::make('text')->label('Texte')->rows(2)->maxLength(300),
-        ]);
-    }
-
     private static function productions(): Block
     {
         return Block::make('productions')->label('Productions du studio (écoute)')->icon('heroicon-o-musical-note')->schema([
@@ -111,7 +91,10 @@ final class PageBlocks
         return Block::make('booking_form')->label('Formulaire de demande (devis, réservation)')->icon('heroicon-o-inbox-arrow-down')->schema([
             TextInput::make('title')->label('Titre')->maxLength(80)->default('Demander un devis'),
             Textarea::make('text')->label('Texte')->rows(2)->maxLength(300),
-            Select::make('booking_type')->label('Type de demande')->options(BookingType::class)->required()->default('equipment_rental')
+            Select::make('booking_type')->label('Type de demande')->options([
+                BookingType::STUDIO_SESSION->value => BookingType::STUDIO_SESSION->getLabel(),
+                BookingType::SPACE_RENTAL->value => BookingType::SPACE_RENTAL->getLabel(),
+            ])->required()->default('studio_session')
                 ->helperText('Les demandes arrivent dans Impact Live › Demandes.'),
         ]);
     }

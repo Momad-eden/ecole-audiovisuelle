@@ -52,6 +52,7 @@ class ContactMessageResource extends Resource
             TextEntry::make('created_at')->label('Reçu le')->dateTime('d/m/Y à H:i'),
             TextEntry::make('name')->label('Nom'),
             TextEntry::make('status')->label('État')->badge(),
+            TextEntry::make('organization')->label('Organisation')->placeholder('—'),
             TextEntry::make('email')->label('E-mail')->placeholder('—')->copyable(),
             TextEntry::make('phone')->label('Téléphone')->placeholder('—'),
             TextEntry::make('message')->label('Message')->columnSpanFull(),
@@ -71,10 +72,11 @@ class ContactMessageResource extends Resource
                 TextColumn::make('created_at')->label('Reçu le')->dateTime('d/m/Y H:i')->sortable(),
                 TextColumn::make('name')->label('Nom')->searchable()->weight('bold')->description(fn (ContactMessage $r) => $r->email ?? $r->phone),
                 TextColumn::make('subject')->label('Objet')->formatStateUsing(fn (string $state) => ContactMessage::SUBJECTS[$state] ?? $state),
+                TextColumn::make('organization')->label('Organisation')->placeholder('—')->searchable(),
                 TextColumn::make('message')->label('Message')->limit(60)->wrap(),
                 TextColumn::make('status')->label('État')->badge(),
             ])
-            ->filters([SelectFilter::make('status')->label('État')->options(ContactMessageStatus::class)->default(ContactMessageStatus::NEW->value)])
+            ->filters([SelectFilter::make('subject')->label('Objet')->options(ContactMessage::SUBJECTS), SelectFilter::make('status')->label('État')->options(ContactMessageStatus::class)->default(ContactMessageStatus::NEW->value)])
             ->recordActions([
                 ViewAction::make()->label('Lire'),
                 $mark(ContactMessageStatus::HANDLED, 'Marquer comme traité', 'heroicon-o-check'),

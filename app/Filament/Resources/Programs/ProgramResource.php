@@ -15,6 +15,7 @@ use App\Filament\Support\RichText\TypographyPlugin;
 use App\Models\Program;
 use BackedEnum;
 use Filament\Actions\EditAction;
+use Filament\Forms\Components\CheckboxList;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\TagsInput;
 use Filament\Forms\Components\Textarea;
@@ -62,6 +63,8 @@ class ProgramResource extends Resource
                         Select::make('audience')->label('Public')->options(Audience::class)->required()
                             ->helperText('« Professionnels » : visible uniquement dans l\'Espace Professionnels.'),
                         Select::make('kind')->label('Type')->options(ProgramKind::class)->required(),
+                        CheckboxList::make('campuses')->label('Disponible à')->relationship('campuses', 'name', fn (Builder $query) => $query->campuses()->published())
+                            ->helperText('Cochez les campus où cette formation est proposée.')->columnSpanFull(),
                         TextInput::make('level_label')->label('Niveau / titre délivré')->placeholder('Ex. Certification de niveau BTS (Bac+2)'),
                         TextInput::make('duration_label')->label('Durée')->placeholder('Ex. 9 mois (1 080 h)'),
                         Textarea::make('summary')->label('Résumé (cartes et référencement)')->rows(3)->maxLength(300)->columnSpanFull(),

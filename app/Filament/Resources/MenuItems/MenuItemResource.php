@@ -15,6 +15,7 @@ use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Toggle;
 use Filament\Resources\Resource;
 use Filament\Schemas\Components\Section;
+use Filament\Schemas\Components\Utilities\Get;
 use Filament\Schemas\Schema;
 use Filament\Support\Icons\Heroicon;
 use Filament\Tables\Columns\IconColumn;
@@ -44,7 +45,12 @@ class MenuItemResource extends Resource
     {
         return $schema->columns(1)->components([
             Section::make()->columns(2)->schema([
-                Select::make('location')->label('Emplacement')->options(MenuItem::LOCATIONS)->default('main')->required(),
+                Select::make('location')->label('Emplacement')->options(MenuItem::LOCATIONS)->default('main')->required()->live(),
+                Select::make('parent_id')->label('Sous-menu de')->placeholder('Aucun (lien de premier niveau)')
+                    ->options(fn (?MenuItem $record) => MenuItem::where('location', 'main')->whereNull('parent_id')
+                        ->when($record, fn ($q) => $q->whereKeyNot($record->id))->orderBy('position')->pluck('label', 'id'))
+                    ->helperText('Choisissez un lien du menu principal pour l\'afficher dans son sous-menu.')
+                    ->visible(fn (Get $get) => $get('location') === 'main')->live(),
                 TextInput::make('label')->label('Texte du lien')->required()->maxLength(40),
                 LinkTargets::field('url', 'Destination')->required(),
                 Toggle::make('is_button')->label('Afficher comme bouton')->helperText('Ex. « Candidater »')->inline(false),
