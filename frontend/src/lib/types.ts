@@ -131,6 +131,7 @@ export type Offering = {
   registrationFeeAmount: number;
   fundingMode: string;
   fundingLabel: string | null;
+  campusIds: number[];
   isOpen: boolean;
   audience: "school" | "professional" | null;
 };

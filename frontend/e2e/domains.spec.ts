@@ -160,4 +160,29 @@ test.describe("nouveaux blocs", () => {
     await expect(lien).toHaveAccessibleName(/PDF/);
     await expect(page.getByText(/^PDF · \d+(,\d)? (octets|Ko|Mo)$/)).toBeVisible();
   });
+
+  // Candidature : aucune candidature n'est envoyée, on s'arrête à la liste des formations.
+  test("depuis la page du campus, la formation et le campus sont présélectionnés", async ({ page }) => {
+    await page.goto("/candidater?campus=emsi-dakar&formation=essai-dakar-seulement");
+    await expect(page.getByRole("radio", { name: /^Dakar/ })).toBeChecked();
+    await expect(page.getByRole("radio", { name: /Essai — Dakar seulement/ })).toBeChecked();
+    await expect(page.getByText(/n'est pas proposée à/)).toHaveCount(0);
+  });
+
+  test("à Saint-Louis, une formation réservée à Dakar n'est pas proposée", async ({ page }) => {
+    await page.goto("/candidater?campus=emsi-saint-louis");
+    await expect(page.getByRole("radio", { name: /^Saint-Louis/ })).toBeChecked();
+    await expect(page.getByRole("radio", { name: /Essai — Dakar seulement/ })).toHaveCount(0);
+    await page.getByRole("radio", { name: /^Dakar/ }).check();
+    await expect(page.getByRole("radio", { name: /Essai — Dakar seulement/ })).toBeVisible();
+    await page.getByRole("radio", { name: /^Saint-Louis/ }).check();
+    await expect(page.getByRole("radio", { name: /Essai — Dakar seulement/ })).toHaveCount(0);
+  });
+
+  test("formation absente du campus demandé : message et aucune présélection", async ({ page }) => {
+    await page.goto("/candidater?campus=emsi-saint-louis&formation=essai-dakar-seulement");
+    await expect(page.getByRole("status")).toHaveText("Cette formation n'est pas proposée à Saint-Louis. Choisissez-en une autre ou changez de campus.");
+    await expect(page.getByRole("radio", { name: /Essai — Dakar seulement/ })).toHaveCount(0);
+    await expect(page.locator('input[name="offeringId"]:checked')).toHaveCount(0);
+  });
 });

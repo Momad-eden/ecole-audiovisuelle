@@ -2,6 +2,7 @@ import { ApplicationForm } from "@/components/forms/ApplicationForm";
 import { ButtonLink } from "@/components/ui/ButtonLink";
 import { PageHeader } from "@/components/ui/PageHeader";
 import { api } from "@/lib/api";
+import { resolvePreselection } from "@/lib/application";
 
 type Props = { audience: "school" | "professional"; formation?: string; campus?: string };
 
@@ -9,8 +10,8 @@ export async function ApplicationPage({ audience, formation, campus }: Props) {
   const [offerings, site] = await Promise.all([api.offerings(audience), api.site()]);
   const campuses = site.places.filter((place) => place.kind === "campus");
   const program = formation ? await api.program(formation) : null;
-  const preselected = program?.cohorts?.flatMap((c) => c.offerings ?? []).find((o) => offerings.some((open) => open.id === o.id))?.id;
-  const preselectedCampus = campuses.find((place) => place.slug === campus)?.id;
+  const programOfferingIds = (program?.cohorts?.flatMap((c) => c.offerings ?? []) ?? []).map((o) => o.id);
+  const { campusId, offeringId, notice } = resolvePreselection({ offerings, campuses, campusSlug: campus, programOfferingIds });
   const professional = audience === "professional";
   const whatsapp = site.settings.whatsapp?.replace(/[^0-9]/g, "");
 
@@ -37,7 +38,7 @@ export async function ApplicationPage({ audience, formation, campus }: Props) {
             </div>
           </div>
         ) : (
-          <ApplicationForm offerings={offerings} audience={audience} campuses={campuses} preselected={preselected ? String(preselected) : undefined} preselectedCampus={preselectedCampus ? String(preselectedCampus) : undefined} />
+          <ApplicationForm offerings={offerings} audience={audience} campuses={campuses} preselected={offeringId} preselectedCampus={campusId} notice={notice} />
         )}
       </div>
     </>
