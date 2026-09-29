@@ -8,12 +8,14 @@ use App\Enums\FundingMode;
 use App\Enums\ProgramKind;
 use App\Enums\PublicationStatus;
 use App\Models\Application;
+use App\Models\CashTransaction;
 use App\Models\Cohort;
 use App\Models\Enrollment;
 use App\Models\Offering;
 use App\Models\Page;
 use App\Models\Place;
 use App\Models\Program;
+use App\Models\Student;
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
@@ -39,7 +41,9 @@ class DomainsShowcaseCommand extends Command
     public function handle(): int
     {
         if ($this->option('remove')) {
-            $this->remove();
+            if (! $this->remove()) {
+                return self::FAILURE;
+            }
             $this->info('Pages et formation d\'essai des nouveaux blocs supprimées.');
 
             return self::SUCCESS;
@@ -117,27 +121,63 @@ class DomainsShowcaseCommand extends Command
         ])->save();
     }
 
-    /** Supprime uniquement ce que la commande a créé (pages et formation retrouvées par leur adresse). */
-    private function remove(): void
+    /**
+     * Supprime uniquement ce que la commande a créé (pages et formation retrouvées par leur adresse), ainsi que
+     * les candidatures et inscriptions déposées par les parcours e2e sur la formation d'essai (et leurs pièces).
+     * Refuse si une inscription d'essai a une écriture de caisse : la caisse ne s'efface jamais.
+     */
+    private function remove(): bool
     {
-        DB::transaction(function () {
-            Page::whereIn('slug', self::SLUGS)->get()->each->delete();
+        $program = Program::withTrashed()->where('slug', self::PROGRAM_SLUG)->first();
+        $cohortIds = $program ? Cohort::where('program_id', $program->id)->pluck('id') : collect();
+        $offeringIds = Offering::whereIn('cohort_id', $cohortIds)->pluck('id');
+        $enrollments = Enrollment::withTrashed()->whereIn('offering_id', $offeringIds)->get();
+        $applications = Application::withTrashed()->whereIn('offering_id', $offeringIds)->get();
 
-            $program = Program::withTrashed()->where('slug', self::PROGRAM_SLUG)->first();
-            if ($program) {
-                $cohortIds = Cohort::where('program_id', $program->id)->pluck('id');
-                $offeringIds = Offering::whereIn('cohort_id', $cohortIds)->pluck('id');
-                // Candidatures déposées par les parcours e2e sur la formation d'essai.
-                Enrollment::whereIn('offering_id', $offeringIds)->get()->each->delete();
-                Application::whereIn('offering_id', $offeringIds)->get()->each->delete();
-                Offering::whereIn('id', $offeringIds)->get()->each->delete();
-                Cohort::whereIn('id', $cohortIds)->get()->each->delete();
-                $program->campuses()->detach();
-                $program->forceDelete();
+        if (CashTransaction::whereIn('enrollment_id', $enrollments->modelKeys())->exists()) {
+            $this->error('Suppression annulée : une inscription à la formation d\'essai « '.self::PROGRAM_SLUG.' » a une écriture de caisse, '
+                .'qui ne peut pas être effacée. Annulez-la dans la caisse puis supprimez la formation d\'essai à la main. Rien n\'a été supprimé.');
+
+            return false;
+        }
+
+        $studentIds = $enrollments->pluck('student_id')->merge($applications->pluck('student_id'))->filter()->unique();
+
+        DB::transaction(function () use ($program, $cohortIds, $offeringIds, $enrollments, $applications, $studentIds) {
+            Page::whereIn('slug', self::SLUGS)->get()->each->delete();
+            if (! $program) {
+                return;
             }
+
+            $enrollments->each->forceDelete();
+            $applications->each->forceDelete(); // l'historique (application_events) suit en cascade
+            Offering::whereIn('id', $offeringIds)->get()->each->delete();
+            Cohort::whereIn('id', $cohortIds)->get()->each->delete();
+            $program->campuses()->detach();
+            $program->forceDelete();
+
+            // Élèves créés seulement pour ces candidatures ou inscriptions d'essai.
+            Student::withTrashed()->whereIn('id', $studentIds)->get()
+                ->reject(fn (Student $student) => Application::withTrashed()->where('student_id', $student->id)->exists()
+                    || Enrollment::withTrashed()->where('student_id', $student->id)->exists())
+                ->each->forceDelete();
         });
 
+        // Pièces jointes des candidatures (disque privé), une fois la base nettoyée.
+        foreach ($applications as $application) {
+            Storage::disk('local')->deleteDirectory("applications/{$application->uuid}");
+            $paths = collect($application->documents ?? [])->pluck('path')->filter()->all();
+            Storage::disk('local')->delete($paths);
+            foreach ($paths as $path) {
+                if (Storage::disk('local')->allFiles(dirname($path)) === []) {
+                    Storage::disk('local')->deleteDirectory(dirname($path));
+                }
+            }
+        }
+
         Storage::disk('public')->deleteDirectory(self::DIRECTORY);
+
+        return true;
     }
 
     /** @return array<string, string> chemins des photos copiées sur le disque public */

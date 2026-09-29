@@ -3,11 +3,15 @@
 namespace Tests\Feature;
 
 use App\Enums\PublicationStatus;
+use App\Models\Application;
+use App\Models\CashTransaction;
 use App\Models\Cohort;
+use App\Models\Enrollment;
 use App\Models\Offering;
 use App\Models\Page;
 use App\Models\Place;
 use App\Models\Program;
+use App\Models\Student;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Storage;
 use Tests\TestCase;
@@ -85,5 +89,56 @@ class DomainsShowcaseCommandTest extends TestCase
         $this->assertSame([$real->cohort_id], Cohort::pluck('id')->all());
         $this->assertSame(2, Place::count());
         $this->assertSame([], Storage::disk('public')->allFiles('pages/essai-domaines'));
+    }
+
+    private function essaiOffering(): Offering
+    {
+        return Program::where('slug', 'essai-dakar-seulement')->firstOrFail()->offerings()->firstOrFail();
+    }
+
+    public function test_remove_also_cleans_applications_and_enrollments_made_on_the_essai_program(): void
+    {
+        Storage::fake('local');
+        $real = Application::factory()->create();
+        $sharedStudent = Student::factory()->create();
+        Enrollment::factory()->for($sharedStudent)->for($real->offering)->create();
+
+        $this->artisan('emsi:domains-showcase')->assertSuccessful();
+        $offering = $this->essaiOffering();
+        $essaiStudent = Student::factory()->create();
+        $withFiles = Application::factory()->for($offering)->create(['student_id' => $essaiStudent->id, 'documents' => [['path' => 'applications/essai-uuid/cv.pdf']]]);
+        Storage::disk('local')->put('applications/essai-uuid/cv.pdf', '%PDF');
+        Storage::disk('local')->put("applications/{$withFiles->uuid}/id.pdf", '%PDF');
+        Enrollment::factory()->for($essaiStudent)->for($offering)->create(['application_id' => $withFiles->id]);
+        Enrollment::factory()->for($sharedStudent)->for($offering)->create();
+        Application::factory()->for($offering)->create()->delete(); // candidature archivée (supprimée en douceur)
+
+        $this->artisan('emsi:domains-showcase', ['--remove' => true])->assertSuccessful();
+
+        $this->assertSame(0, Program::withTrashed()->where('slug', 'essai-dakar-seulement')->count());
+        $this->assertSame([$real->offering_id], Offering::pluck('id')->all());
+        $this->assertSame([$real->offering->cohort_id], Cohort::pluck('id')->all());
+        $this->assertSame([$real->id], Application::withTrashed()->pluck('id')->all());
+        $this->assertSame(1, Enrollment::withTrashed()->count());
+        $this->assertFalse(Student::withTrashed()->whereKey($essaiStudent->id)->exists());
+        $this->assertTrue(Student::whereKey($sharedStudent->id)->exists());
+        $this->assertSame([], Storage::disk('local')->allFiles('applications'));
+    }
+
+    public function test_remove_refuses_to_delete_an_essai_enrollment_with_cash_entries(): void
+    {
+        $this->artisan('emsi:domains-showcase')->assertSuccessful();
+        $enrollment = Enrollment::factory()->for($this->essaiOffering())->create();
+        CashTransaction::create([
+            'number' => 'ESSAI-1', 'direction' => 'in', 'category' => 'scolarite', 'amount' => 1000, 'method' => 'cash',
+            'occurred_on' => now()->toDateString(), 'enrollment_id' => $enrollment->id, 'label' => 'Essai',
+        ]);
+
+        $this->artisan('emsi:domains-showcase', ['--remove' => true])
+            ->expectsOutputToContain('écriture de caisse')
+            ->assertFailed();
+
+        $this->assertSame(1, Program::where('slug', 'essai-dakar-seulement')->count());
+        $this->assertSame(4, Page::whereIn('slug', self::SLUGS)->count());
     }
 }
