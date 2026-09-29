@@ -81,6 +81,44 @@ html:has(.poster-hero[data-first]) .site-header {
   backdrop-filter: blur(12px);
 }
 
+/*
+ * Héros posés sur une photo assombrie (Projection, Studio, Cinéma) : ils restent « de nuit »
+ * même en thème clair, sinon le texte sombre disparaîtrait dans la photo.
+ */
+.scene-dark,
+:root[data-theme="light"] .scene-dark {
+  color-scheme: dark;
+  --color-night: #07070a;
+  --color-night-2: #0f0f14;
+  --color-night-3: #17171e;
+  --color-ink: #f5f2ec;
+  --color-ink-muted: #a7a3b2;
+  --color-line: rgb(245 242 236 / 0.12);
+  --color-brand: #ff7a1a;
+  --color-violet: #8b6cff;
+  --color-gold: #ffb020;
+  --color-rec: #ff3b30;
+  --color-on-accent: #07070a;
+  color: var(--color-ink);
+}
+:root[data-theme="light"] .scene-dark[style*="--accent"] {
+  --accent-ink: var(--accent);
+}
+:root[data-theme="light"] .scene-dark[style*="--accent-on"] {
+  --color-on-accent: var(--accent-on);
+}
+:root[data-theme="light"]:has(.scene-dark[data-first]) .site-header {
+  border-bottom-color: var(--color-line);
+  background: color-mix(in oklab, var(--color-night) 85%, transparent);
+  backdrop-filter: blur(12px);
+}
+
+/* Projection : la poursuite rend ses couleurs à la photo autour de la main du visiteur. */
+.projection-spot {
+  -webkit-mask-image: radial-gradient(circle 24rem at var(--px, 62%) var(--py, 55%), #000 0%, rgb(0 0 0 / 0.55) 40%, transparent 75%);
+  mask-image: radial-gradient(circle 24rem at var(--px, 62%) var(--py, 55%), #000 0%, rgb(0 0 0 / 0.55) 40%, transparent 75%);
+}
+
 html {
   scroll-behavior: smooth;
 }
