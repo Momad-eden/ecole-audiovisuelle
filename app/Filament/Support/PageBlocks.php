@@ -5,10 +5,12 @@ namespace App\Filament\Support;
 use App\Enums\Audience;
 use App\Enums\BookingType;
 use App\Enums\PlaceKind;
+use App\Enums\SiteDomain;
 use App\Filament\Forms\Components\HotspotPicker;
 use App\Filament\Support\RichText\TypographyPlugin;
 use App\Models\Faq;
 use App\Models\Partner;
+use App\Models\Place;
 use App\Models\Room;
 use Filament\Forms\Components\Builder\Block;
 use Filament\Forms\Components\ColorPicker;
@@ -37,6 +39,7 @@ final class PageBlocks
             self::partners(), self::professionalSpace(), self::contact(),
             self::ecosystem(), self::services(), self::productions(),
             self::agenda(), self::bookingForm(), self::places(), self::campuses(),
+            self::domains(), self::campusPrograms(), self::downloads(), self::supportForm(),
         ];
     }
 
@@ -114,6 +117,60 @@ final class PageBlocks
         return Block::make('places')->label('Nos lieux (adresses)')->icon('heroicon-o-map-pin')->schema([
             TextInput::make('title')->label('Titre')->maxLength(80)->default('Nous trouver'),
             Select::make('kind')->label('Lieux affichés')->options(PlaceKind::class)->placeholder('Tous les lieux'),
+        ]);
+    }
+
+    private static function domains(): Block
+    {
+        return Block::make('domains')->label('Nos trois maisons (triptyque)')->icon('heroicon-o-view-columns')->schema([
+            Repeater::make('panels')->label('Panneaux')->minItems(3)->maxItems(3)->defaultItems(3)
+                ->addActionLabel('Ajouter un panneau')->reorderable()
+                ->helperText('Trois grands panneaux côte à côte (empilés sur téléphone), un par domaine. Tout le panneau est cliquable.')
+                ->schema([
+                    Select::make('domain')->label('Domaine (donne la couleur)')->options(SiteDomain::class)->required(),
+                    TextInput::make('eyebrow')->label('Surtitre')->maxLength(60)->placeholder('Ex. Centre culturel · Saint-Louis'),
+                    TextInput::make('title')->label('Titre')->required()->maxLength(40),
+                    Textarea::make('text')->label('Texte court')->rows(2)->maxLength(160),
+                    ...self::image('image', 'Photo'),
+                    LinkTargets::field('url', 'Lien')->required(),
+                    TextInput::make('label')->label('Texte du lien')->maxLength(30)->default('Découvrir'),
+                ]),
+            Textarea::make('intro')->label('Phrase d\'intention (sous les panneaux)')->rows(2)->maxLength(160)
+                ->placeholder('Ex. La culture comme héritage, l\'art comme métier'),
+        ]);
+    }
+
+    private static function campusPrograms(): Block
+    {
+        return Block::make('campus_programs')->label('Formations de ce campus')->icon('heroicon-o-academic-cap')->schema([
+            TextInput::make('title')->label('Titre')->maxLength(80)->default('Les formations de ce campus'),
+            Select::make('campus_id')->label('Campus')->required()
+                ->options(fn () => Place::published()->campuses()->orderBy('position')->pluck('name', 'id')->all())
+                ->helperText('Affiche les formations ouvertes à la candidature dans ce campus, avec la prochaine rentrée. Formations et sessions se gèrent dans le menu Formations.'),
+        ]);
+    }
+
+    private static function downloads(): Block
+    {
+        return Block::make('downloads')->label('Documents à télécharger')->icon('heroicon-o-arrow-down-tray')->schema([
+            TextInput::make('title')->label('Titre')->maxLength(80)->default('Documents à télécharger'),
+            Repeater::make('files')->label('Documents')->minItems(1)->maxItems(20)->addActionLabel('Ajouter un document')->reorderable()
+                ->schema([
+                    FileUpload::make('file')->label('Fichier PDF')->required()->disk('public')->directory('pages/documents')->visibility('public')
+                        ->acceptedFileTypes(['application/pdf'])->maxSize(20480)->preserveFilenames()
+                        ->helperText('PDF uniquement, 20 Mo maximum.'),
+                    TextInput::make('title')->label('Titre')->required()->maxLength(90)->placeholder('Ex. Brochure des formations 2026'),
+                    Textarea::make('description')->label('Description (facultatif)')->rows(2)->maxLength(200),
+                ]),
+        ]);
+    }
+
+    private static function supportForm(): Block
+    {
+        return Block::make('support_form')->label('Nous soutenir (formulaire)')->icon('heroicon-o-heart')->schema([
+            TextInput::make('title')->label('Titre')->maxLength(80)->default('Nous soutenir'),
+            Textarea::make('text')->label('Texte')->rows(3)->maxLength(400)
+                ->helperText('Les messages arrivent dans Site › Messages reçus, avec le type de soutien choisi.'),
         ]);
     }
 
