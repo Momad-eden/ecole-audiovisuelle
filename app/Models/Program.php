@@ -9,6 +9,7 @@ use App\Models\Concerns\HasUniqueSlug;
 use App\Models\Concerns\RevalidatesFrontend;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\HasManyThrough;
 use Illuminate\Database\Eloquent\SoftDeletes;
@@ -32,6 +33,12 @@ class Program extends Model
         'equipment' => 'array',
         'seo' => 'array',
     ];
+
+    /** Campus où la formation est proposée. */
+    public function campuses(): BelongsToMany
+    {
+        return $this->belongsToMany(Place::class, 'place_program');
+    }
 
     public function cohorts(): HasMany
     {

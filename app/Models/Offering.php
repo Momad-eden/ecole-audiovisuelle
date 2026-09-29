@@ -56,6 +56,25 @@ class Offering extends Model
         return $this->is_open && $this->cohort->acceptsApplications() && $this->cohort->program->isPublished();
     }
 
+    /** Offres ouvertes dont la formation est proposée dans ce campus et dont la session est celle du campus (ou de tous). */
+    public function scopeAvailableAt(Builder $query, Place $campus): Builder
+    {
+        return $query->openForApplications()
+            ->whereHas('cohort', fn (Builder $q) => $q
+                ->where(fn (Builder $w) => $w->whereNull('place_id')->orWhere('place_id', $campus->id))
+                ->whereHas('program.campuses', fn (Builder $c) => $c->whereKey($campus->id)));
+    }
+
+    /** Sans campus précisé, l'offre n'est disponible que s'il n'existe qu'un seul campus publié. */
+    public function isAvailableAt(?Place $campus): bool
+    {
+        if ($campus === null) {
+            return Place::published()->campuses()->count() <= 1;
+        }
+
+        return static::availableAt($campus)->whereKey($this->id)->exists();
+    }
+
     /** Offres ouvertes à la candidature en ligne. */
     public function scopeOpenForApplications(Builder $query): Builder
     {

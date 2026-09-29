@@ -14,7 +14,7 @@ class Cohort extends Model
 {
     use HasFactory, RevalidatesFrontend;
 
-    protected $fillable = ['program_id', 'name', 'starts_on', 'ends_on', 'applications_open_at', 'applications_close_at', 'status', 'notes'];
+    protected $fillable = ['program_id', 'place_id', 'name', 'starts_on', 'ends_on', 'applications_open_at', 'applications_close_at', 'status', 'notes'];
 
     protected $casts = [
         'status' => CohortStatus::class,
@@ -27,6 +27,12 @@ class Cohort extends Model
     public function program(): BelongsTo
     {
         return $this->belongsTo(Program::class)->withTrashed();
+    }
+
+    /** Campus de la session ; vide = tous les campus où la formation est proposée. */
+    public function place(): BelongsTo
+    {
+        return $this->belongsTo(Place::class);
     }
 
     public function offerings(): HasMany
