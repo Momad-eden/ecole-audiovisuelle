@@ -117,6 +117,37 @@ class FormController extends Controller
         return response()->json(['data' => ['ok' => true]], 201);
     }
 
+    public function support(Request $request): JsonResponse
+    {
+        if ($request->filled('website')) {
+            return response()->json(['data' => ['ok' => true]], 201);
+        }
+
+        $types = ['partnership' => 'Partenariat', 'sponsorship' => 'Mécénat', 'donation' => 'Don', 'other' => 'Autre'];
+
+        $data = $request->validate([
+            'name' => ['required', 'string', 'max:150'],
+            'organization' => ['nullable', 'string', 'max:150'],
+            'email' => ['nullable', 'required_without:phone', 'email', 'max:255'],
+            'phone' => ['nullable', 'string', 'max:30'],
+            'supportType' => ['required', Rule::in(array_keys($types))],
+            'message' => ['required', 'string', 'max:3000'],
+            'consent' => ['accepted'],
+        ], [], ['name' => 'nom', 'organization' => 'organisation', 'email' => 'adresse e-mail', 'phone' => 'téléphone', 'supportType' => 'type de soutien', 'consent' => 'consentement']);
+
+        ContactMessage::create([
+            'subject' => 'support',
+            'name' => $data['name'],
+            'organization' => $data['organization'] ?? null,
+            'email' => $data['email'] ?? null,
+            'phone' => $data['phone'] ?? null,
+            'message' => 'Type de soutien : '.$types[$data['supportType']]."\n\n".$data['message'],
+            'ip_hash' => hash_hmac('sha256', (string) $request->ip(), (string) config('app.key')),
+        ]);
+
+        return response()->json(['data' => ['ok' => true]], 201);
+    }
+
     public function booking(StoreBookingRequest $request): JsonResponse
     {
         if ($request->filled('website')) {

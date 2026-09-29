@@ -26,6 +26,23 @@ class StoreApplicationRequest extends FormRequest
             'offeringId' => ['required', 'integer', function (string $attribute, mixed $value, Closure $fail) {
                 if (! Offering::openForApplications()->whereKey($value)->exists()) {
                     $fail('Cette formation n\'accepte pas de candidature pour le moment.');
+
+                    return;
+                }
+                // Vérifié seulement quand un campus est donné ou requis (sinon l'erreur porte sur placeId).
+                $placeId = $this->input('placeId');
+                if ($placeId !== null && $placeId !== '') {
+                    $place = Place::published()->campuses()->find($placeId);
+                    if (! $place) {
+                        return;
+                    }
+                } elseif (Place::published()->campuses()->count() > 1) {
+                    return;
+                } else {
+                    $place = null;
+                }
+                if (! Offering::find($value)?->isAvailableAt($place)) {
+                    $fail('Cette formation n\'est pas proposée dans ce campus.');
                 }
             }],
             'firstName' => ['required', 'string', 'max:100'],

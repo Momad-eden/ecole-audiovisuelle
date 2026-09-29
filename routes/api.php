@@ -41,5 +41,6 @@ Route::prefix('v1/public')->middleware('throttle:public-api')->group(function ()
 
     Route::post('booking-requests', [FormController::class, 'booking'])->middleware('throttle:bookings');
     Route::post('applications', [FormController::class, 'application'])->middleware('throttle:applications');
+    Route::post('support', [FormController::class, 'support'])->middleware('throttle:contact');
     Route::post('contact-messages', [FormController::class, 'contact'])->middleware('throttle:contact');
 });
