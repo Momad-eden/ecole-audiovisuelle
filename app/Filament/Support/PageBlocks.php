@@ -5,6 +5,7 @@ namespace App\Filament\Support;
 use App\Enums\Audience;
 use App\Enums\BookingType;
 use App\Enums\PlaceKind;
+use App\Filament\Forms\Components\HotspotPicker;
 use App\Filament\Support\RichText\TypographyPlugin;
 use App\Models\Faq;
 use App\Models\Partner;
@@ -148,6 +149,13 @@ final class PageBlocks
         ];
     }
 
+    private static function audioUpload(string $name, string $label): FileUpload
+    {
+        return FileUpload::make($name)->label($label)
+            ->disk('public')->directory('pages/audio')->visibility('public')
+            ->acceptedFileTypes(['audio/mpeg', 'audio/mp4', 'audio/x-m4a', 'audio/wav', 'audio/x-wav', 'audio/ogg'])->maxSize(20480);
+    }
+
     private static function buttons(int $max = 2): Repeater
     {
         return Repeater::make('buttons')->label('Boutons')->maxItems($max)->defaultItems(0)->columns(3)
@@ -171,8 +179,10 @@ final class PageBlocks
                 ->helperText('MP4 court et léger (moins de 20 Mo). Remplacé par l\'image si l\'internaute limite les animations.'),
             Radio::make('layout')->label('Mise en page')->options([
                 'masterpiece' => 'Œuvre d\'art (rubans de lumière interactifs, titre-image, cartel)',
+                'projection' => 'Projection (photo de fond, rubans de lumière, cartel)',
+                'cinema' => 'Cinéma (diaporama plein écran et chiffres clés)',
                 'stage' => 'Scène animée (faisceaux de lumière)',
-                'studio' => 'Studio animé (console de mixage)',
+                'studio' => 'Studio (photo, matériel commenté et écoute)',
                 'events' => 'Événementiel animé (sonorisation et lumières)',
                 'spotlight' => 'Projecteur (titre centré sous une poursuite)',
                 'editorial' => 'Éditorial (grand titre et portrait, façon magazine)',
@@ -184,18 +194,48 @@ final class PageBlocks
             ])->default('stage')->inline()->live(),
             TagsInput::make('words')->label('Mots qui défilent à la fin du titre')->placeholder('Ex. le son')
                 ->helperText('Scène animée uniquement : le titre se termine par ces mots, l\'un après l\'autre. Laissez vide pour un titre fixe.')
-                ->visible(fn ($get) => in_array($get('layout'), ['stage', 'studio', 'events'], true)),
-            FileUpload::make('sound')->label('Son de l\'œuvre (facultatif)')
-                ->disk('public')->directory('pages/audio')->visibility('public')
-                ->acceptedFileTypes(['audio/mpeg', 'audio/mp4', 'audio/x-m4a', 'audio/wav', 'audio/x-wav', 'audio/ogg'])->maxSize(20480)
+                ->visible(fn ($get) => in_array($get('layout'), ['stage', 'events'], true)),
+            TextInput::make('highlight')->label('Mot(s) du titre à mettre en couleur')->maxLength(40)
+                ->helperText('Doit figurer tel quel dans le titre.')
+                ->visible(fn ($get) => in_array($get('layout'), ['projection', 'studio'], true)),
+            self::audioUpload('sound', 'Son de l\'œuvre (facultatif)')
                 ->helperText('Joué en boucle quand le visiteur clique « Écouter l\'œuvre » ; sa main le déplace entre les enceintes et le rend plus ou moins brillant. Idéal : une nappe ou un extrait de 20 à 60 secondes, qui boucle sans coupure (MP3, 20 Mo maximum). Sans fichier, un son synthétique suit la main.')
-                ->visible(fn ($get) => $get('layout') === 'masterpiece'),
+                ->visible(fn ($get) => in_array($get('layout'), ['masterpiece', 'projection'], true)),
             FileUpload::make('images')->label('Photos de la mosaïque (3 ou 4)')->image()->multiple()->reorderable()->maxFiles(4)
                 ->disk('public')->directory('pages')->maxSize(8192)
                 ->visible(fn ($get) => $get('layout') === 'mosaic'),
             TextInput::make('caption')->label('Légende de la photo')->maxLength(120)
-                ->visible(fn ($get) => in_array($get('layout'), ['masterpiece', 'editorial', 'mosaic', 'poster'], true))
-                ->helperText('Œuvre d\'art : le titre du cartel de musée. Éditorial, mosaïque, affiche : la légende de la photo.'),
+                ->visible(fn ($get) => in_array($get('layout'), ['masterpiece', 'projection', 'editorial', 'mosaic', 'poster'], true))
+                ->helperText('Œuvre d\'art et Projection : le titre du cartel de musée. Éditorial, mosaïque, affiche : la légende de la photo.'),
+            HotspotPicker::make('hotspots')->label('Points sur la photo')->imageField('image')
+                ->visible(fn ($get) => $get('layout') === 'studio'),
+            Repeater::make('tracks')->label('Morceaux à écouter')->maxItems(3)->defaultItems(0)
+                ->addActionLabel('Ajouter un morceau')
+                ->helperText('Jusqu\'à trois productions du studio. Rien ne joue tout seul : le visiteur appuie sur lecture.')
+                ->schema([
+                    self::audioUpload('file', 'Fichier')->required(),
+                    TextInput::make('title')->label('Titre')->required()->maxLength(60),
+                    TextInput::make('credits')->label('Crédit (ex. « Mixé et masterisé ici »)')->maxLength(80),
+                ])
+                ->visible(fn ($get) => $get('layout') === 'studio'),
+            Repeater::make('slides')->label('Diapositives')->minItems(2)->maxItems(5)->defaultItems(0)
+                ->addActionLabel('Ajouter une diapositive')
+                ->helperText('De 2 à 5 photos qui se succèdent toutes les 6 secondes, chacune avec son titre.')
+                ->schema([
+                    ...self::image('image', 'Photo', required: true),
+                    TextInput::make('eyebrow')->label('Surtitre')->maxLength(60),
+                    TextInput::make('title')->label('Titre')->required()->maxLength(80),
+                    TextInput::make('link_label')->label('Texte du lien (facultatif)')->maxLength(30),
+                    LinkTargets::field('link_url', 'Lien')->required(fn ($get) => filled($get('link_label'))),
+                ])
+                ->visible(fn ($get) => $get('layout') === 'cinema'),
+            Repeater::make('facts')->label('Chiffres clés')->maxItems(4)->defaultItems(0)->columns(2)
+                ->addActionLabel('Ajouter un chiffre')
+                ->schema([
+                    TextInput::make('value')->label('Valeur (ex. 5)')->required()->maxLength(12),
+                    TextInput::make('label')->label('Libellé (ex. filières)')->required()->maxLength(40),
+                ])
+                ->visible(fn ($get) => $get('layout') === 'cinema'),
             ColorPicker::make('accent')->label('Couleur de lumière (facultatif)'),
             self::buttons(),
         ]);
