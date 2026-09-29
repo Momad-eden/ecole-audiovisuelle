@@ -2,7 +2,11 @@ import type { ArtworkSummary, Image, NewsItem, Program, RoomSummary } from "@/li
 
 export type ButtonData = { label: string; url: string; style?: "primary" | "secondary" };
 
-export type HeroData = { eyebrow?: string; title: string; subtitle?: string; image?: Image | null; videoLoop?: string | null; layout?: "masterpiece" | "stage" | "studio" | "events" | "spotlight" | "editorial" | "poster" | "mosaic" | "compact" | "full" | "split"; words?: string[]; images?: Image[]; caption?: string; sound?: string | null; accent?: string | null; buttons?: ButtonData[] };
+export type Hotspot = { x: number; y: number; label: string };
+export type HeroTrack = { title: string; credits?: string | null; url: string | null };
+export type CinemaSlide = { eyebrow?: string | null; title: string; image: Image; link?: { label: string; url: string } | null };
+
+export type HeroData = { eyebrow?: string; title: string; subtitle?: string; image?: Image | null; videoLoop?: string | null; layout?: "masterpiece" | "projection" | "cinema" | "stage" | "studio" | "events" | "spotlight" | "editorial" | "poster" | "mosaic" | "compact" | "full" | "split"; words?: string[]; images?: Image[]; caption?: string; sound?: string | null; accent?: string | null; buttons?: ButtonData[]; highlight?: string | null; hotspots?: Hotspot[]; tracks?: HeroTrack[]; slides?: CinemaSlide[]; facts?: { value: string; label: string }[] };
 export type MarqueeData = { words?: string[] };
 export type VenueData = { eyebrow?: string; title: string; text?: string; image?: Image | null; facts?: { value: string; label: string }[]; buttons?: ButtonData[] };
 export type EquipmentData = { title?: string; text?: string; groups?: { category: string; items?: string[]; image?: Image | null }[] };
