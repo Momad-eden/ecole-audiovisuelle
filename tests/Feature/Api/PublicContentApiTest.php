@@ -159,4 +159,47 @@ class PublicContentApiTest extends TestCase
             ->assertJsonPath('data.blocks.0.data.sound', url('/storage/pages/audio/nappe.mp3'))
             ->assertJsonPath('data.blocks.1.data.sound', null);
     }
+
+    public function test_studio_hero_tracks_and_hotspots_are_resolved(): void
+    {
+        Page::create(['title' => 'Studio', 'slug' => 'studio', 'draft_blocks' => [
+            ['type' => 'hero', 'data' => ['title' => 'Le studio', 'layout' => 'studio', 'highlight' => 'studio',
+                'tracks' => [['file' => 'pages/audio/a.mp3', 'title' => 'Démo', 'credits' => 'Mixé ici']],
+                'hotspots' => [
+                    ['x' => 48.54, 'y' => 50, 'label' => ' Console '],
+                    ['x' => 140, 'y' => 20, 'label' => 'Hors cadre'],
+                    ['x' => 10, 'y' => 10, 'label' => ''],
+                ]]],
+        ]])->publish();
+
+        $this->getJson('/api/v1/public/pages/studio')->assertOk()
+            ->assertJsonPath('data.blocks.0.data.tracks.0.url', url('/storage/pages/audio/a.mp3'))
+            ->assertJsonPath('data.blocks.0.data.tracks.0.title', 'Démo')
+            ->assertJsonPath('data.blocks.0.data.tracks.0.credits', 'Mixé ici')
+            ->assertJsonPath('data.blocks.0.data.hotspots', [['x' => 48.5, 'y' => 50, 'label' => 'Console']])
+            ->assertJsonPath('data.blocks.0.data.highlight', 'studio');
+    }
+
+    public function test_cinema_hero_slides_are_resolved_and_slides_without_photo_dropped(): void
+    {
+        Page::create(['title' => 'Cinéma', 'slug' => 'cinema', 'draft_blocks' => [
+            ['type' => 'hero', 'data' => ['title' => 'Cinéma', 'layout' => 'cinema',
+                'slides' => [
+                    ['image' => 'pages/a.jpg', 'image_alt' => 'Salle', 'eyebrow' => 'Scène', 'title' => 'Un', 'link_label' => 'Voir', 'link_url' => '/univers/scene'],
+                    ['image' => null, 'title' => 'Sans photo'],
+                    ['image' => 'pages/b.jpg', 'image_alt' => 'Régie', 'title' => 'Deux'],
+                ],
+                'facts' => [['value' => '5', 'label' => 'filières']]]],
+        ]])->publish();
+
+        $this->getJson('/api/v1/public/pages/cinema')->assertOk()
+            ->assertJsonCount(2, 'data.blocks.0.data.slides')
+            ->assertJsonPath('data.blocks.0.data.slides.0.image.url', url('/storage/pages/a.jpg'))
+            ->assertJsonPath('data.blocks.0.data.slides.0.image.alt', 'Salle')
+            ->assertJsonPath('data.blocks.0.data.slides.0.eyebrow', 'Scène')
+            ->assertJsonPath('data.blocks.0.data.slides.0.link', ['label' => 'Voir', 'url' => '/univers/scene'])
+            ->assertJsonPath('data.blocks.0.data.slides.1.title', 'Deux')
+            ->assertJsonPath('data.blocks.0.data.slides.1.link', null)
+            ->assertJsonPath('data.blocks.0.data.facts.0.value', '5');
+    }
 }

@@ -58,13 +58,13 @@ class BlockResolver
 
         $data = match ($type) {
             'hero' => [...$data, 'video_loop' => Media::url($data['video_loop'] ?? null), 'sound' => Media::url($data['sound'] ?? null),
-                'images' => collect($data['images'] ?? [])->map(fn ($path) => Media::image($path, $data['title'] ?? null))->filter()->values()->all()],
+                'images' => collect($data['images'] ?? [])->map(fn ($path) => Media::image($path, $data['title'] ?? null))->filter()->values()->all(),
+                'tracks' => $this->tracks($data['tracks'] ?? []), 'slides' => $this->heroSlides($data['slides'] ?? []),
+                'hotspots' => $this->heroHotspots($data['hotspots'] ?? [])],
             'gallery' => [...$data, 'images' => collect($data['images'] ?? [])->map(fn ($item) => [
                 ...$this->withImages($item),
             ])->values()->all()],
-            'audio' => [...$data, 'tracks' => collect($data['tracks'] ?? [])->map(fn ($track) => [
-                'title' => $track['title'] ?? '', 'credits' => $track['credits'] ?? null, 'url' => Media::url($track['file'] ?? null),
-            ])->values()->all()],
+            'audio' => [...$data, 'tracks' => $this->tracks($data['tracks'] ?? [])],
             'faq' => [...$data, 'items' => Faq::where('group', $data['group'] ?? 'general')->where('is_visible', true)
                 ->orderBy('position')->get(['question', 'answer'])->toArray()],
             'programs' => [...$data, 'items' => ProgramResource::collection(Program::published()
@@ -100,6 +100,38 @@ class BlockResolver
         };
 
         return $this->camelKeys($data);
+    }
+
+    /** Morceaux à écouter (bloc Audio, héros Studio) : fichier remplacé par son URL publique. */
+    private function tracks(array $tracks): array
+    {
+        return collect($tracks)->map(fn ($track) => [
+            'title' => $track['title'] ?? '', 'credits' => $track['credits'] ?? null, 'url' => Media::url($track['file'] ?? null),
+        ])->values()->all();
+    }
+
+    /** Diapositives du héros Cinéma : une diapositive sans photo est écartée. */
+    private function heroSlides(array $slides): array
+    {
+        return collect($slides)->map(fn ($slide) => $this->withImages($slide))
+            ->filter(fn ($slide) => ($slide['image'] ?? null) !== null)
+            ->map(fn ($slide) => [
+                'eyebrow' => $slide['eyebrow'] ?? null,
+                'title' => $slide['title'] ?? '',
+                'image' => $slide['image'],
+                'link' => filled($slide['link_url'] ?? null) ? ['label' => $slide['link_label'] ?? '', 'url' => $slide['link_url']] : null,
+            ])->values()->all();
+    }
+
+    /** Points du héros Studio, en % de la photo : hors cadre ou sans libellé, ils sont écartés. */
+    private function heroHotspots(array $points): array
+    {
+        return collect($points)
+            ->filter(fn ($p) => is_numeric($p['x'] ?? null) && is_numeric($p['y'] ?? null)
+                && $p['x'] >= 0 && $p['x'] <= 100 && $p['y'] >= 0 && $p['y'] <= 100
+                && trim((string) ($p['label'] ?? '')) !== '')
+            ->map(fn ($p) => ['x' => round((float) $p['x'], 1), 'y' => round((float) $p['y'], 1), 'label' => trim($p['label'])])
+            ->values()->all();
     }
 
     private function agenda(array $data)
