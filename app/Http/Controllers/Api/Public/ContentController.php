@@ -231,10 +231,13 @@ class ContentController extends Controller
             ->get();
 
         // Campus publiés où l'offre est proposée : formation cochée pour le campus et session du campus (ou de tous).
-        $offerings->each(fn (Offering $o) => $o->setAttribute('campus_ids', $campuses
-            ->filter(fn (Place $c) => $o->cohort->program->campuses->contains('id', $c->id)
-                && ($o->cohort->place_id === null || $o->cohort->place_id === $c->id))
-            ->pluck('id')->values()->all()));
+        // Même règle que Offering::isAvailableAt(null) : avec un seul campus publié, toute offre ouverte y est proposée.
+        $offerings->each(fn (Offering $o) => $o->setAttribute('campus_ids', $campuses->count() === 1
+            ? [$campuses->first()->id]
+            : $campuses
+                ->filter(fn (Place $c) => $o->cohort->program->campuses->contains('id', $c->id)
+                    && ($o->cohort->place_id === null || $o->cohort->place_id === $c->id))
+                ->pluck('id')->values()->all()));
 
         return OfferingResource::collection($offerings);
     }

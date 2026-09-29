@@ -43,8 +43,19 @@ class ApplicationCampusTest extends TestCase
 
     public function test_single_campus_school_needs_no_place(): void
     {
+        $campus = $this->campus('Dakar');
         $offering = Offering::factory()->create();
 
         $this->postJson('/api/v1/public/applications', $this->payload($offering))->assertCreated();
+        $this->assertSame([$campus->id], $this->getJson('/api/v1/public/offerings')->json('data.0.campusIds'));
+    }
+
+    public function test_unticked_program_has_no_campus_ids_with_several_campuses(): void
+    {
+        $this->campus('Dakar');
+        $this->campus('Saint-Louis');
+        Offering::factory()->create();
+
+        $this->assertSame([], $this->getJson('/api/v1/public/offerings')->json('data.0.campusIds'));
     }
 }
