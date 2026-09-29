@@ -47,10 +47,10 @@ export function StudioHero({ data, first }: { data: HeroData; first: boolean }) 
         <div className="absolute inset-0 bg-[linear-gradient(90deg,var(--color-night)_0%,rgb(7_7_10/0.78)_34%,transparent_64%),linear-gradient(0deg,var(--color-night)_0%,transparent_34%)]" />
       </div>
 
-      {points.length > 0 && <Hotspots points={points} />}
+      {data.image && points.length > 0 && <Hotspots points={points} src={data.image.url} />}
 
-      <div className="relative z-20 mx-auto w-full max-w-7xl px-4 sm:px-6 lg:px-8">
-        <div className="max-w-xl">
+      <div className="pointer-events-none relative z-20 mx-auto w-full max-w-7xl px-4 sm:px-6 lg:px-8">
+        <div className="pointer-events-auto max-w-xl">
           <p className="cartel mb-5 flex items-center gap-2 text-rec">
             <span className="rec-dot size-2 rounded-full bg-rec" aria-hidden />
             REC <span ref={timecodeRef} className="tabular-nums" aria-hidden>00:00:00:00</span>
@@ -79,7 +79,7 @@ export function StudioHero({ data, first }: { data: HeroData; first: boolean }) 
         </div>
 
         {tracks.length > 0 && (
-          <div className="mt-10 sm:mt-14">
+          <div className="pointer-events-auto mt-10 sm:mt-12">
             <StudioPlayer tracks={tracks} accent={data.accent} />
           </div>
         )}

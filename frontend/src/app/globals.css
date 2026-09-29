@@ -99,6 +99,9 @@ html:has(.poster-hero[data-first]) .site-header {
   --color-gold: #ffb020;
   --color-rec: #ff3b30;
   --color-on-accent: #07070a;
+  /* L'accent par défaut est recalculé ici, sinon il garderait l'orange assombri du thème clair. */
+  --accent: var(--color-brand);
+  --accent-ink: var(--accent);
   color: var(--color-ink);
 }
 :root[data-theme="light"] .scene-dark[style*="--accent"] {

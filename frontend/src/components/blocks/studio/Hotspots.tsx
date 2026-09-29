@@ -1,16 +1,20 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { cn } from "@/lib/utils";
 import type { Hotspot } from "../types";
 
 /**
  * Points lumineux posés sur le matériel de la photo (réglés dans l'admin, en % de la photo).
  * Un point s'ouvre au survol, au focus clavier ou au toucher ; un seul à la fois, Échap le referme.
- * Sur petit écran, les points sont numérotés et leurs libellés passent dans `HotspotList`.
+ * Sur petit écran, le texte recouvre la photo : les points sont masqués et `HotspotList` les liste.
+ * La photo est recadrée pour couvrir le héros (object-cover) : les points sont posés sur la zone
+ * qu'occupe la photo entière, pour rester sur le matériel quel que soit le format de l'écran.
  */
-export function Hotspots({ points }: { points: Hotspot[] }) {
+export function Hotspots({ points, src }: { points: Hotspot[]; src: string }) {
   const [open, setOpen] = useState<number | null>(null);
+  const rootRef = useRef<HTMLDivElement>(null);
+  const box = useCoverBox(rootRef, src);
 
   useEffect(() => {
     if (open === null) return;
@@ -20,7 +24,8 @@ export function Hotspots({ points }: { points: Hotspot[] }) {
   }, [open]);
 
   return (
-    <div className="pointer-events-none absolute inset-0 z-10">
+    <div ref={rootRef} className="pointer-events-none absolute inset-0 z-10 hidden overflow-hidden sm:block">
+      <div className="absolute" style={box ?? { inset: 0 }}>
       {points.map((point, index) => {
         const isOpen = open === index;
         const toLeft = point.x > 62;
@@ -51,8 +56,38 @@ export function Hotspots({ points }: { points: Hotspot[] }) {
           </div>
         );
       })}
+      </div>
     </div>
   );
+}
+
+/** Zone (en px, dans le conteneur) qu'occupe la photo entière quand elle le couvre en object-cover. */
+function useCoverBox(rootRef: React.RefObject<HTMLDivElement | null>, src: string) {
+  const [ratio, setRatio] = useState<number | null>(null);
+  const [box, setBox] = useState<{ left: number; top: number; width: number; height: number } | null>(null);
+
+  useEffect(() => {
+    const image = new window.Image();
+    image.onload = () => image.naturalWidth && setRatio(image.naturalWidth / image.naturalHeight);
+    image.src = src;
+  }, [src]);
+
+  useEffect(() => {
+    const root = rootRef.current;
+    if (!root || !ratio) return;
+    const measure = () => {
+      const { width: w, height: h } = root.getBoundingClientRect();
+      const width = Math.max(w, h * ratio);
+      const height = width / ratio;
+      setBox({ left: (w - width) / 2, top: (h - height) / 2, width, height });
+    };
+    measure();
+    const observer = new ResizeObserver(measure);
+    observer.observe(root);
+    return () => observer.disconnect();
+  }, [rootRef, ratio]);
+
+  return box;
 }
 
 /** Libellés des points en liste numérotée, pour les petits écrans où les étiquettes ne tiennent pas. */
