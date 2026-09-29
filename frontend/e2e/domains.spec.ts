@@ -39,7 +39,7 @@ test.fixme("le menu EMSI s'ouvre au clavier et se referme avec Échap", async ({
   await page.keyboard.press("Enter");
   await expect(bouton).toHaveAttribute("aria-expanded", "true");
   await page.keyboard.press("ArrowDown");
-  await expect(page.getByRole("link", { name: "Dakar" }).first()).toBeFocused();
+  await expect(page.getByRole("link", { name: "L'école" }).first()).toBeFocused();
   await page.keyboard.press("Escape");
   await expect(bouton).toHaveAttribute("aria-expanded", "false");
   await expect(bouton).toBeFocused();

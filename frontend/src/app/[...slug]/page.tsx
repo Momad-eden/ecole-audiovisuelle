@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { notFound, permanentRedirect, redirect } from "next/navigation";
+import { CurrentCrumb } from "@/components/layout/domain-crumb";
 import { DomainChrome } from "@/components/layout/DomainChrome";
 import { BlockRenderer } from "@/components/blocks/BlockRenderer";
 import { api } from "@/lib/api";
@@ -31,6 +32,7 @@ export default async function CmsPage({ params }: Props) {
   const { menus, domains } = await api.site();
   return (
     <DomainChrome domain={page.domain ?? "general"} site={{ menus, domains }} path={`/${path}`} title={page.title}>
+      <CurrentCrumb title={page.title} />
       <BlockRenderer blocks={page.blocks} path={`/${path}`} />
     </DomainChrome>
   );

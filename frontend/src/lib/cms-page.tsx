@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
+import { CurrentCrumb } from "@/components/layout/domain-crumb";
 import { BlockRenderer } from "@/components/blocks/BlockRenderer";
 import { api } from "@/lib/api";
 import { pageMetadata } from "@/lib/metadata";
@@ -13,5 +14,10 @@ export async function cmsMetadata(slug: string): Promise<Metadata> {
 export async function CmsPageContent({ slug }: { slug: string }) {
   const page = await api.page(slug);
   if (!page) notFound();
-  return <BlockRenderer blocks={page.blocks} path={`/${slug}`} />;
+  return (
+    <>
+      <CurrentCrumb title={page.title} />
+      <BlockRenderer blocks={page.blocks} path={`/${slug}`} />
+    </>
+  );
 }

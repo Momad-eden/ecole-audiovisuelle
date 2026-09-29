@@ -84,7 +84,7 @@ export function MobileMenu({ links }: { links: MenuLink[] }) {
                                                     </span>
                                                 </button>
                                                 <ul id={`mobile-sub-${index}`} hidden={!isOpen} className="pb-3">
-                                                    {[{ label: `Tout ${link.label}`, url: link.url }, ...children].map((child) => (
+                                                    {children.map((child) => (
                                                         <li key={child.url}>
                                                             <Link href={child.url} onClick={close} className="flex min-h-11 items-center pl-3 text-lg text-ink/85">
                                                                 {child.label}

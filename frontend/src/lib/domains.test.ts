@@ -13,6 +13,7 @@ const menus: Site["menus"]["main"] = [
       { label: "Formations", url: "/emsi/formations" },
     ],
   },
+  { label: "Studio", url: "/studio", isButton: false, children: [{ label: "Le studio", url: "/studio" }] },
   { label: "Maison", url: "/maison-habib-faye", isButton: false, children: [{ label: "Agenda", url: "/maison-habib-faye/agenda" }] },
   { label: "Contact", url: "/contact", isButton: true, children: [] },
 ];
@@ -29,6 +30,14 @@ test("la page d'entrée d'une section n'a pas de page courante", () => {
   const section = domainSection(menus, "/emsi");
   expect(section?.parent.label).toBe("EMSI");
   expect(section?.current).toBeUndefined();
+});
+
+test("un slash final ne change rien", () => {
+  expect(domainSection(menus, "/emsi/formations/")?.current?.url).toBe("/emsi/formations");
+});
+
+test("à égalité, l'enfant passe avant son parent", () => {
+  expect(domainSection(menus, "/studio")?.current?.label).toBe("Le studio");
 });
 
 test("null hors des sections", () => {

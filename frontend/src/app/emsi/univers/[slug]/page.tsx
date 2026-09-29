@@ -1,3 +1,4 @@
+import { CurrentCrumb } from "@/components/layout/domain-crumb";
 import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
@@ -33,6 +34,7 @@ export default async function UniversePage({ params }: Props) {
 
   return (
     <div style={{ ["--accent" as string]: universe.accentColor }}>
+      <CurrentCrumb title={universe.name} />
       <PageHeader
         eyebrow={universe.isUpcoming ? "Bientôt à l'EMSI" : `Univers ${String(position + 1).padStart(2, "0")}`}
         title={universe.name}

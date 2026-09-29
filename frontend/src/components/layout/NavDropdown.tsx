@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { useId, useRef, useState, type FocusEvent, type KeyboardEvent, type PointerEvent } from "react";
+import { useEffect, useId, useRef, useState, type FocusEvent, type KeyboardEvent, type PointerEvent } from "react";
 import { ChevronDown } from "lucide-react";
 import type { MenuLink } from "@/lib/types";
 import { cn } from "@/lib/utils";
@@ -12,12 +12,44 @@ export function NavDropdown({ link }: { link: MenuLink }) {
   const rootRef = useRef<HTMLLIElement>(null);
   const buttonRef = useRef<HTMLButtonElement>(null);
   const listId = useId();
-  const items = [{ label: `Tout ${link.label}`, url: link.url }, ...(link.children ?? [])];
+  const hoverOpened = useRef(false);
+  const items = link.children ?? [];
+
+  // Un seul menu ouvert à la fois, et un appui hors du menu le referme (les tablettes tactiles ne « quittent » jamais le bouton).
+  useEffect(() => {
+    if (!open) return;
+    const others = (event: Event) => (event as CustomEvent<string>).detail !== listId && setOpen(false);
+    const outside = (event: globalThis.PointerEvent) => !rootRef.current?.contains(event.target as Node) && setOpen(false);
+    window.dispatchEvent(new CustomEvent("nav-dropdown-open", { detail: listId }));
+    window.addEventListener("nav-dropdown-open", others);
+    document.addEventListener("pointerdown", outside);
+    return () => {
+      window.removeEventListener("nav-dropdown-open", others);
+      document.removeEventListener("pointerdown", outside);
+    };
+  }, [open, listId]);
 
   const links = () => Array.from(rootRef.current?.querySelectorAll<HTMLAnchorElement>("[data-nav-item]") ?? []);
 
-  const onPointerEnter = (event: PointerEvent) => event.pointerType === "mouse" && setOpen(true);
-  const onPointerLeave = (event: PointerEvent) => event.pointerType === "mouse" && setOpen(false);
+  const onPointerEnter = (event: PointerEvent) => {
+    if (event.pointerType !== "mouse" || open) return;
+    hoverOpened.current = true;
+    setOpen(true);
+  };
+  // Le survol ne referme que ce qu'il a ouvert : après un clic, le menu reste ouvert jusqu'à Échap ou un appui ailleurs.
+  const onPointerLeave = (event: PointerEvent) => {
+    if (event.pointerType === "mouse" && hoverOpened.current) {
+      hoverOpened.current = false;
+      setOpen(false);
+    }
+  };
+  const onClick = () => {
+    if (open && hoverOpened.current) {
+      hoverOpened.current = false; // ouvert par le survol : le clic l'épingle ouvert
+      return;
+    }
+    setOpen(!open);
+  };
 
   const onBlur = (event: FocusEvent) => {
     if (!rootRef.current?.contains(event.relatedTarget as Node | null)) setOpen(false);
@@ -26,6 +58,7 @@ export function NavDropdown({ link }: { link: MenuLink }) {
   const onKeyDown = (event: KeyboardEvent) => {
     if (event.key === "Escape" && open) {
       event.preventDefault();
+      hoverOpened.current = false;
       setOpen(false);
       buttonRef.current?.focus();
       return;
@@ -51,7 +84,7 @@ export function NavDropdown({ link }: { link: MenuLink }) {
         type="button"
         aria-expanded={open}
         aria-controls={listId}
-        onClick={() => setOpen((value) => !value)}
+        onClick={onClick}
         className="inline-flex items-center gap-1 rounded-full px-4 py-2 text-sm text-ink/80 transition hover:bg-ink/5 hover:text-ink"
       >
         {link.label}

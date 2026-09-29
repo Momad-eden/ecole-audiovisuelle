@@ -86,7 +86,7 @@ export function CinemaHero({ data, first }: { data: HeroData; first: boolean }) 
       ))}
       <div className="absolute inset-0 -z-10 bg-[linear-gradient(0deg,var(--color-night)_6%,rgb(7_7_10/0.35)_55%,rgb(7_7_10/0.55)_100%)]" aria-hidden />
 
-      <div className="mx-auto flex w-full max-w-7xl flex-1 flex-col px-4 pt-24 sm:px-6 lg:px-8">
+      <div className="mx-auto flex w-full max-w-7xl flex-1 flex-col px-4 pt-[calc(var(--chrome-h)+1.5rem)] sm:px-6 lg:px-8">
         {count > 1 && (
           <div className="flex items-center gap-2" {...hoverPause}>
             {slides.map((slide, i) => (

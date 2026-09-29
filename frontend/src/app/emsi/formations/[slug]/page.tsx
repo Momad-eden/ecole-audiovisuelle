@@ -1,3 +1,4 @@
+import { CurrentCrumb } from "@/components/layout/domain-crumb";
 import type { Metadata } from "next";
 import { notFound, permanentRedirect } from "next/navigation";
 import { ProgramDetail } from "@/components/ProgramDetail";
@@ -16,5 +17,10 @@ export default async function ProgramPage({ params }: Props) {
   if (!program) notFound();
   if (program.audience === "professional") permanentRedirect(`/emsi/professionnels/${program.slug}`);
 
-  return <ProgramDetail program={program} applyHref={`/candidater?formation=${program.slug}`} />;
+  return (
+    <>
+      <CurrentCrumb title={program.title} />
+      <ProgramDetail program={program} applyHref={`/candidater?formation=${program.slug}`} />
+    </>
+  );
 }

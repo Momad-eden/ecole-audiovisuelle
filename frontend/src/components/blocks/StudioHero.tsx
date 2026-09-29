@@ -33,7 +33,7 @@ export function StudioHero({ data, first }: { data: HeroData; first: boolean }) 
       ref={sectionRef}
       data-testid="studio-hero"
       data-first={first ? "" : undefined}
-      className="scene-dark relative isolate flex min-h-[92svh] flex-col justify-end overflow-hidden bg-night pb-6 pt-28 sm:pb-8"
+      className="scene-dark relative isolate flex min-h-[92svh] flex-col justify-end overflow-hidden bg-night pb-6 pt-[calc(var(--chrome-h)+2.5rem)] sm:pb-8"
       style={accentVars(data.accent || "#ff3b30")}
     >
       <div className="absolute inset-0 -z-10" aria-hidden>

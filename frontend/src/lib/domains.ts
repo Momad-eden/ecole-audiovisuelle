@@ -16,7 +16,9 @@ export function domainSection(menus: Site["menus"]["main"], path: string): Domai
     if (parent.isButton) continue;
     const candidates: { url: string; child?: MenuChild }[] = [{ url: parent.url }, ...(parent.children ?? []).map((child) => ({ url: child.url, child }))];
     for (const { url, child } of candidates) {
-      if (!matches(url, clean) || (best && url.length <= best.length)) continue;
+      if (!matches(url, clean)) continue;
+      // Le plus long préfixe l'emporte ; à égalité, l'enfant passe avant son parent.
+      if (best && (url.length < best.length || (url.length === best.length && (!child || best.current)))) continue;
       best = { parent, current: child, length: url.length };
     }
   }

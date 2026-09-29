@@ -1,3 +1,4 @@
+import { CurrentCrumb } from "@/components/layout/domain-crumb";
 import { DEFAULT_SHARE_IMAGE } from "@/lib/metadata";
 import type { Metadata } from "next";
 import Link from "next/link";
@@ -47,6 +48,7 @@ export default async function ArtworkPage({ params }: Props) {
 
   return (
     <article style={{ ["--accent" as string]: accent }}>
+      <CurrentCrumb title={artwork.title} />
       <div className="mx-auto max-w-7xl px-4 pt-32 sm:px-6 lg:px-8">
         <Link href={artwork.room ? `/emsi/realisations?univers=${artwork.room.slug}` : "/emsi/realisations"} className="cartel inline-flex items-center gap-2 hover:text-ink">
           <ArrowLeft className="size-4" aria-hidden /> Réalisations{artwork.room ? ` · ${artwork.room.name}` : ""}

@@ -1,3 +1,4 @@
+import { CurrentCrumb } from "@/components/layout/domain-crumb";
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { ProgramDetail } from "@/components/ProgramDetail";
@@ -16,6 +17,7 @@ export default async function ProfessionalProgramPage({ params }: Props) {
 
   return (
     <div style={{ ["--accent" as string]: "var(--color-hmi)" }}>
+      <CurrentCrumb title={program.title} />
       <ProgramDetail program={program} applyHref={`/emsi/professionnels/candidater?formation=${program.slug}`} />
     </div>
   );

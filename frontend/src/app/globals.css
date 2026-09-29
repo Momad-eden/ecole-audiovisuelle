@@ -74,8 +74,16 @@
 :root[data-theme="light"] [style*="--accent-on"] {
   --color-on-accent: var(--accent-on-light);
 }
+/* Hauteur totale de l'en-tête fixe : 4,5 rem, plus la rangée de repères de domaine (2,75 rem) quand la page en a une. */
+:root {
+  --chrome-h: 4.5rem;
+}
+html:has([data-domain-row]) {
+  --chrome-h: 7.25rem;
+}
 /* Une affiche en haut de page est un aplat de couleur : l'en-tête garde son fond pour que le menu reste lisible. */
-html:has(.poster-hero[data-first]) .site-header {
+html:has(.poster-hero[data-first]) .site-header,
+html:has(.poster-hero[data-first]) [data-domain-row] {
   border-bottom-color: var(--color-line);
   background: color-mix(in oklab, var(--color-night) 85%, transparent);
   backdrop-filter: blur(12px);
@@ -110,7 +118,8 @@ html:has(.poster-hero[data-first]) .site-header {
 :root[data-theme="light"] .scene-dark[style*="--accent-on"] {
   --color-on-accent: var(--accent-on);
 }
-:root[data-theme="light"]:has(.scene-dark[data-first]) .site-header {
+:root[data-theme="light"]:has(.scene-dark[data-first]) .site-header,
+:root[data-theme="light"]:has(.scene-dark[data-first]) [data-domain-row] {
   border-bottom-color: var(--color-line);
   background: color-mix(in oklab, var(--color-night) 85%, transparent);
   backdrop-filter: blur(12px);
