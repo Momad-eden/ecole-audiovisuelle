@@ -26,3 +26,6 @@ yarn-error.log
 /.zed
 /public/js/app
 /public/css/app
+
+# Maquettes de conception (compagnon visuel)
+/.superpowers/
