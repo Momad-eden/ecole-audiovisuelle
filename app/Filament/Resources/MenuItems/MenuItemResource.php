@@ -47,7 +47,9 @@ class MenuItemResource extends Resource
             Section::make()->columns(2)->schema([
                 Select::make('location')->label('Emplacement')->options(MenuItem::LOCATIONS)->default('main')->required()->live(),
                 Select::make('parent_id')->label('Sous-menu de')->placeholder('Aucun (lien de premier niveau)')
-                    ->options(fn (?MenuItem $record) => MenuItem::where('location', 'main')->whereNull('parent_id')->whereDoesntHave('children')
+                    ->options(fn (?MenuItem $record) => MenuItem::where(fn ($q) => $q
+                        ->where(fn ($q) => $q->where('location', 'main')->whereNull('parent_id')->whereDoesntHave('children'))
+                        ->when($record?->parent_id, fn ($q, $parentId) => $q->orWhereKey($parentId)))
                         ->when($record, fn ($q) => $q->whereKeyNot($record->id))->orderBy('position')->pluck('label', 'id'))
                     ->helperText(fn (?MenuItem $record) => $record?->children()->exists()
                         ? 'Cet élément a déjà des sous-menus.'

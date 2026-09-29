@@ -156,4 +156,15 @@ class DomainsAdminTest extends TestCase
 
         $this->assertSame(SiteDomain::MAISON, $page->fresh()->domain);
     }
+
+    public function test_child_menu_item_keeps_its_current_parent_in_the_options(): void
+    {
+        $parent = MenuItem::create(['location' => 'main', 'label' => 'Parent', 'url' => '/p']);
+        $child = MenuItem::create(['location' => 'main', 'label' => 'Enfant', 'url' => '/e', 'parent_id' => $parent->id]);
+        $other = MenuItem::create(['location' => 'main', 'label' => 'Autre', 'url' => '/o']);
+
+        Livewire::test(EditMenuItem::class, ['record' => $child->id])
+            ->assertFormSet(['parent_id' => $parent->id])
+            ->assertFormFieldExists('parent_id', fn (Select $f) => $f->getOptions() === [$parent->id => 'Parent', $other->id => 'Autre']);
+    }
 }
