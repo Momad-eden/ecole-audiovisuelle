@@ -10,7 +10,7 @@ export function ArtworkCard({ artwork }: { artwork: ArtworkSummary }) {
 
   return (
     <article className="group relative" style={{ ["--accent" as string]: accent }}>
-      <Link href={`/realisations/${artwork.slug}`} className="block">
+      <Link href={`/emsi/realisations/${artwork.slug}`} className="block">
         <div className="relative aspect-[4/5] overflow-hidden rounded-2xl border border-line bg-night-3">
           {artwork.cover ? (
             <MediaImage image={artwork.cover} sizes="(min-width: 1024px) 33vw, (min-width: 640px) 50vw, 100vw" className="transition duration-700 group-hover:scale-[1.03]" fallbackAlt={artwork.title} />
@@ -40,7 +40,7 @@ export function ArtworkGrid({ artworks, empty }: { artworks: ArtworkSummary[]; e
   if (artworks.length === 0) {
     return (
       <EmptyState title={empty ?? "Les premières réalisations des étudiants seront bientôt publiées."} text="Films, photos, mixages, affiches, créations lumière : chaque promotion viendra exposer ici son travail." visual="image">
-        <ButtonLink href="/univers">Découvrir les univers</ButtonLink>
+        <ButtonLink href="/emsi">Découvrir les univers</ButtonLink>
       </EmptyState>
     );
   }

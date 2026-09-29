@@ -107,7 +107,7 @@ export function BookingForm({ type = "equipment_rental" }: { type?: BookingType 
           <p className="cartel mb-3">Votre sélection</p>
           {quote.items.length === 0 ? (
             <p className="text-sm text-ink-muted">
-              Aucun matériel choisi. <Link href="/events/materiel" className="font-semibold text-[var(--accent-ink)] underline underline-offset-4">Parcourir le matériel</Link>, ou décrivez simplement votre besoin ci-dessous.
+              Aucun matériel choisi. <Link href="/maison-habib-faye" className="font-semibold text-[var(--accent-ink)] underline underline-offset-4">Parcourir le matériel</Link>, ou décrivez simplement votre besoin ci-dessous.
             </p>
           ) : (
             <ul className="divide-y divide-line">

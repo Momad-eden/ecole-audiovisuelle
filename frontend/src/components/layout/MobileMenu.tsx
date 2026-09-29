@@ -90,7 +90,7 @@ export function MobileMenu({
                                 {universes.map((universe) => (
                                     <li key={universe.id}>
                                         <Link
-                                            href={`/univers/${universe.slug}`}
+                                            href={`/emsi/univers/${universe.slug}`}
                                             onClick={close}
                                             className="inline-flex min-h-11 items-center gap-2 rounded-full border border-line px-4 text-sm"
                                             style={{

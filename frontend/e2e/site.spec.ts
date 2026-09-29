@@ -4,27 +4,27 @@ test("l'accueil présente l'école, ses univers et un appel à candidater", asyn
   await page.goto("/");
   await expect(page.getByRole("heading", { level: 1 })).toContainText("Faites de votre passion un métier");
   await expect(page.getByRole("heading", { name: "Choisissez votre univers" })).toBeVisible();
-  await expect(page.locator('a[href="/univers/son"]').first()).toBeAttached();
+  await expect(page.locator('a[href="/emsi/univers/son"]').first()).toBeAttached();
   await expect(page.getByRole("link", { name: "Candidater" }).first()).toBeVisible();
 });
 
 test("on découvre un univers, ses filières et ses métiers", async ({ page }) => {
-  await page.goto("/univers");
+  await page.goto("/emsi");
   // Attendre que le défilement horizontal soit en place (bureau) ; sur mobile, la pile est statique.
   await page.waitForFunction(() => window.matchMedia("(max-width: 1023px)").matches || document.querySelector(".universe-track")?.classList.contains("is-horizontal"));
   // Au clavier : le panneau qui reçoit le focus est amené à l'écran, même pendant le défilement horizontal.
-  const panel = page.locator('main a[href="/univers/scene"]').first();
+  const panel = page.locator('main a[href="/emsi/univers/scene"]').first();
   await panel.focus();
   await expect(panel).toBeInViewport();
   await page.keyboard.press("Enter");
-  await expect(page).toHaveURL(/\/univers\/scene$/, { timeout: 15000 });
+  await expect(page).toHaveURL(/\/emsi\/univers\/scene$/, { timeout: 15000 });
   await expect(page.getByRole("heading", { level: 1, name: /^Scène\s: régie & lumière$/ })).toBeVisible({ timeout: 15000 });
   await expect(page.getByRole("heading", { name: "Technicien Lumière" })).toBeVisible();
   await expect(page.getByText("Régisseur lumière", { exact: true })).toBeVisible();
 });
 
 test("la page Formations range les filières par univers", async ({ page }) => {
-  await page.goto("/formations");
+  await page.goto("/emsi/formations");
   await expect(page.getByRole("heading", { level: 2, name: /^Image\s: vidéo & photo$/ })).toBeVisible();
   await expect(page.getByRole("heading", { name: "Cadrage Sportif et Régie Vidéo" })).toBeVisible();
 });
@@ -33,7 +33,7 @@ test("les adresses de l'ancien musée redirigent vers les univers et les réalis
   await page.goto("/musee/salle-du-son");
   await expect(page).toHaveURL(/\/univers\/son$/);
   await page.goto("/musee");
-  await expect(page).toHaveURL(/\/realisations$/);
+  await expect(page).toHaveURL(/\/emsi\/realisations$/);
   await expect(page.getByRole("heading", { level: 1, name: "Faites par nos étudiants" })).toBeVisible();
 });
 
@@ -57,7 +57,7 @@ test("le formulaire de contact signale les champs manquants en français", async
 });
 
 test("la candidature professionnelle guide le candidat étape par étape", async ({ page }) => {
-  await page.goto("/professionnels/candidater");
+  await page.goto("/emsi/professionnels/candidater");
   const closed = page.getByText("Aucune candidature n'est ouverte pour le moment.");
   if (await closed.isVisible()) {
     test.skip(true, "Aucune session professionnelle ouverte dans cette base.");
@@ -74,7 +74,7 @@ test("la candidature professionnelle guide le candidat étape par étape", async
 });
 
 test("le changeur de thème passe en clair et s'en souvient", async ({ page, isMobile }) => {
-  await page.goto("/formations");
+  await page.goto("/emsi/formations");
   await expect(page.locator("html")).toHaveAttribute("data-theme", "dark");
   if (isMobile) await page.getByRole("button", { name: "Ouvrir le menu" }).click();
   await page.getByRole("button", { name: "Passer au thème clair" }).first().click();

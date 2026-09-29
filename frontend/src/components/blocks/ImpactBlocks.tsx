@@ -98,7 +98,7 @@ export function ServicesBlock({ data }: { data: { title?: string; text?: string;
 export function EquipmentCard({ item }: { item: EquipmentItem }) {
   return (
     <article className="group flex h-full flex-col overflow-hidden rounded-3xl border border-line bg-night-2 transition duration-500 hover:border-[var(--accent)]">
-      <Link href={`/events/materiel/${item.slug}`} className="block">
+      <Link href={"/maison-habib-faye"} className="block">
         <div className="relative aspect-[4/3] overflow-hidden border-b border-line bg-night-3">
           {item.image ? <MediaImage image={item.image} sizes="(min-width: 1024px) 25vw, (min-width: 640px) 50vw, 100vw" className="transition duration-700 group-hover:scale-105" /> : (
             <div className="absolute inset-0 grid place-items-center p-6 text-center" aria-hidden><span className="display text-3xl text-ink/15">{item.brand ?? item.name}</span></div>
@@ -155,7 +155,7 @@ export function EquipmentListBlock({ data }: { data: { title?: string; text?: st
       <div style={accent("events")}>
         <div className="flex flex-wrap items-end justify-between gap-6">
           <SectionTitle eyebrow="Location" title={data.title} text={data.text} />
-          <Link href="/events/materiel" className="group mb-12 inline-flex items-center gap-2 text-sm font-semibold text-[var(--accent-ink)]">Tout le matériel <ArrowRight className="size-4 transition-transform group-hover:translate-x-1" aria-hidden /></Link>
+          <Link href="/maison-habib-faye" className="group mb-12 inline-flex items-center gap-2 text-sm font-semibold text-[var(--accent-ink)]">Tout le matériel <ArrowRight className="size-4 transition-transform group-hover:translate-x-1" aria-hidden /></Link>
         </div>
         <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
           {items.map((item) => <EquipmentCard key={item.id} item={item} />)}
@@ -213,7 +213,7 @@ export function ProductionsBlock({ data }: { data: { title?: string; items?: Art
         <SectionTitle eyebrow="Écouter" title={data.title} />
         <ol className="divide-y divide-line rounded-[2rem] border border-line bg-night-2">
           {items.map((item, index) => {
-            const track = { src: item.audio!.url, title: item.title, subtitle: "Impact Live Studio", href: `/realisations/${item.slug}`, peaks: item.audio!.peaks, accent: "var(--color-rec)" };
+            const track = { src: item.audio!.url, title: item.title, subtitle: "Impact Live Studio", href: `/emsi/realisations/${item.slug}`, peaks: item.audio!.peaks, accent: "var(--color-rec)" };
             return (
               <li key={item.id} className="grid items-center gap-5 p-5 sm:grid-cols-[auto_auto_1fr] sm:p-7">
                 <span className="cartel hidden tabular-nums sm:block">{String(index + 1).padStart(2, "0")}</span>
@@ -222,7 +222,7 @@ export function ProductionsBlock({ data }: { data: { title?: string; items?: Art
                     {item.cover ? <MediaImage image={item.cover} sizes="64px" /> : <Disc3 className="size-8 text-[var(--accent-ink)]" aria-hidden />}
                   </span>
                   <span>
-                    <Link href={`/realisations/${item.slug}`} className="display block text-lg leading-tight hover:text-[var(--accent-ink)]">{item.title}</Link>
+                    <Link href={`/emsi/realisations/${item.slug}`} className="display block text-lg leading-tight hover:text-[var(--accent-ink)]">{item.title}</Link>
                     {item.summary && <span className="mt-1 line-clamp-1 block text-sm text-ink-muted">{item.summary}</span>}
                   </span>
                 </div>
@@ -248,7 +248,7 @@ const timeFormat = new Intl.DateTimeFormat("fr-FR", { weekday: "long", hour: "2-
 export function AgendaCard({ event }: { event: AgendaEvent }) {
   const start = event.startsAt ? new Date(event.startsAt) : null;
   return (
-    <Link href={`/agenda/${event.slug}`} className="group flex h-full gap-5 rounded-3xl border border-line bg-night-2 p-5 transition duration-500 hover:border-[var(--accent)]" style={accent(event.activity)}>
+    <Link href={`/maison-habib-faye/agenda/${event.slug}`} className="group flex h-full gap-5 rounded-3xl border border-line bg-night-2 p-5 transition duration-500 hover:border-[var(--accent)]" style={accent(event.activity)}>
       <div className="grid w-20 shrink-0 place-items-center rounded-2xl border border-line bg-night py-3 text-center">
         {start ? (
           <span><span className="display block text-3xl text-[var(--accent-ink)]">{dayFormat.format(start)}</span><span className="cartel">{monthFormat.format(start).replace(".", "")}</span></span>
@@ -292,7 +292,7 @@ export function AgendaBlock({ data }: { data: { title?: string; scope?: "upcomin
     <Section id="programmation">
       <div className="flex flex-wrap items-end justify-between gap-6">
         <SectionTitle eyebrow="Agenda" title={data.title} />
-        <Link href="/agenda" className="group mb-12 inline-flex items-center gap-2 text-sm font-semibold text-brand">Tout l&apos;agenda <ArrowRight className="size-4 transition-transform group-hover:translate-x-1" aria-hidden /></Link>
+        <Link href="/maison-habib-faye/agenda" className="group mb-12 inline-flex items-center gap-2 text-sm font-semibold text-brand">Tout l&apos;agenda <ArrowRight className="size-4 transition-transform group-hover:translate-x-1" aria-hidden /></Link>
       </div>
       <ul className="grid gap-4 md:grid-cols-2">
         {items.map((event) => <li key={event.id}><AgendaCard event={event} /></li>)}

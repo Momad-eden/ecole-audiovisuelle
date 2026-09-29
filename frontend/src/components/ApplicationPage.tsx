@@ -33,7 +33,7 @@ export async function ApplicationPage({ audience, formation, campus }: Props) {
             <div className="mt-8 flex flex-wrap gap-3">
               {whatsapp && <ButtonLink href={`https://wa.me/${whatsapp}`}>Nous écrire sur WhatsApp</ButtonLink>}
               <ButtonLink href="/contact" variant={whatsapp ? "secondary" : "primary"}>Nous contacter</ButtonLink>
-              <ButtonLink href={professional ? "/professionnels" : "/formations"} variant="secondary">Voir les formations</ButtonLink>
+              <ButtonLink href={professional ? "/emsi/professionnels" : "/emsi/formations"} variant="secondary">Voir les formations</ButtonLink>
             </div>
           </div>
         ) : (

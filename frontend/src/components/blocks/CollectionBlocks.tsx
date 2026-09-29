@@ -27,7 +27,7 @@ export function ProgramsBlock({ data }: { data: ProgramsData }) {
     <Section>
       <div className="flex flex-wrap items-end justify-between gap-6">
         <SectionTitle title={data.title} />
-        <SeeAll href="/formations">Toutes les formations</SeeAll>
+        <SeeAll href="/emsi/formations">Toutes les formations</SeeAll>
       </div>
       <div className="grid gap-5 md:grid-cols-2 lg:grid-cols-3">
         {items.map((program, i) => <Reveal key={program.id} delay={(i % 3) * 100} className="h-full"><ProgramCard program={program} /></Reveal>)}
@@ -43,7 +43,7 @@ export function ArtworksBlock({ data }: { data: ArtworksData }) {
     <Section>
       <div className="flex flex-wrap items-end justify-between gap-6">
         <SectionTitle eyebrow="Faits par nos étudiants" title={data.title} />
-        <SeeAll href="/realisations">Toutes les réalisations</SeeAll>
+        <SeeAll href="/emsi/realisations">Toutes les réalisations</SeeAll>
       </div>
       <ArtworkGrid artworks={items} />
     </Section>
@@ -110,7 +110,7 @@ export function ProfessionalSpaceBlock({ data }: { data: ProfessionalSpaceData }
           <p className="cartel flex items-center gap-3 text-[var(--accent-ink)]"><span className="h-px w-10 bg-[var(--accent-ink)]" aria-hidden />Espace Professionnels</p>
           <h2 className="display mt-5 text-[clamp(2rem,4vw,3.4rem)] text-balance">{data.title}</h2>
           {data.text && <p className="mt-5 max-w-xl text-lg text-ink/80">{data.text}</p>}
-          <div className="mt-9"><ButtonLink href="/professionnels">{data.buttonLabel || "Découvrir le programme"}</ButtonLink></div>
+          <div className="mt-9"><ButtonLink href="/emsi/professionnels">{data.buttonLabel || "Découvrir le programme"}</ButtonLink></div>
         </div>
         {data.image ? (
           <div className="relative min-h-72"><MediaImage image={data.image} sizes="(min-width: 1024px) 45vw, 100vw" /></div>

@@ -28,9 +28,9 @@ export default async function ArtworkPage({ params }: Props) {
   const artwork = await api.artwork((await params).slug);
   if (!artwork) notFound();
 
-  const learnHref = artwork.room ? `/univers/${artwork.room.slug}#filieres` : "/formations";
+  const learnHref = artwork.room ? `/emsi/univers/${artwork.room.slug}#filieres` : "/emsi/formations";
   const accent = artwork.room?.accentColor ?? "var(--color-brand)";
-  const href = `/realisations/${artwork.slug}`;
+  const href = `/emsi/realisations/${artwork.slug}`;
   const track = artwork.audio ? { src: artwork.audio.url, title: artwork.title, subtitle: artwork.room?.name, href, peaks: artwork.audio.peaks, accent } : null;
 
   const jsonLd = {
@@ -48,7 +48,7 @@ export default async function ArtworkPage({ params }: Props) {
   return (
     <article style={{ ["--accent" as string]: accent }}>
       <div className="mx-auto max-w-7xl px-4 pt-32 sm:px-6 lg:px-8">
-        <Link href={artwork.room ? `/realisations?univers=${artwork.room.slug}` : "/realisations"} className="cartel inline-flex items-center gap-2 hover:text-ink">
+        <Link href={artwork.room ? `/emsi/realisations?univers=${artwork.room.slug}` : "/emsi/realisations"} className="cartel inline-flex items-center gap-2 hover:text-ink">
           <ArrowLeft className="size-4" aria-hidden /> Réalisations{artwork.room ? ` · ${artwork.room.name}` : ""}
         </Link>
       </div>

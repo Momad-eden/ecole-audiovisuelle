@@ -4,7 +4,7 @@ import type { Program } from "@/lib/types";
 import { MediaImage } from "@/components/ui/MediaImage";
 
 export function programHref(program: Pick<Program, "audience" | "slug">): string {
-  return program.audience === "professional" ? `/professionnels/${program.slug}` : `/formations/${program.slug}`;
+  return program.audience === "professional" ? `/emsi/professionnels/${program.slug}` : `/emsi/formations/${program.slug}`;
 }
 
 export function ProgramCard({ program }: { program: Program }) {

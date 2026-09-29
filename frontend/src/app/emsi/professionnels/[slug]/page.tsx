@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { notFound, permanentRedirect } from "next/navigation";
+import { notFound } from "next/navigation";
 import { ProgramDetail } from "@/components/ProgramDetail";
 import { api } from "@/lib/api";
 
@@ -10,11 +10,13 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   return program ? { title: program.seo?.title || program.title, description: program.seo?.description || program.summary || undefined } : {};
 }
 
-export default async function ProgramPage({ params }: Props) {
-  const { slug } = await params;
-  const program = await api.program(slug);
-  if (!program) notFound();
-  if (program.audience === "professional") permanentRedirect(`/professionnels/${program.slug}`);
+export default async function ProfessionalProgramPage({ params }: Props) {
+  const program = await api.program((await params).slug);
+  if (!program || program.audience !== "professional") notFound();
 
-  return <ProgramDetail program={program} applyHref={`/candidater?formation=${program.slug}`} />;
+  return (
+    <div style={{ ["--accent" as string]: "var(--color-hmi)" }}>
+      <ProgramDetail program={program} applyHref={`/emsi/professionnels/candidater?formation=${program.slug}`} />
+    </div>
+  );
 }

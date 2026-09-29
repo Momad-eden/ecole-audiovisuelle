@@ -31,13 +31,13 @@ export default async function AgendaEventPage({ params }: Props) {
     endDate: event.endsAt ?? undefined,
     description: event.summary ?? undefined,
     image: event.image?.url,
-    url: `${siteUrl}/agenda/${event.slug}`,
+    url: `${siteUrl}/maison-habib-faye/agenda/${event.slug}`,
     location: { "@type": "Place", name: event.venue ?? event.city ?? "Saint-Louis", address: { "@type": "PostalAddress", addressLocality: event.city ?? undefined, addressCountry: "SN" } },
   } : null;
 
   return (
     <article className="mx-auto max-w-5xl px-4 pb-24 pt-32 sm:px-6 lg:px-8" style={{ ["--accent" as string]: ACTIVITY_ACCENT[event.activity] }}>
-      <Link href="/agenda" className="cartel inline-flex items-center gap-2 hover:text-ink"><ArrowLeft className="size-4" aria-hidden /> Agenda</Link>
+      <Link href="/maison-habib-faye/agenda" className="cartel inline-flex items-center gap-2 hover:text-ink"><ArrowLeft className="size-4" aria-hidden /> Agenda</Link>
       <p className="cartel mt-8 text-[var(--accent-ink)]">{event.activityLabel}</p>
       <h1 className="display mt-3 text-[clamp(2.4rem,6vw,4.8rem)] text-balance">{event.title}</h1>
       <ul className="mt-6 flex flex-wrap gap-x-6 gap-y-2 text-ink/85">
@@ -48,7 +48,7 @@ export default async function AgendaEventPage({ params }: Props) {
       {event.image && <div className="relative mt-12 aspect-[16/9] overflow-hidden rounded-[2rem] border border-line"><MediaImage image={event.image} sizes="(min-width: 1024px) 64rem, 100vw" priority /></div>}
       {event.summary && <p className="mt-10 text-xl text-ink/85">{event.summary}</p>}
       {event.content && <RichText html={event.content} className="mt-8 text-lg" />}
-      <div className="mt-14 border-t border-line pt-8"><ShareButtons path={`/agenda/${event.slug}`} title={event.title} /></div>
+      <div className="mt-14 border-t border-line pt-8"><ShareButtons path={`/maison-habib-faye/agenda/${event.slug}`} title={event.title} /></div>
       {jsonLd && <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd).replace(/</g, "\\u003c") }} />}
     </article>
   );

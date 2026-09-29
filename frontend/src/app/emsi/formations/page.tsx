@@ -32,14 +32,14 @@ export default async function ProgramsPage() {
                   <span className="size-3 rounded-full bg-[var(--accent-ink)] shadow-[0_0_18px_var(--accent)]" aria-hidden />
                   {universe.name}
                 </h2>
-                <Link href={`/univers/${universe.slug}`} className="group inline-flex items-center gap-2 text-sm font-semibold text-[var(--accent-ink)]">
+                <Link href={`/emsi/univers/${universe.slug}`} className="group inline-flex items-center gap-2 text-sm font-semibold text-[var(--accent-ink)]">
                   Découvrir l&apos;univers <ArrowRight className="size-4 transition-transform group-hover:translate-x-1" aria-hidden />
                 </Link>
               </div>
               <ul className="grid gap-5 md:grid-cols-2">
                 {(universe.tracks ?? []).map((track, i) => (
                   <Reveal as="li" key={track.id} delay={i * 100} className={(universe.tracks ?? []).length === 1 ? "md:col-span-2" : undefined}>
-                    <Link href={`/univers/${universe.slug}#filieres`} className="group flex h-full flex-col rounded-3xl border border-line bg-night-2 p-7 transition duration-500 hover:-translate-y-1 hover:border-[var(--accent)]">
+                    <Link href={`/emsi/univers/${universe.slug}#filieres`} className="group flex h-full flex-col rounded-3xl border border-line bg-night-2 p-7 transition duration-500 hover:-translate-y-1 hover:border-[var(--accent)]">
                       <p className="cartel text-[var(--accent-ink)]">Filière</p>
                       <h3 className="display mt-3 text-2xl">{track.name}</h3>
                       {track.summary && <p className="mt-3 line-clamp-3 text-ink-muted">{track.summary}</p>}

@@ -21,8 +21,8 @@ export default async function NewsPage({ searchParams }: Props) {
       <Section className="pt-0 sm:pt-0">
         {news.data.length === 0 ? (
           <EmptyState title="Les premières actualités arrivent." text="Rentrées, portes ouvertes, concerts, réalisations d'étudiants : suivez-nous en attendant sur l'agenda.">
-            <ButtonLink href="/agenda">Voir l&apos;agenda</ButtonLink>
-            <ButtonLink href="/univers" variant="secondary">Découvrir les univers</ButtonLink>
+            <ButtonLink href="/maison-habib-faye/agenda">Voir l&apos;agenda</ButtonLink>
+            <ButtonLink href="/emsi" variant="secondary">Découvrir les univers</ButtonLink>
           </EmptyState>
         ) : (
           <div className="grid gap-x-8 gap-y-14 md:grid-cols-2 lg:grid-cols-3">

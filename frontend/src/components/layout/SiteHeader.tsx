@@ -29,7 +29,7 @@ export function SiteHeader({ site }: { site: Site }) {
         <nav aria-label="Navigation principale" className="hidden lg:block">
           <ul className="flex items-center gap-1">
             {navLinks.map((link) => {
-              const isUniverses = link.url === "/univers" && universes.length > 0;
+              const isUniverses = link.url === "/emsi" && universes.length > 0;
               return (
                 <li key={link.url} className={isUniverses ? "group relative" : undefined}>
                   <Link href={link.url} className="inline-flex items-center gap-1 rounded-full px-4 py-2 text-sm text-ink/80 transition hover:bg-ink/5 hover:text-ink">
@@ -41,7 +41,7 @@ export function SiteHeader({ site }: { site: Site }) {
                       <ul className="grid gap-1 rounded-3xl border border-line bg-night-2/95 p-3 shadow-2xl backdrop-blur-xl sm:grid-cols-2">
                         {universes.map((universe) => (
                           <li key={universe.id}>
-                            <Link href={`/univers/${universe.slug}`} className="group/item flex h-full gap-3 rounded-2xl p-3 transition hover:bg-ink/5" style={{ ["--accent" as string]: universe.accentColor }}>
+                            <Link href={`/emsi/univers/${universe.slug}`} className="group/item flex h-full gap-3 rounded-2xl p-3 transition hover:bg-ink/5" style={{ ["--accent" as string]: universe.accentColor }}>
                               <span className="mt-1.5 size-2.5 shrink-0 rounded-full bg-[var(--accent-ink)] shadow-[0_0_14px_var(--accent)]" aria-hidden />
                               <span>
                                 <span className="flex items-center gap-2 font-semibold">

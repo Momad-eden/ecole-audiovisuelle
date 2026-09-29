@@ -32,11 +32,29 @@ const nextConfig: NextConfig = {
   async redirects() {
     // Le « musée » est devenu les univers (disciplines) et les réalisations des étudiants.
     const rooms: Record<string, string> = { "salle-du-son": "son", "salle-de-la-lumiere": "scene", "salle-de-limage": "image", "salle-du-visuel": "design" };
+    const permanent = (source: string, destination: string) => ({ source, destination, permanent: true });
     return [
-      { source: "/musee", destination: "/realisations", permanent: true },
-      { source: "/musee/oeuvres/:slug", destination: "/realisations/:slug", permanent: true },
-      ...Object.entries(rooms).map(([from, to]) => ({ source: `/musee/${from}`, destination: `/univers/${to}`, permanent: true })),
-      { source: "/musee/:slug", destination: "/univers/:slug", permanent: true },
+      // Les trois domaines : école (/emsi), Maison Habib Faye et Impact Live Studio (/maison-habib-faye).
+      // L'ancre #univers de la spec n'est pas portée : /univers mène à /emsi.
+      permanent("/univers", "/emsi"),
+      permanent("/univers/:slug", "/emsi/univers/:slug"),
+      permanent("/formations/:path*", "/emsi/formations/:path*"),
+      permanent("/realisations/:path*", "/emsi/realisations/:path*"),
+      permanent("/professionnels/:path*", "/emsi/professionnels/:path*"),
+      permanent("/expositions", "/emsi/realisations"),
+      permanent("/expositions/:path*", "/emsi/realisations"),
+      permanent("/studio", "/maison-habib-faye/studio"),
+      permanent("/ecole", "/emsi"),
+      permanent("/espace-habib-faye", "/maison-habib-faye"),
+      permanent("/agenda", "/maison-habib-faye/agenda"),
+      permanent("/agenda/:slug", "/maison-habib-faye/agenda/:slug"),
+      permanent("/events", "/maison-habib-faye"),
+      permanent("/events/:path*", "/maison-habib-faye"),
+      // Le « musée » est devenu les univers (disciplines) et les réalisations des étudiants : cibles directes, sans chaîne.
+      permanent("/musee", "/emsi/realisations"),
+      permanent("/musee/oeuvres/:slug", "/emsi/realisations/:slug"),
+      ...Object.entries(rooms).map(([from, to]) => permanent(`/musee/${from}`, `/emsi/univers/${to}`)),
+      permanent("/musee/:slug", "/emsi/univers/:slug"),
     ];
   },
   async rewrites() {

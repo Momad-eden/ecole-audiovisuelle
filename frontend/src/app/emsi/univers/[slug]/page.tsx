@@ -44,7 +44,7 @@ export default async function UniversePage({ params }: Props) {
           </div>
         }
       >
-        <Link href="/univers" className="cartel mt-8 inline-flex items-center gap-2 hover:text-ink"><ArrowLeft className="size-4" aria-hidden /> Tous les univers</Link>
+        <Link href="/emsi" className="cartel mt-8 inline-flex items-center gap-2 hover:text-ink"><ArrowLeft className="size-4" aria-hidden /> Tous les univers</Link>
         {universe.intro && <p className="mt-8 max-w-2xl whitespace-pre-line text-ink/80">{universe.intro}</p>}
         <div className="mt-10 flex flex-wrap gap-3">
           {universe.isUpcoming ? (
@@ -115,7 +115,7 @@ export default async function UniversePage({ params }: Props) {
 
       {next && next.slug !== universe.slug && (
         <section className="border-y border-line" style={{ ["--accent" as string]: next.accentColor }}>
-          <Link href={`/univers/${next.slug}`} className="group mx-auto flex max-w-7xl items-center justify-between gap-6 px-4 py-14 sm:px-6 lg:px-8">
+          <Link href={`/emsi/univers/${next.slug}`} className="group mx-auto flex max-w-7xl items-center justify-between gap-6 px-4 py-14 sm:px-6 lg:px-8">
             <span>
               <span className="cartel block">Univers suivant</span>
               <span className="display mt-3 block text-[clamp(2rem,5vw,4rem)] transition group-hover:text-[var(--accent-ink)]">{next.name}</span>
