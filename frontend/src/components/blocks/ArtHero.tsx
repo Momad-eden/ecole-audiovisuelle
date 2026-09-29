@@ -1,41 +1,13 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useRef } from "react";
 import { Volume2, VolumeX } from "lucide-react";
 import { ButtonLink } from "@/components/ui/ButtonLink";
-import { useReducedMotion } from "@/components/motion/useReducedMotion";
-import { sameOrigin } from "@/components/audio/peaks";
 import { accentVars } from "@/lib/contrast";
 import { cn, frenchSpacing } from "@/lib/utils";
+import { useArtSound } from "./art/useArtSound";
+import { useLightRibbons } from "./art/useLightRibbons";
 import type { HeroData } from "./types";
-
-/** Couleurs des rubans : l'orange et le violet du logo, le bleu des projecteurs HMI. */
-const RIBBONS = [
-  { hue: "255 122 26", amp: 0.16, freq: 1.3, speed: 0.22, offset: 0.0, y: 0.52 },
-  { hue: "139 108 255", amp: 0.13, freq: 1.8, speed: 0.17, offset: 1.7, y: 0.56 },
-  { hue: "63 208 255", amp: 0.1, freq: 2.4, speed: 0.28, offset: 3.1, y: 0.6 },
-  { hue: "255 176 32", amp: 0.08, freq: 3.1, speed: 0.34, offset: 4.4, y: 0.5 },
-  { hue: "255 79 163", amp: 0.07, freq: 1.1, speed: 0.13, offset: 5.2, y: 0.64 },
-  { hue: "139 108 255", amp: 0.05, freq: 4.2, speed: 0.41, offset: 0.9, y: 0.58 },
-];
-
-type Pointer = { x: number; y: number; energy: number };
-
-/**
- * Son de l'œuvre : le fichier choisi dans l'admin (joué en boucle), sinon trois oscillateurs
- * (note, quinte, octave). La main du visiteur règle la place stéréo, le filtre et l'intensité.
- */
-type SoundGraph = {
-  context: AudioContext;
-  gain: GainNode;
-  filter: BiquadFilterNode;
-  panner: StereoPannerNode;
-  oscillators: OscillatorNode[];
-  source?: AudioBufferSourceNode;
-};
-
-/** Fichiers déjà décodés : on ne retélécharge pas le son à chaque clic. */
-const decoded = new Map<string, Promise<ArrayBuffer>>();
 
 /**
  * « Œuvre » : un héros conçu comme une pièce d'exposition. Des rubans de lumière, comme des
@@ -44,176 +16,18 @@ const decoded = new Map<string, Promise<ArrayBuffer>>();
  * Le son est facultatif, lancé par un bouton, jamais automatiquement.
  */
 export function ArtHero({ data, first }: { data: HeroData; first: boolean }) {
-  const reducedMotion = useReducedMotion();
   const sectionRef = useRef<HTMLElement>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
-  const pointer = useRef<Pointer>({ x: 0.62, y: 0.55, energy: 0 });
   const readoutRef = useRef<HTMLSpanElement>(null);
-  const sound = useRef<SoundGraph | null>(null);
-  const [listening, setListening] = useState(false);
-  const [loading, setLoading] = useState(false);
+  const { pointer, follow: trace } = useLightRibbons(sectionRef, canvasRef);
+  const { listening, loading, toggle: toggleSound, steer } = useArtSound(data.sound);
   const Heading = first ? "h1" : "h2";
 
-  // Rubans de lumière (canvas 2D, fusion additive), suspendus hors écran, figés en mouvement réduit.
-  useEffect(() => {
-    const canvas = canvasRef.current;
-    const section = sectionRef.current;
-    if (!canvas || !section) return;
-    const context = canvas.getContext("2d");
-    if (!context) return;
-
-    let width = 0;
-    let height = 0;
-    let frame = 0;
-    let visible = true;
-    const ratio = Math.min(window.devicePixelRatio || 1, 1.5);
-
-    const resize = () => {
-      width = section.clientWidth;
-      height = section.clientHeight;
-      canvas.width = Math.round(width * ratio);
-      canvas.height = Math.round(height * ratio);
-      context.setTransform(ratio, 0, 0, ratio, 0, 0);
-    };
-
-    const draw = (time: number) => {
-      const t = time / 1000;
-      const p = pointer.current;
-      p.energy *= 0.96;
-      context.clearRect(0, 0, width, height);
-      context.globalCompositeOperation = "lighter";
-      const steps = Math.max(80, Math.round(width / 9));
-
-      for (const ribbon of RIBBONS) {
-        const points: [number, number][] = [];
-        for (let i = 0; i <= steps; i++) {
-          const u = i / steps;
-          const near = Math.exp(-Math.pow((u - p.x) * 3.2, 2));
-          const swell = 1 + near * (0.9 + p.energy * 2.2);
-          const wave =
-            Math.sin(u * Math.PI * 2 * ribbon.freq + t * ribbon.speed * 6 + ribbon.offset) * 0.62 +
-            Math.sin(u * Math.PI * 2 * ribbon.freq * 2.3 - t * ribbon.speed * 4 + ribbon.offset * 1.7) * 0.38;
-          const pull = (p.y - ribbon.y) * near * 0.55;
-          points.push([u * width, (ribbon.y + pull + wave * ribbon.amp * swell) * height]);
-        }
-        for (const [lineWidth, alpha] of [[26, 0.035], [9, 0.09], [1.6, 0.75]] as const) {
-          context.beginPath();
-          points.forEach(([x, y], i) => (i === 0 ? context.moveTo(x, y) : context.lineTo(x, y)));
-          context.strokeStyle = `rgb(${ribbon.hue} / ${alpha})`;
-          context.lineWidth = lineWidth;
-          context.lineCap = "round";
-          context.stroke();
-        }
-      }
-      context.globalCompositeOperation = "source-over";
-      if (!reducedMotion && visible) frame = requestAnimationFrame(draw);
-    };
-
-    resize();
-    draw(performance.now());
-    const resizeObserver = new ResizeObserver(() => {
-      resize();
-      if (reducedMotion) draw(4000);
-    });
-    resizeObserver.observe(section);
-    const intersection = new IntersectionObserver(([entry]) => {
-      visible = entry.isIntersecting;
-      cancelAnimationFrame(frame);
-      if (visible && !reducedMotion) frame = requestAnimationFrame(draw);
-    });
-    intersection.observe(section);
-
-    return () => {
-      cancelAnimationFrame(frame);
-      resizeObserver.disconnect();
-      intersection.disconnect();
-    };
-  }, [reducedMotion]);
-
-  // Arrêter proprement le son en quittant la page.
-  useEffect(() => () => void sound.current?.context.close(), []);
-
   function follow(event: React.PointerEvent<HTMLElement>) {
-    const rect = event.currentTarget.getBoundingClientRect();
-    const x = (event.clientX - rect.left) / rect.width;
-    const y = (event.clientY - rect.top) / rect.height;
-    const p = pointer.current;
-    p.energy = Math.min(1, p.energy + Math.hypot(x - p.x, y - p.y) * 4);
-    p.x = x;
-    p.y = y;
+    const { x, y } = trace(event);
     const frequency = Math.round(110 * Math.pow(2, x * 3));
     if (readoutRef.current) readoutRef.current.textContent = `${frequency} Hz · x ${x.toFixed(2)} · y ${y.toFixed(2)}`;
-    const s = sound.current;
-    if (s) {
-      const now = s.context.currentTime;
-      s.oscillators.forEach((osc, i) => osc.frequency.setTargetAtTime(frequency * [1, 1.5, 2.01][i], now, 0.08));
-      s.panner.pan.setTargetAtTime(x * 1.6 - 0.8, now, 0.12);
-      // Fichier : le haut de l'écran ouvre le filtre (son brillant), le bas l'étouffe.
-      s.filter.frequency.setTargetAtTime(s.source ? 300 * Math.pow(2, (1 - y) * 6) : 400 + (1 - y) * 3200, now, 0.1);
-      if (s.source) s.gain.gain.setTargetAtTime(0.55 + p.energy * 0.35, now, 0.2);
-    }
-  }
-
-  async function toggleSound() {
-    if (sound.current) {
-      const s = sound.current;
-      s.gain.gain.setTargetAtTime(0, s.context.currentTime, 0.15);
-      setTimeout(() => void s.context.close(), 600);
-      sound.current = null;
-      setListening(false);
-      return;
-    }
-
-    const Context = window.AudioContext ?? (window as unknown as { webkitAudioContext: typeof AudioContext }).webkitAudioContext;
-    const context = new Context();
-    const gain = context.createGain();
-    const filter = context.createBiquadFilter();
-    const panner = context.createStereoPanner();
-    filter.type = "lowpass";
-    gain.gain.value = 0;
-    filter.connect(panner).connect(gain).connect(context.destination);
-    const graph: SoundGraph = { context, gain, filter, panner, oscillators: [] };
-
-    let source: AudioBufferSourceNode | undefined;
-    if (data.sound) {
-      setLoading(true);
-      try {
-        if (!decoded.has(data.sound)) decoded.set(data.sound, fetch(sameOrigin(data.sound)).then((r) => r.arrayBuffer()));
-        const buffer = await context.decodeAudioData((await decoded.get(data.sound)!).slice(0));
-        source = context.createBufferSource();
-        source.buffer = buffer;
-        source.loop = true;
-        source.connect(filter);
-        filter.frequency.value = 6000;
-        source.start();
-      } catch {
-        decoded.delete(data.sound);
-        source = undefined;
-      }
-      setLoading(false);
-    }
-
-    if (source) {
-      graph.source = source;
-      gain.gain.setTargetAtTime(0.6, context.currentTime, 0.6);
-    } else {
-      // Pas de fichier (ou illisible) : trois oscillateurs, note, quinte et octave.
-      filter.frequency.value = 1400;
-      graph.oscillators = (["sine", "triangle", "sine"] as OscillatorType[]).map((type, i) => {
-        const osc = context.createOscillator();
-        osc.type = type;
-        osc.frequency.value = 220 * [1, 1.5, 2.01][i];
-        const voice = context.createGain();
-        voice.gain.value = [0.5, 0.18, 0.12][i];
-        osc.connect(voice).connect(filter);
-        osc.start();
-        return osc;
-      });
-      gain.gain.setTargetAtTime(0.06, context.currentTime, 0.4);
-    }
-
-    sound.current = graph;
-    setListening(true);
+    steer(x, y, pointer.current.energy);
   }
 
   const image = data.image?.url;
