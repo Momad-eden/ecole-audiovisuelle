@@ -1,16 +1,16 @@
 import Link from "next/link";
-import { ArrowRight, ChevronDown } from "lucide-react";
+import { ArrowRight } from "lucide-react";
 import { MediaImage } from "@/components/ui/MediaImage";
 import type { Site } from "@/lib/types";
 import { HeaderShell } from "./HeaderShell";
 import { MobileMenu } from "./MobileMenu";
+import { NavDropdown } from "./NavDropdown";
 import { ThemeToggle } from "./ThemeToggle";
 
 export function SiteHeader({ site }: { site: Site }) {
   const links = site.menus.main;
   const navLinks = links.filter((link) => !link.isButton);
   const cta = links.find((link) => link.isButton);
-  const universes = site.rooms;
 
   return (
     <HeaderShell>
@@ -28,37 +28,17 @@ export function SiteHeader({ site }: { site: Site }) {
 
         <nav aria-label="Navigation principale" className="hidden lg:block">
           <ul className="flex items-center gap-1">
-            {navLinks.map((link) => {
-              const isUniverses = link.url === "/emsi" && universes.length > 0;
-              return (
-                <li key={link.url} className={isUniverses ? "group relative" : undefined}>
-                  <Link href={link.url} className="inline-flex items-center gap-1 rounded-full px-4 py-2 text-sm text-ink/80 transition hover:bg-ink/5 hover:text-ink">
+            {navLinks.map((link) =>
+              link.children?.length ? (
+                <NavDropdown key={link.url + link.label} link={link} />
+              ) : (
+                <li key={link.url + link.label}>
+                  <Link href={link.url} className="inline-flex items-center rounded-full px-4 py-2 text-sm text-ink/80 transition hover:bg-ink/5 hover:text-ink">
                     {link.label}
-                    {isUniverses && <ChevronDown className="size-3.5 transition group-hover:rotate-180 group-focus-within:rotate-180" aria-hidden />}
                   </Link>
-                  {isUniverses && (
-                    <div className="invisible absolute left-1/2 top-full w-[34rem] -translate-x-1/2 pt-3 opacity-0 transition duration-300 group-hover:visible group-hover:opacity-100 group-focus-within:visible group-focus-within:opacity-100">
-                      <ul className="grid gap-1 rounded-3xl border border-line bg-night-2/95 p-3 shadow-2xl backdrop-blur-xl sm:grid-cols-2">
-                        {universes.map((universe) => (
-                          <li key={universe.id}>
-                            <Link href={`/emsi/univers/${universe.slug}`} className="group/item flex h-full gap-3 rounded-2xl p-3 transition hover:bg-ink/5" style={{ ["--accent" as string]: universe.accentColor }}>
-                              <span className="mt-1.5 size-2.5 shrink-0 rounded-full bg-[var(--accent-ink)] shadow-[0_0_14px_var(--accent)]" aria-hidden />
-                              <span>
-                                <span className="flex items-center gap-2 font-semibold">
-                                  {universe.name}
-                                  {universe.isUpcoming && <span className="cartel text-[var(--accent-ink)]">Bientôt</span>}
-                                </span>
-                                {universe.tagline && <span className="mt-1 line-clamp-2 block text-xs text-ink-muted">{universe.tagline}</span>}
-                              </span>
-                            </Link>
-                          </li>
-                        ))}
-                      </ul>
-                    </div>
-                  )}
                 </li>
-              );
-            })}
+              ),
+            )}
           </ul>
         </nav>
 
@@ -70,7 +50,7 @@ export function SiteHeader({ site }: { site: Site }) {
               <ArrowRight className="size-4 transition-transform group-hover:translate-x-0.5" aria-hidden />
             </Link>
           )}
-          <MobileMenu links={links} universes={universes} />
+          <MobileMenu links={links} />
         </div>
       </div>
     </HeaderShell>

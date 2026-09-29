@@ -8,6 +8,7 @@ import { MediaImage } from "@/components/ui/MediaImage";
 import { RichText } from "@/components/ui/RichText";
 import { ShareButtons } from "@/components/ui/ShareButtons";
 import { api } from "@/lib/api";
+import { DomainChrome } from "@/components/layout/DomainChrome";
 import { siteUrl } from "@/lib/utils";
 
 type Props = { params: Promise<{ slug: string }> };
@@ -35,8 +36,11 @@ export default async function AgendaEventPage({ params }: Props) {
     location: { "@type": "Place", name: event.venue ?? event.city ?? "Saint-Louis", address: { "@type": "PostalAddress", addressLocality: event.city ?? undefined, addressCountry: "SN" } },
   } : null;
 
+  const { menus, domains } = await api.site();
+
   return (
-    <article className="mx-auto max-w-5xl px-4 pb-24 pt-32 sm:px-6 lg:px-8" style={{ ["--accent" as string]: ACTIVITY_ACCENT[event.activity] }}>
+    <DomainChrome domain="maison" site={{ menus, domains }} path={`/maison-habib-faye/agenda/${event.slug}`} title={event.title}>
+    <article className="mx-auto max-w-5xl px-4 pb-24 pt-12 sm:px-6 lg:px-8" style={{ ["--accent" as string]: ACTIVITY_ACCENT[event.activity] }}>
       <Link href="/maison-habib-faye/agenda" className="cartel inline-flex items-center gap-2 hover:text-ink"><ArrowLeft className="size-4" aria-hidden /> Agenda</Link>
       <p className="cartel mt-8 text-[var(--accent-ink)]">{event.activityLabel}</p>
       <h1 className="display mt-3 text-[clamp(2.4rem,6vw,4.8rem)] text-balance">{event.title}</h1>
@@ -51,5 +55,6 @@ export default async function AgendaEventPage({ params }: Props) {
       <div className="mt-14 border-t border-line pt-8"><ShareButtons path={`/maison-habib-faye/agenda/${event.slug}`} title={event.title} /></div>
       {jsonLd && <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd).replace(/</g, "\\u003c") }} />}
     </article>
+    </DomainChrome>
   );
 }

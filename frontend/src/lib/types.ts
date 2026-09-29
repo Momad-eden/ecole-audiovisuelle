@@ -2,7 +2,14 @@
 
 export type Image = { url: string; alt: string };
 
-export type MenuLink = { label: string; url: string; isButton: boolean };
+export type MenuChild = { label: string; url: string };
+
+/** Entrée du menu ; `children` : sous-menu d'un niveau (vide pour les liens simples). */
+export type MenuLink = { label: string; url: string; isButton: boolean; children?: MenuChild[] };
+
+/** Les trois domaines de la Maison, plus le domaine général (accueil, contact…). */
+export type DomainKey = "general" | "maison" | "emsi" | "studio";
+export type Domains = Record<DomainKey, { label: string; color: string }>;
 
 /** Signature animée d'un univers (voir UniverseVisual). */
 export type UniverseVisualKind = "sound" | "image" | "design" | "stage" | "cinema";
@@ -50,6 +57,7 @@ export type Site = {
     social: Partial<Record<"facebook" | "instagram" | "youtube" | "tiktok" | "linkedin" | "twitter", string>>;
   };
   menus: { main: MenuLink[]; footer: MenuLink[]; legal: MenuLink[] };
+  domains: Domains;
   rooms: RoomSummary[];
   places: Place[];
   hasSchoolPrograms: boolean;
@@ -61,6 +69,7 @@ export type Page = {
   title: string;
   slug: string;
   type: string;
+  domain: DomainKey;
   seo: { title?: string; description?: string } | null;
   blocks: Block[];
   updatedAt: string | null;

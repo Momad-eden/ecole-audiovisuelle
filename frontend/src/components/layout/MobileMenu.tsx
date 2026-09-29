@@ -3,17 +3,13 @@
 import Link from "next/link";
 import { useEffect, useRef, useState } from "react";
 import { ArrowRight, Menu, X } from "lucide-react";
-import type { MenuLink, RoomSummary } from "@/lib/types";
+import { ChevronDown } from "lucide-react";
+import type { MenuLink } from "@/lib/types";
 import { ThemeToggle } from "./ThemeToggle";
 
-export function MobileMenu({
-    links,
-    universes,
-}: {
-    links: MenuLink[];
-    universes: RoomSummary[];
-}) {
+export function MobileMenu({ links }: { links: MenuLink[] }) {
     const [open, setOpen] = useState(false);
+    const [expanded, setExpanded] = useState<string | null>(null);
     const dialogRef = useRef<HTMLDialogElement>(null);
     const navLinks = links.filter((link) => !link.isButton);
     const cta = links.find((link) => link.isButton);
@@ -61,54 +57,53 @@ export function MobileMenu({
 
                     <nav aria-label="Navigation principale" className="mt-8">
                         <ul>
-                            {navLinks.map((link, index) => (
-                                <li
-                                    key={link.url}
-                                    className="border-b border-line"
-                                >
-                                    <Link
-                                        href={link.url}
-                                        onClick={close}
-                                        className="flex items-baseline justify-between py-4"
-                                    >
-                                        <span className="display text-3xl">
-                                            {link.label}
-                                        </span>
-                                        <span className="cartel tabular-nums">
-                                            {String(index + 1).padStart(2, "0")}
-                                        </span>
-                                    </Link>
-                                </li>
-                            ))}
+                            {navLinks.map((link, index) => {
+                                const key = link.url + link.label;
+                                const children = link.children ?? [];
+                                const isOpen = expanded === key;
+                                const number = (
+                                    <span className="cartel tabular-nums">
+                                        {String(index + 1).padStart(2, "0")}
+                                    </span>
+                                );
+                                return (
+                                    <li key={key} className="border-b border-line">
+                                        {children.length > 0 ? (
+                                            <>
+                                                <button
+                                                    type="button"
+                                                    aria-expanded={isOpen}
+                                                    aria-controls={`mobile-sub-${index}`}
+                                                    onClick={() => setExpanded(isOpen ? null : key)}
+                                                    className="flex w-full items-baseline justify-between py-4 text-left"
+                                                >
+                                                    <span className="display text-3xl">{link.label}</span>
+                                                    <span className="flex items-center gap-3">
+                                                        {number}
+                                                        <ChevronDown className={"size-4 self-center transition motion-reduce:transition-none " + (isOpen ? "rotate-180" : "")} aria-hidden />
+                                                    </span>
+                                                </button>
+                                                <ul id={`mobile-sub-${index}`} hidden={!isOpen} className="pb-3">
+                                                    {[{ label: `Tout ${link.label}`, url: link.url }, ...children].map((child) => (
+                                                        <li key={child.url}>
+                                                            <Link href={child.url} onClick={close} className="flex min-h-11 items-center pl-3 text-lg text-ink/85">
+                                                                {child.label}
+                                                            </Link>
+                                                        </li>
+                                                    ))}
+                                                </ul>
+                                            </>
+                                        ) : (
+                                            <Link href={link.url} onClick={close} className="flex items-baseline justify-between py-4">
+                                                <span className="display text-3xl">{link.label}</span>
+                                                {number}
+                                            </Link>
+                                        )}
+                                    </li>
+                                );
+                            })}
                         </ul>
                     </nav>
-
-                    {universes.length > 0 && (
-                        <div className="mt-8">
-                            <p className="cartel">Les univers</p>
-                            <ul className="mt-3 flex flex-wrap gap-2">
-                                {universes.map((universe) => (
-                                    <li key={universe.id}>
-                                        <Link
-                                            href={`/emsi/univers/${universe.slug}`}
-                                            onClick={close}
-                                            className="inline-flex min-h-11 items-center gap-2 rounded-full border border-line px-4 text-sm"
-                                            style={{
-                                                ["--accent" as string]:
-                                                    universe.accentColor,
-                                            }}
-                                        >
-                                            <span
-                                                className="size-2 rounded-full bg-[var(--accent-ink)] shadow-[0_0_10px_var(--accent)]"
-                                                aria-hidden
-                                            />
-                                            {universe.name}
-                                        </Link>
-                                    </li>
-                                ))}
-                            </ul>
-                        </div>
-                    )}
 
                     {cta && (
                         <Link

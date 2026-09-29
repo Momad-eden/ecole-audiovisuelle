@@ -30,3 +30,39 @@ test("les anciennes adresses arrivent sur la nouvelle en une seule redirection",
     expect(new URL(response.headers()["location"], "http://x").pathname, from).toBe(to);
   }
 });
+
+// activé après emsi:site-v4 (Task 10)
+test.fixme("le menu EMSI s'ouvre au clavier et se referme avec Échap", async ({ page }) => {
+  await page.goto("/");
+  const bouton = page.getByRole("navigation", { name: "Navigation principale" }).getByRole("button", { name: "EMSI" });
+  await bouton.focus();
+  await page.keyboard.press("Enter");
+  await expect(bouton).toHaveAttribute("aria-expanded", "true");
+  await page.keyboard.press("ArrowDown");
+  await expect(page.getByRole("link", { name: "Dakar" }).first()).toBeFocused();
+  await page.keyboard.press("Escape");
+  await expect(bouton).toHaveAttribute("aria-expanded", "false");
+  await expect(bouton).toBeFocused();
+});
+
+// activé après emsi:site-v4 (Task 10)
+test.fixme("sur téléphone, le menu EMSI s'ouvre en accordéon", async ({ page }) => {
+  await page.setViewportSize({ width: 390, height: 800 });
+  await page.goto("/");
+  await page.getByRole("button", { name: "Ouvrir le menu" }).click();
+  const bouton = page.getByRole("dialog").getByRole("button", { name: /EMSI/ });
+  await expect(bouton).toHaveAttribute("aria-expanded", "false");
+  await bouton.click();
+  await expect(bouton).toHaveAttribute("aria-expanded", "true");
+  await expect(page.getByRole("dialog").getByRole("link", { name: "Dakar" })).toBeVisible();
+});
+
+// activé après emsi:site-v4 (Task 10)
+test.fixme("une page de campus affiche le fil d'Ariane et la sous-navigation EMSI, page courante marquée", async ({ page }) => {
+  await page.goto("/emsi/dakar");
+  const ariane = page.getByRole("navigation", { name: "Fil d'Ariane" });
+  await expect(ariane.getByRole("link", { name: "Accueil" })).toBeVisible();
+  await expect(ariane.getByRole("link", { name: "EMSI" })).toBeVisible();
+  const sousNav = page.getByRole("navigation", { name: "Rubriques EMSI" });
+  await expect(sousNav.getByRole("link", { name: "Dakar" })).toHaveAttribute("aria-current", "page");
+});
