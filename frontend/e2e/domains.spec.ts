@@ -33,8 +33,8 @@ test("les anciennes adresses arrivent sur la nouvelle en une seule redirection",
   }
 });
 
-// activé après emsi:site-v4 (Task 10)
-test.fixme("le menu EMSI s'ouvre au clavier et se referme avec Échap", async ({ page }) => {
+test("le menu EMSI s'ouvre au clavier et se referme avec Échap", async ({ page, isMobile }) => {
+  test.skip(isMobile, "Menu de bureau : sur téléphone, voir l'accordéon ci-dessous.");
   await page.goto("/");
   const bouton = page.getByRole("navigation", { name: "Navigation principale" }).getByRole("button", { name: "EMSI" });
   await bouton.focus();
@@ -47,8 +47,7 @@ test.fixme("le menu EMSI s'ouvre au clavier et se referme avec Échap", async ({
   await expect(bouton).toBeFocused();
 });
 
-// activé après emsi:site-v4 (Task 10)
-test.fixme("sur téléphone, le menu EMSI s'ouvre en accordéon", async ({ page }) => {
+test("sur téléphone, le menu EMSI s'ouvre en accordéon", async ({ page }) => {
   await page.setViewportSize({ width: 390, height: 800 });
   await page.goto("/");
   await page.getByRole("button", { name: "Ouvrir le menu" }).click();
@@ -59,12 +58,14 @@ test.fixme("sur téléphone, le menu EMSI s'ouvre en accordéon", async ({ page 
   await expect(page.getByRole("dialog").getByRole("link", { name: "Dakar" })).toBeVisible();
 });
 
-// activé après emsi:site-v4 (Task 10)
-test.fixme("une page de campus affiche le fil d'Ariane et la sous-navigation EMSI, page courante marquée", async ({ page }) => {
+test("une page de campus affiche le fil d'Ariane et la sous-navigation EMSI, page courante marquée", async ({ page, isMobile }) => {
   await page.goto("/emsi/dakar");
   const ariane = page.getByRole("navigation", { name: "Fil d'Ariane" });
-  await expect(ariane.getByRole("link", { name: "Accueil" })).toBeVisible();
-  await expect(ariane.getByRole("link", { name: "EMSI" })).toBeVisible();
+  if (!isMobile) {
+    // Le fil d'Ariane est masqué sur téléphone, la sous-navigation reste.
+    await expect(ariane.getByRole("link", { name: "Accueil" })).toBeVisible();
+    await expect(ariane.getByRole("link", { name: "EMSI" })).toBeVisible();
+  }
   const sousNav = page.getByRole("navigation", { name: "Rubriques EMSI" });
   await expect(sousNav.getByRole("link", { name: "Dakar" })).toHaveAttribute("aria-current", "page");
 });
@@ -112,7 +113,7 @@ test.describe("nouveaux blocs", () => {
     expect(Math.abs(a.x - b.x)).toBeLessThan(2);
     expect(b.y).toBeGreaterThanOrEqual(a.y + a.height - 1);
     expect(c.y).toBeGreaterThanOrEqual(b.y + b.height - 1);
-    for (const [name] of MAISONS) await expect(page.getByRole("link", { name, exact: true })).toBeVisible();
+    for (const [name] of MAISONS) await expect(page.getByTestId("domains-block").getByRole("link", { name, exact: true })).toBeVisible();
     expect(await page.evaluate(() => document.documentElement.scrollWidth)).toBeLessThanOrEqual(390);
   });
 
@@ -189,8 +190,7 @@ test.describe("nouveaux blocs", () => {
   });
 });
 
-// activé après emsi:site-v4 (Task 10)
-test.fixme("les pages de campus et de la Maison exposent leurs données structurées", async ({ page }) => {
+test("les pages de campus et de la Maison exposent leurs données structurées", async ({ page }) => {
   const jsonLd = async (path: string) => {
     await page.goto(path);
     const scripts = await page.locator('script[type="application/ld+json"]').allTextContents();

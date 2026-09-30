@@ -1,22 +1,26 @@
 import { expect, test } from "@playwright/test";
 
-test("l'accueil présente l'école, ses univers et un appel à candidater", async ({ page }) => {
+test("l'accueil présente les trois domaines et un appel à candidater", async ({ page }) => {
   await page.goto("/");
-  await expect(page.getByRole("heading", { level: 1 })).toContainText("Faites de votre passion un métier");
-  await expect(page.getByRole("heading", { name: "Choisissez votre univers" })).toBeVisible();
-  await expect(page.locator('a[href="/emsi/univers/son"]').first()).toBeAttached();
-  await expect(page.getByRole("link", { name: "Candidater" }).first()).toBeVisible();
+  await expect(page.getByRole("heading", { level: 1 })).toContainText("La culture comme héritage");
+  const triptyque = page.getByTestId("domains-block");
+  await expect(triptyque.locator('a[href="/maison-habib-faye"]').first()).toBeAttached();
+  await expect(triptyque.locator('a[href="/emsi"]')).toBeAttached();
+  await expect(triptyque.locator('a[href="/maison-habib-faye/studio"]')).toBeAttached();
+  // Sur téléphone, le lien « Candidater » vit dans le menu replié : il est présent dans la page.
+  await expect(page.locator('a[href^="/candidater"]').first()).toBeAttached();
+});
+
+test("la page du campus de Dakar présente le Grand Théâtre comme partenaire et ses formations", async ({ page }) => {
+  await page.goto("/emsi/dakar");
+  await expect(page.getByRole("heading", { level: 1, name: "Campus de Dakar" })).toBeVisible();
+  await expect(page.getByRole("heading", { name: "Les formations à Dakar" })).toBeVisible();
+  await expect(page.getByRole("heading", { name: "Notre partenaire, le Grand Théâtre National" })).toBeVisible();
 });
 
 test("on découvre un univers, ses filières et ses métiers", async ({ page }) => {
-  await page.goto("/emsi");
-  // Attendre que le défilement horizontal soit en place (bureau) ; sur mobile, la pile est statique.
-  await page.waitForFunction(() => window.matchMedia("(max-width: 1023px)").matches || document.querySelector(".universe-track")?.classList.contains("is-horizontal"));
-  // Au clavier : le panneau qui reçoit le focus est amené à l'écran, même pendant le défilement horizontal.
-  const panel = page.locator('main a[href="/emsi/univers/scene"]').first();
-  await panel.focus();
-  await expect(panel).toBeInViewport();
-  await page.keyboard.press("Enter");
+  await page.goto("/");
+  await page.locator('footer a[href="/emsi/univers/scene"]').first().click();
   await expect(page).toHaveURL(/\/emsi\/univers\/scene$/, { timeout: 15000 });
   await expect(page.getByRole("heading", { level: 1, name: /^Scène\s: régie & lumière$/ })).toBeVisible({ timeout: 15000 });
   await expect(page.getByRole("heading", { name: "Technicien Lumière" })).toBeVisible();
@@ -86,7 +90,7 @@ test("le changeur de thème passe en clair et s'en souvient", async ({ page, isM
 });
 
 test("le studio présente ses services, ses productions et la réservation d'une session", async ({ page }) => {
-  await page.goto("/studio");
+  await page.goto("/maison-habib-faye/studio");
   await expect(page.getByRole("heading", { level: 1 })).toContainText("Ici, votre son");
   await expect(page.getByRole("heading", { name: "Du premier enregistrement au master" })).toBeVisible();
   await expect(page.getByRole("heading", { name: "Mixage" })).toBeVisible();
@@ -94,23 +98,23 @@ test("le studio présente ses services, ses productions et la réservation d'une
   await expect(page.getByLabel("Votre demande")).toHaveValue("studio_session", { timeout: 15000 });
 });
 
-test("l'Espace Habib Faye et l'agenda sont accessibles depuis le pied de page", async ({ page }) => {
+test("la Maison Habib Faye et sa programmation sont accessibles depuis le pied de page", async ({ page }) => {
   await page.goto("/");
-  await page.locator('footer a[href="/espace-habib-faye"]').click();
+  await page.locator('footer a[href="/maison-habib-faye"]').click();
   await expect(page.getByRole("heading", { level: 1, name: "Espace Habib Faye" })).toBeVisible({ timeout: 15000 });
-  await page.goto("/agenda");
-  await expect(page.getByRole("heading", { level: 1, name: "Les prochains rendez-vous" })).toBeVisible();
+  await page.goto("/maison-habib-faye/agenda");
+  await expect(page.getByRole("heading", { level: 1, name: "Programmation" })).toBeVisible();
 });
 
-test("la page L'École présente les deux campus et oriente vers la candidature", async ({ page }) => {
-  await page.goto("/ecole");
+test("la page EMSI présente les deux campus et oriente vers la candidature", async ({ page }) => {
+  await page.goto("/emsi");
   await expect(page.getByRole("heading", { level: 1 })).toContainText("Deux écoles");
   await expect(page.getByRole("link", { name: "Candidater à Dakar" })).toHaveAttribute("href", "/candidater?campus=emsi-dakar");
   await expect(page.getByRole("link", { name: "Candidater à Saint-Louis" })).toHaveAttribute("href", "/candidater?campus=emsi-saint-louis");
 });
 
 test("les liens partagés affichent l'aperçu de l'EMSI", async ({ page, request }) => {
-  await page.goto("/studio");
+  await page.goto("/maison-habib-faye/studio");
   const image = await page.locator('meta[property="og:image"]').first().getAttribute("content");
   expect(image).toContain("/opengraph-image");
   const response = await request.get("/opengraph-image");
