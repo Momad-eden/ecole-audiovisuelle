@@ -62,7 +62,18 @@ trait HasTranslations
             return $french;
         }
 
-        return $this->isStructuredField($field) ? json_decode($row->value, true) : $row->value;
+        if (! $this->isStructuredField($field)) {
+            return $row->value;
+        }
+
+        // JSON invalide ou qui n'est pas un tableau : repli sur le français.
+        try {
+            $decoded = json_decode($row->value, true, 512, JSON_THROW_ON_ERROR);
+        } catch (\JsonException) {
+            return $french;
+        }
+
+        return is_array($decoded) ? $decoded : $french;
     }
 
     public function sourceHash(string $field): string
@@ -70,10 +81,25 @@ trait HasTranslations
         $value = $this->frenchValue($field);
 
         if (is_array($value)) {
-            $value = json_encode($value, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
+            $value = json_encode(self::sortKeys($value), JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
         }
 
         return hash('sha256', trim((string) ($value ?? '')));
+    }
+
+    /** Trie récursivement les clés des objets (MySQL json réordonne les clés) ; les listes gardent leur ordre. */
+    private static function sortKeys(array $value): array
+    {
+        foreach ($value as $key => $item) {
+            if (is_array($item)) {
+                $value[$key] = self::sortKeys($item);
+            }
+        }
+        if (! array_is_list($value)) {
+            ksort($value);
+        }
+
+        return $value;
     }
 
     protected function hasFrenchContent(string $field): bool

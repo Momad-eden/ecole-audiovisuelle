@@ -98,7 +98,7 @@ class TranslationStorageTest extends TestCase
         $blocks = [['type' => 'text', 'data' => ['text' => 'Bonjour é/']]];
         $page = Page::create(['title' => 'A', 'slug' => 'a', 'type' => 'standard', 'blocks' => $blocks, 'draft_blocks' => [['x' => 1]]]);
 
-        $this->assertSame(hash('sha256', json_encode($blocks, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES)), $page->sourceHash('blocks'));
+        $this->assertSame(hash('sha256', json_encode([['data' => ['text' => 'Bonjour é/'], 'type' => 'text']], JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES)), $page->sourceHash('blocks'));
         $this->assertSame(hash('sha256', 'A'), $page->sourceHash('title'));
         $this->assertSame(hash('sha256', ''), $page->sourceHash('seo'));
     }
@@ -134,7 +134,7 @@ class TranslationStorageTest extends TestCase
 
         $faq->delete();
 
-        $this->assertSame(0, Translation::where('translatable_id', $faq->id)->where('translatable_type', Faq::class)->count());
+        $this->assertSame(0, Translation::where('translatable_id', $faq->id)->where('translatable_type', 'faq')->count());
         $this->assertSame(1, $other->translations()->count());
     }
 
@@ -162,5 +162,36 @@ class TranslationStorageTest extends TestCase
         $this->assertSame('Traduction automatique', TranslationStatus::AUTO->label());
         $this->assertSame('Relue', TranslationStatus::REVIEWED->label());
         $this->assertSame('Échec', TranslationStatus::FAILED->label());
+    }
+
+    public function test_morph_type_is_a_short_alias(): void
+    {
+        $faq = $this->faq();
+        $this->store($faq, 'question', 'x');
+
+        $this->assertSame('faq', Translation::first()->translatable_type);
+        $this->assertTrue(Translation::first()->translatable->is($faq));
+        $this->assertSame('page', (new Page)->getMorphClass());
+    }
+
+    public function test_invalid_stored_json_falls_back_to_french(): void
+    {
+        $program = Program::create(['title' => 'Son', 'slug' => 'son', 'audience' => 'school', 'kind' => 'certificate', 'skills' => ['Mixage']]);
+        $this->store($program, 'skills', '["Mixing"');
+        $this->assertSame(['Mixage'], $program->fresh()->translated('skills', 'en'));
+
+        $program->translation('skills')->update(['value' => '"just a string"']);
+        $this->assertSame(['Mixage'], $program->fresh()->translated('skills', 'en'));
+    }
+
+    public function test_source_hash_ignores_key_order_but_not_list_order(): void
+    {
+        $a = [['type' => 'text', 'data' => ['text' => 'A', 'align' => 'left']], ['type' => 'cta', 'data' => ['x' => 1]]];
+        $b = [['data' => ['align' => 'left', 'text' => 'A'], 'type' => 'text'], ['data' => ['x' => 1], 'type' => 'cta']];
+        $c = [$a[1], $a[0]];
+
+        $p = new Page(['blocks' => $a]);
+        $this->assertSame($p->sourceHash('blocks'), (new Page(['blocks' => $b]))->sourceHash('blocks'));
+        $this->assertNotSame($p->sourceHash('blocks'), (new Page(['blocks' => $c]))->sourceHash('blocks'));
     }
 }

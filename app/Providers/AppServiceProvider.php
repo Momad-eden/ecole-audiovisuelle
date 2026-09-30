@@ -2,12 +2,25 @@
 
 namespace App\Providers;
 
+use App\Models\AgendaEvent;
+use App\Models\Artwork;
+use App\Models\Faq;
+use App\Models\MenuItem;
+use App\Models\News;
+use App\Models\Page;
+use App\Models\Place;
+use App\Models\Program;
+use App\Models\Room;
+use App\Models\Service;
+use App\Models\Setting;
+use App\Models\Track;
 use App\Services\FrontendRevalidator;
 use Filament\Support\Assets\Css;
 use Filament\Support\Assets\Js;
 use Filament\Support\Facades\FilamentAsset;
 use Illuminate\Cache\RateLimiting\Limit;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\Relation;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\RateLimiter;
 use Illuminate\Support\ServiceProvider;
@@ -24,6 +37,22 @@ class AppServiceProvider extends ServiceProvider
     {
         // Détecte en développement les chargements paresseux (N+1) et les attributs inconnus.
         Model::shouldBeStrict(! $this->app->isProduction());
+
+        // Types courts et stables des fiches traduites (table translations, relation polymorphe).
+        Relation::morphMap([
+            'page' => Page::class,
+            'program' => Program::class,
+            'track' => Track::class,
+            'room' => Room::class,
+            'artwork' => Artwork::class,
+            'news' => News::class,
+            'faq' => Faq::class,
+            'agenda_event' => AgendaEvent::class,
+            'service' => Service::class,
+            'place' => Place::class,
+            'menu_item' => MenuItem::class,
+            'setting' => Setting::class,
+        ]);
 
         // Éditeur de texte : polices et tailles guidées (script chargé seulement avec l'éditeur).
         FilamentAsset::register([
