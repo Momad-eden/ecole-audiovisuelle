@@ -1,5 +1,5 @@
 import { expect, test } from "@playwright/test";
-import { offeringsForCampus, resolvePreselection } from "./application";
+import { offeringsForCampus, resolvePreselection, wantedOffering } from "./application";
 import type { Offering, Place } from "./types";
 
 const place = (id: number, slug: string, city: string) => ({ id, slug, city, name: `EMSI ${city}`, kind: "campus" }) as Place;
@@ -41,4 +41,27 @@ test("programme inconnu : ni présélection ni message", () => {
 test("un seul campus : offre dont campusIds est vide, présélectionnée sans message", () => {
   const r = resolvePreselection({ offerings: [offering(12, [])], campuses: [dakar], programOfferingIds: [12] });
   expect(r).toEqual({ campusId: undefined, offeringId: "12", notice: undefined });
+});
+
+test("depuis une fiche formation, sans campus : formation d'un seul campus, campus présélectionné", () => {
+  expect(resolvePreselection({ offerings, campuses: [dakar, sl], programOfferingIds: [10] })).toEqual({ campusId: "1", offeringId: "10", notice: undefined });
+});
+
+test("depuis une fiche formation, sans campus : formation des deux campus, rien d'imposé ni de message", () => {
+  expect(resolvePreselection({ offerings, campuses: [dakar, sl], programOfferingIds: [11] })).toEqual({ campusId: undefined, offeringId: undefined, notice: undefined });
+});
+
+test("le campus se reconnaît aussi à sa ville, comme dans l'adresse /emsi/saint-louis", () => {
+  expect(resolvePreselection({ offerings, campuses: [dakar, sl], campusSlug: "saint-louis", programOfferingIds: [11] }).campusId).toBe("2");
+  expect(resolvePreselection({ offerings, campuses: [dakar, sl], campusSlug: "dakar", programOfferingIds: [] }).campusId).toBe("1");
+});
+
+test("formation voulue resélectionnée dès que le campus choisi la propose, message sinon", () => {
+  expect(wantedOffering({ offerings, campuses: [dakar, sl], campusId: "2", wantedIds: [11] })).toEqual({ offeringId: "11", notice: undefined });
+  expect(wantedOffering({ offerings, campuses: [dakar, sl], campusId: "1", wantedIds: [11] })).toEqual({ offeringId: "11", notice: undefined });
+  expect(wantedOffering({ offerings, campuses: [dakar, sl], campusId: "2", wantedIds: [10] })).toEqual({
+    offeringId: undefined, notice: "Cette formation n'est pas proposée à Saint-Louis. Choisissez-en une autre ou changez de campus.",
+  });
+  expect(wantedOffering({ offerings, campuses: [dakar, sl], campusId: "", wantedIds: [10] })).toEqual({ offeringId: undefined, notice: undefined });
+  expect(wantedOffering({ offerings, campuses: [dakar, sl], campusId: "2", wantedIds: [] })).toEqual({ offeringId: undefined, notice: undefined });
 });

@@ -39,7 +39,7 @@ export async function ApplicationPage({ audience, formation, campus }: Props) {
             </div>
           </div>
         ) : (
-          <ApplicationForm offerings={offerings} audience={audience} campuses={campuses} preselected={offeringId} preselectedCampus={campusId} notice={notice} />
+          <ApplicationForm offerings={offerings} audience={audience} campuses={campuses} preselected={offeringId} preselectedCampus={campusId} notice={notice} wanted={programOfferingIds} />
         )}
       </div>
     </>

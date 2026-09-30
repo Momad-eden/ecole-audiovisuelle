@@ -172,6 +172,22 @@ test.describe("nouveaux blocs", () => {
     await expect(page.getByText(/n'est pas proposée à/)).toHaveCount(0);
   });
 
+  test("depuis la fiche formation (sans campus), la formation est gardée et resélectionnée", async ({ page }) => {
+    await page.goto("/candidater?formation=essai-dakar-seulement");
+    // Ouverte seulement à Dakar : le campus est présélectionné avec elle.
+    await expect(page.getByRole("radio", { name: /^Dakar/ })).toBeChecked();
+    await expect(page.getByRole("radio", { name: /Essai — Dakar seulement/ })).toBeChecked();
+    await page.getByRole("radio", { name: /^Saint-Louis/ }).check();
+    await expect(page.getByRole("status")).toHaveText("Cette formation n'est pas proposée à Saint-Louis. Choisissez-en une autre ou changez de campus.");
+    await page.getByRole("radio", { name: /^Dakar/ }).check();
+    await expect(page.getByRole("radio", { name: /Essai — Dakar seulement/ })).toBeChecked();
+  });
+
+  test("le campus se reconnaît à sa ville dans l'adresse (?campus=saint-louis)", async ({ page }) => {
+    await page.goto("/candidater?campus=saint-louis");
+    await expect(page.getByRole("radio", { name: /^Saint-Louis/ })).toBeChecked();
+  });
+
   test("à Saint-Louis, une formation réservée à Dakar n'est pas proposée", async ({ page }) => {
     await page.goto("/candidater?campus=emsi-saint-louis");
     await expect(page.getByRole("radio", { name: /^Saint-Louis/ })).toBeChecked();

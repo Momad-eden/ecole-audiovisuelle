@@ -7,7 +7,7 @@ import { useFieldArray, useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import type { Offering, Place } from "@/lib/types";
-import { campusLabel, offeringsForCampus } from "@/lib/application";
+import { campusLabel, offeringsForCampus, wantedOffering } from "@/lib/application";
 import { fcfa, cn } from "@/lib/utils";
 import { Field, Honeypot, inputClass } from "./Field";
 
@@ -43,12 +43,14 @@ type Values = z.infer<typeof schema>;
 
 const STEPS = ["Formation", "Identité", "Coordonnées", "Parcours", "Envoi"];
 
-export function ApplicationForm({ offerings, audience, preselected, campuses = [], preselectedCampus, notice }: { offerings: Offering[]; audience: "school" | "professional"; preselected?: string; campuses?: Place[]; preselectedCampus?: string; notice?: string }) {
+export function ApplicationForm({ offerings, audience, preselected, campuses = [], preselectedCampus, notice, wanted = [] }: { offerings: Offering[]; audience: "school" | "professional"; preselected?: string; campuses?: Place[]; preselectedCampus?: string; notice?: string; wanted?: number[] }) {
   const router = useRouter();
   const draftKey = `emsi-candidature-${audience}`;
   const [step, setStep] = useState(0);
   const [serverError, setServerError] = useState<string | null>(null);
   const [campusNotice, setCampusNotice] = useState<string | undefined>(notice);
+  // Formation demandée depuis sa fiche : gardée jusqu'à ce que le candidat en choisisse une autre.
+  const [wantedIds, setWantedIds] = useState<number[]>(wanted);
   const professional = audience === "professional";
   const chooseCampus = campuses.length > 1;
 
@@ -91,12 +93,21 @@ export function ApplicationForm({ offerings, audience, preselected, campuses = [
     return () => subscription.unsubscribe();
   }, [watch, draftKey]);
 
-  // Une formation choisie qui n'existe pas dans le campus retenu est retirée.
+  // Une formation choisie qui n'existe pas dans le campus retenu est retirée ; la formation demandée
+  // depuis sa fiche est resélectionnée dès qu'un campus qui la propose est choisi (message sinon).
   const placeId = watch("placeId");
   const offeringId = watch("offeringId");
   const visibleOfferings = chooseCampus ? offeringsForCampus(offerings, placeId) : offerings;
   useEffect(() => {
-    if (chooseCampus && offeringId && !visibleOfferings.some((o) => String(o.id) === offeringId)) form.setValue("offeringId", "");
+    if (!chooseCampus) return;
+    const kept = !!offeringId && visibleOfferings.some((o) => String(o.id) === offeringId);
+    if (kept || !placeId) {
+      if (offeringId && !kept) form.setValue("offeringId", "");
+      return;
+    }
+    const wantedHere = wantedOffering({ offerings, campuses, campusId: placeId, wantedIds });
+    form.setValue("offeringId", wantedHere.offeringId ?? "");
+    if (wantedHere.notice) setCampusNotice(wantedHere.notice);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [placeId, offeringId]);
 
@@ -223,7 +234,7 @@ export function ApplicationForm({ offerings, audience, preselected, campuses = [
               {chooseCampus && placeId && visibleOfferings.length === 0 && <p className="text-sm text-ink-muted">Aucune formation n&apos;est ouverte dans ce campus pour le moment.</p>}
               {visibleOfferings.map((offering) => (
                 <label key={offering.id} className="flex cursor-pointer items-start gap-4 rounded-2xl border border-line p-5 has-[:checked]:border-brand">
-                  <input type="radio" value={String(offering.id)} className="mt-1 size-4 accent-brand" {...register("offeringId")} />
+                  <input type="radio" value={String(offering.id)} className="mt-1 size-4 accent-brand" {...register("offeringId", { onChange: (e) => { setCampusNotice(undefined); if (!wantedIds.includes(Number(e.target.value))) setWantedIds([]); } })} />
                   <span>
                     <span className="block font-medium">{offering.label}</span>
                     <span className="text-sm text-ink-muted">
