@@ -102,7 +102,7 @@ class DeepLTranslatorTest extends TestCase
 
         $this->assertSame('<p>See <a href="/contact">us</a></p>', $out['rich']);
         $this->assertSame('Hello', $out['plain']);
-        $this->assertSame(['plain', 'rich'], array_keys($out) === ['plain', 'rich'] ? ['plain', 'rich'] : []);
+        $this->assertSame(['plain', 'rich'], array_keys($out));
         $this->assertDeepLCount(2);
         Http::assertSent(fn (Request $r) => $r->method() === 'POST' && str_contains($r->url(), 'translate') && ($r['tag_handling'] ?? null) === 'html' && $r['text'] === ['<p>Voir <a href="/contact">nous</a></p>']);
         Http::assertSent(fn (Request $r) => str_contains($r->url(), 'translate') && ! isset($r['tag_handling']) && $r['text'] === ['Salut']);
@@ -230,5 +230,91 @@ class DeepLTranslatorTest extends TestCase
         $this->assertFalse(Schema::hasColumn('settings', 'deepl_glossary_id'));
         $this->artisan('migrate', ['--path' => $path])->assertSuccessful();
         $this->assertTrue(Schema::hasColumn('settings', 'deepl_glossary_id'));
+    }
+
+    public function test_quota_is_updated_after_each_send(): void
+    {
+        Http::fake([
+            'api-free.deepl.com/v2/usage' => Http::response(['character_count' => 900, 'character_limit' => 1000]),
+            'api-free.deepl.com/v2/translate' => fn (Request $r) => Http::response([
+                'translations' => array_map(fn ($t) => ['text' => "EN $t"], $r['text']),
+            ]),
+        ]);
+        $quota = app(TranslationQuota::class);
+        $this->assertTrue($quota->canSend(40));
+
+        $this->translator()->translate(['a' => str_repeat('é', 30)]); // 30 caractères envoyés
+
+        $this->assertSame(930, $quota->usage()['used']);
+        $this->assertFalse($quota->canSend(40)); // 970 > 950
+        $usageCalls = Http::recorded()->filter(fn ($p) => str_ends_with($p[0]->url(), '/v2/usage'))->count();
+        $this->assertSame(1, $usageCalls);
+    }
+
+    public function test_456_clears_the_usage_cache(): void
+    {
+        Http::fake([
+            'api-free.deepl.com/v2/usage' => Http::response(['character_count' => 100, 'character_limit' => 1000]),
+            'api-free.deepl.com/v2/translate' => Http::response([], 456),
+        ]);
+        app(TranslationQuota::class)->usage();
+        $this->assertTrue(Cache::has('deepl:usage'));
+
+        try {
+            $this->translator()->translate(['a' => 'un']);
+            $this->fail('456 attendu');
+        } catch (QuotaExceeded) {
+        }
+
+        $this->assertFalse(Cache::has('deepl:usage'));
+        app(TranslationQuota::class)->usage();
+        $usageCalls = Http::recorded()->filter(fn ($p) => str_ends_with($p[0]->url(), '/v2/usage'))->count();
+        $this->assertSame(2, $usageCalls);
+    }
+
+    public function test_failed_glossary_create_keeps_old_id_and_old_glossary(): void
+    {
+        Setting::current()->forceFill(['deepl_glossary_id' => 'old'])->save();
+        Http::fake([
+            'api-free.deepl.com/v2/glossaries' => Http::response([], 503),
+            'api-free.deepl.com/v2/glossaries/old' => Http::response('', 204),
+        ]);
+
+        try {
+            app(DeepLGlossary::class)->sync([['fr' => 'a', 'en' => 'b']]);
+            $this->fail('exception attendue');
+        } catch (TranslationTemporarilyUnavailable) {
+        }
+
+        $this->assertSame('old', Setting::current()->deepl_glossary_id);
+        Http::assertNotSent(fn (Request $r) => $r->method() === 'DELETE');
+    }
+
+    public function test_glossary_delete_failure_does_not_throw(): void
+    {
+        Setting::current()->forceFill(['deepl_glossary_id' => 'old'])->save();
+        Http::fake([
+            'api-free.deepl.com/v2/glossaries/old' => Http::response('', 500),
+            'api-free.deepl.com/v2/glossaries' => Http::response(['glossary_id' => 'new-id'], 201),
+        ]);
+
+        $this->assertSame('new-id', app(DeepLGlossary::class)->sync([['fr' => 'a', 'en' => 'b']]));
+        $this->assertSame('new-id', Setting::current()->deepl_glossary_id);
+    }
+
+    public function test_stale_glossary_is_cleared_and_request_retried_once(): void
+    {
+        Setting::current()->forceFill(['deepl_glossary_id' => 'stale'])->save();
+        Http::fake(['api-free.deepl.com/v2/translate' => function (Request $r) {
+            if (isset($r['glossary_id'])) {
+                return Http::response(['message' => 'Glossary not found'], 404);
+            }
+
+            return Http::response(['translations' => [['text' => 'Hello']]]);
+        }]);
+
+        $this->assertSame(['a' => 'Hello'], $this->translator()->translate(['a' => 'Salut']));
+        $this->assertNull(Setting::current()->deepl_glossary_id);
+        $this->assertDeepLCount(2);
     }
 }

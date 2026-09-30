@@ -3,13 +3,14 @@
 namespace App\Services\Translation;
 
 use App\Models\Setting;
+use App\Services\Translation\Exceptions\QuotaExceeded;
 use App\Services\Translation\Exceptions\TranslationFailed;
 
 class DeepLTranslator implements Translator
 {
     public const BATCH_SIZE = 50;
 
-    public function __construct(private DeepLClient $client) {}
+    public function __construct(private DeepLClient $client, private TranslationQuota $quota) {}
 
     public function isAvailable(): bool
     {
@@ -49,7 +50,7 @@ class DeepLTranslator implements Translator
     }
 
     /** @param array<int|string, string> $batch */
-    private function sendBatch(array $batch, bool $html, ?string $glossaryId): array
+    private function sendBatch(array $batch, bool $html, ?string &$glossaryId): array
     {
         $body = [
             'text' => array_values($batch),
@@ -64,7 +65,26 @@ class DeepLTranslator implements Translator
             $body['glossary_id'] = $glossaryId;
         }
 
-        $translations = $this->client->send('POST', '/v2/translate', $body)->json('translations');
+        try {
+            try {
+                $response = $this->client->send('POST', '/v2/translate', $body);
+            } catch (TranslationFailed $e) {
+                if ($e->getCode() !== 404 || ! $glossaryId) {
+                    throw $e;
+                }
+                // Glossaire disparu côté DeepL : on l'oublie et on réessaie une fois sans lui.
+                Setting::current()->forceFill(['deepl_glossary_id' => null])->save();
+                $glossaryId = null;
+                unset($body['glossary_id']);
+                $response = $this->client->send('POST', '/v2/translate', $body);
+            }
+        } catch (QuotaExceeded $e) {
+            $this->quota->forget();
+            throw $e;
+        }
+        $this->quota->record(array_sum(array_map('mb_strlen', $batch)));
+
+        $translations = $response->json('translations');
         if (! is_array($translations) || count($translations) !== count($batch)) {
             throw new TranslationFailed('Réponse DeepL invalide : nombre de textes inattendu.');
         }

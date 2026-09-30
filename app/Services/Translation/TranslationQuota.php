@@ -28,6 +28,22 @@ class TranslationQuota
         });
     }
 
+    /** Ajoute au compteur en cache les caractères qui viennent d'être envoyés. */
+    public function record(int $characters): void
+    {
+        $cached = Cache::get(self::CACHE_KEY);
+        if (is_array($cached)) {
+            $cached['used'] += $characters;
+            Cache::put(self::CACHE_KEY, $cached, now()->addMinutes(10));
+        }
+    }
+
+    /** Oublie la consommation en cache (le prochain calcul relit l'API). */
+    public function forget(): void
+    {
+        Cache::forget(self::CACHE_KEY);
+    }
+
     /** Faux aussi quand la consommation est illisible : on ne prend pas le risque. */
     public function canSend(int $characters): bool
     {

@@ -3,6 +3,8 @@
 namespace App\Services\Translation;
 
 use App\Models\Setting;
+use Illuminate\Support\Facades\Log;
+use Throwable;
 
 /** Glossaire FR→EN de l'école (termes à traduire toujours pareil). */
 class DeepLGlossary
@@ -26,10 +28,9 @@ class DeepLGlossary
         }
 
         $setting = Setting::current();
-        if ($old = $setting->deepl_glossary_id) {
-            $this->client->send('DELETE', "/v2/glossaries/$old", allow404: true);
-        }
+        $old = $setting->deepl_glossary_id;
 
+        // Créer d'abord : si la création échoue, l'ancien glossaire et son identifiant restent valides.
         $id = null;
         if ($lines) {
             $id = $this->client->send('POST', '/v2/glossaries', [
@@ -42,6 +43,14 @@ class DeepLGlossary
         }
 
         $setting->forceFill(['deepl_glossary_id' => $id])->save();
+
+        if ($old && $old !== $id) {
+            try {
+                $this->client->send('DELETE', "/v2/glossaries/$old", allow404: true);
+            } catch (Throwable $e) {
+                Log::warning('Suppression du glossaire DeepL impossible : '.$e->getMessage());
+            }
+        }
 
         return $id;
     }

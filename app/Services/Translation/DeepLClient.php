@@ -38,7 +38,7 @@ class DeepLClient
         throw match (true) {
             $status === 456 => new QuotaExceeded('Quota DeepL dépassé.'),
             $status === 429, $status >= 500 => new TranslationTemporarilyUnavailable("DeepL indisponible (HTTP $status)."),
-            default => new TranslationFailed("Requête DeepL refusée (HTTP $status)."),
+            default => new TranslationFailed("Requête DeepL refusée (HTTP $status).", $status),
         };
     }
 }
