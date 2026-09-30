@@ -11,6 +11,7 @@ use App\Models\PageRevision;
 use App\Models\Place;
 use App\Models\Program;
 use App\Models\Redirect;
+use App\Models\Setting;
 use Database\Seeders\ContentSeeder;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Http;
@@ -44,7 +45,9 @@ class SiteV4CommandTest extends TestCase
             $this->assertSame($old->id, $page->id, $slug);
             $this->assertSame($domain, $page->domain, $slug);
             $this->assertSame($old->status, $page->status);
-            $this->assertSame(array_column($old->blocks, 'type'), array_column($page->blocks, 'type'), $slug);
+            // La page EMSI gagne les univers et les réalisations ; le lieu du Grand Théâtre part sur /emsi/dakar.
+            $types = fn (array $blocks) => array_values(array_diff(array_column($blocks, 'type'), $slug === 'ecole' ? ['rooms', 'artworks', 'venue'] : []));
+            $this->assertSame($types($old->blocks), $types($page->blocks), $slug);
             $this->assertEmpty(array_diff($revisionIds[$slug], $page->revisions()->pluck('id')->all()), $slug);
         }
         $this->getJson('/api/v1/public/pages/maison-habib-faye/studio')->assertOk()->assertJsonPath('data.domain', 'studio');
@@ -120,7 +123,7 @@ class SiteV4CommandTest extends TestCase
         MenuItem::where('location', 'main')->where('label', 'Programmation')->update(['label' => 'Agenda']);
         MenuItem::where('location', 'footer')->where('label', 'Presse')->update(['is_visible' => false]);
 
-        $this->artisan('emsi:site-v4')->expectsOutputToContain('Menu principal : déjà en place')->assertSuccessful();
+        $this->artisan('emsi:site-v4')->expectsOutputToContain('pages, menus et campus des formations ne sont plus modifiés')->assertSuccessful();
 
         $this->assertTrue(MenuItem::where('location', 'main')->where('label', 'Agenda')->where('url', '/maison-habib-faye/agenda')->exists());
         $this->assertFalse(MenuItem::where('location', 'main')->where('label', 'Programmation')->exists());
@@ -140,7 +143,8 @@ class SiteV4CommandTest extends TestCase
         $home->refresh();
         $this->assertSame($types, array_column($home->blocks, 'type'));
         $this->assertSame('Dakar · Saint-Louis', $home->blocks[0]['data']['eyebrow']);
-        $this->assertSame('/emsi', $home->blocks[0]['data']['buttons'][0]['url']);
+        // « Choisir mon univers » (/univers) mène au bloc des univers de la page EMSI.
+        $this->assertSame('/emsi#univers', $home->blocks[0]['data']['buttons'][0]['url']);
 
         // Photos existantes réutilisées pour les trois diapositives.
         $this->setHeroImage('accueil', 'pages/accueil.jpg');
@@ -270,6 +274,129 @@ class SiteV4CommandTest extends TestCase
             $this->assertStringNotContainsString($old, $live, $old);
         }
         $this->assertSame(0, MenuItem::where('is_visible', true)->where('url', 'like', '/events%')->count());
+    }
+
+    public function test_the_upgrade_is_recorded_and_a_later_run_recreates_nothing(): void
+    {
+        $this->artisan('emsi:site-v4', ['--home' => true])->assertSuccessful();
+        $this->assertSame(4, (int) Setting::current()->site_version);
+
+        // L'équipe renomme des pages, change le menu et le pied de page, décoche une formation de tous les campus.
+        Page::where('slug', 'presse')->update(['slug' => 'espace-presse']);
+        Page::where('slug', 'emsi/dakar')->update(['slug' => 'emsi/campus-dakar']);
+        $maison = MenuItem::where('location', 'main')->whereNull('parent_id')->where('url', '/maison-habib-faye')->firstOrFail();
+        $maison->update(['label' => 'La Maison', 'url' => '/la-maison']);
+        $added = MenuItem::create(['location' => 'main', 'parent_id' => $maison->id, 'label' => 'Résidences', 'url' => '/maison-habib-faye/residences', 'position' => 9]);
+        MenuItem::where('location', 'footer')->where('url', '/mission')->delete();
+        $program = Program::orderBy('id')->firstOrFail();
+        $program->campuses()->detach();
+        $pages = Page::count();
+        $menus = MenuItem::orderBy('id')->get(['id', 'parent_id', 'label', 'url', 'position', 'is_visible'])->toArray();
+
+        $this->artisan('emsi:site-v4', ['--home' => true])->expectsOutputToContain('--force')->assertSuccessful();
+
+        $this->assertSame($pages, Page::count());
+        $this->assertFalse(Page::where('slug', 'presse')->exists());
+        $this->assertFalse(Page::where('slug', 'emsi/dakar')->exists());
+        $this->assertSame($menus, MenuItem::orderBy('id')->get(['id', 'parent_id', 'label', 'url', 'position', 'is_visible'])->toArray());
+        $this->assertTrue($added->fresh()->is_visible);
+        $this->assertSame(0, $program->campuses()->count());
+    }
+
+    public function test_force_runs_the_whole_upgrade_again(): void
+    {
+        $this->artisan('emsi:site-v4')->assertSuccessful();
+        Page::where('slug', 'presse')->delete();
+        MenuItem::where('location', 'footer')->where('url', '/mission')->delete();
+
+        $this->artisan('emsi:site-v4', ['--force' => true])->assertSuccessful();
+
+        $this->assertTrue(Page::where('slug', 'presse')->exists());
+        $this->assertTrue(MenuItem::where('location', 'footer')->where('url', '/mission')->where('is_visible', true)->exists());
+    }
+
+    public function test_an_upgraded_base_without_the_marker_is_recognised_and_its_emsi_page_completed(): void
+    {
+        // Base mise à niveau par la première version de la commande (celle de l'école) : pas de repère,
+        // page EMSI sans univers ni réalisations et avec le lieu du Grand Théâtre, déjà copié sur /emsi/dakar.
+        $this->artisan('emsi:site-v4', ['--home' => true])->assertSuccessful();
+        Setting::current()->forceFill(['site_version' => null])->save();
+        $emsi = Page::where('slug', 'emsi')->firstOrFail();
+        $old = collect($emsi->blocks)->reject(fn ($b) => in_array($b['type'], ['rooms', 'artworks'], true))->values()->all();
+        $old[] = ['type' => 'venue', 'data' => ['title' => 'Au cœur du Grand Théâtre National']];
+        $emsi->forceFill(['blocks' => $old, 'draft_blocks' => $old])->save();
+        $emsi->revisions()->delete();
+        $emsi->revisions()->create(['title' => $emsi->title, 'blocks' => $old]);
+        Page::where('slug', 'presse')->update(['slug' => 'espace-presse']);
+        MenuItem::where('location', 'main')->whereNull('parent_id')->where('url', '/maison-habib-faye')->update(['url' => '/la-maison']);
+        $menus = MenuItem::orderBy('id')->get(['id', 'parent_id', 'label', 'url', 'position', 'is_visible'])->toArray();
+        // Les univers de l'ancien accueil, retouchés par l'équipe, sont repris tels quels.
+        $home = Page::where('slug', 'accueil')->firstOrFail();
+        $rooms = $home->revisions()->get()->map(fn (PageRevision $r) => collect($r->blocks)->firstWhere('type', 'rooms'))->filter()->first();
+        $this->assertNotNull($rooms);
+
+        $this->artisan('emsi:site-v4', ['--home' => true])->expectsOutputToContain('déjà au format des trois domaines')->assertSuccessful();
+
+        $this->assertSame(4, (int) Setting::current()->site_version);
+        $this->assertFalse(Page::where('slug', 'presse')->exists());
+        $this->assertSame($menus, MenuItem::orderBy('id')->get(['id', 'parent_id', 'label', 'url', 'position', 'is_visible'])->toArray());
+        $emsi->refresh();
+        $types = array_column($emsi->blocks, 'type');
+        $this->assertContains('rooms', $types);
+        $this->assertContains('artworks', $types);
+        $this->assertNotContains('venue', $types);
+        $this->assertSame($rooms['data'], collect($emsi->blocks)->firstWhere('type', 'rooms')['data']);
+        $this->assertSame($emsi->blocks, $emsi->draft_blocks);
+        $this->assertSame(2, $emsi->revisions()->count());
+        $this->assertContains('venue', array_column(Page::where('slug', 'emsi/dakar')->firstOrFail()->blocks, 'type'));
+
+        // Relancée : plus rien ne change.
+        $revisions = PageRevision::count();
+        $this->artisan('emsi:site-v4', ['--home' => true])->assertSuccessful();
+        $this->assertSame($revisions, PageRevision::count());
+    }
+
+    public function test_the_emsi_page_shows_universes_artworks_and_leaves_the_venue_to_dakar(): void
+    {
+        $this->artisan('emsi:site-v4', ['--home' => true])->assertSuccessful();
+
+        $types = array_column(Page::where('slug', 'emsi')->firstOrFail()->blocks, 'type');
+        $this->assertContains('rooms', $types);
+        $this->assertContains('artworks', $types);
+        $this->assertNotContains('venue', $types);
+        // Univers et réalisations juste après les cartes des campus.
+        $at = array_search('campuses', $types, true);
+        $this->assertSame(['rooms', 'artworks'], array_slice($types, $at + 1, 2));
+        $this->assertContains('venue', array_column(Page::where('slug', 'emsi/dakar')->firstOrFail()->blocks, 'type'));
+        $this->getJson('/api/v1/public/pages/emsi')->assertOk()->assertJsonFragment(['type' => 'rooms']);
+    }
+
+    public function test_emsi_completion_respects_a_pending_draft_and_a_removal_by_the_team(): void
+    {
+        $this->artisan('emsi:site-v4')->assertSuccessful();
+        Setting::current()->forceFill(['site_version' => null])->save();
+        $emsi = Page::where('slug', 'emsi')->firstOrFail();
+        $live = collect($emsi->blocks)->reject(fn ($b) => in_array($b['type'], ['rooms', 'artworks'], true))->values()->all();
+        $emsi->revisions()->delete();
+        $draft = [...$live, ['type' => 'text', 'data' => ['title' => 'Brouillon de l\'équipe', 'body' => '<p>En cours.</p>']]];
+        $emsi->forceFill(['blocks' => $live, 'draft_blocks' => $draft])->save();
+
+        $this->artisan('emsi:site-v4')->assertSuccessful();
+
+        $emsi->refresh();
+        $this->assertContains('rooms', array_column($emsi->blocks, 'type'));
+        $this->assertContains('rooms', array_column($emsi->draft_blocks, 'type'));
+        $titles = fn (array $blocks) => array_column(array_column($blocks, 'data'), 'title');
+        $this->assertContains('Brouillon de l\'équipe', $titles($emsi->draft_blocks));
+        $this->assertNotContains('Brouillon de l\'équipe', $titles($emsi->blocks));
+
+        // L'équipe retire ensuite les univers de la page : une nouvelle exécution ne les remet pas.
+        $emsi->update(['draft_blocks' => collect($emsi->draft_blocks)->reject(fn ($b) => $b['type'] === 'rooms')->values()->all()]);
+        $emsi->publish();
+
+        $this->artisan('emsi:site-v4')->assertSuccessful();
+
+        $this->assertNotContains('rooms', array_column($emsi->fresh()->blocks, 'type'));
     }
 
     private function setHeroImage(string $slug, string $image): void

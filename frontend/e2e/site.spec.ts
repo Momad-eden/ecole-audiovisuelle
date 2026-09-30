@@ -111,6 +111,18 @@ test("la page EMSI présente les deux campus et oriente vers la candidature", as
   await expect(page.getByRole("heading", { level: 1 })).toContainText("Deux écoles");
   await expect(page.getByRole("link", { name: "Candidater à Dakar" })).toHaveAttribute("href", "/candidater?campus=emsi-dakar");
   await expect(page.getByRole("link", { name: "Candidater à Saint-Louis" })).toHaveAttribute("href", "/candidater?campus=emsi-saint-louis");
+  // Chaque carte mène aussi à la page de son campus.
+  const pages = page.getByRole("link", { name: "Découvrir le campus" });
+  await expect(pages).toHaveCount(2);
+  expect(await pages.evaluateAll((links) => links.map((link) => link.getAttribute("href")).sort())).toEqual(["/emsi/dakar", "/emsi/saint-louis"]);
+});
+
+// Contenu ajouté par `emsi:site-v4` (page EMSI complétée) : à relancer après la mise à niveau de la base.
+test("la page EMSI présente les univers ; /univers y mène", async ({ page }) => {
+  await page.goto("/univers");
+  await expect(page).toHaveURL(/\/emsi#univers$/, { timeout: 15000 });
+  await expect(page.locator("#univers")).toBeAttached();
+  await expect(page.locator('a[href^="/emsi/univers/"]').first()).toBeAttached();
 });
 
 test("les liens partagés affichent l'aperçu de l'EMSI", async ({ page, request }) => {

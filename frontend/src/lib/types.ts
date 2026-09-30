@@ -205,6 +205,8 @@ export type Place = {
   description: string | null;
   highlights: string[];
   image: Image | null;
+  /** Bloc « Nos campus » seulement : page du campus (« Découvrir le campus »), absente si elle n'est pas publiée. */
+  pageUrl?: string | null;
 };
 
 export type Service = {

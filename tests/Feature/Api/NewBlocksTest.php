@@ -123,4 +123,30 @@ class NewBlocksTest extends TestCase
             ->assertJsonPath('data.blocks.0.data.title', 'Nous soutenir')
             ->assertJsonPath('data.blocks.0.data.text', 'Partenaires, mécènes, donateurs.');
     }
+
+    public function test_campus_cards_link_to_the_campus_page(): void
+    {
+        $dakar = $this->campus('Dakar');
+        $saintLouis = $this->campus('Saint-Louis');
+        $thies = $this->campus('Thiès');
+        // Page du campus repérée par son bloc « Formations de ce campus », même renommée par l'équipe…
+        Page::create(['title' => 'Campus de Dakar', 'slug' => 'emsi/campus-dakar', 'type' => 'free', 'draft_blocks' => [
+            ['type' => 'campus_programs', 'data' => ['title' => 'Formations', 'campus_id' => $dakar->id]],
+        ]])->publish();
+        // … sinon par l'adresse /emsi/{ville}.
+        Page::create(['title' => 'Campus de Saint-Louis', 'slug' => 'emsi/saint-louis', 'type' => 'free', 'draft_blocks' => [
+            ['type' => 'text', 'data' => ['title' => 'Saint-Louis', 'body' => '<p>Campus.</p>']],
+        ]])->publish();
+        // Page en brouillon : pas de lien vers une page absente du site.
+        Page::create(['title' => 'Campus de Thiès', 'slug' => 'emsi/thies', 'type' => 'free', 'draft_blocks' => [
+            ['type' => 'campus_programs', 'data' => ['title' => 'Formations', 'campus_id' => $thies->id]],
+        ]]);
+        $this->page([['type' => 'campuses', 'data' => ['title' => 'Nos campus']]]);
+
+        $items = collect($this->getJson('/api/v1/public/pages/essai')->assertOk()->json('data.blocks.0.data.items'))->keyBy('id');
+
+        $this->assertSame('/emsi/campus-dakar', $items[$dakar->id]['pageUrl']);
+        $this->assertSame('/emsi/saint-louis', $items[$saintLouis->id]['pageUrl']);
+        $this->assertNull($items[$thies->id]['pageUrl']);
+    }
 }

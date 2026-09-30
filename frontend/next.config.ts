@@ -35,8 +35,8 @@ const nextConfig: NextConfig = {
     const permanent = (source: string, destination: string) => ({ source, destination, permanent: true });
     return [
       // Les trois domaines : école (/emsi), Maison Habib Faye et Impact Live Studio (/maison-habib-faye).
-      // L'ancre #univers de la spec n'est pas portée : /univers mène à /emsi.
-      permanent("/univers", "/emsi"),
+      // /univers mène au bloc des univers de la page EMSI (id="univers").
+      permanent("/univers", "/emsi#univers"),
       permanent("/univers/:slug", "/emsi/univers/:slug"),
       permanent("/formations/:path*", "/emsi/formations/:path*"),
       permanent("/realisations/:path*", "/emsi/realisations/:path*"),

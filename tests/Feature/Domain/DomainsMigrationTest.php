@@ -55,4 +55,15 @@ class DomainsMigrationTest extends TestCase
         $this->assertTrue(Schema::hasColumn('contact_messages', 'organization'));
         $this->assertTrue(Schema::hasTable('place_program'));
     }
+
+    /** Repère de version du site (emsi:site-v4 déjà faite) : colonne ajoutée puis retirée proprement. */
+    public function test_site_version_migration_rolls_back_cleanly(): void
+    {
+        $path = 'database/migrations/2026_09_30_100000_add_site_version_to_settings.php';
+        $this->artisan('migrate:rollback', ['--path' => $path])->assertSuccessful();
+        $this->assertFalse(Schema::hasColumn('settings', 'site_version'));
+
+        $this->artisan('migrate', ['--path' => $path])->assertSuccessful();
+        $this->assertTrue(Schema::hasColumn('settings', 'site_version'));
+    }
 }

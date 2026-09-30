@@ -57,6 +57,7 @@ export function CampusesBlock({ data }: { data: { eyebrow?: string; title?: stri
                   )}
                   <div className="mt-auto flex flex-wrap gap-3 pt-8">
                     <ButtonLink href={`/candidater?campus=${campus.slug}`}>Candidater à {campus.city ?? campus.name}</ButtonLink>
+                    {campus.pageUrl && <ButtonLink href={campus.pageUrl} variant="secondary">Découvrir le campus</ButtonLink>}
                     {campus.mapUrl && <ButtonLink href={campus.mapUrl} variant="secondary">Itinéraire</ButtonLink>}
                   </div>
                 </div>

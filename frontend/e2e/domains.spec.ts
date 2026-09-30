@@ -4,7 +4,7 @@ test("les anciennes adresses arrivent sur la nouvelle en une seule redirection",
   const redirections: [string, string][] = [
     ["/formations", "/emsi/formations"],
     ["/formations/son-live", "/emsi/formations/son-live"],
-    ["/univers", "/emsi"],
+    ["/univers", "/emsi#univers"],
     ["/univers/son", "/emsi/univers/son"],
     ["/realisations", "/emsi/realisations"],
     ["/realisations/une-oeuvre", "/emsi/realisations/une-oeuvre"],

@@ -19,6 +19,7 @@ use App\Models\EquipmentItem;
 use App\Models\Faq;
 use App\Models\News;
 use App\Models\Offering;
+use App\Models\Page;
 use App\Models\Partner;
 use App\Models\Place;
 use App\Models\Program;
@@ -88,7 +89,7 @@ class BlockResolver
             'productions' => [...$data, 'items' => ArtworkResource::collection(Artwork::published()->where('origin', 'studio')->with(['room', 'track'])
                 ->latest('published_at')->limit((int) ($data['limit'] ?? 6))->get())->resolve()],
             'ecosystem' => [...$data, 'items' => collect($data['items'] ?? [])->map(fn ($item) => $this->withImages($item))->values()->all()],
-            'campuses' => [...$data, 'items' => PlaceResource::collection(Place::published()->campuses()->orderBy('position')->get())->resolve()],
+            'campuses' => [...$data, 'items' => $this->campusCards()],
             'places' => [...$data, 'items' => PlaceResource::collection(Place::published()
                 ->when($data['kind'] ?? null, fn ($q, $kind) => $q->where('kind', $kind))->orderBy('position')->get())->resolve()],
             'equipment' => [...$data, 'groups' => collect($data['groups'] ?? [])->map(fn ($group) => $this->withImages($group))->values()->all()],
@@ -107,6 +108,32 @@ class BlockResolver
         };
 
         return $this->camelKeys($data);
+    }
+
+    /**
+     * Cartes des campus, avec l'adresse de la page du campus (« Découvrir le campus ») : la page publiée
+     * qui porte son bloc « Formations de ce campus », sinon /emsi/{ville} si elle est publiée, sinon aucune.
+     */
+    private function campusCards(): array
+    {
+        $pages = Page::published()->get(['slug', 'blocks']);
+        $byBlock = [];
+        foreach ($pages as $page) {
+            foreach ($page->blocks ?? [] as $block) {
+                $campusId = ($block['type'] ?? null) === 'campus_programs' ? ($block['data']['campus_id'] ?? null) : null;
+                if ($campusId !== null) {
+                    $byBlock[(int) $campusId] ??= '/'.$page->slug;
+                }
+            }
+        }
+        $slugs = $pages->pluck('slug')->flip();
+
+        return Place::published()->campuses()->orderBy('position')->get()->map(function (Place $place) use ($byBlock, $slugs) {
+            $citySlug = 'emsi/'.Str::slug((string) ($place->city ?: $place->name));
+
+            return [...(new PlaceResource($place))->resolve(),
+                'pageUrl' => $byBlock[$place->id] ?? ($slugs->has($citySlug) ? '/'.$citySlug : null)];
+        })->all();
     }
 
     /** Morceaux à écouter (bloc Audio, héros Studio) : fichier remplacé par son URL publique. */

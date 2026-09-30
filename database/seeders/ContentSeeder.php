@@ -61,28 +61,61 @@ class ContentSeeder extends Seeder
         $this->siteV3();
     }
 
+    /** Repère posé dans les paramètres quand emsi:site-v4 est passée. */
+    public const SITE_V4 = 4;
+
     /**
-     * Site v4 : un site, trois domaines (Maison Habib Faye, EMSI, Impact Live Studio). Relançable et sans perte :
+     * Site v4 : un site, trois domaines (Maison Habib Faye, EMSI, Impact Live Studio). Sans perte :
      * les pages sont déplacées (pas recréées), une page déjà présente n'est jamais réécrite, l'accueil n'est
-     * remplacé qu'avec $home. Retourne le résumé en français de ce qui a été fait.
+     * remplacé qu'avec $home. Le premier passage est noté dans les paramètres (site_version) : les suivants
+     * ne font plus que les réécritures de liens et les compléments de la page EMSI, sans recréer les pages,
+     * menus ni campus des formations que l'équipe a pu retoucher ou retirer, sauf avec $force.
+     * Retourne le résumé en français de ce qui a été fait.
      *
      * @return list<string>
      */
-    public function refreshSiteV4(bool $home = false): array
+    public function refreshSiteV4(bool $home = false, bool $force = false): array
     {
         $this->report = [];
-        $this->unpublishEvents();
+        $settings = Setting::current();
+        $done = (int) $settings->site_version >= self::SITE_V4;
+        if (! $done && $this->siteV4AlreadyApplied()) {
+            $done = true;
+            $this->report[] = 'Site déjà au format des trois domaines (mise à niveau faite avant le repère de version) : repère enregistré.';
+        }
+        $full = ! $done || $force;
+
+        if ($full) {
+            $this->unpublishEvents();
+        }
         $this->rewriteLinks();
-        $this->movePages();
-        $this->siteV4Pages();
+        if ($full) {
+            $this->movePages();
+            $this->siteV4Pages();
+        }
         if ($home) {
             $this->homeV4();
         }
-        $this->programCampuses();
-        $this->menusV4();
+        $this->completeEmsiPage();
+        if ($full) {
+            $this->programCampuses();
+            $this->menusV4();
+        } else {
+            $this->report[] = 'Mise à niveau déjà faite : les pages, menus et campus des formations ne sont plus modifiés (relancez avec --force pour les reprendre).';
+        }
         $this->rewriteRedirects();
 
-        return $this->report ?: ['Rien à changer : le site est déjà au format des trois domaines.'];
+        if ((int) $settings->site_version < self::SITE_V4) {
+            $settings->forceFill(['site_version' => self::SITE_V4])->save();
+        }
+
+        return $this->report;
+    }
+
+    /** Base mise à niveau par une version de la commande antérieure au repère : pages EMSI et Studio à leur nouvelle adresse. */
+    private function siteV4AlreadyApplied(): bool
+    {
+        return Page::where('slug', 'emsi')->exists() && Page::where('slug', 'maison-habib-faye/studio')->exists();
     }
 
     /** Ajoute Impact Live (studio, événementiel, Espace Habib Faye) et le campus de Saint-Louis à un site existant. */
@@ -940,6 +973,70 @@ class ContentSeeder extends Seeder
         $home->update(['draft_blocks' => $blocks]);
         $home->publish();
         $this->report[] = 'Accueil republié avec '.($missing === [] ? 'le héros Cinéma et ' : '').'le triptyque des trois maisons ; l\'ancienne version reste dans l\'historique.';
+    }
+
+    /**
+     * Page EMSI : les univers et les réalisations (repris de l'ancien accueil, sinon textes de départ),
+     * juste après les cartes des campus ; le lieu du Grand Théâtre est retiré s'il est déjà sur /emsi/dakar.
+     * Un bloc que la page a déjà eu (dans son historique) et que l'équipe a retiré n'est pas remis.
+     * Brouillon en attente respecté ; nouvelle révision seulement si quelque chose change. Relançable.
+     */
+    private function completeEmsiPage(): void
+    {
+        $page = Page::where('slug', 'emsi')->first();
+        if (! $page) {
+            return;
+        }
+        $history = $page->revisions()->pluck('blocks')->flatten(1)->pluck('type')->filter()->unique();
+        $dakar = Page::where('slug', 'emsi/dakar')->first();
+        $venueAtDakar = collect([...($dakar?->blocks ?? []), ...($dakar?->draft_blocks ?? [])])->contains('type', 'venue');
+
+        $complete = function (?array $blocks) use ($history, $venueAtDakar): ?array {
+            if ($blocks === null) {
+                return null;
+            }
+            $blocks = array_values($blocks);
+            if ($venueAtDakar) {
+                $blocks = array_values(array_filter($blocks, fn ($block) => ($block['type'] ?? null) !== 'venue'));
+            }
+            $types = array_column($blocks, 'type');
+            $missing = array_values(array_filter(['rooms', 'artworks'], fn (string $type) => ! in_array($type, $types, true) && ! $history->contains($type)));
+            if ($missing === []) {
+                return $blocks;
+            }
+            $at = array_search('campuses', $types, true);
+            $at = $at === false ? min(1, count($blocks)) : $at + 1;
+            array_splice($blocks, $at, 0, array_map(fn (string $type) => ['type' => $type, 'data' => $this->formerHomeBlock($type)], $missing));
+
+            return $blocks;
+        };
+
+        $live = $complete($page->blocks);
+        $draft = $complete($page->draft_blocks);
+        if ($live === $page->blocks && $draft === $page->draft_blocks) {
+            return;
+        }
+        $this->saveBlocks($page, $draft, $live);
+        $this->report[] = 'Page « /emsi » complétée : univers et réalisations des étudiants'.($venueAtDakar ? ', lieu du Grand Théâtre laissé à /emsi/dakar' : '').'.';
+    }
+
+    /** Bloc de l'accueil actuel ou de son historique (le plus récent), sinon les textes de départ. */
+    private function formerHomeBlock(string $type): array
+    {
+        $home = Page::where('type', 'home')->orderBy('id')->first() ?? Page::where('slug', 'accueil')->first();
+        $versions = collect([$home?->blocks, $home?->draft_blocks])->merge($home?->revisions()->pluck('blocks') ?? []);
+        foreach ($versions as $blocks) {
+            $block = collect($blocks ?? [])->firstWhere('type', $type);
+            if (is_array($block['data'] ?? null)) {
+                return $block['data'];
+            }
+        }
+
+        return match ($type) {
+            'rooms' => ['eyebrow' => 'Cinq univers, une école', 'title' => 'Choisissez votre univers',
+                'text' => 'Chaque univers a sa lumière, ses outils et ses métiers. Explorez-les, puis trouvez la formation qui vous ressemble.'],
+            'artworks' => ['title' => 'Réalisations des étudiants', 'source' => 'latest', 'limit' => 6],
+        };
     }
 
     /** @return array{image: string, image_alt: ?string}|null Photo du premier héros (version en ligne) de la première de ces pages qui en a une. */

@@ -12,7 +12,8 @@ class LegacyPathsTest extends TestCase
     public static function addresses(): array
     {
         return [
-            'univers' => ['/univers', '/emsi'],
+            'univers' => ['/univers', '/emsi#univers'],
+            'univers query dropped' => ['/univers?x=1#haut', '/emsi#univers'],
             'univers slug' => ['/univers/son', '/emsi/univers/son'],
             'formations' => ['/formations', '/emsi/formations'],
             'formation' => ['/formations/technicien-lumiere', '/emsi/formations/technicien-lumiere'],

@@ -28,7 +28,7 @@ final class LegacyPaths
         $tail = $rest === '' ? '' : '/'.$rest;
 
         $target = match ($segments[0] ?? null) {
-            'univers' => $rest === '' ? '/emsi' : '/emsi/univers'.$tail,
+            'univers' => $rest === '' ? ['/emsi#univers'] : '/emsi/univers'.$tail,   // bloc des univers de la page EMSI
             'formations', 'realisations', 'professionnels' => '/emsi/'.$segments[0].$tail,
             'studio' => $rest === '' ? '/maison-habib-faye/studio' : null,
             'ecole' => $rest === '' ? '/emsi' : null,
