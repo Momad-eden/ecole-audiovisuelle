@@ -39,6 +39,13 @@ class Page extends Model
         return $this->hasMany(PageRevision::class)->latest('created_at')->latest('id');
     }
 
+    /** Traduction seulement à la publication (ou au changement du titre / du SEO), jamais pour le brouillon. */
+    public function shouldQueueTranslation(): bool
+    {
+        return $this->wasChanged(['blocks', 'title', 'seo'])
+            || ($this->wasRecentlyCreated && filled($this->blocks));
+    }
+
     public function hasUnpublishedChanges(): bool
     {
         return $this->draft_blocks !== $this->blocks;

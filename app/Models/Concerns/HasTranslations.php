@@ -3,8 +3,12 @@
 namespace App\Models\Concerns;
 
 use App\Enums\TranslationStatus;
+use App\Jobs\TranslateRecord;
+use App\Models\Setting;
 use App\Models\Translation;
+use App\Services\Translation\Translator;
 use Illuminate\Database\Eloquent\Relations\MorphMany;
+use Illuminate\Support\Facades\DB;
 
 /**
  * Champs traduits d'une fiche (anglais) : le français reste dans les colonnes d'origine.
@@ -14,12 +18,38 @@ trait HasTranslations
 {
     public static function bootHasTranslations(): void
     {
+        // Traduction automatique en file, une fois l'enregistrement validé (spec R2 §3.1).
+        static::saved(function ($model) {
+            if (! $model->shouldQueueTranslation()) {
+                return;
+            }
+            DB::afterCommit(fn () => $model->queueTranslation());
+        });
+
         static::deleted(function ($model) {
             // Suppression logique : les traductions restent pour une restauration éventuelle.
             if (! method_exists($model, 'isForceDeleting') || $model->isForceDeleting()) {
                 $model->translations()->delete();
             }
         });
+    }
+
+    /** Vrai si l'enregistrement qui vient d'avoir lieu touche un champ traduit (ou crée la fiche). */
+    public function shouldQueueTranslation(): bool
+    {
+        return $this->wasRecentlyCreated || $this->wasChanged($this->translatableFields());
+    }
+
+    /** Met en file la traduction anglaise si elle est activée, possible et utile. */
+    public function queueTranslation(): void
+    {
+        if (! app(Translator::class)->isAvailable() || ! Setting::current()->auto_translate) {
+            return;
+        }
+
+        if ($this->load('translations')->outdatedFields('en') !== []) {
+            TranslateRecord::dispatch($this);
+        }
     }
 
     public function translations(): MorphMany
@@ -38,7 +68,7 @@ trait HasTranslations
     }
 
     /** Valeur française d'un champ (pour Page, `blocks` = blocs publiés). */
-    protected function frenchValue(string $field): mixed
+    public function frenchValue(string $field): mixed
     {
         return $this->getAttribute($field);
     }

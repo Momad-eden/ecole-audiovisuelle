@@ -4,16 +4,23 @@ namespace App\Filament\Pages;
 
 use App\Enums\UserRole;
 use App\Models\Setting;
+use App\Services\Translation\DeepLGlossary;
+use App\Services\Translation\TranslationQuota;
+use App\Services\Translation\Translator;
 use BackedEnum;
 use Filament\Actions\Action;
 use Filament\Forms\Components\FileUpload;
+use Filament\Forms\Components\Repeater;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
+use Filament\Forms\Components\Toggle;
+use Filament\Infolists\Components\TextEntry;
 use Filament\Notifications\Notification;
 use Filament\Pages\Page;
 use Filament\Schemas\Components\Section;
 use Filament\Schemas\Schema;
 use Filament\Support\Icons\Heroicon;
+use Throwable;
 
 /**
  * @property-read Schema $form
@@ -74,7 +81,40 @@ class SiteSettings extends Page
                 TextInput::make('seo_title')->label('Titre du site dans Google')->maxLength(70),
                 Textarea::make('seo_description')->label('Description dans Google')->maxLength(160)->rows(2),
             ]),
+            Section::make('Traduction anglaise')->columns(1)->schema([
+                TextEntry::make('translation_quota')->hiddenLabel()->state(fn () => $this->quotaLine()),
+                Toggle::make('auto_translate')->label('Traduction automatique activée')
+                    ->helperText('À chaque publication, les textes sont traduits en anglais ; vous pouvez ensuite les relire et les corriger.'),
+                Repeater::make('translation_glossary')->label('Lexique de traduction')
+                    ->helperText('Termes toujours traduits de la même façon. Pour un nom à ne jamais traduire, écrivez-le deux fois à l\'identique.')
+                    ->columns(2)->defaultItems(0)->addActionLabel('Ajouter un terme')
+                    ->schema([
+                        TextInput::make('fr')->label('Terme français')->required()->maxLength(200),
+                        TextInput::make('en')->label('Traduction anglaise')->required()->maxLength(200),
+                    ]),
+            ]),
         ]);
+    }
+
+    /** État du quota DeepL ; ne lève jamais d'erreur (DeepL injoignable → message d'attente). */
+    public function quotaLine(): string
+    {
+        if (! app(Translator::class)->isAvailable()) {
+            return 'Traduction automatique non configurée : traduisez à la main dans l\'onglet Anglais des fiches';
+        }
+
+        try {
+            ['used' => $used, 'limit' => $limit] = app(TranslationQuota::class)->usage();
+        } catch (Throwable) {
+            return 'Quota indisponible pour le moment';
+        }
+
+        $format = fn (int $n) => number_format($n, 0, ',', ' ');
+        $line = "Caractères traduits ce mois-ci : {$format($used)} / {$format($limit)}";
+
+        return $limit > 0 && $used >= floor(0.95 * $limit)
+            ? $line.' — Quota gratuit de traduction atteint ce mois-ci'
+            : $line;
     }
 
     protected function getFormActions(): array
@@ -84,8 +124,27 @@ class SiteSettings extends Page
 
     public function save(): void
     {
-        Setting::current()->update($this->form->getState());
+        $state = $this->form->getState();
+        $state['translation_glossary'] = array_values(array_map(
+            fn (array $pair) => ['fr' => trim((string) ($pair['fr'] ?? '')), 'en' => trim((string) ($pair['en'] ?? ''))],
+            $state['translation_glossary'] ?? [],
+        ));
+
+        $setting = Setting::current();
+        $glossaryChanged = ($setting->translation_glossary ?? []) !== $state['translation_glossary'];
+        $setting->update($state);
 
         Notification::make()->title('Paramètres enregistrés.')->success()->send();
+
+        if ($glossaryChanged && app(Translator::class)->isAvailable()) {
+            try {
+                app(DeepLGlossary::class)->sync($state['translation_glossary']);
+            } catch (Throwable $e) {
+                report($e);
+                Notification::make()->title('Lexique enregistré, mais DeepL ne l\'a pas encore reçu')
+                    ->body('Les prochaines traductions n\'en tiendront pas compte. Réenregistrez le lexique un peu plus tard.')
+                    ->danger()->persistent()->send();
+            }
+        }
     }
 }
