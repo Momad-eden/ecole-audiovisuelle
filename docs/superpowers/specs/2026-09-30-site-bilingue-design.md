@@ -4,7 +4,8 @@
 - **Décideur** : Momar Diop
 - **Périmètre** : second sous-projet de la restructuration demandée par Boubacar Tall (R1 « un site, trois domaines » est fusionné, PR #12). Le site doit être bilingue **dès le lancement**, pour un public et des financeurs internationaux.
 - **Décisions** (29–30/09/2026) :
-  - l'anglais est **proposé par traduction automatique (Claude) et relu par l'équipe** ;
+  - l'anglais est **proposé par traduction automatique gratuite (DeepL API Free) et relu par l'équipe** ; aucun service payant (décision du 30/09/2026, après abandon de Claude pour raison de coût) ;
+  - **sans compte DeepL, tout fonctionne** : l'équipe traduit à la main dans l'admin, le site affiche le français tant qu'un texte n'est pas traduit ;
   - une traduction automatique est **en ligne tout de suite**, l'admin liste les traductions « à relire » ;
   - stockage dans une **table de traductions à part** (les colonnes françaises ne bougent pas) ;
   - mêmes adresses sous `/en/…` ; l'admin reste en français.
@@ -13,7 +14,8 @@
 
 - Un visiteur anglophone trouve un site **complet** en anglais : textes des pages, formations, actualités, agenda, menus, formulaires, messages, référencement.
 - Le contenu anglais suit le français **sans travail manuel obligatoire** ; l'équipe garde le dernier mot par la relecture.
-- Aucun risque pour le contenu français existant ; sans clé d'API ou en cas de panne, le site anglais affiche le français.
+- Aucun risque pour le contenu français existant ; sans clé d'API, quota atteint ou panne, le site anglais affiche le français.
+- **Jamais de dépense** : la traduction automatique reste dans la formule gratuite de DeepL (500 000 caractères par mois).
 
 ## 2. Données (Laravel)
 
@@ -65,14 +67,15 @@ Les noms propres (`Place.name`, `Partner.name`, noms de personnes) ne sont pas t
 - `Page` : seulement à la **publication** (`blocks` publiés), jamais sur `draft_blocks`.
 - Interrupteur « Traduction automatique activée » dans les Paramètres du site (désactivé = aucune tâche).
 
-### 3.2 Appel à Claude
+### 3.2 Appel à DeepL (formule gratuite)
 
-- SDK PHP officiel d'Anthropic, modèle **`claude-opus-5-5`**, effort `medium`, sortie structurée (JSON `{chemin: texte}` avec le même ensemble de clés que l'entrée), un appel par fiche.
-- Consignes système (stables, mises en cache) : anglais britannique (choix par défaut : usage courant des institutions culturelles internationales et des bailleurs européens), registre soutenu adapté à une institution culturelle internationale ; conserver le HTML et les espaces ; ne pas traduire les noms propres (EMSI, Impact Live Studio, Maison de la culture Habib Faye → conservé tel quel, Grand Théâtre National Doudou Ndiaye Coumba Rose, noms de personnes, de lieux) ; montants en FCFA inchangés ; respecter le **lexique**.
-- **Lexique** : paires « français → anglais » réglables dans les Paramètres du site (ex. « VAE » → « Recognition of Prior Learning (VAE) », « filière » → « programme track »), injectées dans les consignes.
-- Vérification de la réponse : mêmes clés, aucune valeur vide si la source ne l'est pas ; sinon échec.
-- Refus ou erreur : 3 tentatives espacées ; ensuite l'échec est journalisé et visible dans « Traductions à relire » (statut « échec »). Aucun impact sur le site (repli français).
-- Clé : `ANTHROPIC_API_KEY` dans l'environnement ; absente → aucune tâche lancée, un avertissement dans l'admin.
+- Service : **DeepL API Free** (`https://api-free.deepl.com/v2/translate`), clé `DEEPL_API_KEY` dans l'environnement ; client HTTP de Laravel (pas de paquet supplémentaire), derrière une interface `Translator` (une implémentation DeepL, une implémentation factice pour les tests, une implémentation « aucune » quand la clé est absente).
+- Paramètres : `source_lang=FR`, `target_lang=EN-GB` (anglais britannique, usage courant des institutions culturelles et bailleurs européens), `tag_handling=html` pour les champs HTML (la mise en forme est conservée), `preserve_formatting=1`. Tous les textes d'une fiche partent dans un seul appel (liste de textes, 50 au plus par appel ; au-delà, plusieurs appels).
+- **Noms propres et lexique** : un glossaire DeepL (français → anglais) est créé et tenu à jour à partir du **lexique** réglable dans les Paramètres du site (ex. « VAE » → « Recognition of Prior Learning (VAE) », « filière » → « programme track ») ; les noms à ne jamais traduire (EMSI, Impact Live Studio, Maison de la culture Habib Faye, Grand Théâtre National Doudou Ndiaye Coumba Rose, noms de personnes et de lieux) y figurent avec eux-mêmes comme traduction. Le lexique est prérempli avec ces noms. À chaque modification du lexique, le glossaire est recréé.
+- **Quota gratuit** : avant chaque tâche, lecture du compteur DeepL (`/v2/usage`) ; si l'envoi ferait dépasser **95 %** de la limite mensuelle, la tâche est remise à plus tard (reprise automatique le mois suivant) et l'admin affiche « Quota gratuit de traduction atteint ce mois-ci ». Le compte gratuit ne peut de toute façon pas être facturé ; ce garde-fou évite des échecs en série.
+- Vérification de la réponse : autant de textes renvoyés qu'envoyés, aucun texte vide si la source ne l'est pas ; sinon échec.
+- Erreur (réseau, 429, 456 quota, 5xx) : 3 tentatives espacées ; ensuite l'échec est journalisé et visible dans « Traductions à relire » (statut « Échec »). Aucun impact sur le site (repli français).
+- Clé absente : aucune tâche, l'admin indique « Traduction automatique non configurée : traduisez à la main dans l'onglet Anglais ».
 
 ### 3.3 Relecture
 
@@ -82,9 +85,9 @@ Les noms propres (`Place.name`, `Partner.name`, noms de personnes) ne sont pas t
 
 ### 3.4 Lancement : `php artisan emsi:translate {--all} {--model=} {--dry-run}`
 
-- `--all` : traduit tout le contenu publié sans traduction à jour, via l'**API Batches** (moitié prix), puis suit le lot jusqu'à la fin.
-- Affiche avant de lancer le nombre de fiches, une estimation des jetons et du coût, et demande confirmation (`--force` pour l'automatiser).
-- `--dry-run` : n'appelle pas l'API, affiche seulement l'estimation.
+- `--all` : met en file la traduction de tout le contenu publié sans traduction à jour, en commençant par les pages, puis formations, univers, menus, lieux, services, actualités récentes. Les tâches respectent le quota (§3.2) : si le contenu dépasse la limite du mois, le reste se traduit automatiquement le mois suivant.
+- Affiche avant de lancer le nombre de fiches, le **nombre de caractères** à envoyer et le quota restant du mois, puis demande confirmation (`--force` pour l'automatiser).
+- `--dry-run` : n'appelle pas le service de traduction, affiche seulement le décompte.
 
 ## 4. API publique
 
@@ -105,12 +108,12 @@ Les noms propres (`Place.name`, `Partner.name`, noms de personnes) ne sont pas t
 
 - **Onglet « Anglais »** sur chaque ressource traduite : pour chaque champ, le français (lecture seule) à côté de l'anglais (modifiable), le statut (« Traduction automatique », « Relue », « Échec », « Pas encore traduit »), et les actions « Marquer comme relue », « Retraduire ». Pour les pages, les feuilles texte des blocs sont présentées une à une avec leur contexte (bloc, champ).
 - **Page « Traductions à relire »** : liste filtrable (type de contenu, statut), lien vers la fiche ; widget du tableau de bord avec le nombre à relire et les échecs.
-- **Paramètres du site** : interrupteur de traduction automatique, lexique (répéteur « Terme français » / « Traduction anglaise »).
+- **Paramètres du site** : interrupteur de traduction automatique, lexique (répéteur « Terme français » / « Traduction anglaise », prérempli avec les noms à ne pas traduire), et l'état du quota gratuit du mois (caractères utilisés / 500 000).
 - Droits : `directeur` et `communication` relisent et modifient ; les autres rôles consultent.
 
 ## 7. Tests
 
-- **Laravel** (client Claude simulé, aucun appel réel) : migrations aller-retour ; API `?locale=en` avec repli ; extraction des feuilles texte des blocs (liens, images et réglages intacts) ; réapplication des feuilles après modification de la structure ; modification du français → nouvelle tâche, statut `auto` ; champ relu non écrasé sans changement du français, `previous_value` rempli sinon ; brouillon de page non traduit ; clé absente ou erreur → aucune tâche ou échec journalisé sans impact ; validation de la réponse (clés manquantes) ; commande `emsi:translate --dry-run` et estimation ; formulaires avec `locale` et messages en anglais ; droits de relecture.
+- **Laravel** (service de traduction simulé, aucun appel réel) : migrations aller-retour ; API `?locale=en` avec repli ; extraction des feuilles texte des blocs (liens, images et réglages intacts) ; réapplication des feuilles après modification de la structure ; modification du français → nouvelle tâche, statut `auto` ; champ relu non écrasé sans changement du français, `previous_value` rempli sinon ; brouillon de page non traduit ; clé absente → aucune tâche et saisie manuelle possible ; erreur → échec journalisé sans impact ; quota proche de la limite → tâche reportée ; glossaire recréé quand le lexique change ; validation de la réponse (clés manquantes) ; commande `emsi:translate --dry-run` et décompte des caractères ; formulaires avec `locale` et messages en anglais ; droits de relecture.
 - **Site** : dictionnaires complets (test unitaire) ; Playwright : sélecteur FR → EN sur la même page et retour, `hreflang` présents, une page anglaise sans traduction affiche le français, un formulaire affiche ses erreurs en anglais, redirections R1 sous `/en`, aucun défilement horizontal à 360 px en anglais.
 - Suites complètes : `php artisan test`, `composer test:mysql`, `npm run lint`, `npm test`, `npm run build`, `npm run e2e`.
 
@@ -119,4 +122,5 @@ Les noms propres (`Place.name`, `Partner.name`, noms de personnes) ne sont pas t
 - Autres langues (wolof, arabe…) : la structure le permet, non prévu.
 - Admin en anglais ; courriels transactionnels bilingues (aucun courriel au candidat aujourd'hui).
 - Traduction des fichiers (PDF, sons) et des textes intégrés aux images.
+- Tout service de traduction payant (Claude, DeepL Pro, Google) : l'interface `Translator` permet d'en brancher un plus tard sans changer le reste.
 - Adresses traduites (`/en/habib-faye-house`).
