@@ -15,6 +15,9 @@ use App\Models\Service;
 use App\Models\Setting;
 use App\Models\Track;
 use App\Services\FrontendRevalidator;
+use App\Services\Translation\DeepLTranslator;
+use App\Services\Translation\NullTranslator;
+use App\Services\Translation\Translator;
 use Filament\Support\Assets\Css;
 use Filament\Support\Assets\Js;
 use Filament\Support\Facades\FilamentAsset;
@@ -31,6 +34,9 @@ class AppServiceProvider extends ServiceProvider
     public function register(): void
     {
         $this->app->singleton(FrontendRevalidator::class);
+        $this->app->bind(Translator::class, fn ($app) => filled(config('services.deepl.key'))
+            ? $app->make(DeepLTranslator::class)
+            : new NullTranslator);
     }
 
     public function boot(): void
