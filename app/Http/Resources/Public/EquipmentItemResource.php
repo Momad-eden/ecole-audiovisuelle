@@ -4,6 +4,7 @@ namespace App\Http\Resources\Public;
 
 use App\Models\EquipmentItem;
 use App\Support\Media;
+use App\Support\Translation\Localized;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
 
@@ -30,7 +31,7 @@ class EquipmentItemResource extends JsonResource
             'summary' => $this->summary,
             'image' => Media::image($this->image, $this->image_alt ?: $this->name),
             'priceFrom' => $this->price_from,
-            'priceLabel' => $this->priceLabel(),
+            'priceLabel' => $this->priceLabel(Localized::locale()),
             'isFeatured' => $this->is_featured,
             'category' => $this->whenLoaded('category', fn () => ['name' => $this->category->name, 'slug' => $this->category->slug]),
             $this->mergeWhen($this->full, fn () => [

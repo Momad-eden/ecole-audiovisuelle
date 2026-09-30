@@ -24,6 +24,22 @@ enum PriceUnit: string implements HasLabel
         };
     }
 
+    /** Libellé dans la langue de l'API publique (`en` : anglais) ; en français, identique à getLabel() (admin). */
+    public function labelFor(string $locale): string
+    {
+        if ($locale !== 'en') {
+            return $this->getLabel();
+        }
+
+        return match ($this) {
+            self::HOUR => 'per hour',
+            self::SESSION => 'per session',
+            self::TRACK => 'per track',
+            self::DAY => 'per day',
+            self::EVENT => 'per event',
+        };
+    }
+
     public function suffix(): string
     {
         return match ($this) {

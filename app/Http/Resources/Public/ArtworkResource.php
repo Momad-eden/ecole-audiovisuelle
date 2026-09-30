@@ -32,7 +32,7 @@ class ArtworkResource extends JsonResource
             'slug' => $this->slug,
             'year' => $this->year,
             'kind' => $this->kind?->value,
-            'kindLabel' => $this->kind?->getLabel(),
+            'kindLabel' => $this->kind?->labelFor(Localized::locale()),
             'summary' => $this->t('summary'),
             'cover' => Media::image($this->cover_image, $this->t('cover_alt')),
             'isFeatured' => $this->is_featured,

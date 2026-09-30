@@ -20,7 +20,7 @@ class OfferingResource extends JsonResource
             'feeAmount' => $this->fee_amount,
             'registrationFeeAmount' => $this->registration_fee_amount,
             'fundingMode' => $this->funding_mode?->value,
-            'fundingLabel' => $this->funding_note ?: $this->funding_mode?->getLabel(),
+            'fundingLabel' => $this->funding_note ?: $this->funding_mode?->labelFor(Localized::locale()),
             'campusIds' => $this->resource->getAttributes()['campus_ids'] ?? [],
             'isOpen' => $this->is_open,
             'audience' => $this->relationLoaded('cohort') && $this->cohort->relationLoaded('program') ? $this->cohort->program->audience?->value : null,

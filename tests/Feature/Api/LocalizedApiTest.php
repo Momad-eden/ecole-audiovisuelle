@@ -2,7 +2,13 @@
 
 namespace Tests\Feature\Api;
 
+use App\Enums\Activity;
+use App\Enums\ArtworkKind;
 use App\Enums\Audience;
+use App\Enums\CohortStatus;
+use App\Enums\FundingMode;
+use App\Enums\PriceUnit;
+use App\Enums\ProgramKind;
 use App\Enums\PublicationStatus;
 use App\Enums\TranslationStatus;
 use App\Models\AgendaEvent;
@@ -10,6 +16,8 @@ use App\Models\Application;
 use App\Models\Artwork;
 use App\Models\BookingRequest;
 use App\Models\ContactMessage;
+use App\Models\EquipmentCategory;
+use App\Models\EquipmentItem;
 use App\Models\Faq;
 use App\Models\MenuItem;
 use App\Models\News;
@@ -17,6 +25,7 @@ use App\Models\Offering;
 use App\Models\Page;
 use App\Models\Place;
 use App\Models\Program;
+use App\Models\RentalPack;
 use App\Models\Room;
 use App\Models\Service;
 use App\Models\Setting;
@@ -24,6 +33,7 @@ use App\Models\Track;
 use App\Support\PreviewToken;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Str;
 use Tests\TestCase;
 
@@ -254,6 +264,77 @@ class LocalizedApiTest extends TestCase
         $this->getJson('/api/v1/public/agenda?locale=en')->assertOk()->assertJsonPath('data.0.title', 'Concert Sound room');
         $this->getJson('/api/v1/public/offerings?locale=en')->assertOk()
             ->assertJsonFragment(['label' => 'Sound programme — '.$offering->cohort->name.' · Track Sound room']);
+    }
+
+    public function test_enum_labels_follow_the_request_locale(): void
+    {
+        $category = EquipmentCategory::create(['name' => 'Sonorisation', 'position' => 1]);
+        EquipmentItem::create(['name' => 'Line array K2', 'equipment_category_id' => $category->id, 'usage' => 'rental', 'price_from' => 150000, 'price_unit' => 'day', 'status' => PublicationStatus::PUBLISHED]);
+        Service::create(['name' => 'Mixage', 'activity' => 'studio', 'price_from' => 25000, 'price_unit' => 'track', 'position' => 1, 'status' => PublicationStatus::PUBLISHED]);
+        Service::create(['name' => 'Mastering', 'activity' => 'studio', 'position' => 2, 'status' => PublicationStatus::PUBLISHED]);
+        RentalPack::create(['name' => 'Pack concert', 'price_from' => 1250000, 'price_unit' => 'event', 'status' => PublicationStatus::PUBLISHED]);
+        AgendaEvent::create(['title' => 'Concert', 'slug' => 'concert', 'activity' => 'events', 'starts_at' => now()->addWeek(), 'status' => PublicationStatus::PUBLISHED]);
+        Artwork::create(['title' => 'Paysage sonore', 'kind' => 'live', 'status' => PublicationStatus::PUBLISHED]);
+        $offering = Offering::factory()->create(['funding_mode' => FundingMode::SPONSORED]);
+        $offering->cohort->program->update(['kind' => ProgramKind::SHORT_COURSE]);
+        $slug = $offering->cohort->program->slug;
+
+        $this->getJson('/api/v1/public/equipment?locale=en')->assertJsonPath('data.0.priceLabel', 'From 150,000 FCFA per day');
+        $this->getJson('/api/v1/public/services?activity=studio&locale=en')
+            ->assertJsonPath('data.0.priceLabel', 'From 25,000 FCFA per track')
+            ->assertJsonPath('data.1.priceLabel', 'On request');
+        $this->getJson('/api/v1/public/packs?locale=en')->assertJsonPath('data.0.priceLabel', 'From 1,250,000 FCFA per event');
+        $this->getJson('/api/v1/public/agenda?locale=en')->assertJsonPath('data.0.activityLabel', 'Impact Live Events');
+        $this->getJson('/api/v1/public/artworks?locale=en')->assertJsonPath('data.0.kindLabel', 'Live show / live recording');
+        $this->getJson("/api/v1/public/programs/{$slug}?locale=en")
+            ->assertJsonPath('data.kindLabel', 'Short course / workshop')
+            ->assertJsonPath('data.cohorts.0.statusLabel', 'Applications open')
+            ->assertJsonPath('data.cohorts.0.offerings.0.fundingLabel', 'Funded');
+        $this->getJson('/api/v1/public/offerings?locale=en')->assertJsonPath('data.0.fundingLabel', 'Funded');
+
+        $this->getJson('/api/v1/public/equipment')->assertJsonPath('data.0.priceLabel', 'À partir de 150 000 FCFA / jour');
+        $this->getJson('/api/v1/public/services?activity=studio')
+            ->assertJsonPath('data.0.priceLabel', 'À partir de 25 000 FCFA / titre')
+            ->assertJsonPath('data.1.priceLabel', 'Sur devis');
+        $this->getJson('/api/v1/public/packs')->assertJsonPath('data.0.priceLabel', 'À partir de 1 250 000 FCFA / événement');
+        $this->getJson('/api/v1/public/artworks')->assertJsonPath('data.0.kindLabel', 'Spectacle / captation live');
+        $this->getJson("/api/v1/public/programs/{$slug}")
+            ->assertJsonPath('data.kindLabel', 'Stage / atelier court')
+            ->assertJsonPath('data.cohorts.0.statusLabel', 'Candidatures ouvertes')
+            ->assertJsonPath('data.cohorts.0.offerings.0.fundingLabel', 'Pris en charge');
+    }
+
+    public function test_every_enum_case_has_an_english_label_and_keeps_its_french_label(): void
+    {
+        foreach ([Activity::class, ArtworkKind::class, ProgramKind::class, CohortStatus::class, FundingMode::class, PriceUnit::class] as $enum) {
+            foreach ($enum::cases() as $case) {
+                $this->assertSame($case->getLabel(), $case->labelFor('fr'), $enum.'::'.$case->name);
+                $this->assertNotSame('', $case->labelFor('en'), $enum.'::'.$case->name);
+            }
+        }
+        $this->assertSame('par heure', PriceUnit::HOUR->getLabel());
+        $this->assertSame('per hour', PriceUnit::HOUR->labelFor('en'));
+    }
+
+    public function test_saving_or_deleting_a_translation_refreshes_the_website(): void
+    {
+        $faq = Faq::create(['group' => 'general', 'question' => 'Comment postuler ?', 'answer' => 'En ligne.', 'position' => 1]);
+        config(['services.frontend.url' => 'https://emsi.test', 'services.frontend.revalidate_secret' => 'secret']);
+        Http::fake(['emsi.test/*' => Http::response(['revalidated' => true])]);
+
+        $this->translate($faq, 'question', 'How do I apply?');
+        Http::assertSentCount(1);
+
+        // Écrite sous transaction (tâche de traduction) : rien n'est demandé avant la validation.
+        DB::transaction(function () use ($faq) {
+            $faq->translation('question')->update(['value' => 'How can I apply?']);
+            Http::assertSentCount(1);
+        });
+        Http::assertSentCount(2);
+
+        $faq->translation('question')->delete();
+        Http::assertSentCount(3);
+        Http::assertSent(fn ($request) => $request->url() === 'https://emsi.test/api/revalidate' && $request['tags'] === ['content']);
     }
 
     public function test_english_news_list_uses_a_bounded_number_of_queries(): void

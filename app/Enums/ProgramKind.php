@@ -23,6 +23,22 @@ enum ProgramKind: string implements HasLabel
         };
     }
 
+    /** Libellé dans la langue de l'API publique (`en` : anglais) ; en français, identique à getLabel() (admin). */
+    public function labelFor(string $locale): string
+    {
+        if ($locale !== 'en') {
+            return $this->getLabel();
+        }
+
+        return match ($this) {
+            self::INITIAL_TRAINING => 'Initial training',
+            self::CERTIFICATE => 'Certified programme',
+            self::SHORT_COURSE => 'Short course / workshop',
+            self::INTENSIVE_UPSKILLING => 'Intensive upskilling',
+            self::VAE_BTS => 'BTS-level certification through recognition of prior learning (VAE)',
+        };
+    }
+
     public function label(): string
     {
         return $this->getLabel();

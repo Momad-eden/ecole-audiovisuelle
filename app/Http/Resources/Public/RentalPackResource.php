@@ -4,6 +4,7 @@ namespace App\Http\Resources\Public;
 
 use App\Models\RentalPack;
 use App\Support\Media;
+use App\Support\Translation\Localized;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
 
@@ -20,7 +21,7 @@ class RentalPackResource extends JsonResource
             'capacity' => $this->capacity,
             'contents' => $this->contents ?? [],
             'priceFrom' => $this->price_from,
-            'priceLabel' => $this->priceLabel(),
+            'priceLabel' => $this->priceLabel(Localized::locale()),
             'image' => Media::image($this->image, $this->image_alt ?: $this->name),
         ];
     }

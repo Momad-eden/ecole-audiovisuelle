@@ -23,6 +23,22 @@ enum ArtworkKind: string implements HasLabel
         };
     }
 
+    /** Libellé dans la langue de l'API publique (`en` : anglais) ; en français, identique à getLabel() (admin). */
+    public function labelFor(string $locale): string
+    {
+        if ($locale !== 'en') {
+            return $this->getLabel();
+        }
+
+        return match ($this) {
+            self::AUDIO => 'Sound',
+            self::VIDEO => 'Video',
+            self::IMAGE => 'Image',
+            self::SERIES => 'Series',
+            self::LIVE => 'Live show / live recording',
+        };
+    }
+
     public function label(): string
     {
         return $this->getLabel();

@@ -25,8 +25,9 @@ class RentalPack extends Model
         return 'name';
     }
 
-    public function priceLabel(): string
+    /** Prix affiché ; français par défaut (admin), langue de la requête pour l'API publique. */
+    public function priceLabel(string $locale = 'fr'): string
     {
-        return Price::label($this->price_from, $this->price_unit);
+        return Price::label($this->price_from, $this->price_unit, $locale);
     }
 }

@@ -5,6 +5,7 @@ namespace App\Http\Resources\Public;
 use App\Http\Resources\Public\Concerns\TranslatesFields;
 use App\Models\Program;
 use App\Support\Media;
+use App\Support\Translation\Localized;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
 
@@ -21,7 +22,7 @@ class ProgramResource extends JsonResource
             'slug' => $this->slug,
             'audience' => $this->audience?->value,
             'kind' => $this->kind?->value,
-            'kindLabel' => $this->kind?->getLabel(),
+            'kindLabel' => $this->kind?->labelFor(Localized::locale()),
             'levelLabel' => $this->t('level_label'),
             'durationLabel' => $this->t('duration_label'),
             'summary' => $this->t('summary'),

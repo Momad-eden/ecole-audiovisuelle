@@ -3,6 +3,7 @@
 namespace App\Http\Resources\Public;
 
 use App\Models\Cohort;
+use App\Support\Translation\Localized;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
 
@@ -17,7 +18,7 @@ class CohortResource extends JsonResource
             'startsOn' => $this->starts_on?->toDateString(),
             'endsOn' => $this->ends_on?->toDateString(),
             'status' => $this->status?->value,
-            'statusLabel' => $this->status?->getLabel(),
+            'statusLabel' => $this->status?->labelFor(Localized::locale()),
             'applicationsOpenAt' => $this->applications_open_at?->toIso8601String(),
             'applicationsCloseAt' => $this->applications_close_at?->toIso8601String(),
             'acceptsApplications' => $this->acceptsApplications(),

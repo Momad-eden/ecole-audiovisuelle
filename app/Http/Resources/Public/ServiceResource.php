@@ -5,6 +5,7 @@ namespace App\Http\Resources\Public;
 use App\Http\Resources\Public\Concerns\TranslatesFields;
 use App\Models\Service;
 use App\Support\Media;
+use App\Support\Translation\Localized;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
 
@@ -24,7 +25,7 @@ class ServiceResource extends JsonResource
             'description' => $this->t('description'),
             'priceFrom' => $this->price_from,
             'priceUnit' => $this->price_unit?->value,
-            'priceLabel' => $this->priceLabel(),
+            'priceLabel' => $this->priceLabel(Localized::locale()),
             'icon' => $this->icon,
             'image' => Media::image($this->image, $this->t('image_alt')),
         ];
