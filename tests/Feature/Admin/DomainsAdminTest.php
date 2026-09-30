@@ -61,11 +61,41 @@ class DomainsAdminTest extends TestCase
         MenuItem::create(['location' => 'main', 'label' => 'Enfant', 'url' => '/b', 'parent_id' => $top->id]);
         MenuItem::create(['location' => 'footer', 'label' => 'Pied', 'url' => '/c']);
         $free = MenuItem::create(['location' => 'main', 'label' => 'Libre', 'url' => '/d']);
+        MenuItem::create(['location' => 'main', 'label' => 'Candidater', 'url' => '/candidater', 'is_button' => true]);
 
         $this->get(MenuItemResource::getUrl('create'))->assertOk()->assertSee('Sous-menu de');
 
+        // Un élément qui a déjà des sous-menus reste proposé (on y ajoute un lien) ; un bouton ne l'est pas.
         Livewire::test(CreateMenuItem::class)
-            ->assertFormFieldExists('parent_id', fn (Select $field) => $field->getOptions() === [$free->id => 'Libre']);
+            ->assertFormFieldExists('parent_id', fn (Select $field) => $field->getOptions() === [$top->id => 'Racine', $free->id => 'Libre']);
+    }
+
+    public function test_a_child_can_be_added_under_an_existing_dropdown(): void
+    {
+        $top = MenuItem::create(['location' => 'main', 'label' => 'EMSI', 'url' => '/emsi']);
+        MenuItem::create(['location' => 'main', 'label' => 'L\'école', 'url' => '/emsi', 'parent_id' => $top->id]);
+
+        Livewire::test(CreateMenuItem::class)
+            ->fillForm(['location' => 'main', 'parent_id' => $top->id, 'label' => 'Nouveau', 'url' => '/emsi/formations'])
+            ->call('create')->assertHasNoFormErrors();
+
+        $this->assertSame($top->id, MenuItem::where('label', 'Nouveau')->firstOrFail()->parent_id);
+    }
+
+    public function test_moving_a_child_out_of_the_main_menu_detaches_it_from_its_dropdown(): void
+    {
+        $top = MenuItem::create(['location' => 'main', 'label' => 'EMSI', 'url' => '/emsi']);
+        $child = MenuItem::create(['location' => 'main', 'label' => 'Presse', 'url' => '/presse', 'parent_id' => $top->id]);
+
+        Livewire::test(EditMenuItem::class, ['record' => $child->id])
+            ->fillForm(['location' => 'footer'])->call('save')->assertHasNoFormErrors();
+
+        $this->assertNull($child->fresh()->parent_id);
+        $this->assertSame('footer', $child->fresh()->location);
+
+        // Même règle hors formulaire (import, script) : un lien hors menu principal n'a pas de parent.
+        $stray = MenuItem::create(['location' => 'legal', 'label' => 'Mentions', 'url' => '/mentions-legales', 'parent_id' => $top->id]);
+        $this->assertNull($stray->fresh()->parent_id);
     }
 
     public function test_program_form_offers_campus_availability(): void
@@ -107,15 +137,16 @@ class DomainsAdminTest extends TestCase
         $this->assertSame(['studio_session' => 'Session studio', 'space_rental' => 'Location de l\'Espace Habib Faye'], $type->getOptions());
     }
 
-    public function test_menu_parent_options_on_edit_exclude_self_and_items_with_children(): void
+    public function test_menu_parent_options_on_edit_exclude_self_and_buttons(): void
     {
         $parent = MenuItem::create(['location' => 'main', 'label' => 'Parent', 'url' => '/p']);
         MenuItem::create(['location' => 'main', 'label' => 'Enfant', 'url' => '/e', 'parent_id' => $parent->id]);
         $plain = MenuItem::create(['location' => 'main', 'label' => 'Simple', 'url' => '/s']);
         $other = MenuItem::create(['location' => 'main', 'label' => 'Autre', 'url' => '/o']);
+        MenuItem::create(['location' => 'main', 'label' => 'Candidater', 'url' => '/candidater', 'is_button' => true]);
 
         Livewire::test(EditMenuItem::class, ['record' => $plain->id])
-            ->assertFormFieldExists('parent_id', fn (Select $f) => $f->getOptions() === [$other->id => 'Autre']);
+            ->assertFormFieldExists('parent_id', fn (Select $f) => $f->getOptions() === [$parent->id => 'Parent', $other->id => 'Autre']);
 
         Livewire::test(EditMenuItem::class, ['record' => $parent->id])
             ->assertFormFieldIsDisabled('parent_id');

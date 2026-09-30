@@ -24,6 +24,17 @@ class MenuItem extends Model
         'is_visible' => 'boolean',
     ];
 
+    protected static function booted(): void
+    {
+        // Seul le menu principal a des menus déroulants : un lien passé au pied de page
+        // ou aux liens légaux quitte son ancien sous-menu.
+        static::saving(function (MenuItem $item) {
+            if ($item->location !== 'main') {
+                $item->parent_id = null;
+            }
+        });
+    }
+
     public function parent(): BelongsTo
     {
         return $this->belongsTo(self::class, 'parent_id');
