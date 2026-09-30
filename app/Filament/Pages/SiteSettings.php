@@ -3,6 +3,7 @@
 namespace App\Filament\Pages;
 
 use App\Enums\UserRole;
+use App\Filament\Support\TranslationTab;
 use App\Models\Setting;
 use App\Services\Translation\DeepLGlossary;
 use App\Services\Translation\TranslationQuota;
@@ -93,6 +94,9 @@ class SiteSettings extends Page
                         TextInput::make('en')->label('Traduction anglaise')->required()->maxLength(200),
                     ]),
             ]),
+            Section::make('Anglais')->columns(1)->collapsible()
+                ->description('Textes de cette page affichés sur le site anglais.')
+                ->schema(fn () => TranslationTab::components(Setting::current())),
         ]);
     }
 
@@ -133,6 +137,7 @@ class SiteSettings extends Page
         $setting = Setting::current();
         $glossaryChanged = ($setting->translation_glossary ?? []) !== $state['translation_glossary'];
         $setting->update($state);
+        TranslationTab::flush($setting);
 
         Notification::make()->title('Paramètres enregistrés.')->success()->send();
 
