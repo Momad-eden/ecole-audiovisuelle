@@ -48,10 +48,23 @@ class TranslationQuota
     public function canSend(int $characters): bool
     {
         try {
-            ['used' => $used, 'limit' => $limit] = $this->usage();
+            return $this->hasRoomFor($characters);
         } catch (TranslationFailed|TranslationTemporarilyUnavailable) {
             return false;
         }
+    }
+
+    /**
+     * Comme canSend(), mais une consommation illisible lève l'erreur (panne passagère ou refus)
+     * au lieu de répondre « non » : la tâche de traduction peut alors réessayer ou échouer.
+     *
+     * @throws TranslationFailed
+     * @throws TranslationTemporarilyUnavailable
+     * @throws Exceptions\QuotaExceeded
+     */
+    public function hasRoomFor(int $characters): bool
+    {
+        ['used' => $used, 'limit' => $limit] = $this->usage();
 
         return $used + $characters <= (int) floor(0.95 * $limit);
     }

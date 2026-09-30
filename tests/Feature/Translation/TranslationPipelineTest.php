@@ -18,7 +18,6 @@ use App\Services\Translation\Translator;
 use Illuminate\Contracts\Queue\ShouldBeUnique;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Http\Client\Request;
-use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Http;
@@ -255,9 +254,8 @@ class TranslationPipelineTest extends TestCase
 
     // --- Quota et erreurs ---
 
-    public function test_insufficient_quota_releases_the_job_until_next_month(): void
+    public function test_insufficient_quota_releases_the_job_for_one_day(): void
     {
-        Carbon::setTestNow(Carbon::parse('2026-09-30 15:00:00', 'Africa/Dakar'));
         Queue::fake();
         $page = $this->page();
         $page->publish();
@@ -266,11 +264,142 @@ class TranslationPipelineTest extends TestCase
         $job = (new TranslateRecord($page))->withFakeQueueInteractions();
         $job->handle(app(Translator::class), app(TranslationQuota::class));
 
-        $job->assertReleased(Carbon::parse('2026-10-01 00:05:00', 'Africa/Dakar'));
+        // DeepL renouvelle le quota à la date anniversaire du compte : on revient voir chaque jour.
+        $job->assertReleased(86400);
         $job->assertNotFailed();
         $this->assertSame([], $this->translator->calls);
         $this->assertSame(0, Translation::count());
-        Carbon::setTestNow();
+    }
+
+    public function test_usage_temporarily_unavailable_is_retried_not_released(): void
+    {
+        Queue::fake();
+        $page = $this->page();
+        $page->publish();
+        $this->usageStatus = 503;
+        Cache::flush();
+
+        $job = (new TranslateRecord($page))->withFakeQueueInteractions();
+        try {
+            $job->handle(app(Translator::class), app(TranslationQuota::class));
+            $this->fail('Une panne passagère doit remonter pour un nouvel essai.');
+        } catch (TranslationTemporarilyUnavailable) {
+        }
+
+        $job->assertNotReleased();
+        $job->assertNotFailed();
+        $this->assertSame(0, Translation::count());
+    }
+
+    public function test_usage_refused_marks_fields_failed(): void
+    {
+        Queue::fake();
+        $page = $this->page();
+        $page->publish();
+        $this->usageStatus = 403;
+        Cache::flush();
+
+        $job = (new TranslateRecord($page))->withFakeQueueInteractions();
+        $job->handle(app(Translator::class), app(TranslationQuota::class));
+
+        $job->assertFailed();
+        $job->assertNotReleased();
+        $this->assertSame(TranslationStatus::FAILED, $this->row($page, 'title')->status);
+        $this->assertSame([], $this->translator->calls);
+    }
+
+    public function test_review_saved_during_translation_with_same_french_is_kept(): void
+    {
+        Queue::fake();
+        $page = $this->page();
+        $page->publish();
+        $page->translations()->create(['field' => 'title', 'locale' => 'en', 'value' => 'EN: Ancien', 'source_hash' => 'old', 'status' => TranslationStatus::AUTO]);
+
+        // Pendant l'appel à DeepL, une personne corrige l'anglais du français actuel.
+        $this->translator = new class($page) extends FakeTranslator
+        {
+            public function __construct(private Page $page)
+            {
+                parent::__construct();
+            }
+
+            public function translate(array $texts, array $htmlKeys = []): array
+            {
+                $this->page->translations()->where('field', 'title')->update([
+                    'value' => 'Home (reviewed)', 'status' => 'reviewed', 'source_hash' => $this->page->sourceHash('title'),
+                ]);
+
+                return parent::translate($texts, $htmlKeys);
+            }
+        };
+        $this->app->instance(Translator::class, $this->translator);
+
+        (new TranslateRecord($page->fresh()))->handle(app(Translator::class), app(TranslationQuota::class));
+
+        $title = $this->row($page, 'title');
+        $this->assertSame('Home (reviewed)', $title->value);
+        $this->assertSame(TranslationStatus::REVIEWED, $title->status);
+        $this->assertSame(TranslationStatus::AUTO, $this->row($page, 'blocks')->status, 'les autres champs sont traduits');
+    }
+
+    public function test_review_saved_during_translation_of_older_french_goes_to_previous_value(): void
+    {
+        Queue::fake();
+        $page = $this->page();
+        $page->publish();
+        $page->translations()->create(['field' => 'title', 'locale' => 'en', 'value' => 'EN: Ancien', 'source_hash' => 'old', 'status' => TranslationStatus::AUTO]);
+
+        $this->translator = new class($page) extends FakeTranslator
+        {
+            public function __construct(private Page $page)
+            {
+                parent::__construct();
+            }
+
+            public function translate(array $texts, array $htmlKeys = []): array
+            {
+                $this->page->translations()->where('field', 'title')->update(['value' => 'Old home (reviewed)', 'status' => 'reviewed']);
+
+                return parent::translate($texts, $htmlKeys);
+            }
+        };
+        $this->app->instance(Translator::class, $this->translator);
+
+        (new TranslateRecord($page->fresh()))->handle(app(Translator::class), app(TranslationQuota::class));
+
+        $title = $this->row($page, 'title');
+        $this->assertSame('EN: Accueil', $title->value);
+        $this->assertSame(TranslationStatus::AUTO, $title->status);
+        $this->assertSame('Old home (reviewed)', $title->previous_value);
+    }
+
+    public function test_lexicon_saved_without_key_is_synced_by_the_next_job(): void
+    {
+        Queue::fake();
+        Setting::current()->forceFill(['translation_glossary' => [['fr' => 'filière', 'en' => 'track']], 'deepl_glossary_id' => null])->save();
+        Http::fake(['api-free.deepl.com/v2/glossaries' => Http::response(['glossary_id' => 'gl-late'])]);
+        $page = $this->page();
+        $page->publish();
+
+        (new TranslateRecord($page))->handle(app(Translator::class), app(TranslationQuota::class));
+
+        $this->assertSame('gl-late', Setting::current()->fresh()->deepl_glossary_id);
+        Http::assertSent(fn (Request $r) => str_ends_with($r->url(), '/v2/glossaries') && $r['entries'] === "filière\ttrack");
+        $this->assertSame('EN: Accueil', $this->row($page, 'title')->value);
+    }
+
+    public function test_late_glossary_sync_failure_does_not_block_translation(): void
+    {
+        Queue::fake();
+        Setting::current()->forceFill(['translation_glossary' => [['fr' => 'filière', 'en' => 'track']], 'deepl_glossary_id' => null])->save();
+        Http::fake(['api-free.deepl.com/v2/glossaries' => Http::response([], 500)]);
+        $page = $this->page();
+        $page->publish();
+
+        (new TranslateRecord($page))->handle(app(Translator::class), app(TranslationQuota::class));
+
+        $this->assertNull(Setting::current()->fresh()->deepl_glossary_id);
+        $this->assertSame('EN: Accueil', $this->row($page, 'title')->value);
     }
 
     public function test_quota_exceeded_by_deepl_releases_the_job(): void
@@ -462,6 +591,23 @@ class TranslationPipelineTest extends TestCase
             ->call('save');
 
         Http::assertNotSent(fn (Request $r) => str_contains($r->url(), '/v2/glossaries'));
+    }
+
+    public function test_settings_page_warns_when_quota_is_reached(): void
+    {
+        $this->admin();
+        $this->fakeUsage(480000, 500000);
+
+        Livewire::test(SiteSettings::class)
+            ->assertSee('Quota gratuit de traduction atteint : reprise automatique dès qu\'il se renouvelle');
+    }
+
+    public function test_tests_never_see_a_real_deepl_key_nor_reach_the_network(): void
+    {
+        $this->assertSame('', (string) env('DEEPL_API_KEY'));
+
+        $this->expectException(\RuntimeException::class);
+        Http::get('https://example.org/stray');
     }
 
     public function test_settings_page_survives_unreachable_deepl(): void

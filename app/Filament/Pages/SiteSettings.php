@@ -113,7 +113,7 @@ class SiteSettings extends Page
         $line = "Caractères traduits ce mois-ci : {$format($used)} / {$format($limit)}";
 
         return $limit > 0 && $used >= floor(0.95 * $limit)
-            ? $line.' — Quota gratuit de traduction atteint ce mois-ci'
+            ? $line.' — Quota gratuit de traduction atteint : reprise automatique dès qu\'il se renouvelle'
             : $line;
     }
 

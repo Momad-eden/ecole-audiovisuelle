@@ -3,7 +3,9 @@
 namespace App\Jobs;
 
 use App\Enums\TranslationStatus;
+use App\Models\Setting;
 use App\Services\FrontendRevalidator;
+use App\Services\Translation\DeepLGlossary;
 use App\Services\Translation\Exceptions\QuotaExceeded;
 use App\Services\Translation\Exceptions\TranslationFailed;
 use App\Services\Translation\TranslationQuota;
@@ -13,7 +15,7 @@ use Illuminate\Contracts\Queue\ShouldBeUniqueUntilProcessing;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Foundation\Queue\Queueable;
-use Illuminate\Support\Carbon;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Throwable;
 
@@ -22,9 +24,9 @@ use Throwable;
  *
  * Tentatives : `$tries = 0` (pas de limite de passages) et `$maxExceptions = 3`. Seules les erreurs
  * passagères (réseau, 429, 5xx) lèvent une exception : trois au plus, espacées de 1, 5 puis 15 minutes,
- * puis `failed()` marque les champs en échec. Le quota atteint remet la tâche au 1er du mois suivant
- * par `release()`, qui ne compte pas comme une exception : l'attente peut durer plusieurs mois sans
- * épuiser les essais. Une erreur définitive (réponse invalide, requête refusée) échoue tout de suite.
+ * puis `failed()` marque les champs en échec ; une lecture du quota en panne passagère suit le même
+ * chemin. Le quota atteint remet la tâche au lendemain par `release()`, qui ne compte pas comme une
+ * exception : l'attente peut durer jusqu'au renouvellement du quota sans épuiser les essais. Une erreur définitive (réponse invalide, requête refusée) échoue tout de suite.
  *
  * Unicité par fiche jusqu'au début du traitement : une modification enregistrée pendant qu'une tâche
  * tourne remet bien une nouvelle tâche en file (sinon ce français-là resterait sans traduction).
@@ -32,6 +34,9 @@ use Throwable;
 class TranslateRecord implements ShouldBeUniqueUntilProcessing, ShouldQueue
 {
     use Queueable;
+
+    /** Attente quand le quota gratuit est atteint (secondes). */
+    public const QUOTA_RETRY_DELAY = 86400;
 
     public int $tries = 0;
 
@@ -81,16 +86,16 @@ class TranslateRecord implements ShouldBeUniqueUntilProcessing, ShouldQueue
         }
 
         if ($texts !== []) {
-            if (! $quota->canSend(array_sum(array_map('mb_strlen', $texts)))) {
-                $this->releaseUntilNextMonth();
-
-                return;
-            }
-
             try {
+                if (! $quota->hasRoomFor(array_sum(array_map('mb_strlen', $texts)))) {
+                    $this->releaseUntilQuotaRenews();
+
+                    return;
+                }
+                $this->syncPendingGlossary();
                 $translated = $translator->translate($texts, $htmlKeys);
             } catch (QuotaExceeded) {
-                $this->releaseUntilNextMonth();
+                $this->releaseUntilQuotaRenews();
 
                 return;
             } catch (TranslationFailed $e) {
@@ -100,7 +105,8 @@ class TranslateRecord implements ShouldBeUniqueUntilProcessing, ShouldQueue
 
                 return;
             }
-            // TranslationTemporarilyUnavailable remonte : nouvel essai après attente (backoff).
+            // TranslationTemporarilyUnavailable (traduction ou lecture du quota) remonte :
+            // nouvel essai après attente (backoff), trois au plus (maxExceptions).
         } else {
             $translated = [];
         }
@@ -146,9 +152,31 @@ class TranslateRecord implements ShouldBeUniqueUntilProcessing, ShouldQueue
         }
     }
 
-    private function releaseUntilNextMonth(): void
+    /**
+     * DeepL renouvelle le quota à la date anniversaire du compte (pas forcément le 1er du mois) :
+     * la tâche revient voir chaque jour.
+     */
+    private function releaseUntilQuotaRenews(): void
     {
-        $this->release(Carbon::now('Africa/Dakar')->startOfMonth()->addMonthNoOverflow()->setTime(0, 5));
+        $this->release(self::QUOTA_RETRY_DELAY);
+    }
+
+    /**
+     * Lexique enregistré alors qu'aucune clé n'était configurée : envoyé à DeepL une fois, avant la
+     * première traduction. En cas d'échec, on traduit sans glossaire (nouvel essai à la tâche suivante).
+     */
+    private function syncPendingGlossary(): void
+    {
+        $setting = Setting::current();
+        if ($setting->deepl_glossary_id || empty($setting->translation_glossary)) {
+            return;
+        }
+
+        try {
+            app(DeepLGlossary::class)->sync($setting->translation_glossary);
+        } catch (Throwable $e) {
+            Log::warning('Envoi du lexique à DeepL impossible : '.$e->getMessage());
+        }
     }
 
     /**
@@ -200,20 +228,30 @@ class TranslateRecord implements ShouldBeUniqueUntilProcessing, ShouldQueue
         return json_encode($source, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
     }
 
+    /**
+     * Relit la ligne sous verrou juste avant d'écrire : une relecture enregistrée pendant l'appel à DeepL
+     * n'est jamais perdue (gardée telle quelle si elle porte sur le français actuel, sinon mise dans
+     * previous_value).
+     */
     private function store(Model $record, string $field, string $value, string $hash): void
     {
-        $row = $record->translation($field, 'en');
-        $attributes = ['value' => $value, 'source_hash' => $hash, 'status' => TranslationStatus::AUTO, 'translated_at' => now()];
+        DB::transaction(function () use ($record, $field, $value, $hash) {
+            $row = $record->translations()->where('field', $field)->where('locale', 'en')->lockForUpdate()->first();
+            $attributes = ['value' => $value, 'source_hash' => $hash, 'status' => TranslationStatus::AUTO, 'translated_at' => now()];
 
-        if (! $row) {
-            $record->translations()->create(['field' => $field, 'locale' => 'en', ...$attributes]);
+            if (! $row) {
+                $record->translations()->create(['field' => $field, 'locale' => 'en', ...$attributes]);
 
-            return;
-        }
+                return;
+            }
 
-        if ($row->status === TranslationStatus::REVIEWED) {
-            $attributes['previous_value'] = $row->value;
-        }
-        $row->update($attributes);
+            if ($row->status === TranslationStatus::REVIEWED) {
+                if ($row->source_hash === $hash) {
+                    return;
+                }
+                $attributes['previous_value'] = $row->value;
+            }
+            $row->update($attributes);
+        });
     }
 }
