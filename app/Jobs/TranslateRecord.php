@@ -67,31 +67,9 @@ class TranslateRecord implements ShouldBeUniqueUntilProcessing, ShouldQueue
         }
 
         $record = $this->record->load('translations');
-        $fields = $record->outdatedFields('en');
-        if ($fields === []) {
+        ['texts' => $texts, 'htmlKeys' => $htmlKeys, 'prepared' => $prepared] = self::plan($record);
+        if ($prepared === []) {
             return;
-        }
-
-        $texts = [];
-        $htmlKeys = [];
-        $prepared = [];
-        foreach ($fields as $field) {
-            $prepared[$field] = ['hash' => $record->sourceHash($field), 'leaves' => []];
-            if ($record->hasStructuredTranslation($field)) {
-                // Champ structuré : seuls les textes sans traduction à jour partent (spec R2 §3.3).
-                $french = $record->frenchLeaves($field);
-                $states = TranslationLeaves::states($record, $field, $record->translation($field, 'en'));
-                $toSend = array_intersect_key($french, array_flip(TranslationLeaves::pending($record, $field, $states)));
-                $prepared[$field]['leaves'] = array_map(fn (string $text) => $record::leafHash($text), $toSend);
-            } else {
-                $toSend = ['' => (string) $record->frenchValue($field)];
-            }
-            foreach ($toSend as $key => $text) {
-                $texts["{$field}::{$key}"] = $text;
-                if ($this->isHtml($field, (string) $key, $text)) {
-                    $htmlKeys[] = "{$field}::{$key}";
-                }
-            }
         }
 
         if ($texts !== []) {
@@ -133,6 +111,47 @@ class TranslateRecord implements ShouldBeUniqueUntilProcessing, ShouldQueue
         }
 
         app(FrontendRevalidator::class)->queue(['content']);
+    }
+
+    /**
+     * Textes français qui partiraient à DeepL pour cette fiche : clés « champ::clé », seuls les textes
+     * changés, manquants ou en échec (la commande emsi:translate compte les caractères avec la même règle).
+     *
+     * @return array<string, string>
+     */
+    public static function pendingTexts(Model $record): array
+    {
+        return self::plan($record->loadMissing('translations'))['texts'];
+    }
+
+    /**
+     * @return array{texts: array<string, string>, htmlKeys: array<int, string>, prepared: array<string, array{hash: string, leaves: array<string, string>}>}
+     */
+    private static function plan(Model $record): array
+    {
+        $texts = [];
+        $htmlKeys = [];
+        $prepared = [];
+        foreach ($record->outdatedFields('en') as $field) {
+            $prepared[$field] = ['hash' => $record->sourceHash($field), 'leaves' => []];
+            if ($record->hasStructuredTranslation($field)) {
+                // Champ structuré : seuls les textes sans traduction à jour partent (spec R2 §3.3).
+                $french = $record->frenchLeaves($field);
+                $states = TranslationLeaves::states($record, $field, $record->translation($field, 'en'));
+                $toSend = array_intersect_key($french, array_flip(TranslationLeaves::pending($record, $field, $states)));
+                $prepared[$field]['leaves'] = array_map(fn (string $text) => $record::leafHash($text), $toSend);
+            } else {
+                $toSend = ['' => (string) $record->frenchValue($field)];
+            }
+            foreach ($toSend as $key => $text) {
+                $texts["{$field}::{$key}"] = $text;
+                if (self::isHtml($field, (string) $key, $text)) {
+                    $htmlKeys[] = "{$field}::{$key}";
+                }
+            }
+        }
+
+        return ['texts' => $texts, 'htmlKeys' => $htmlKeys, 'prepared' => $prepared];
     }
 
     /** Échec définitif : les champs à traduire passent en « Échec » (le site garde le français). */
@@ -195,7 +214,7 @@ class TranslateRecord implements ShouldBeUniqueUntilProcessing, ShouldQueue
         }
     }
 
-    private function isHtml(string $field, string $key, string $text): bool
+    private static function isHtml(string $field, string $key, string $text): bool
     {
         return $field === 'blocks' ? BlockTexts::isHtml($key, $text) : BlockTexts::isHtml($field, $text);
     }
