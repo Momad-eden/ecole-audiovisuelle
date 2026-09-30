@@ -81,6 +81,47 @@ html:has(.poster-hero[data-first]) .site-header {
   backdrop-filter: blur(12px);
 }
 
+/*
+ * Héros posés sur une photo assombrie (Projection, Studio, Cinéma) : ils restent « de nuit »
+ * même en thème clair, sinon le texte sombre disparaîtrait dans la photo.
+ */
+.scene-dark,
+:root[data-theme="light"] .scene-dark {
+  color-scheme: dark;
+  --color-night: #07070a;
+  --color-night-2: #0f0f14;
+  --color-night-3: #17171e;
+  --color-ink: #f5f2ec;
+  --color-ink-muted: #a7a3b2;
+  --color-line: rgb(245 242 236 / 0.12);
+  --color-brand: #ff7a1a;
+  --color-violet: #8b6cff;
+  --color-gold: #ffb020;
+  --color-rec: #ff3b30;
+  --color-on-accent: #07070a;
+  /* L'accent par défaut est recalculé ici, sinon il garderait l'orange assombri du thème clair. */
+  --accent: var(--color-brand);
+  --accent-ink: var(--accent);
+  color: var(--color-ink);
+}
+:root[data-theme="light"] .scene-dark[style*="--accent"] {
+  --accent-ink: var(--accent);
+}
+:root[data-theme="light"] .scene-dark[style*="--accent-on"] {
+  --color-on-accent: var(--accent-on);
+}
+:root[data-theme="light"]:has(.scene-dark[data-first]) .site-header {
+  border-bottom-color: var(--color-line);
+  background: color-mix(in oklab, var(--color-night) 85%, transparent);
+  backdrop-filter: blur(12px);
+}
+
+/* Projection : la poursuite rend ses couleurs à la photo autour de la main du visiteur. */
+.projection-spot {
+  -webkit-mask-image: radial-gradient(circle 24rem at var(--px, 62%) var(--py, 55%), #000 0%, rgb(0 0 0 / 0.55) 40%, transparent 75%);
+  mask-image: radial-gradient(circle 24rem at var(--px, 62%) var(--py, 55%), #000 0%, rgb(0 0 0 / 0.55) 40%, transparent 75%);
+}
+
 html {
   scroll-behavior: smooth;
 }
@@ -236,6 +277,22 @@ body::after {
   50% { opacity: 0.15; }
 }
 .rec-dot { animation: blink 1.2s steps(1) infinite; }
+
+/* Cinéma : lent zoom sur la photo affichée, barre qui se remplit, titre qui apparaît. */
+.cinema-zoom { animation: cinema-zoom 9s ease-out both; }
+@keyframes cinema-zoom { from { transform: scale(1.02); } to { transform: scale(1.12) translate(-1%, -1%); } }
+.cinema-progress { width: 0; animation: cinema-progress linear forwards; }
+@keyframes cinema-progress { to { width: 100%; } }
+.cinema-caption { animation: art-rise 0.9s cubic-bezier(0.2, 0.7, 0.2, 1) both; }
+
+/* Studio : point posé sur le matériel, qui pulse doucement pour inviter à le survoler. */
+.hotspot-dot {
+  box-shadow: 0 0 0 4px color-mix(in oklab, var(--accent) 35%, transparent);
+  animation: hotspot-pulse 2.4s ease-out infinite;
+}
+@keyframes hotspot-pulse {
+  70% { box-shadow: 0 0 0 12px color-mix(in oklab, var(--accent) 0%, transparent); }
+}
 
 @keyframes word-in {
   from { opacity: 0; transform: translateY(0.35em); filter: blur(8px); }

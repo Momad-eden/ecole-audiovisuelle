@@ -10,7 +10,10 @@ export default defineConfig({
   use: { baseURL: process.env.E2E_BASE_URL ?? "http://localhost:3000", trace: "retain-on-failure" },
   projects: [
     { name: "unitaire", testDir: "./src", testMatch: /\.test\.ts$/ },
-    { name: "bureau", testDir: "./e2e", use: { ...devices["Desktop Chrome"] } },
-    { name: "mobile", testDir: "./e2e", use: { ...devices["Pixel 7"] } },
+    // Pages d'essai des héros : créées avant les parcours navigateur, supprimées après.
+    { name: "préparation", testDir: "./e2e", testMatch: /showcase\.setup\.ts$/, teardown: "nettoyage" },
+    { name: "nettoyage", testDir: "./e2e", testMatch: /showcase\.teardown\.ts$/ },
+    { name: "bureau", testDir: "./e2e", dependencies: ["préparation"], use: { ...devices["Desktop Chrome"] } },
+    { name: "mobile", testDir: "./e2e", dependencies: ["préparation"], use: { ...devices["Pixel 7"] } },
   ],
 });

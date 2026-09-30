@@ -5,17 +5,17 @@ import { ButtonLink } from "@/components/ui/ButtonLink";
 import { MediaImage } from "@/components/ui/MediaImage";
 import { useReducedMotion } from "@/components/motion/useReducedMotion";
 import { HeroVideo } from "./HeroVideo";
-import { ConsoleArt, LineArrayArt } from "./HeroArt";
+import { LineArrayArt } from "./HeroArt";
+import { useRecTimecode } from "./studio/useRecTimecode";
 import { InView } from "@/components/motion/InView";
 import { accentVars } from "@/lib/contrast";
 import type { HeroData } from "./types";
 
-type Variant = "stage" | "studio" | "events";
+type Variant = "stage" | "events";
 
 /** Couleurs reprises tour à tour par les mots qui défilent, selon le décor. */
 const WORD_COLORS: Record<Variant, string[]> = {
   stage: ["var(--color-violet)", "var(--color-hmi)", "var(--color-gold)", "var(--color-magenta)", "var(--color-brand)"],
-  studio: ["var(--color-rec)", "var(--color-gold)", "var(--color-brand)", "var(--color-violet)"],
   events: ["var(--color-gold)", "var(--color-brand)", "var(--color-hmi)"],
 };
 
@@ -25,7 +25,6 @@ const BEAMS: Record<Variant, { left: string; beam: string; from: string; to: str
     { left: "38%", beam: "var(--color-violet)", from: "14deg", to: "-16deg", sweep: "10s" },
     { left: "70%", beam: "var(--color-hmi)", from: "-8deg", to: "24deg", sweep: "15s" },
   ],
-  studio: [{ left: "30%", beam: "var(--color-rec)", from: "-10deg", to: "10deg", sweep: "16s" }],
   events: [
     { left: "18%", beam: "var(--color-gold)", from: "-20deg", to: "14deg", sweep: "9s" },
     { left: "46%", beam: "var(--color-brand)", from: "16deg", to: "-18deg", sweep: "11s" },
@@ -33,7 +32,7 @@ const BEAMS: Record<Variant, { left: string; beam: string; from: string; to: str
   ],
 };
 
-const ACCENT: Record<Variant, string | undefined> = { stage: undefined, studio: "var(--color-rec)", events: "var(--color-gold)" };
+const ACCENT: Record<Variant, string | undefined> = { stage: undefined, events: "var(--color-gold)" };
 
 /**
  * Héros « scène » : la page s'ouvre sur un plateau dans le noir balayé par des projecteurs,
@@ -54,28 +53,7 @@ export function StageHero({ data, first, variant = "stage" }: { data: HeroData; 
     return () => window.clearInterval(id);
   }, [reducedMotion, words.length]);
 
-  // Timecode REC à 25 images/s, écrit directement dans le DOM (aucun rendu React), arrêté hors écran.
-  useEffect(() => {
-    const section = sectionRef.current;
-    if (reducedMotion || !section) return;
-    const start = performance.now();
-    const pad = (n: number) => String(n).padStart(2, "0");
-    let timer = 0;
-    const tick = () => {
-      const total = Math.floor(((performance.now() - start) / 1000) * 25);
-      const f = total % 25, s = Math.floor(total / 25) % 60, m = Math.floor(total / 1500) % 60;
-      if (timecodeRef.current) timecodeRef.current.textContent = `00:${pad(m)}:${pad(s)}:${pad(f)}`;
-    };
-    const observer = new IntersectionObserver(([entry]) => {
-      window.clearInterval(timer);
-      if (entry.isIntersecting) timer = window.setInterval(tick, 40);
-    });
-    observer.observe(section);
-    return () => {
-      observer.disconnect();
-      window.clearInterval(timer);
-    };
-  }, [reducedMotion]);
+  useRecTimecode(sectionRef, timecodeRef);
 
   function followSpot(event: React.PointerEvent<HTMLElement>) {
     if (reducedMotion || event.pointerType !== "mouse" || !sectionRef.current) return;
@@ -102,9 +80,6 @@ export function StageHero({ data, first, variant = "stage" }: { data: HeroData; 
         ))}
         <div className="follow-spot" />
         <div className="absolute inset-x-0 bottom-0 h-2/3 bg-gradient-to-t from-night via-night/80 to-transparent" />
-        {variant === "studio" && <InView className="absolute inset-0 opacity-35 sm:opacity-60"><ConsoleArt /></InView>}
-        {variant === "studio" && <div className="absolute inset-x-0 top-0 h-1/2 bg-gradient-to-b from-night to-transparent" />}
-        {variant === "studio" && <div className="absolute inset-y-0 left-0 w-full bg-gradient-to-r from-night via-night/80 to-transparent sm:w-3/4" />}
         <div className="absolute inset-x-0 bottom-[22%] h-px bg-gradient-to-r from-transparent via-ink/20 to-transparent" />
       </div>
 
@@ -149,7 +124,7 @@ export function StageHero({ data, first, variant = "stage" }: { data: HeroData; 
             <span className="rec-dot size-2 rounded-full bg-rec" />
             REC <span ref={timecodeRef} className="tabular-nums">00:00:00:00</span>
           </span>
-          <span className="hidden sm:inline">{variant === "studio" ? "Enregistrement · Mixage · Mastering" : variant === "events" ? "Sonorisation · Lumière · Podiums" : "Son · Image · Lumière · Design · Scène"}</span>
+          <span className="hidden sm:inline">{variant === "events" ? "Sonorisation · Lumière · Podiums" : "Son · Image · Lumière · Design · Scène"}</span>
           <span>Défiler ↓</span>
         </div>
       </div>

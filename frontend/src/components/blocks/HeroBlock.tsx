@@ -5,16 +5,21 @@ import { cn, frenchSpacing } from "@/lib/utils";
 import { HeroVideo } from "./HeroVideo";
 import { StageHero } from "./StageHero";
 import { ArtHero } from "./ArtHero";
+import { ProjectionHero } from "./ProjectionHero";
+import { StudioHero } from "./StudioHero";
+import { CinemaHero } from "./CinemaHero";
 import { CompactHero, EditorialHero, MosaicHero, PosterHero, SpotlightHero, heroTitleSize } from "./HeroLayouts";
 import type { HeroData } from "./types";
 
 export function HeroBlock({ data, first }: { data: HeroData; first: boolean }) {
   switch (data.layout) {
     case "stage":
-    case "studio":
     case "events":
       return <StageHero data={data} first={first} variant={data.layout} />;
     case "masterpiece": return <ArtHero data={data} first={first} />;
+    case "projection": return <ProjectionHero data={data} first={first} />;
+    case "studio": return <StudioHero data={data} first={first} />;
+    case "cinema": return <CinemaHero data={data} first={first} />;
     case "spotlight": return <SpotlightHero data={data} first={first} />;
     case "editorial": return <EditorialHero data={data} first={first} />;
     case "poster": return <PosterHero data={data} first={first} />;
