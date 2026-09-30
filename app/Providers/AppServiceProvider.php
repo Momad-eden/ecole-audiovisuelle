@@ -64,7 +64,7 @@ class AppServiceProvider extends ServiceProvider
         ]);
 
         // Onglet « Anglais » : les textes relus s'écrivent après la fiche (empreinte du français enregistré).
-        Event::listen(RecordSaved::class, fn (Model $record) => TranslationTab::flush($record));
+        Event::listen(RecordSaved::class, fn (Model $record, array $data, object $page) => TranslationTab::flush($record, $page));
 
         // Éditeur de texte : polices et tailles guidées (script chargé seulement avec l'éditeur).
         FilamentAsset::register([

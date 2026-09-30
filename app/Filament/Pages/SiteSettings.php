@@ -137,7 +137,7 @@ class SiteSettings extends Page
         $setting = Setting::current();
         $glossaryChanged = ($setting->translation_glossary ?? []) !== $state['translation_glossary'];
         $setting->update($state);
-        TranslationTab::flush($setting);
+        TranslationTab::flush($setting, $this);
 
         Notification::make()->title('Paramètres enregistrés.')->success()->send();
 

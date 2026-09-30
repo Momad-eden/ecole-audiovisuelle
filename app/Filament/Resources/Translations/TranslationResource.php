@@ -102,13 +102,9 @@ class TranslationResource extends Resource
             ])
             ->recordActions([
                 Action::make('markReviewed')->label('Marquer comme relue')->icon(Heroicon::OutlinedCheck)->color('success')
-                    ->visible(fn (Translation $record) => TranslationTab::canManage() && $record->value !== null && $record->status !== TranslationStatus::REVIEWED && $record->translatable)
+                    ->visible(fn (Translation $record) => TranslationTab::canManage() && $record->translatable && TranslationTab::canMarkReviewed($record->translatable, $record->field))
                     ->action(function (Translation $record) {
-                        abort_unless(TranslationTab::canManage(), 403);
-                        $record->update([
-                            'status' => TranslationStatus::REVIEWED, 'source_hash' => $record->translatable->sourceHash($record->field),
-                            'reviewed_at' => now(), 'reviewed_by' => auth()->id(), 'previous_value' => null,
-                        ]);
+                        TranslationTab::markReviewed($record->translatable, $record->field);
                         Notification::make()->title('Traduction marquée comme relue.')->success()->send();
                     }),
             ])
@@ -153,14 +149,12 @@ class TranslationResource extends Resource
             : null;
     }
 
+    /** Champ structuré : « 2 textes à relire sur 7 ». */
     private static function fieldDetail(Translation $translation): ?string
     {
-        if ($translation->field !== 'blocks' || $translation->value === null) {
-            return null;
-        }
-        $count = count(json_decode($translation->value, true) ?: []);
+        $record = $translation->translatable;
 
-        return $count.' '.($count > 1 ? 'textes traduits' : 'texte traduit');
+        return $record ? TranslationTab::reviewSummary($record, $translation->field, $translation) : null;
     }
 
     public static function getPages(): array

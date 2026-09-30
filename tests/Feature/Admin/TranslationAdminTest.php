@@ -135,7 +135,10 @@ class TranslationAdminTest extends TestCase
             ->assertHasNoFormErrors();
 
         $row = $this->row($page, 'blocks');
-        $this->assertSame(TranslationStatus::REVIEWED, $row->status);
+        // Seul le texte corrigé est « Relue » ; l'autre reste automatique, donc la ligne aussi (état par texte).
+        $this->assertSame('reviewed', $row->leaves['hero#0:title']['s']);
+        $this->assertSame('auto', $row->leaves['hero#0:subtitle']['s']);
+        $this->assertSame(TranslationStatus::AUTO, $row->status);
         $this->assertSame(['hero#0:title' => 'Hello and welcome', 'hero#0:subtitle' => 'Sound and image'], json_decode($row->value, true));
         $this->assertSame($this->directeur->id, $row->reviewed_by);
         $this->assertNotNull($row->reviewed_at);

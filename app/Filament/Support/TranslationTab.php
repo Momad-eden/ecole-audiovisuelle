@@ -8,6 +8,7 @@ use App\Jobs\TranslateRecord;
 use App\Models\Translation;
 use App\Services\Translation\Translator;
 use App\Support\Translation\BlockTexts;
+use App\Support\Translation\TranslationLeaves;
 use Filament\Actions\Action;
 use Filament\Forms\Components\Field;
 use Filament\Forms\Components\Hidden;
@@ -25,6 +26,7 @@ use Filament\Schemas\Components\Text;
 use Filament\Support\Icons\Heroicon;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\DB;
+use WeakMap;
 
 /**
  * Onglet « Anglais » des fiches traduites (spec R2 §6) : pour chaque champ, le français en lecture seule
@@ -36,7 +38,13 @@ use Illuminate\Support\Facades\DB;
  * dans le formulaire, pas à la base : une traduction automatique arrivée entre-temps n'est pas effacée)
  * deviennent « Relue ». Elles sont écrites APRÈS la fiche (flush(), appelé par l'événement RecordSaved de
  * Filament ou par la page Paramètres), pour que l'empreinte du français soit celle du texte enregistré :
- * aucune retraduction automatique du champ qui vient d'être relu. Vider un texte anglais rend le français.
+ * aucune retraduction automatique du texte qui vient d'être relu. Vider un texte anglais rend le français.
+ *
+ * Les corrections relevées sont rattachées à l'instance de la page Livewire (WeakMap) : elles disparaissent
+ * avec la requête, et un enregistrement interrompu ne peut jamais être écrit plus tard par quelqu'un d'autre.
+ *
+ * Champs structurés (blocs, listes, SEO) : état par texte (TranslationLeaves) ; seuls les textes corrigés
+ * passent en « Relue », les autres gardent leur état.
  */
 final class TranslationTab
 {
@@ -89,8 +97,8 @@ final class TranslationTab
 
     private const SEO_LABELS = ['title' => 'Titre affiché dans Google', 'description' => 'Description affichée dans Google'];
 
-    /** @var array<string, array<string, array<string, string>>> fiche → champ → case → texte anglais saisi */
-    private static array $pending = [];
+    /** @var WeakMap<object, array<string, array<string, array<string, string>>>>|null page → fiche → champ → case → texte saisi */
+    private static ?WeakMap $pending = null;
 
     public static function make(): Tab
     {
@@ -119,7 +127,7 @@ final class TranslationTab
                 ->model($record)
                 ->dehydrated(false)
                 ->disabled(fn () => ! self::canManage())
-                ->loadStateFromRelationshipsUsing(fn (Group $component) => $component->state(self::formState($record)))
+                ->loadStateFromRelationshipsUsing(fn (Group $component) => $component->state(self::formState($record, $component->getLivewire())))
                 ->saveRelationshipsUsing(fn (Group $component) => self::collect($component, $record)),
         ];
     }
@@ -153,15 +161,73 @@ final class TranslationTab
 
     public static function statusColor(?Translation $row): string
     {
-        return match ($row?->status) {
+        return self::colorOf($row?->status);
+    }
+
+    /** « 2 textes à relire sur 7 » pour un champ structuré ; null pour un champ simple. */
+    public static function reviewSummary(Model $record, string $field, ?Translation $row): ?string
+    {
+        if (! $record->hasStructuredTranslation($field)) {
+            return null;
+        }
+        [$count, $total] = TranslationLeaves::toReview($record, $field, $row);
+
+        return match (true) {
+            $total === 0 => null,
+            $count === 0 => $total > 1 ? "{$total} textes relus" : '1 texte relu',
+            default => $count.' '.($count > 1 ? 'textes' : 'texte').' à relire sur '.$total,
+        };
+    }
+
+    /**
+     * « Marquer comme relue » sans modification. Champ structuré : seuls les textes qui ont un anglais sont
+     * marqués ; un texte sans anglais reste à traduire (le champ reste alors « à traduire » pour la tâche).
+     */
+    public static function markReviewed(Model $record, string $field): void
+    {
+        abort_unless(self::canManage(), 403);
+
+        DB::transaction(function () use ($record, $field) {
+            $row = $record->translations()->where('field', $field)->where('locale', 'en')->lockForUpdate()->first();
+            if (! $row) {
+                return;
+            }
+            $review = ['reviewed_at' => now(), 'reviewed_by' => auth()->id()];
+
+            if (! $record->hasStructuredTranslation($field)) {
+                $row->update(['status' => TranslationStatus::REVIEWED, 'source_hash' => $record->sourceHash($field), 'previous_value' => null, ...$review]);
+
+                return;
+            }
+
+            $states = TranslationLeaves::states($record, $field, $row);
+            $english = TranslationLeaves::english($record, $field, $row);
+            $previous = TranslationLeaves::previous($row);
+            foreach ($record->frenchLeaves($field) as $key => $text) {
+                if (isset($english[$key])) {
+                    $states[$key] = ['h' => $record::leafHash($text), 's' => TranslationStatus::REVIEWED->value];
+                    unset($previous[$key]);
+                }
+            }
+            TranslationLeaves::persist($record, $field, $row, $english, $states, $previous, [
+                'source_hash' => self::sourceHashAfterReview($record, $field, $states, $row), ...$review,
+            ]);
+        });
+
+        $record->unsetRelation('translations');
+    }
+
+    // --- Présentation -------------------------------------------------------------------------------
+
+    private static function colorOf(?TranslationStatus $status): string
+    {
+        return match ($status) {
             TranslationStatus::REVIEWED => 'success',
             TranslationStatus::AUTO => 'warning',
             TranslationStatus::FAILED => 'danger',
             default => 'gray',
         };
     }
-
-    // --- Présentation -------------------------------------------------------------------------------
 
     private static function section(Model $record, string $field, string $label, string $kind): ?Section
     {
@@ -172,14 +238,18 @@ final class TranslationTab
                 : null;
         }
 
+        $structured = $record->hasStructuredTranslation($field);
         $rows = [];
         foreach ($slots as $slot) {
-            $pair = [
-                TextEntry::make('fr_'.md5($slot['name']))->label('Français')->state($slot['french'])->html($slot['html'])
-                    ->extraAttributes(['class' => 'break-words']),
-                self::input($slot)->label('Anglais'),
-            ];
-            $previous = fn () => self::slotValue(self::row($record, $field)?->previous_value, $kind, $slot['slot']);
+            $pair = [];
+            if ($structured) {
+                $state = fn () => self::slotState($record, $field, $slot);
+                $pair[] = Text::make(fn () => $state()[0])->badge()->color(fn () => $state()[1])->columnSpanFull();
+            }
+            $pair[] = TextEntry::make('fr_'.md5($slot['name']))->label('Français')->state($slot['french'])->html($slot['html'])
+                ->extraAttributes(['class' => 'break-words']);
+            $pair[] = self::input($slot)->label('Anglais');
+            $previous = fn () => self::previousOf($record, $field, $slot['slot']);
             $pair[] = TextEntry::make('prev_'.md5($slot['name']))->label('Ancienne version relue')->columnSpanFull()
                 ->state($previous)->html($slot['html'])->color('gray')
                 ->visible(fn () => filled($previous()));
@@ -199,9 +269,27 @@ final class TranslationTab
             ->schema($rows);
     }
 
+    /** @return array{0: string, 1: string} libellé et couleur de l'état d'un texte d'un champ structuré */
+    private static function slotState(Model $record, string $field, array $slot): array
+    {
+        $state = TranslationLeaves::states($record, $field, self::row($record, $field))[$slot['slot']] ?? null;
+        $status = $state ? TranslationStatus::tryFrom($state['s']) : null;
+        if (! $status) {
+            return ['Pas encore traduit', 'gray'];
+        }
+        $outdated = $status !== TranslationStatus::FAILED && $state['h'] !== $record::leafHash($slot['french']);
+
+        return [$status->label().($outdated ? ' · le français a changé' : ''), $outdated ? 'warning' : self::colorOf($status)];
+    }
+
     private static function hint(Model $record, string $field): ?string
     {
         $row = self::row($record, $field);
+        if ($summary = self::reviewSummary($record, $field, $row)) {
+            return $row?->status === TranslationStatus::FAILED
+                ? $summary.'. Des textes n\'ont pas pu être traduits : le site affiche leur français.'
+                : $summary.'.';
+        }
 
         return match (true) {
             $row === null => 'Le site affiche le français tant que ce texte n\'est pas traduit.',
@@ -225,20 +313,32 @@ final class TranslationTab
     private static function markReviewedAction(Model $record, string $field): Action
     {
         return Action::make('markReviewed')->label('Marquer comme relue')->icon(Heroicon::OutlinedCheck)->color('success')->size('sm')
-            ->visible(function () use ($record, $field) {
-                $row = self::row($record, $field);
-
-                return self::canManage() && $row?->value !== null && $row->status !== TranslationStatus::REVIEWED;
-            })
+            ->visible(fn () => self::canManage() && self::canMarkReviewed($record, $field))
             ->action(function () use ($record, $field) {
-                abort_unless(self::canManage(), 403);
-                self::row($record, $field)?->update([
-                    'status' => TranslationStatus::REVIEWED, 'source_hash' => $record->sourceHash($field),
-                    'reviewed_at' => now(), 'reviewed_by' => auth()->id(), 'previous_value' => null,
-                ]);
-                $record->unsetRelation('translations');
+                self::markReviewed($record, $field);
                 Notification::make()->title('Traduction marquée comme relue.')->success()->send();
             });
+    }
+
+    public static function canMarkReviewed(Model $record, string $field): bool
+    {
+        $row = self::row($record, $field);
+        if ($row?->value === null) {
+            return false;
+        }
+        if (! $record->hasStructuredTranslation($field)) {
+            return $row->status !== TranslationStatus::REVIEWED;
+        }
+
+        $states = TranslationLeaves::states($record, $field, $row);
+        $french = $record->frenchLeaves($field);
+        foreach (array_keys(TranslationLeaves::english($record, $field, $row)) as $key) {
+            if (isset($french[$key]) && ($states[$key]['s'] !== TranslationStatus::REVIEWED->value || $states[$key]['h'] !== $record::leafHash($french[$key]))) {
+                return true;
+            }
+        }
+
+        return false;
     }
 
     private static function retranslateAction(Model $record, string $field, string $label): Action
@@ -260,8 +360,12 @@ final class TranslationTab
 
                     return;
                 }
-                // Empreinte effacée : le champ redevient « à traduire » pour la tâche.
-                self::row($record, $field)?->update(['source_hash' => null]);
+                // Empreintes effacées : le champ (et chacun de ses textes) redevient « à traduire » pour la tâche.
+                $row = self::row($record, $field);
+                if ($row) {
+                    $leaves = is_array($row->leaves) ? array_map(fn ($state) => ['h' => null, 's' => $state['s'] ?? 'auto'], $row->leaves) : null;
+                    $row->update(['source_hash' => null, 'leaves' => $leaves]);
+                }
                 $record->unsetRelation('translations');
                 TranslateRecord::dispatch($record);
                 Notification::make()->title('Traduction demandée')->body('Le texte anglais sera mis à jour dans quelques minutes.')->success()->send();
@@ -282,75 +386,75 @@ final class TranslationTab
      */
     private static function slots(Model $record, string $field, string $kind): array
     {
-        $french = $record->frenchValue($field);
         $slots = [];
         $add = function (string $slot, string $name, ?string $label, string $text, string $input) use ($field, &$slots) {
             $slots[] = ['field' => $field, 'slot' => $slot, 'name' => $name, 'label' => $label, 'french' => $text,
                 'html' => in_array($input, ['rich', 'rich_images'], true), 'input' => $input];
         };
 
-        switch ($kind) {
-            case 'blocks':
-                $blocks = is_array($french) ? $french : [];
-                foreach (BlockTexts::keyed($blocks) as $key => $text) {
-                    $add($key, 'blocks.'.self::slot($key), BlockTexts::describe($key, $blocks), $text, BlockTexts::isHtml($key, $text) ? 'rich' : 'textarea');
-                }
-                break;
-            case 'list':
-                foreach (is_array($french) ? $french : [] as $i => $item) {
-                    if (is_string($item) && trim($item) !== '') {
-                        $add((string) $i, "{$field}.{$i}", 'Élément '.((int) $i + 1), $item, 'text');
-                    }
-                }
-                break;
-            case 'seo':
-                foreach (self::SEO_LABELS as $key => $label) {
-                    if (is_string($french[$key] ?? null) && trim($french[$key]) !== '') {
-                        $add($key, "{$field}.{$key}", $label, $french[$key], $key === 'title' ? 'text' : 'textarea');
-                    }
-                }
-                break;
-            default:
-                if (is_scalar($french) && trim((string) $french) !== '') {
-                    $add('', $field, null, (string) $french, $kind);
-                }
+        if (! $record->hasStructuredTranslation($field)) {
+            $french = $record->frenchValue($field);
+            if (is_scalar($french) && ! $record::isBlankText((string) $french)) {
+                $add('', $field, null, (string) $french, $kind);
+            }
+
+            return $slots;
+        }
+
+        $blocks = $kind === 'blocks' ? (array) $record->frenchValue($field) : [];
+        foreach ($record->frenchLeaves($field) as $key => $text) {
+            match ($kind) {
+                'blocks' => $add($key, 'blocks.'.self::slot($key), BlockTexts::describe($key, $blocks), $text, BlockTexts::isHtml($key, $text) ? 'rich' : 'textarea'),
+                'seo' => $add($key, "{$field}.{$key}", self::SEO_LABELS[$key] ?? $key, $text, $key === 'title' ? 'text' : 'textarea'),
+                default => $add($key, "{$field}.{$key}", 'Élément '.((int) $key + 1), $text, 'text'),
+            };
         }
 
         return $slots;
     }
 
-    /** Texte anglais d'une case, lu dans une valeur enregistrée (texte, ou JSON pour blocs, listes et SEO). */
-    private static function slotValue(?string $stored, string $kind, string $slot): ?string
+    private static function englishOf(Model $record, string $field, string $slot): ?string
     {
-        if ($stored === null) {
-            return null;
+        $row = self::row($record, $field);
+        if (! $record->hasStructuredTranslation($field)) {
+            return $row?->value;
         }
-        if (! in_array($kind, ['blocks', 'list', 'seo'], true)) {
-            return $stored;
-        }
-        $decoded = json_decode($stored, true);
 
-        return is_array($decoded) && is_string($decoded[$slot] ?? null) ? $decoded[$slot] : null;
+        return TranslationLeaves::english($record, $field, $row)[$slot] ?? null;
     }
 
-    /** @return array<string, ?string> nom de case → texte anglais (en base, puis corrections en attente) */
-    private static function values(Model $record): array
+    private static function previousOf(Model $record, string $field, string $slot): ?string
     {
-        $pending = self::$pending[self::key($record)] ?? [];
+        $row = self::row($record, $field);
+        if (! $record->hasStructuredTranslation($field)) {
+            return $row?->previous_value;
+        }
+
+        return TranslationLeaves::previous($row)[$slot] ?? null;
+    }
+
+    private static function pendingMap(): WeakMap
+    {
+        return self::$pending ??= new WeakMap;
+    }
+
+    /** @return array<string, ?string> nom de case → texte anglais (en base, puis corrections en attente de cette page) */
+    private static function values(Model $record, ?object $livewire): array
+    {
+        $pending = $livewire ? (self::pendingMap()[$livewire][self::key($record)] ?? []) : [];
         $values = [];
         foreach (self::fieldsFor($record) as $field => [, $kind]) {
-            $row = self::row($record, $field);
             foreach (self::slots($record, $field, $kind) as $slot) {
-                $values[$slot['name']] = $pending[$field][$slot['slot']] ?? self::slotValue($row?->value, $kind, $slot['slot']);
+                $values[$slot['name']] = $pending[$field][$slot['slot']] ?? self::englishOf($record, $field, $slot['slot']);
             }
         }
 
         return $values;
     }
 
-    private static function formState(Model $record): array
+    private static function formState(Model $record, ?object $livewire): array
     {
-        $values = self::values($record);
+        $values = self::values($record, $livewire);
         $state = ['loaded' => json_encode($values, JSON_UNESCAPED_UNICODE)];
         foreach ($values as $name => $value) {
             data_set($state, $name, $value);
@@ -362,63 +466,71 @@ final class TranslationTab
     /** Relève les textes modifiés depuis le chargement du formulaire ; écrits par flush() après la fiche. */
     private static function collect(Group $component, Model $record): void
     {
-        if (! self::canManage()) {
-            return;
-        }
+        $livewire = $component->getLivewire();
+        $all = self::pendingMap()[$livewire] ?? [];
+        unset($all[self::key($record)]);
 
-        $raw = $component->getRawState();
-        $loaded = json_decode(is_array($raw) ? (string) ($raw['loaded'] ?? '') : '', true) ?: [];
-        $inputs = [];
-        foreach ($component->getChildSchema()->getFlatFields(withHidden: true) as $input) {
-            $inputs[$input->getName()] = $input;
-        }
+        if (self::canManage()) {
+            $raw = $component->getRawState();
+            $loaded = json_decode(is_array($raw) ? (string) ($raw['loaded'] ?? '') : '', true) ?: [];
+            $inputs = [];
+            foreach ($component->getChildSchema()->getFlatFields(withHidden: true) as $input) {
+                $inputs[$input->getName()] = $input;
+            }
 
-        $changes = [];
-        foreach (self::fieldsFor($record) as $field => [, $kind]) {
-            foreach (self::slots($record, $field, $kind) as $slot) {
-                $input = $inputs[$slot['name']] ?? null;
-                if (! $input || ! array_key_exists($slot['name'], $loaded)) {
-                    continue;
+            $changes = [];
+            foreach (self::fieldsFor($record) as $field => [, $kind]) {
+                foreach (self::slots($record, $field, $kind) as $slot) {
+                    $input = $inputs[$slot['name']] ?? null;
+                    if (! $input || ! array_key_exists($slot['name'], $loaded)) {
+                        continue;
+                    }
+                    $new = self::clean($input->getState());
+                    if ($new !== self::clean(self::normalize($input, $loaded[$slot['name']]))) {
+                        $changes[$field][$slot['slot']] = $new;
+                    }
                 }
-                $new = self::clean($input->getState());
-                if ($new !== self::clean(self::normalize($input, $loaded[$slot['name']]))) {
-                    $changes[$field][$slot['slot']] = $new;
-                }
+            }
+            if ($changes !== []) {
+                $all[self::key($record)] = $changes;
             }
         }
 
-        if ($changes === []) {
-            unset(self::$pending[self::key($record)]);
-        } else {
-            self::$pending[self::key($record)] = $changes;
-        }
+        self::pendingMap()[$livewire] = $all;
     }
 
-    /** Enregistre les corrections relevées pour cette fiche (après l'enregistrement du français). */
-    public static function flush(Model $record): void
+    /** Enregistre les corrections relevées par cette page pour cette fiche (après l'enregistrement du français). */
+    public static function flush(Model $record, ?object $livewire): void
     {
-        $changes = self::$pending[self::key($record)] ?? [];
-        unset(self::$pending[self::key($record)]);
+        if (! $livewire) {
+            return;
+        }
+        $all = self::pendingMap()[$livewire] ?? [];
+        $changes = $all[self::key($record)] ?? [];
+        unset($all[self::key($record)]);
+        self::pendingMap()[$livewire] = $all;
         if ($changes === [] || ! self::canManage()) {
             return;
         }
 
-        $fields = self::fieldsFor($record);
         foreach ($changes as $field => $slots) {
-            DB::transaction(function () use ($record, $field, $slots, $fields) {
+            DB::transaction(function () use ($record, $field, $slots) {
                 $row = $record->translations()->where('field', $field)->where('locale', 'en')->lockForUpdate()->first();
-                $value = self::merge($record, $field, $fields[$field][1], $row?->value, $slots);
+                $review = ['reviewed_at' => now(), 'reviewed_by' => auth()->id()];
 
-                if ($value === null) {
-                    $row?->delete();
+                if ($record->hasStructuredTranslation($field)) {
+                    self::flushLeaves($record, $field, $row, $slots, $review);
 
                     return;
                 }
 
-                $attributes = [
-                    'value' => $value, 'status' => TranslationStatus::REVIEWED, 'source_hash' => $record->sourceHash($field),
-                    'reviewed_at' => now(), 'reviewed_by' => auth()->id(), 'previous_value' => null,
-                ];
+                $text = $slots[''] ?? '';
+                if ($text === '') {
+                    $row?->delete();
+
+                    return;
+                }
+                $attributes = ['value' => $text, 'status' => TranslationStatus::REVIEWED, 'source_hash' => $record->sourceHash($field), 'previous_value' => null, ...$review];
                 $row ? $row->update($attributes) : $record->translations()->create(['field' => $field, 'locale' => 'en', ...$attributes]);
             });
         }
@@ -427,61 +539,38 @@ final class TranslationTab
     }
 
     /**
-     * Nouvelle valeur enregistrée d'un champ, les corrections appliquées à la valeur en base ; null = plus
-     * aucun texte anglais (la traduction est supprimée, le site revient au français).
+     * Champ structuré : seuls les textes corrigés passent en « Relue » (avec l'empreinte de leur français) ;
+     * un texte vidé perd son anglais. L'empreinte du champ n'avance que si plus aucun texte n'est à traduire.
      *
      * @param  array<string, string>  $slots
      */
-    private static function merge(Model $record, string $field, string $kind, ?string $stored, array $slots): ?string
+    private static function flushLeaves(Model $record, string $field, ?Translation $row, array $slots, array $review): void
     {
-        $json = fn (array $value) => json_encode($value, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
-        $decoded = $stored !== null ? json_decode($stored, true) : null;
-        $decoded = is_array($decoded) ? $decoded : [];
+        $french = $record->frenchLeaves($field);
+        $states = TranslationLeaves::states($record, $field, $row);
+        $english = TranslationLeaves::english($record, $field, $row);
+        $previous = TranslationLeaves::previous($row);
 
-        switch ($kind) {
-            case 'blocks':
-                foreach ($slots as $key => $text) {
-                    if ($text === '') {
-                        unset($decoded[$key]);
-                    } else {
-                        $decoded[$key] = $text;
-                    }
-                }
+        foreach ($slots as $key => $text) {
+            $key = (string) $key;
+            unset($previous[$key]);
+            if ($text === '' || ! isset($french[$key])) {
+                unset($english[$key], $states[$key]);
 
-                return $decoded === [] ? null : $json($decoded);
-
-            case 'seo':
-                $french = $record->frenchValue($field);
-                $french = is_array($french) ? $french : [];
-                $english = [];
-                foreach (array_keys(self::SEO_LABELS) as $key) {
-                    $text = array_key_exists($key, $slots) ? $slots[$key] : ($decoded[$key] ?? null);
-                    if (is_string($text) && trim($text) !== '' && $text !== ($french[$key] ?? null)) {
-                        $english[$key] = $text;
-                    }
-                }
-
-                return $english === [] ? null : $json(array_merge($french, $english));
-
-            case 'list':
-                $french = $record->frenchValue($field);
-                $french = is_array($french) ? $french : [];
-                $result = [];
-                $translated = false;
-                foreach ($french as $i => $item) {
-                    $text = array_key_exists((string) $i, $slots) ? $slots[(string) $i] : ($decoded[$i] ?? null);
-                    $has = is_string($text) && trim($text) !== '' && $text !== $item;
-                    $translated = $translated || $has;
-                    $result[] = $has ? $text : $item;
-                }
-
-                return $translated ? $json($result) : null;
-
-            default:
-                $text = $slots[''] ?? '';
-
-                return $text === '' ? null : $text;
+                continue;
+            }
+            $english[$key] = $text;
+            $states[$key] = ['h' => $record::leafHash($french[$key]), 's' => TranslationStatus::REVIEWED->value];
         }
+
+        TranslationLeaves::persist($record, $field, $row, $english, $states, $previous, [
+            'source_hash' => self::sourceHashAfterReview($record, $field, $states, $row), ...$review,
+        ]);
+    }
+
+    private static function sourceHashAfterReview(Model $record, string $field, array $states, ?Translation $row): ?string
+    {
+        return TranslationLeaves::pending($record, $field, $states) === [] ? $record->sourceHash($field) : $row?->source_hash;
     }
 
     /** Valeur chargée passée par les mêmes conversions que la saisie (l'éditeur réécrit le HTML). */
