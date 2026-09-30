@@ -13,6 +13,7 @@ use App\Models\Program;
 use App\Models\Redirect;
 use Database\Seeders\ContentSeeder;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Support\Facades\Http;
 use Tests\TestCase;
 
 /** emsi:site-v4 : du site EMSI au site des trois domaines, sans perte et relançable. */
@@ -68,7 +69,9 @@ class SiteV4CommandTest extends TestCase
         $this->assertSame('space_rental', collect(Page::where('slug', 'maison-habib-faye/espaces')->first()->blocks)->firstWhere('type', 'booking_form')['data']['booking_type']);
         $this->assertContains('agenda', $types('maison-habib-faye/agenda'));
         $this->assertContains('support_form', $types('soutenir'));
-        $this->assertContains('downloads', $types('presse'));
+        // Pas de bloc « Documents » vide : l'admin exige un document, la page ne pourrait plus être enregistrée.
+        $this->assertNotContains('downloads', $types('presse'));
+        $this->assertStringContainsString('Documents à télécharger', json_encode(Page::where('slug', 'presse')->first()->blocks, JSON_UNESCAPED_UNICODE));
         $this->assertStringContainsString('À compléter', json_encode(Page::where('slug', 'mission')->first()->blocks, JSON_UNESCAPED_UNICODE));
 
         // Impact Live Events : page gardée mais plus servie.
@@ -159,6 +162,45 @@ class SiteV4CommandTest extends TestCase
         $this->assertSame($home->blocks, $home->draft_blocks);
         $this->assertTrue($home->revisions()->get()->contains(fn (PageRevision $revision) => $revision->blocks === $previous));
         $this->getJson('/api/v1/public/pages/accueil')->assertOk()->assertJsonPath('data.blocks.1.type', 'domains');
+    }
+
+    public function test_the_new_home_is_built_from_the_live_version_and_the_pending_draft_is_kept(): void
+    {
+        $home = Page::where('slug', 'accueil')->firstOrFail();
+        $live = $home->blocks;
+        $draft = $live;
+        array_unshift($draft, ['type' => 'news', 'data' => ['title' => 'Brouillon non relu', 'limit' => 3]]);
+        $home->update(['draft_blocks' => $draft]);
+
+        $this->artisan('emsi:site-v4', ['--home' => true])->assertSuccessful();
+
+        $home->refresh();
+        $this->assertStringNotContainsString('Brouillon non relu', json_encode($home->blocks, JSON_UNESCAPED_UNICODE));
+        $this->assertSame(collect($live)->firstWhere('type', 'news'), collect($home->blocks)->firstWhere('type', 'news'));
+        $kept = $home->revisions()->get()->first(fn (PageRevision $revision) => str_contains(json_encode($revision->blocks, JSON_UNESCAPED_UNICODE), 'Brouillon non relu'));
+        $this->assertNotNull($kept);
+        $this->assertSame('Brouillon non relu', $kept->blocks[0]['data']['title']);
+    }
+
+    public function test_the_public_site_is_refreshed_once_after_the_upgrade(): void
+    {
+        config(['services.frontend.url' => 'https://emsi.test', 'services.frontend.revalidate_secret' => 'secret']);
+        Http::fake(['emsi.test/*' => Http::response(['revalidated' => true])]);
+
+        $this->artisan('emsi:site-v4', ['--home' => true])->assertSuccessful();
+
+        Http::assertSentCount(1);
+        Http::assertSent(fn ($request) => $request->url() === 'https://emsi.test/api/revalidate' && $request['tags'] === ['content']);
+    }
+
+    public function test_an_unreachable_site_only_gives_a_warning(): void
+    {
+        config(['services.frontend.url' => 'https://emsi.test', 'services.frontend.revalidate_secret' => 'secret']);
+        Http::fake(['emsi.test/*' => Http::response('down', 502)]);
+
+        $this->artisan('emsi:site-v4')->expectsOutputToContain('pas pu être rafraîchi')->assertSuccessful();
+
+        $this->assertTrue(Page::where('slug', 'emsi/dakar')->exists());
     }
 
     public function test_without_photos_the_home_opens_on_the_three_domains(): void

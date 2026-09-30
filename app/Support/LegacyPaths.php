@@ -36,6 +36,7 @@ final class LegacyPaths
             'agenda' => '/maison-habib-faye/agenda'.$tail,
             'events' => ['/maison-habib-faye'],
             'expositions' => ['/emsi/realisations'],
+            'demande' => ['/maison-habib-faye/studio#reserver'],   // ancienne demande de devis d'Impact Live Events
             'musee' => match (true) {
                 $rest === '' => ['/emsi/realisations'],
                 ($segments[1] ?? null) === 'oeuvres' && isset($segments[2]) => '/emsi/realisations/'.$segments[2],

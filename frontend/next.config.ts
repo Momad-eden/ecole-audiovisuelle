@@ -50,6 +50,8 @@ const nextConfig: NextConfig = {
       permanent("/agenda/:slug", "/maison-habib-faye/agenda/:slug"),
       permanent("/events", "/maison-habib-faye"),
       permanent("/events/:path*", "/maison-habib-faye"),
+      // Ancienne demande de devis d'Impact Live Events (retiré) : vers la réservation du studio.
+      permanent("/demande", "/maison-habib-faye/studio#reserver"),
       // Le « musée » est devenu les univers (disciplines) et les réalisations des étudiants : cibles directes, sans chaîne.
       permanent("/musee", "/emsi/realisations"),
       permanent("/musee/oeuvres/:slug", "/emsi/realisations/:slug"),

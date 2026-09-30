@@ -34,6 +34,8 @@ class LegacyPathsTest extends TestCase
             'musee oeuvre' => ['/musee/oeuvres/la-nuit', '/emsi/realisations/la-nuit'],
             'musee salle' => ['/musee/salle-du-son', '/emsi/univers/son'],
             'musee autre salle' => ['/musee/cinema', '/emsi/univers/cinema'],
+            'demande de devis' => ['/demande', '/maison-habib-faye/studio#reserver'],
+            'demande avec requête' => ['/demande?type=x', '/maison-habib-faye/studio#reserver'],
             'trailing slash' => ['/studio/', '/maison-habib-faye/studio'],
         ];
     }
@@ -49,7 +51,7 @@ class LegacyPathsTest extends TestCase
         return [
             ['/'], ['/#univers'], ['/candidater'], ['/candidater?campus=emsi-dakar'], ['/contact'], ['/actualites/une-nouvelle'],
             ['/emsi'], ['/emsi/formations/x'], ['/maison-habib-faye/studio#reserver'], ['/maison-habib-faye'],
-            ['/studios'], ['/eventsx'], ['/formationsx'], ['/demande'], ['#reserver'], [''],
+            ['/studios'], ['/eventsx'], ['/formationsx'], ['/demandes'], ['#reserver'], [''],
             ['https://emsi.sn/formations'], ['mailto:contact@emsi.sn'], ['tel:+221776807062'],
         ];
     }

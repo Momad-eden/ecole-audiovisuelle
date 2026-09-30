@@ -94,20 +94,6 @@ test("le studio présente ses services, ses productions et la réservation d'une
   await expect(page.getByLabel("Votre demande")).toHaveValue("studio_session", { timeout: 15000 });
 });
 
-test("on compose une demande de devis depuis Impact Live Events", async ({ page }) => {
-  await page.goto("/events");
-  await page.getByRole("button", { name: "Ajouter : Sonorisation" }).click();
-  const bar = page.getByRole("link", { name: /Ma demande/ });
-  await expect(bar).toContainText("1");
-  await bar.click();
-  await expect(page).toHaveURL(/\/demande$/);
-  await expect(page.getByText("Sonorisation", { exact: true })).toBeVisible({ timeout: 15000 });
-  await page.getByRole("button", { name: "Envoyer ma demande" }).click();
-  await expect(page.getByText("Indiquez votre nom.")).toBeVisible();
-  await page.getByRole("button", { name: "Retirer Sonorisation" }).click();
-  await expect(page.getByText("Aucun matériel choisi.", { exact: false })).toBeVisible();
-});
-
 test("l'Espace Habib Faye et l'agenda sont accessibles depuis le pied de page", async ({ page }) => {
   await page.goto("/");
   await page.locator('footer a[href="/espace-habib-faye"]').click();

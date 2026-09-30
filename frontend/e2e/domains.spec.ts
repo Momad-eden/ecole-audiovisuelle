@@ -23,11 +23,13 @@ test("les anciennes adresses arrivent sur la nouvelle en une seule redirection",
     ["/musee/oeuvres/une-oeuvre", "/emsi/realisations/une-oeuvre"],
     ["/musee/salle-du-son", "/emsi/univers/son"],
     ["/musee/design", "/emsi/univers/design"],
+    ["/demande", "/maison-habib-faye/studio#reserver"],
   ];
   for (const [from, to] of redirections) {
     const response = await request.get(from, { maxRedirects: 0 });
     expect(response.status(), from).toBe(308); // permanent de Next
-    expect(new URL(response.headers()["location"], "http://x").pathname, from).toBe(to);
+    const location = new URL(response.headers()["location"], "http://x");
+    expect(location.pathname + location.hash, from).toBe(to);
   }
 });
 

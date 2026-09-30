@@ -826,7 +826,7 @@ class ContentSeeder extends Seeder
             ?? $campuses->first(fn (Place $p) => ! $p->is($dakar));
 
         $venue = collect([Page::where('type', 'home')->orderBy('id')->first(), Page::where('slug', 'accueil')->first(), Page::where('slug', 'emsi')->first()])
-            ->filter()->map(fn (Page $p) => collect($p->draft_blocks ?? $p->blocks ?? [])->firstWhere('type', 'venue')['data'] ?? null)->filter()->first()
+            ->filter()->map(fn (Page $p) => collect($p->blocks ?? $p->draft_blocks ?? [])->firstWhere('type', 'venue')['data'] ?? null)->filter()->first()
             ?? ['eyebrow' => 'Notre adresse', 'title' => 'Au cœur du Grand Théâtre National Doudou Ndiaye Coumba Rose',
                 'text' => 'À Dakar, nos apprenants se forment là où le spectacle se fabrique : sur les plateaux, dans les salles et en régie.'];
         $venue['buttons'] = [];
@@ -861,7 +861,8 @@ class ContentSeeder extends Seeder
         ]);
         $this->createPage('presse', 'Presse', SiteDomain::GENERAL, [
             $hero('Espace presse', 'Presse', $todo('présentez ici le contact presse et les documents à disposition.')),
-            ['downloads', ['title' => 'Documents à télécharger', 'files' => []]],
+            // Pas de bloc « Documents » vide : l'admin exige au moins un document pour enregistrer la page.
+            $text('Dossier de presse', $todo('ajoutez un bloc « Documents à télécharger » avec le dossier de presse et les logos, puis retirez ce texte.')),
         ]);
     }
 
@@ -889,8 +890,9 @@ class ContentSeeder extends Seeder
 
             return;
         }
-        $current = $home->draft_blocks ?? $home->blocks ?? [];
-        if (collect($current)->contains('type', 'domains')) {
+        // Construit depuis la version en ligne : un brouillon non relu n'est jamais publié (il est gardé dans l'historique).
+        $current = $home->blocks ?? [];
+        if (collect($current)->contains('type', 'domains') || collect($home->draft_blocks ?? [])->contains('type', 'domains')) {
             $this->report[] = 'Accueil : déjà au format des trois domaines, non modifié.';
 
             return;
@@ -940,12 +942,12 @@ class ContentSeeder extends Seeder
         $this->report[] = 'Accueil republié avec '.($missing === [] ? 'le héros Cinéma et ' : '').'le triptyque des trois maisons ; l\'ancienne version reste dans l\'historique.';
     }
 
-    /** @return array{image: string, image_alt: ?string}|null Photo du premier héros de la première de ces pages qui en a une. */
+    /** @return array{image: string, image_alt: ?string}|null Photo du premier héros (version en ligne) de la première de ces pages qui en a une. */
     private function heroImage(array $slugs): ?array
     {
         foreach ($slugs as $slug) {
             $page = Page::where('slug', $slug)->first();
-            $hero = collect($page?->draft_blocks ?? $page?->blocks ?? [])->firstWhere('type', 'hero')['data'] ?? [];
+            $hero = collect($page?->blocks ?? $page?->draft_blocks ?? [])->firstWhere('type', 'hero')['data'] ?? [];
             if (is_string($hero['image'] ?? null) && $hero['image'] !== '') {
                 return ['image' => $hero['image'], 'image_alt' => $hero['image_alt'] ?? null];
             }

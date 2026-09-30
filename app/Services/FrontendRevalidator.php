@@ -16,6 +16,47 @@ class FrontendRevalidator
     /** @var array<int, string> */
     private array $pending = [];
 
+    private bool $paused = false;
+
+    /**
+     * Exécute $callback (une mise à niveau en transaction) sans demander de régénération à chaque
+     * enregistrement : le site lirait des données pas encore validées. Appeler refreshNow() après.
+     */
+    public function withoutRefreshing(callable $callback): mixed
+    {
+        $paused = $this->paused;
+        $this->paused = true;
+        try {
+            return $callback();
+        } finally {
+            $this->paused = $paused;
+        }
+    }
+
+    /**
+     * Demande tout de suite une régénération. Retourne null si le site n'est pas configuré,
+     * false s'il n'a pas pu être joint (l'erreur est journalisée, jamais levée).
+     *
+     * @param  array<int, string>  $tags
+     */
+    public function refreshNow(array $tags = ['content']): ?bool
+    {
+        if (! $this->isConfigured()) {
+            return null;
+        }
+
+        try {
+            return Http::timeout(5)->post(rtrim((string) config('services.frontend.url'), '/').'/api/revalidate', [
+                'secret' => config('services.frontend.revalidate_secret'),
+                'tags' => $tags,
+            ])->successful();
+        } catch (Throwable $e) {
+            Log::warning('Régénération du site impossible : '.$e->getMessage());
+
+            return false;
+        }
+    }
+
     /**
      * En requête web, les demandes sont regroupées et envoyées une seule fois, après la réponse.
      * En console (imports, commandes) et en test, elles partent immédiatement.
@@ -24,7 +65,7 @@ class FrontendRevalidator
      */
     public function queue(array $tags = ['content']): void
     {
-        if (! $this->isConfigured()) {
+        if ($this->paused || ! $this->isConfigured()) {
             return;
         }
 
