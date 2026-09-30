@@ -94,6 +94,8 @@ FRONTEND_URL=https://emsi.sn
 FRONTEND_REVALIDATE_SECRET=<chaîne aléatoire longue : openssl rand -hex 32>
 ```
 
+`FRONTEND_URL` doit pointer vers le site Next.js de l'EMSI : c'est cette adresse que Laravel appelle pour rafraîchir le site après une publication ou une mise à niveau (`emsi:site-v4`). Si elle pointe vers un autre site (en local, un autre projet sur le port 3000 par exemple), les pages ne se rafraîchissent pas.
+
 ## 5. Nginx et HTTPS (avant la compilation du site)
 
 Next.js interroge l'API pendant sa compilation : Laravel doit déjà répondre sur `https://emsi.sn`.
@@ -138,6 +140,7 @@ server {
 ```bash
 php artisan migrate --force
 php artisan db:seed --force              # contenu de référence (univers, filières, programmes, pages…)
+php artisan emsi:site-v4 --home         # site des trois domaines (Maison Habib Faye, EMSI, pages générales) sur le contenu de référence
 php artisan storage:link
 php artisan emsi:create-admin            # premier directeur (mot de passe saisi de façon masquée)
 php artisan filament:assets
@@ -159,6 +162,8 @@ gunzip < /tmp/emsi-contenu.sql.gz | mysql emsi
 tar xzf /tmp/emsi-medias.tgz -C /var/www/emsi/storage/app
 php artisan migrate --force && php artisan storage:link
 ```
+
+La base locale est déjà au niveau du site des trois domaines : **ne relancez pas** `emsi:site-v4` après ce transfert. En revanche, sur une installation faite avec `db:seed`, lancez `php artisan migrate --force` puis `php artisan emsi:site-v4 --home` (relançable sans risque : il ne réécrit pas ce qui a déjà été modifié dans l'admin ; `--home` remplace l'accueil par les trois maisons).
 
 Supprimer ensuite les comptes de test et vérifier ceux de l'équipe (Administration › Comptes).
 Aucun compte n'est créé par défaut. Les documents des candidats sont stockés dans `storage/app/private` (jamais publics).
@@ -245,7 +250,7 @@ Copier ensuite `/var/backups/emsi` hors du serveur (ex. `rclone sync` vers un st
 
 `./deploy.sh` depuis `/var/www/emsi` (maintenance, `git pull`, dépendances, migrations, caches, file d'attente, compilation et redémarrage du site).
 
-Pour une base installée avant ces versions, une seule fois chacune : `php artisan emsi:site-v2`, `emsi:impact-live`, `emsi:site-v3`.
+Pour une base installée avant ces versions, une seule fois chacune : `php artisan emsi:site-v2`, `emsi:impact-live`, `emsi:site-v3`, puis `emsi:site-v4 --home` (site des trois domaines, après `php artisan migrate`).
 
 ## 12. Vérifications après déploiement
 

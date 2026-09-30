@@ -124,9 +124,32 @@ On ne modifie jamais une opération enregistrée. Ouvrez-la › **Annuler cette 
 
 **Exporter le journal** : Journal de caisse › **Exporter le journal** (fichier CSV qui s'ouvre dans Excel).
 
+### Les trois domaines du site
+
+Le site présente trois « maisons » : la **Maison de la culture Habib Faye** (avec Impact Live Studio), l'**EMSI** (campus de Dakar et de Saint-Louis) et des pages générales (mission, partenaires, soutenir, presse). Le Grand Théâtre est présenté comme partenaire qui accueille le campus de Dakar.
+
+- **Domaine d'une page** : dans **Site › Pages du site**, chaque page a un champ **Domaine** (Maison Habib Faye, EMSI ou Général). Il règle la couleur, le fil d'Ariane et la sous-navigation. Le domaine se déduit de l'adresse (`maison-habib-faye/…`, `emsi/…`) : changez-le seulement si vous savez pourquoi.
+- **Sous-menus** : dans **Site › Menus du site**, un élément peut être placé dans un **Sous-menu de** (Maison Habib Faye ou EMSI) ; il apparaît alors dans le menu déroulant de ce parent (Maison Habib Faye, EMSI). Le menu principal est : Accueil · Maison Habib Faye ▾ · EMSI ▾ · Candidater.
+- **Campus des formations** : sur une formation, **Disponible à** permet de cocher Dakar, Saint-Louis ou les deux. Sur une session, le champ **Campus** dit où elle a lieu. Le formulaire de candidature ne propose que les formations du campus choisi.
+
+### Les nouveaux blocs
+
+Dans **Ajouter un bloc** d'une page :
+
+- **Nos trois maisons** : trois grands panneaux cliquables (Maison Habib Faye, EMSI, Impact Live Studio) avec photo, titre et texte. C'est le premier bloc de l'accueil.
+- **Formations de ce campus** : la liste des formations proposées dans le campus choisi (à placer sur la page du campus).
+- **Documents à télécharger** : des fichiers PDF (dossier de présentation, dossier de presse…) à ajouter depuis la médiathèque, avec un titre.
+- **Nous soutenir** : formulaire pour les financeurs et partenaires. Les messages arrivent dans **Site › Messages reçus** avec le type **Soutien / partenariat** (et le type de soutien choisi : partenariat, mécénat, don) ; traitez-les comme les autres (Lire › Marquer comme traité).
+
+### Compléter le site
+
+- **Textes « À compléter »** : plusieurs pages créées à la mise à niveau (Programmation, Espaces, Campus de Dakar, Campus de Saint-Louis, Mission, Partenaires, Nous soutenir, Presse) contiennent un texte commençant par « À compléter ». Ouvrez la page dans **Site › Pages du site**, remplacez-le par votre texte, puis **Publier**. Ne laissez pas ces textes en ligne.
+- **Photos de la Maison** : ajoutez-les dans la médiathèque, puis dans la page **Maison Habib Faye** (bloc Grand titre › Photo). Quand vous avez de belles photos, vous pouvez mettre sur l'accueil, avant « Nos trois maisons », un **Grand titre** en mise en page **Cinéma** (diaporama de 2 à 5 photos).
+- **Agenda** : la page **Programmation** (Maison Habib Faye) affiche les événements publiés dans Impact Live › Agenda et références. L'ancienne page « Events » (location de sono) n'est plus sur le site.
+
 ---
 
-## Impact Live : studio, événementiel, Espace Habib Faye
+## Impact Live : studio, agenda et Espace Habib Faye
 
 Menu **Impact Live** (rôles Directeur et Commercial ; la Communication peut aussi mettre à jour la vitrine).
 
