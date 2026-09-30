@@ -18,13 +18,19 @@ namespace App\Support\Translation;
  *    où le rang est la position (0…) du bloc parmi les blocs du MÊME type de la page. Ajouter ou retirer
  *    un bloc d'un autre type ne décale rien ; ajouter/retirer/déplacer un bloc du même type avant lui
  *    décale les rangs (les textes anglais suivent alors le rang, limite acceptée).
+ * Les clés de `data` ne doivent pas contenir de point (les chemins sont en notation pointée).
  */
 final class BlockTexts
 {
-    /** Liste fermée des clés texte (spec §2.3). Toute clé finissant par `_alt` est aussi un texte. */
+    /**
+     * Liste fermée des clés texte (spec §2.3, complétée des textes visibles detail, period, tag, transcript,
+     * button_label, category). Toute clé finissant par `_alt` est aussi un texte. `name`, `author` et les
+     * listes d'étiquettes du matériel restent exclus (noms propres).
+     */
     public const TEXT_KEYS = [
         'title', 'subtitle', 'eyebrow', 'text', 'body', 'caption', 'label', 'link_label', 'intro',
         'question', 'answer', 'description', 'credits', 'value', 'highlight', 'quote', 'author_role', 'role',
+        'detail', 'period', 'tag', 'transcript', 'button_label', 'category',
     ];
 
     /** Clé dont la valeur est une liste de chaînes, une entrée par élément. */
@@ -60,7 +66,8 @@ final class BlockTexts
         'caption' => 'Légende', 'label' => 'Libellé', 'link_label' => 'Texte du lien', 'intro' => 'Phrase d\'intention',
         'question' => 'Question', 'answer' => 'Réponse', 'description' => 'Description', 'credits' => 'Crédit',
         'value' => 'Valeur', 'highlight' => 'Mot(s) en couleur', 'quote' => 'Citation', 'author_role' => 'Fonction',
-        'role' => 'Fonction',
+        'role' => 'Fonction', 'detail' => 'Précision', 'period' => 'Période', 'tag' => 'Étiquette',
+        'transcript' => 'Transcription', 'button_label' => 'Texte du bouton', 'category' => 'Catégorie',
         'panels.label' => 'Texte du lien', 'buttons.label' => 'Texte', 'hotspots.label' => 'Texte',
         'quote.text' => 'Citation',
     ];
@@ -80,14 +87,17 @@ final class BlockTexts
         return $out;
     }
 
-    /** Remplace les feuilles texte existantes par les valeurs données ; chemins absents ou non texte ignorés. */
+    /**
+     * Remplace les feuilles texte existantes par les valeurs données ; chemins absents ou non texte ignorés,
+     * traductions vides ou blanches ignorées (le français reste).
+     */
     public static function apply(array $blocks, array $texts): array
     {
         if ($texts === []) {
             return $blocks;
         }
         foreach (self::extract($blocks) as $path => $_) {
-            if (array_key_exists($path, $texts) && is_string($texts[$path])) {
+            if (array_key_exists($path, $texts) && is_string($texts[$path]) && trim($texts[$path]) !== '') {
                 self::set($blocks, explode('.', $path), $texts[$path]);
             }
         }

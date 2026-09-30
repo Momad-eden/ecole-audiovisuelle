@@ -131,6 +131,7 @@ class BlockTextsTest extends TestCase
             '5.data.items.1.title' => 'Réseau',
             '6.data.title' => 'En chiffres',
             '6.data.items.0.label' => 'diplômés',
+            '6.data.items.0.detail' => 'depuis 2010',
             '6.data.items.1.value' => '98 %',
             '6.data.items.1.label' => 'insertion',
         ], $texts);
@@ -259,6 +260,52 @@ class BlockTextsTest extends TestCase
     {
         $blocks = $this->blocks();
         $this->assertSame($blocks, BlockTexts::applyKeyed($blocks, ['nonsense' => 'x', 'hero#x:title' => 'y', 'hero#0:title' => ['array'], 'hero#0:accent' => 'red']));
+    }
+
+    public function test_secondary_visible_texts_are_extracted(): void
+    {
+        $texts = BlockTexts::keyed([
+            ['type' => 'stats', 'data' => ['items' => [['value' => '300', 'label' => 'diplômés', 'detail' => 'depuis 2010']]]],
+            ['type' => 'timeline', 'data' => ['layout' => 'steps', 'steps' => [['period' => 'Février 2027', 'title' => 'Ouverture', 'tag' => 'Volet 2', 'text' => '']]]],
+            ['type' => 'video', 'data' => ['url' => 'https://youtu.be/x', 'caption' => 'Répétition', 'transcript' => 'Bonjour à tous.']],
+            ['type' => 'professional_space', 'data' => ['title' => 'Espace Professionnels', 'button_label' => 'Découvrir le programme']],
+            ['type' => 'equipment', 'data' => ['groups' => [['category' => 'Consoles son', 'items' => ['DiGiCo', 'Yamaha']]]]],
+            ['type' => 'ecosystem', 'data' => ['items' => [['name' => 'Impact Live Studio', 'activity' => 'studio']]]],
+            ['type' => 'quote', 'data' => ['text' => 'Une citation', 'author' => 'Awa Diop', 'role' => 'Diplômée']],
+        ]);
+
+        $this->assertSame('depuis 2010', $texts['stats#0:items.0.detail']);
+        $this->assertSame('Février 2027', $texts['timeline#0:steps.0.period']);
+        $this->assertSame('Volet 2', $texts['timeline#0:steps.0.tag']);
+        $this->assertSame('Bonjour à tous.', $texts['video#0:transcript']);
+        $this->assertSame('Découvrir le programme', $texts['professional_space#0:button_label']);
+        $this->assertSame('Consoles son', $texts['equipment#0:groups.0.category']);
+        $this->assertArrayNotHasKey('equipment#0:groups.0.items.0', $texts);
+        $this->assertArrayNotHasKey('ecosystem#0:items.0.name', $texts);
+        $this->assertArrayNotHasKey('quote#0:author', $texts);
+        $this->assertSame('Diplômée', $texts['quote#0:role']);
+    }
+
+    public function test_secondary_fields_have_labels(): void
+    {
+        $blocks = [
+            ['type' => 'stats', 'data' => []], ['type' => 'timeline', 'data' => []], ['type' => 'video', 'data' => []],
+            ['type' => 'professional_space', 'data' => []], ['type' => 'equipment', 'data' => []],
+        ];
+        $this->assertSame('Bloc 1 · Chiffres clés · Élément 1 · Précision', BlockTexts::describe('stats#0:items.0.detail', $blocks));
+        $this->assertSame('Bloc 2 · Chronologie / étapes · Étape 1 · Période', BlockTexts::describe('timeline#0:steps.0.period', $blocks));
+        $this->assertSame('Bloc 2 · Chronologie / étapes · Étape 1 · Étiquette', BlockTexts::describe('timeline#0:steps.0.tag', $blocks));
+        $this->assertSame('Bloc 3 · Vidéo · Transcription', BlockTexts::describe('video#0:transcript', $blocks));
+        $this->assertSame('Bloc 4 · Encart Espace Professionnels · Texte du bouton', BlockTexts::describe('professional_space#0:button_label', $blocks));
+        $this->assertSame('Bloc 5 · Le matériel · Catégorie 1 · Catégorie', BlockTexts::describe('equipment#0:groups.0.category', $blocks));
+    }
+
+    public function test_empty_or_blank_translations_never_blank_the_french(): void
+    {
+        $blocks = $this->blocks();
+
+        $this->assertSame($blocks, BlockTexts::apply($blocks, ['0.data.title' => '', '0.data.subtitle' => "  \n ", '3.data.words.0' => ' ']));
+        $this->assertSame($blocks, BlockTexts::applyKeyed($blocks, ['hero#0:title' => '', 'text#0:body' => '   ']));
     }
 
     public function test_is_html(): void
