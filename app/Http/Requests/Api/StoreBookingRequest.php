@@ -24,7 +24,7 @@ class StoreBookingRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'type' => ['required', Rule::enum(BookingType::class)],
+            'type' => ['required', Rule::in([BookingType::STUDIO_SESSION->value, BookingType::SPACE_RENTAL->value])],
             'name' => ['required', 'string', 'max:150'],
             'organization' => ['nullable', 'string', 'max:150'],
             'phone' => ['required', 'string', 'regex:/^\+?[0-9][0-9 ().-]{7,19}$/'],

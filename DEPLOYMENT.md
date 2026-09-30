@@ -94,6 +94,8 @@ FRONTEND_URL=https://emsi.sn
 FRONTEND_REVALIDATE_SECRET=<chaîne aléatoire longue : openssl rand -hex 32>
 ```
 
+`FRONTEND_URL` doit pointer vers le site Next.js de l'EMSI : c'est cette adresse que Laravel appelle pour rafraîchir le site après une publication ou une mise à niveau (`emsi:site-v4`). Si elle pointe vers un autre site (en local, un autre projet sur le port 3000 par exemple), les pages ne se rafraîchissent pas.
+
 ## 5. Nginx et HTTPS (avant la compilation du site)
 
 Next.js interroge l'API pendant sa compilation : Laravel doit déjà répondre sur `https://emsi.sn`.
@@ -138,6 +140,7 @@ server {
 ```bash
 php artisan migrate --force
 php artisan db:seed --force              # contenu de référence (univers, filières, programmes, pages…)
+php artisan emsi:site-v4 --home         # site des trois domaines (Maison Habib Faye, EMSI, pages générales) sur le contenu de référence
 php artisan storage:link
 php artisan emsi:create-admin            # premier directeur (mot de passe saisi de façon masquée)
 php artisan filament:assets
@@ -149,6 +152,7 @@ php artisan optimize && php artisan filament:optimize
 ```bash
 # Sur le poste local
 php artisan emsi:hero-showcase --remove   # retire les pages d'essai des tests, si un test a été interrompu
+php artisan emsi:domains-showcase --remove   # retire les pages et la formation d'essai des nouveaux blocs, idem
 mysqldump --single-transaction --no-tablespaces ecole_audiovisuelle | gzip > emsi-contenu.sql.gz
 tar czf emsi-medias.tgz -C storage/app public private
 scp emsi-contenu.sql.gz emsi-medias.tgz emsi@<ip-du-serveur>:/tmp/
@@ -158,6 +162,10 @@ gunzip < /tmp/emsi-contenu.sql.gz | mysql emsi
 tar xzf /tmp/emsi-medias.tgz -C /var/www/emsi/storage/app
 php artisan migrate --force && php artisan storage:link
 ```
+
+La base locale est déjà au niveau du site des trois domaines : après ce transfert, `emsi:site-v4` n'est pas nécessaire. Sur une installation faite avec `db:seed`, lancez `php artisan migrate --force` puis `php artisan emsi:site-v4 --home` (`--home` remplace l'accueil par les trois maisons ; l'ancien reste dans l'historique).
+
+Le premier passage de `emsi:site-v4` est noté dans les paramètres du site (repère de version). **Relancée ensuite**, la commande ne fait plus que réécrire les liens vers les anciennes adresses et compléter la page EMSI (univers, réalisations) : elle ne recrée ni les pages que l'équipe a renommées ou supprimées, ni les menus, ni les campus décochés sur une formation. `--force` reprend toute la mise à niveau (pages, menus et campus manquants) : ne l'utilisez pas une fois que l'équipe a retouché le site. Une base mise à niveau avant l'ajout du repère est reconnue (pages `/emsi` et `/maison-habib-faye/studio` présentes) et reçoit le repère.
 
 Supprimer ensuite les comptes de test et vérifier ceux de l'équipe (Administration › Comptes).
 Aucun compte n'est créé par défaut. Les documents des candidats sont stockés dans `storage/app/private` (jamais publics).
@@ -244,7 +252,7 @@ Copier ensuite `/var/backups/emsi` hors du serveur (ex. `rclone sync` vers un st
 
 `./deploy.sh` depuis `/var/www/emsi` (maintenance, `git pull`, dépendances, migrations, caches, file d'attente, compilation et redémarrage du site).
 
-Pour une base installée avant ces versions, une seule fois chacune : `php artisan emsi:site-v2`, `emsi:impact-live`, `emsi:site-v3`.
+Pour une base installée avant ces versions, une seule fois chacune : `php artisan emsi:site-v2`, `emsi:impact-live`, `emsi:site-v3`, puis `emsi:site-v4 --home` (site des trois domaines, après `php artisan migrate` ; relancée, elle ne refait que les liens et la page EMSI, voir § 6).
 
 ## 12. Vérifications après déploiement
 

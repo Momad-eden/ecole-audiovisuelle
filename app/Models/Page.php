@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use App\Enums\PublicationStatus;
+use App\Enums\SiteDomain;
 use App\Models\Concerns\HasPublication;
 use App\Models\Concerns\HasUniqueSlug;
 use App\Models\Concerns\RevalidatesFrontend;
@@ -18,14 +19,17 @@ class Page extends Model
 {
     use HasFactory, HasPublication, HasUniqueSlug, RevalidatesFrontend;
 
-    protected $fillable = ['title', 'slug', 'type', 'blocks', 'draft_blocks', 'seo', 'is_locked', 'status', 'published_at'];
+    protected $fillable = ['title', 'slug', 'type', 'domain', 'blocks', 'draft_blocks', 'seo', 'is_locked', 'status', 'published_at'];
 
     protected $casts = [
         'blocks' => 'array',
         'draft_blocks' => 'array',
         'seo' => 'array',
         'is_locked' => 'boolean',
+        'domain' => SiteDomain::class,
     ];
+
+    protected $attributes = ['domain' => 'general'];
 
     public function revisions(): HasMany
     {

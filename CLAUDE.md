@@ -10,7 +10,7 @@
   - **Volet 2** — Cycle BTS par la VAE (60 jeunes, 9 mois, démarrage 2027)
   - 5 filières : Son, Technicien Lumière, Régie Générale Spectacle, Infographie & Création Numérique, Cadrage Sportif & Régie Vidéo
   - Document source : `Copie de PROJET_EMSI_DAKAR_GRAND_THEATRE_FESTIVALS_EVENEMENTS.pdf` (racine du repo) = **référence de contenu**.
-- **Écosystème** (depuis le 27/09/2026) : fondé par Boubacar Tall, ingénieur du son sénégalais basé à Saint-Louis : l'EMSI (campus de Dakar au Grand Théâtre et de Saint-Louis, mêmes formations), **Impact Live Studio** (studio d'enregistrement), **Impact Live Events** (location de sono, lumières, podiums et prestations) et l'**Espace Habib Faye** (centre culturel privé). Spec : `docs/superpowers/specs/2026-09-27-impact-live-design.md`.
+- **Écosystème** (depuis le 27/09/2026) : fondé par Boubacar Tall, ingénieur du son sénégalais basé à Saint-Louis : l'EMSI (campus de Dakar au Grand Théâtre et de Saint-Louis, mêmes formations), **Impact Live Studio** (studio d'enregistrement) et l'**Espace Habib Faye** (centre culturel privé), réunis dans la Maison de la culture Habib Faye. **Impact Live Events** (location de sono, lumières, podiums) est **retiré du site** (décision du 29/09/2026) ; ses données restent en base. Specs : `docs/superpowers/specs/2026-09-27-impact-live-design.md` puis `2026-09-29-trois-domaines-design.md`.
 - **Développeur / décideur** : Momar Diop (Halal Techno).
 
 ## 2. Objectif de la refonte
@@ -22,11 +22,13 @@
 
 ## 2 bis. Principes directeurs (décisions de Momar — non négociables)
 
-### A. La plateforme = l'école EMSI, pas le projet
-- L'élément principal du site est **l'EMSI** : ses formations, ses ateliers, les réalisations de ses apprenants, son univers artistique.
-- Le projet EMSI × Grand Théâtre (Volet 1 + BTS par la VAE) s'adresse à des **professionnels** (titulaires CPS/CS, techniciens en activité). Il est regroupé dans **une seule rubrique centralisée**, par exemple « **Espace Professionnels** » (`/professionnels`) : présentation du programme, les 2 volets, la VAE, les filières concernées, le calendrier, les partenaires, la candidature professionnelle.
-- Le projet ne doit **pas** dominer l'accueil, le menu principal ou l'identité du site : un seul point d'entrée clair (entrée de menu + un bloc sur l'accueil), le reste vit dans sa rubrique.
-- Les anciennes pages dispersées (`/projet`, `/vae`, parties de l'accueil et de `/ecole`) sont fusionnées dans cette rubrique.
+### A. La plateforme = trois domaines (décision du 29/09/2026, remplace « la plateforme = l'école »)
+- Le site présente **trois domaines** : la **Maison de la culture Habib Faye** (avec Impact Live Studio : agenda, espaces à louer, studio), l'**EMSI** (campus de Dakar et de Saint-Louis, mêmes formations, disponibilité par campus) et des **pages générales pour les financeurs** (mission, partenaires, soutenir, presse).
+- Le **Grand Théâtre National Doudou Ndiaye Coumba Rose est un partenaire** qui accueille le campus de Dakar ; ce n'est pas un domaine.
+- Le projet EMSI × Grand Théâtre (Volet 1 + BTS par la VAE) s'adresse à des **professionnels** ; il vit dans sa rubrique `/emsi/professionnels` et ne domine ni l'accueil ni le menu.
+- Navigation principale : **Accueil · Maison Habib Faye ▾ · EMSI ▾ · Candidater** (sous-menus au clic et au clavier, accordéon sur téléphone, fil d'Ariane et sous-navigation de domaine). L'accueil commence par le triptyque « Nos trois maisons ».
+- **À venir (R2)** : site **bilingue français / anglais**, à faire avant le style des titres et le paiement mensuel.
+- Les anciennes adresses (`/formations`, `/studio`, `/ecole`, `/agenda`, `/events`, `/musee`, `/demande`…) sont redirigées en une fois vers les nouvelles.
 
 ### B. Tout est administrable par un non-informaticien
 - **Aucun contenu visible ne doit nécessiter de modifier du code** : textes, images, vidéos, sons, menus, pied de page, blocs de l'accueil, chiffres clés, FAQ, SEO, coordonnées, réseaux sociaux, couleurs d'accent des « univers ».
@@ -42,7 +44,7 @@
 - Le site doit **faire ressentir l'art du son, de la lumière et de l'image** et être à la hauteur d'une école installée au **Grand Théâtre National Doudou Ndiaye Coumba Rose**, équipée de matériel de dernière génération : une œuvre qui attire l'œil, pas une plaquette institutionnelle.
 - Organisation en **univers** (disciplines) : Son · Image (vidéo & photo) · Infographie & design · Scène (régie & lumière) · Cinéma (bientôt). Chaque univers présente ses filières, ce qu'on y apprend, les métiers, les formations et les **réalisations** des étudiants (fiche : médias, **audio avec forme d'onde**, crédits, filière, promotion, matériel, récit de création).
 - Direction artistique **« Plein feux »** (spec : `docs/superpowers/specs/2026-09-27-site-public-v2-design.md`) : scène dans le noir qui s'allume au défilement, couleurs du logo (orange projecteur, violet), une lumière par univers, titres Archivo étendus, signatures animées en SVG. Toujours **lisible et performant** : `prefers-reduced-motion` respecté, animations suspendues hors écran, aucun son en lecture automatique.
-- Navigation simple : Univers · Formations · L'École · Réalisations · Espace Pro, CTA « Candidater » toujours visible.
+- Navigation simple : Accueil · Maison Habib Faye ▾ · EMSI ▾ · Candidater ; le CTA « Candidater » est toujours visible.
 
 ## 3. Architecture en place (depuis le 27/09/2026)
 
@@ -58,6 +60,8 @@
 Comptabilité : **une caisse par campus** (`place_id`, code DKR/STL dans la numérotation, soldes, clôtures et exports séparés) ; personnel rattachable à un campus (`users.place_id`, requêtes et Policies filtrées via `BelongsToCampus`).
 
 Impact Live : lieux (`places`), services à prix « à partir de », matériel à louer et packs, agenda et références, demandes de devis/réservation (`BookingWorkflow` : nouvelle → devis envoyé → confirmée → réalisée / annulée), rôle `commercial`.
+
+Trois domaines : chaque page porte un domaine (`domain` : `general`, `maison`, `emsi`, `studio` ; déduit de l'adresse dans l'admin, modifiable) et un parent ; les menus ont des sous-menus (`menu_items.parent_id`) ; formations et sessions ont une **disponibilité par campus** (table `place_program`, « Disponible à » / « Campus »). Blocs ajoutés : `domains` (Nos trois maisons), `campus_programs` (formations de ce campus), documents à télécharger, `support_form` (Nous soutenir, messages de type soutien/partenariat).
 
 Domaine : filières → programmes (école / professionnels) → sessions → offres ; candidatures (`ApplicationWorkflow`) → étudiants → inscriptions ; caisse inaltérable (`CashRegister` : contre-écritures, clôtures). Univers (table `rooms`) → filières ; réalisations (`artworks`) et expositions. Contenu : pages à blocs (brouillon → publication → révisions), actualités, FAQ, menus, redirections.
 
@@ -99,6 +103,8 @@ php artisan emsi:create-admin    # créer un compte (aucun compte par défaut)
 php artisan emsi:site-v2         # mettre à niveau une base existante vers le site « Plein feux » (relançable)
 php artisan emsi:impact-live     # ajouter Impact Live et le campus de Saint-Louis à une base existante (relançable)
 php artisan emsi:site-v3         # page L'École à deux campus, chiffres clés et agenda sur l'accueil (relançable)
+php artisan emsi:site-v4 [--home] [--force]  # site des trois domaines : adresses, menus, pied de page, pages à compléter ; --home remplace l'accueil. Premier passage noté (settings.site_version = 4) : relancée, elle ne refait que les liens et la page EMSI ; --force reprend tout
+php artisan emsi:domains-showcase  # pages d'essai des nouveaux blocs pour Playwright (--remove pour les retirer ; créées et supprimées par les tests)
 ./vendor/bin/pint
 
 # Tout lancer en local (Laravel :8000, file d'attente, site :3000)
@@ -109,11 +115,12 @@ cd frontend && npm install && npm run dev
 npm run lint && npm run build
 ```
 
-## 8. État du projet (au 28/09/2026)
+## 8. État du projet (au 30/09/2026)
 
 - **Code terminé** : PR #1 à #9 fusionnées dans `main` (site « Plein feux » avec thème clair, univers, Impact Live, deux campus et deux caisses, héros « Œuvre d'art » avec son, choix des liens dans l'admin, titres lisibles quelle que soit la couleur, guide de déploiement corrigé, PHP 8.4 minimum). Suites vertes : 104 tests Laravel (SQLite et MySQL), 6 tests unitaires (`npm test`), 26 parcours Playwright.
 - **Héros (branche `feat/heros-projection-studio-cinema`, 29/09/2026)** : nouvelles mises en page *Projection* (photo de fond, rubans, poursuite) et *Cinéma* (diaporama et chiffres clés) ; *Studio* refait (points posés sur le matériel dans l'admin via `HotspotPicker`, 1 à 3 morceaux à écouter). *Œuvre d'art* inchangée. Les héros sur photo gardent une palette de nuit en thème clair (`.scene-dark`). Pages d'essai e2e : `php artisan emsi:hero-showcase` (créées puis supprimées par Playwright, jamais par `db:seed`). Suites : 116 tests Laravel (SQLite et MySQL), 12 tests unitaires, 44 parcours Playwright (le serveur local de l'EMSI tourne sur le port 3001 : `E2E_BASE_URL=http://localhost:3001 npm run e2e`). Suite de la demande de Momar : 2. style des titres et textes dans l'admin, 4. passe visuelle, 3. paiement mensuel des étudiants.
-- **Prochaine étape — mise en ligne** : l'EMSI réserve `emsi.sn` (bureau d'enregistrement accrédité NIC Sénégal) et commande un OVHcloud VPS-2 (Ubuntu 24.04). Ensuite installation selon `DEPLOYMENT.md`, en **transférant la base et `storage/app` locales** (le contenu y est déjà saisi), pas en repartant d'un `db:seed`.
+- **Trois domaines (R1, branche `feat/trois-domaines`, 30/09/2026)** : terminé et vérifié en local (`emsi:site-v4 --home` appliqué à la base locale). Suites : 231 tests Laravel (SQLite et MySQL), 40 tests unitaires (`npm test`), 88 parcours Playwright (bureau et téléphone ; 8 ignorés selon l'écran ou les données). Suite : **R2 site bilingue FR/EN**, puis 2. style des titres, 3. paiement mensuel. Restes connus : **photos de la Maison à fournir** (puis un héros Cinéma sur l'accueil), textes « À compléter » à remplacer dans l'admin (agenda, espaces, campus, mission, partenaires, soutenir, presse), relancer `php artisan migrate` puis `emsi:site-v4` sur la base locale pour poser le repère de version et compléter la page EMSI (univers, réalisations ; `/univers` → `/emsi#univers`).
+- **Prochaine étape — mise en ligne** : l'EMSI réserve `emsi.sn` (bureau d'enregistrement accrédité NIC Sénégal) et commande un OVHcloud VPS-2 (Ubuntu 24.04). Ensuite installation selon `DEPLOYMENT.md`, en **transférant la base et `storage/app` locales** (le contenu y est déjà saisi, déjà mis à niveau), pas en repartant d'un `db:seed` ; sur un `db:seed`, lancer `migrate` puis `emsi:site-v4 --home`.
 - **Attendu de l'école** : photos, tarifs du studio, matériel à louer, dates de rentrée, coordonnées des quatre lieux, mentions légales, comptes de l'équipe, boîtes mail.
 - **Documents** : présentation du site à Boubacar Tall et guide de mise en ligne (domaine, serveur, e-mails, budget), publiés comme pages privées claude.ai ; guide de l'équipe `docs/GUIDE-ADMIN.md`.
 - **Restes techniques** : fichiers front hérités à la racine (`package.json`, `vite.config.js`, `tailwind.config.js`, `resources/css`) sans usage par Filament ; le parcours e2e de l'accueil dépend du contenu de la base locale.

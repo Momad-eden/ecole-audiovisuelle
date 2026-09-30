@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Api\Public;
 
+use App\Enums\SiteDomain;
 use App\Http\Controllers\Controller;
 use App\Http\Resources\Public\ArtworkResource;
 use App\Http\Resources\Public\ExhibitionResource;
@@ -12,7 +13,6 @@ use App\Http\Resources\Public\ProgramResource;
 use App\Http\Resources\Public\RoomResource;
 use App\Models\AgendaEvent;
 use App\Models\Artwork;
-use App\Models\EquipmentItem;
 use App\Models\Exhibition;
 use App\Models\Faq;
 use App\Models\MenuItem;
@@ -63,16 +63,31 @@ class ContentController extends Controller
                 'seoDescription' => $settings->seo_description,
                 'social' => collect($settings->only(['facebook', 'instagram', 'youtube', 'tiktok', 'linkedin', 'twitter']))->filter()->all(),
             ],
-            'menus' => MenuItem::where('is_visible', true)->orderBy('position')->get()
-                // Jamais de lien vers une page de l'admin encore en brouillon (ex. mentions légales à compléter).
-                ->reject(fn (MenuItem $i) => in_array(ltrim($i->url, '/'), $unpublished, true))
-                ->groupBy('location')
-                ->map(fn ($items) => $items->map(fn (MenuItem $i) => ['label' => $i->label, 'url' => $i->url, 'isButton' => $i->is_button])->values())
-                ->all() + ['main' => [], 'footer' => [], 'legal' => []],
+            'menus' => $this->menus($unpublished),
+            'domains' => collect(SiteDomain::cases())->mapWithKeys(fn (SiteDomain $d) => [$d->value => ['label' => $d->label(), 'color' => $d->color()]])->all(),
             'rooms' => RoomResource::collection(Room::published()->orderBy('position')->get())->resolve(),
             'places' => PlaceResource::collection(Place::published()->orderBy('position')->get())->resolve(),
             'hasSchoolPrograms' => Program::published()->where('audience', 'school')->exists(),
         ]]);
+    }
+
+    /** Menus à un seul niveau de sous-menus ; jamais de lien vers une page encore en brouillon. */
+    private function menus(array $unpublished): array
+    {
+        $visible = MenuItem::where('is_visible', true)->orderBy('position')->orderBy('id')->get()
+            ->reject(fn (MenuItem $i) => in_array(ltrim($i->url, '/'), $unpublished, true));
+
+        $children = $visible->whereNotNull('parent_id')->groupBy('parent_id');
+
+        return $visible->whereNull('parent_id')
+            ->groupBy('location')
+            ->map(fn ($items) => $items->map(fn (MenuItem $i) => [
+                'label' => $i->label,
+                'url' => $i->url,
+                'isButton' => $i->is_button,
+                'children' => ($children[$i->id] ?? collect())->map(fn (MenuItem $c) => ['label' => $c->label, 'url' => $c->url])->values()->all(),
+            ])->values())
+            ->all() + ['main' => [], 'footer' => [], 'legal' => []];
     }
 
     public function page(string $slug): JsonResponse
@@ -98,6 +113,7 @@ class ContentController extends Controller
             'title' => $page->title,
             'slug' => $page->slug,
             'type' => $page->type,
+            'domain' => ($page->domain ?? SiteDomain::GENERAL)->value,
             'seo' => $page->seo,
             'blocks' => $this->blocks->resolve($blocks),
             'updatedAt' => $page->updated_at?->toIso8601String(),
@@ -196,10 +212,33 @@ class ContentController extends Controller
 
     public function offerings(Request $request): AnonymousResourceCollection
     {
-        return OfferingResource::collection(Offering::openForApplications()
-            ->with(['cohort.program', 'track'])
+        $campus = $request->query('campus');
+        $campuses = Place::published()->campuses()->get();
+
+        $query = Offering::openForApplications();
+        if ($campus) {
+            $place = $campuses->firstWhere('slug', $campus);
+            if (! $place) {
+                return OfferingResource::collection(collect());
+            }
+            $query = Offering::availableAt($place);
+        }
+
+        $offerings = $query
+            ->with(['cohort.program.campuses', 'track'])
             ->when($request->query('audience'), fn (Builder $q, $audience) => $q->whereHas('cohort.program', fn ($p) => $p->where('audience', $audience)))
-            ->get());
+            ->get();
+
+        // Campus publiés où l'offre est proposée : formation cochée pour le campus et session du campus (ou de tous).
+        // Même règle que Offering::isAvailableAt(null) : avec un seul campus publié, toute offre ouverte y est proposée.
+        $offerings->each(fn (Offering $o) => $o->setAttribute('campus_ids', $campuses->count() === 1
+            ? [$campuses->first()->id]
+            : $campuses
+                ->filter(fn (Place $c) => $o->cohort->program->campuses->contains('id', $c->id)
+                    && ($o->cohort->place_id === null || $o->cohort->place_id === $c->id))
+                ->pluck('id')->values()->all()));
+
+        return OfferingResource::collection($offerings);
     }
 
     public function news(Request $request): AnonymousResourceCollection
@@ -237,14 +276,12 @@ class ContentController extends Controller
 
         return response()->json(['data' => collect()
             ->merge(Page::published()->get(['slug', 'type', 'updated_at'])->map(fn (Page $p) => $entry($p->type === 'home' ? '/' : '/'.$p->slug, $p->updated_at)))
-            ->merge(Room::published()->get(['slug', 'updated_at'])->map(fn (Room $r) => $entry('/univers/'.$r->slug, $r->updated_at)))
-            ->merge(Artwork::published()->get(['slug', 'updated_at'])->map(fn (Artwork $a) => $entry('/realisations/'.$a->slug, $a->updated_at)))
-            ->merge(Exhibition::published()->get(['slug', 'updated_at'])->map(fn (Exhibition $e) => $entry('/expositions/'.$e->slug, $e->updated_at)))
+            ->merge(Room::published()->get(['slug', 'updated_at'])->map(fn (Room $r) => $entry('/emsi/univers/'.$r->slug, $r->updated_at)))
+            ->merge(Artwork::published()->get(['slug', 'updated_at'])->map(fn (Artwork $a) => $entry('/emsi/realisations/'.$a->slug, $a->updated_at)))
             ->merge(Program::published()->get(['slug', 'audience', 'updated_at'])->map(fn (Program $p) => $entry(
-                ($p->audience?->value === 'professional' ? '/professionnels/' : '/formations/').$p->slug, $p->updated_at)))
+                ($p->audience?->value === 'professional' ? '/emsi/professionnels/' : '/emsi/formations/').$p->slug, $p->updated_at)))
             ->merge(News::published()->get(['slug', 'updated_at'])->map(fn (News $n) => $entry('/actualites/'.$n->slug, $n->updated_at)))
-            ->merge(AgendaEvent::published()->get(['slug', 'updated_at'])->map(fn (AgendaEvent $e) => $entry('/agenda/'.$e->slug, $e->updated_at)))
-            ->merge(EquipmentItem::published()->where('usage', 'rental')->get(['slug', 'updated_at'])->map(fn (EquipmentItem $i) => $entry('/events/materiel/'.$i->slug, $i->updated_at)))
+            ->merge(AgendaEvent::published()->get(['slug', 'updated_at'])->map(fn (AgendaEvent $e) => $entry('/maison-habib-faye/agenda/'.$e->slug, $e->updated_at)))
             ->values()]);
     }
 }

@@ -9,6 +9,7 @@ use App\Enums\FundingMode;
 use App\Enums\PlaceKind;
 use App\Enums\ProgramKind;
 use App\Enums\PublicationStatus;
+use App\Enums\SiteDomain;
 use App\Models\AgendaEvent;
 use App\Models\Cohort;
 use App\Models\EquipmentCategory;
@@ -23,6 +24,7 @@ use App\Models\Room;
 use App\Models\Service;
 use App\Models\Setting;
 use App\Models\Track;
+use App\Support\LegacyPaths;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Str;
 
@@ -35,6 +37,9 @@ use Illuminate\Support\Str;
  */
 class ContentSeeder extends Seeder
 {
+    /** @var list<string> Résumé de emsi:site-v4. */
+    private array $report = [];
+
     public function run(): void
     {
         $this->settings();
@@ -54,6 +59,63 @@ class ContentSeeder extends Seeder
     public function refreshSiteV3(): void
     {
         $this->siteV3();
+    }
+
+    /** Repère posé dans les paramètres quand emsi:site-v4 est passée. */
+    public const SITE_V4 = 4;
+
+    /**
+     * Site v4 : un site, trois domaines (Maison Habib Faye, EMSI, Impact Live Studio). Sans perte :
+     * les pages sont déplacées (pas recréées), une page déjà présente n'est jamais réécrite, l'accueil n'est
+     * remplacé qu'avec $home. Le premier passage est noté dans les paramètres (site_version) : les suivants
+     * ne font plus que les réécritures de liens et les compléments de la page EMSI, sans recréer les pages,
+     * menus ni campus des formations que l'équipe a pu retoucher ou retirer, sauf avec $force.
+     * Retourne le résumé en français de ce qui a été fait.
+     *
+     * @return list<string>
+     */
+    public function refreshSiteV4(bool $home = false, bool $force = false): array
+    {
+        $this->report = [];
+        $settings = Setting::current();
+        $done = (int) $settings->site_version >= self::SITE_V4;
+        if (! $done && $this->siteV4AlreadyApplied()) {
+            $done = true;
+            $this->report[] = 'Site déjà au format des trois domaines (mise à niveau faite avant le repère de version) : repère enregistré.';
+        }
+        $full = ! $done || $force;
+
+        if ($full) {
+            $this->unpublishEvents();
+        }
+        $this->rewriteLinks();
+        if ($full) {
+            $this->movePages();
+            $this->siteV4Pages();
+        }
+        if ($home) {
+            $this->homeV4();
+        }
+        $this->completeEmsiPage();
+        if ($full) {
+            $this->programCampuses();
+            $this->menusV4();
+        } else {
+            $this->report[] = 'Mise à niveau déjà faite : les pages, menus et campus des formations ne sont plus modifiés (relancez avec --force pour les reprendre).';
+        }
+        $this->rewriteRedirects();
+
+        if ((int) $settings->site_version < self::SITE_V4) {
+            $settings->forceFill(['site_version' => self::SITE_V4])->save();
+        }
+
+        return $this->report;
+    }
+
+    /** Base mise à niveau par une version de la commande antérieure au repère : pages EMSI et Studio à leur nouvelle adresse. */
+    private function siteV4AlreadyApplied(): bool
+    {
+        return Page::where('slug', 'emsi')->exists() && Page::where('slug', 'maison-habib-faye/studio')->exists();
     }
 
     /** Ajoute Impact Live (studio, événementiel, Espace Habib Faye) et le campus de Saint-Louis à un site existant. */
@@ -614,6 +676,464 @@ class ContentSeeder extends Seeder
             '/admission' => '/candidater', '/admission/succes' => '/candidater',
         ] as $from => $to) {
             Redirect::updateOrCreate(['from_path' => $from], ['to_path' => $to, 'status_code' => 301]);
+        }
+    }
+
+    /** Impact Live Events est retiré du site : sa page est gardée, en brouillon (plus servie). */
+    private function unpublishEvents(): void
+    {
+        $events = Page::where('slug', 'events')->first();
+        if ($events && $events->status !== PublicationStatus::DRAFT) {
+            $events->forceFill(['status' => PublicationStatus::DRAFT])->save();
+            $this->report[] = 'Page « /events » (Impact Live Events) repassée en brouillon : gardée, mais plus affichée.';
+        }
+    }
+
+    /**
+     * Liens des blocs (version en ligne et brouillon) et des menus vers les nouvelles adresses ;
+     * surtitres de héros « Dakar · Grand Théâtre National » → « Dakar · Saint-Louis ».
+     */
+    private function rewriteLinks(): void
+    {
+        $pages = [];
+        foreach (Page::orderBy('id')->get() as $page) {
+            $draft = $this->rewriteBlocks($page->draft_blocks);
+            $live = $this->rewriteBlocks($page->blocks);
+            if ($draft !== $page->draft_blocks || $live !== $page->blocks) {
+                $this->saveBlocks($page, $draft, $live);
+                $pages[] = '/'.$page->slug;
+            }
+        }
+        if ($pages) {
+            $this->report[] = 'Liens et surtitres mis à jour sur '.count($pages).' page(s) : '.implode(', ', $pages).'.';
+        }
+
+        $menus = 0;
+        foreach (MenuItem::orderBy('id')->get() as $item) {
+            $url = LegacyPaths::rewrite((string) $item->url);
+            if ($url !== $item->url) {
+                $item->update(['url' => $url]);
+                $menus++;
+            }
+        }
+        if ($menus) {
+            $this->report[] = "Liens de menu mis à jour : {$menus}.";
+        }
+    }
+
+    private function rewriteBlocks(?array $blocks): ?array
+    {
+        if ($blocks === null) {
+            return null;
+        }
+
+        return array_map(function ($block) {
+            if (! is_array($block)) {
+                return $block;
+            }
+            $block = $this->rewriteValue($block);
+            if (($block['type'] ?? null) === 'hero' && is_array($block['data'] ?? null)) {
+                $block['data'] = $this->siteV4Eyebrow($block['data']);
+                foreach ($block['data']['slides'] ?? [] as $i => $slide) {
+                    if (is_array($slide)) {
+                        $block['data']['slides'][$i] = $this->siteV4Eyebrow($slide);
+                    }
+                }
+            }
+
+            return $block;
+        }, $blocks);
+    }
+
+    /** Adresses (champs « url », « …_url ») et liens des textes enrichis, à toute profondeur. */
+    private function rewriteValue(mixed $value, int|string|null $key = null): mixed
+    {
+        if (is_array($value)) {
+            foreach ($value as $k => $v) {
+                $value[$k] = $this->rewriteValue($v, is_string($k) ? $k : null);
+            }
+
+            return $value;
+        }
+        if (! is_string($value) || $key === null) {
+            return $value;
+        }
+        if ($key === 'url' || str_ends_with($key, '_url')) {
+            return LegacyPaths::rewrite($value);
+        }
+
+        return str_contains($value, 'href') ? LegacyPaths::rewriteHtml($value) : $value;
+    }
+
+    private function siteV4Eyebrow(array $data): array
+    {
+        if (is_string($data['eyebrow'] ?? null)) {
+            $data['eyebrow'] = str_replace('Dakar · Grand Théâtre National', 'Dakar · Saint-Louis', $data['eyebrow']);
+        }
+
+        return $data;
+    }
+
+    /**
+     * Enregistre des blocs corrigés sans rien publier à la place de l'équipe : une page en ligne sans
+     * modification en attente est republiée (nouvelle révision) ; sinon la version en ligne et le brouillon
+     * sont corrigés chacun de leur côté, et la nouvelle version en ligne est gardée dans l'historique.
+     */
+    private function saveBlocks(Page $page, ?array $draft, ?array $live): void
+    {
+        if ($page->isPublished() && ! $page->hasUnpublishedChanges()) {
+            $page->update(['draft_blocks' => $draft]);
+            $page->publish();
+
+            return;
+        }
+
+        $liveChanged = $live !== $page->blocks;
+        $page->forceFill(['draft_blocks' => $draft, 'blocks' => $live])->save();
+        if ($page->isPublished() && $liveChanged) {
+            $page->revisions()->create(['title' => $page->title, 'blocks' => $live]);
+        }
+    }
+
+    /** Déplace une page (même enregistrement : blocs, historique et statut gardés), jamais sur une page existante. */
+    private function movePages(): void
+    {
+        $moves = [
+            ['studio', 'maison-habib-faye/studio', SiteDomain::STUDIO],
+            ['ecole', 'emsi', SiteDomain::EMSI],
+            ['espace-habib-faye', 'maison-habib-faye', SiteDomain::MAISON],
+            ['professionnels', 'emsi/professionnels', SiteDomain::EMSI],
+        ];
+        foreach ($moves as [$from, $to, $domain]) {
+            $page = Page::where('slug', $from)->first();
+            if (! $page) {
+                continue;
+            }
+            if (Page::where('slug', $to)->exists()) {
+                $this->report[] = "Page « /{$from} » non déplacée : l'adresse « /{$to} » est déjà prise (rien n'a été écrasé). À régler dans l'admin.";
+
+                continue;
+            }
+            $page->forceFill(['slug' => $to, 'domain' => $domain])->save();
+            $this->report[] = "Page déplacée : /{$from} → /{$to}.";
+        }
+    }
+
+    /** Pages des trois domaines, créées seulement si leur adresse est libre, publiées, textes « À compléter ». */
+    private function siteV4Pages(): void
+    {
+        $todo = fn (string $what) => "À compléter : {$what}";
+        $hero = fn (string $eyebrow, string $title, string $subtitle, array $buttons = []) => ['hero', array_filter([
+            'eyebrow' => $eyebrow, 'title' => $title, 'subtitle' => $subtitle, 'layout' => 'compact', 'buttons' => $buttons,
+        ])];
+        $text = fn (string $title, string $body) => ['text', ['title' => $title, 'body' => "<p>{$body}</p>"]];
+
+        // Seulement si aucune page n'a pu y être déplacée (nouvelle installation).
+        $this->createPage('maison-habib-faye', 'Maison Habib Faye', SiteDomain::MAISON, [
+            $hero('Centre culturel · Saint-Louis', 'Maison Habib Faye', $todo('présentez ici la Maison, Habib Faye et Boubacar Tall.')),
+            $text('Notre mission', $todo('la mission de la Maison.')),
+            ['agenda', ['title' => 'Programmation', 'scope' => 'upcoming', 'limit' => 6]],
+            ['places', ['title' => 'Nous trouver', 'kind' => 'cultural_center']],
+        ]);
+        $this->createPage('emsi', 'L\'école', SiteDomain::EMSI, [
+            $hero('EMSI · Dakar · Saint-Louis', 'École des Métiers du Son et de l\'Image', $todo('présentez ici l\'école.'),
+                [['label' => 'Candidater', 'url' => '/candidater', 'style' => 'primary']]),
+            ['campuses', ['eyebrow' => 'Nos campus', 'title' => 'Choisissez votre campus']],
+            ['programs', ['title' => 'Nos formations', 'audience' => 'school', 'limit' => 6]],
+        ]);
+
+        $this->createPage('maison-habib-faye/agenda', 'Programmation', SiteDomain::MAISON, [
+            $hero('Maison Habib Faye', 'Programmation', $todo('présentez ici la programmation de la Maison (concerts, résidences, rencontres).')),
+            ['agenda', ['title' => 'Prochains rendez-vous', 'scope' => 'upcoming', 'limit' => 24]],
+        ]);
+        $this->createPage('maison-habib-faye/espaces', 'Les espaces', SiteDomain::MAISON, [
+            $hero('Maison Habib Faye · Saint-Louis', 'Les espaces', $todo('présentez ici les salles et espaces à louer (capacité, équipement).')),
+            ['places', ['title' => 'Nos espaces', 'kind' => 'cultural_center']],
+            ['booking_form', ['title' => 'Louer un espace', 'text' => 'Date, type d\'événement, public attendu : nous vous répondons avec une proposition.', 'booking_type' => 'space_rental']],
+        ]);
+
+        // Campus : repérés par leur ville (Dakar, Saint-Louis), sinon par leur ordre dans Administration › Lieux.
+        $campuses = Place::campuses()->orderBy('position')->orderBy('id')->get();
+        $dakar = $campuses->first(fn (Place $p) => Str::slug((string) $p->city) === 'dakar') ?? $campuses->get(0);
+        $saintLouis = $campuses->first(fn (Place $p) => Str::slug((string) $p->city) === 'saint-louis')
+            ?? $campuses->first(fn (Place $p) => ! $p->is($dakar));
+
+        $venue = collect([Page::where('type', 'home')->orderBy('id')->first(), Page::where('slug', 'accueil')->first(), Page::where('slug', 'emsi')->first()])
+            ->filter()->map(fn (Page $p) => collect($p->blocks ?? $p->draft_blocks ?? [])->firstWhere('type', 'venue')['data'] ?? null)->filter()->first()
+            ?? ['eyebrow' => 'Notre adresse', 'title' => 'Au cœur du Grand Théâtre National Doudou Ndiaye Coumba Rose',
+                'text' => 'À Dakar, nos apprenants se forment là où le spectacle se fabrique : sur les plateaux, dans les salles et en régie.'];
+        $venue['buttons'] = [];
+        $theatre = Partner::where('name', 'like', '%Grand Théâtre%')->first();
+
+        foreach ([['emsi/dakar', 'Dakar', $dakar], ['emsi/saint-louis', 'Saint-Louis', $saintLouis]] as [$slug, $city, $campus]) {
+            $blocks = [$hero("EMSI · Campus de {$city}", "Campus de {$city}", $todo("présentez ici le campus de {$city} (lieu, équipe, équipements)."),
+                $campus ? [['label' => "Candidater à {$city}", 'url' => "/candidater?campus={$campus->slug}", 'style' => 'primary']] : [])];
+            if ($campus) {
+                $blocks[] = ['campus_programs', ['title' => "Les formations à {$city}", 'campus_id' => $campus->id]];
+            } elseif (! Page::where('slug', $slug)->exists()) {
+                $this->report[] = "Aucun campus de {$city} dans Administration › Lieux : bloc « Formations de ce campus » à ajouter sur /{$slug}.";
+            }
+            if ($city === 'Dakar') {
+                $blocks[] = ['venue', $venue];
+                $blocks[] = ['partners', ['title' => 'Notre partenaire, le Grand Théâtre National', 'categories' => [$theatre->category ?? 'co_organizer']]];
+            }
+            $this->createPage($slug, "Campus de {$city}", SiteDomain::EMSI, $blocks);
+        }
+
+        $this->createPage('mission', 'Mission et impact', SiteDomain::GENERAL, [
+            $hero('Maison Habib Faye · EMSI · Impact Live Studio', 'Mission et impact', $todo('résumez ici la mission commune des trois maisons.')),
+            $text('Notre mission', $todo('la mission, les publics touchés, les résultats (chiffres fournis par l\'équipe).')),
+        ]);
+        $this->createPage('partenaires', 'Partenaires et soutiens', SiteDomain::GENERAL, [
+            $hero('Ils nous accompagnent', 'Partenaires et soutiens', $todo('présentez ici ce que les partenaires rendent possible.')),
+            ['partners', ['title' => 'Nos partenaires']],
+        ]);
+        $this->createPage('soutenir', 'Nous soutenir', SiteDomain::GENERAL, [
+            $hero('Partenariat, mécénat, don', 'Nous soutenir', $todo('expliquez ici comment soutenir la Maison, l\'école et le studio.')),
+            ['support_form', ['title' => 'Nous écrire', 'text' => 'Partenaires, mécènes et donateurs : écrivez-nous, nous vous répondrons rapidement.']],
+        ]);
+        $this->createPage('presse', 'Presse', SiteDomain::GENERAL, [
+            $hero('Espace presse', 'Presse', $todo('présentez ici le contact presse et les documents à disposition.')),
+            // Pas de bloc « Documents » vide : l'admin exige au moins un document pour enregistrer la page.
+            $text('Dossier de presse', $todo('ajoutez un bloc « Documents à télécharger » avec le dossier de presse et les logos, puis retirez ce texte.')),
+        ]);
+    }
+
+    private function createPage(string $slug, string $title, SiteDomain $domain, array $blocks): void
+    {
+        if (Page::where('slug', $slug)->exists()) {
+            return;
+        }
+        $page = Page::create(['slug' => $slug, 'title' => $title, 'type' => 'system', 'domain' => $domain, 'is_locked' => true,
+            'draft_blocks' => array_map(fn (array $block) => ['type' => $block[0], 'data' => $block[1]], $blocks)]);
+        $page->publish();
+        $this->report[] = "Page créée : /{$slug} ({$title}), textes « À compléter ».";
+    }
+
+    /**
+     * Accueil des trois domaines : héros Cinéma (une diapositive par domaine, photos des pages existantes),
+     * triptyque, puis chiffres, agenda, actualités et partenaires de l'accueil actuel. L'ancienne version
+     * (et un brouillon non publié) restent dans l'historique. Un accueil qui a déjà le triptyque n'est pas touché.
+     */
+    private function homeV4(): void
+    {
+        $home = Page::where('type', 'home')->orderBy('id')->first() ?? Page::where('slug', 'accueil')->first();
+        if (! $home) {
+            $this->report[] = 'Accueil introuvable : non modifié.';
+
+            return;
+        }
+        // Construit depuis la version en ligne : un brouillon non relu n'est jamais publié (il est gardé dans l'historique).
+        $current = $home->blocks ?? [];
+        if (collect($current)->contains('type', 'domains') || collect($home->draft_blocks ?? [])->contains('type', 'domains')) {
+            $this->report[] = 'Accueil : déjà au format des trois domaines, non modifié.';
+
+            return;
+        }
+
+        $images = [
+            'maison' => $this->heroImage(['maison-habib-faye', 'espace-habib-faye']),
+            'emsi' => $this->heroImage([$home->slug, 'emsi', 'ecole']),
+            'studio' => $this->heroImage(['maison-habib-faye/studio', 'studio']),
+        ];
+        $domains = [
+            'maison' => ['Centre culturel · Saint-Louis', 'Maison Habib Faye', 'Concerts, résidences et transmission, dans la maison de Habib Faye.', '/maison-habib-faye', 'Découvrir la Maison'],
+            'emsi' => ['École · Dakar · Saint-Louis', 'EMSI', 'Les métiers du son, de l\'image et de la scène, sur du matériel professionnel.', '/emsi', 'Se former'],
+            'studio' => ['Studio d\'enregistrement · Saint-Louis', 'Impact Live Studio', 'Enregistrement, mixage et mastering, dans un studio pensé pour les artistes.', '/maison-habib-faye/studio', 'Réserver une séance'],
+        ];
+
+        $panels = [];
+        $slides = [];
+        foreach ($domains as $domain => [$eyebrow, $title, $text, $url, $label]) {
+            $image = $images[$domain] ?? ['image' => null, 'image_alt' => null];
+            $panels[] = ['domain' => $domain, 'eyebrow' => $eyebrow, 'title' => $title, 'text' => $text] + $image + ['url' => $url, 'label' => $label];
+            $slides[] = $image + ['eyebrow' => $eyebrow, 'title' => $title, 'link_label' => $label, 'link_url' => $url];
+        }
+
+        $blocks = [];
+        $missing = array_keys(array_filter($images, fn ($image) => $image === null));
+        if ($missing === []) {
+            $blocks[] = ['type' => 'hero', 'data' => ['eyebrow' => 'Dakar · Saint-Louis', 'title' => 'La culture comme héritage, l\'art comme métier', 'layout' => 'cinema',
+                'slides' => $slides, 'facts' => [['value' => '3', 'label' => 'maisons'], ['value' => '2', 'label' => 'campus de l\'EMSI']]]];
+        } else {
+            $names = array_map(fn (string $domain) => SiteDomain::from($domain)->label(), $missing);
+            $this->report[] = 'Accueil : photo manquante pour '.implode(', ', $names).' (image du héros de sa page) : le triptyque ouvre la page à la place du héros Cinéma. '
+                .'Ajoutez les photos puis un héros « Cinéma » dans l\'admin si vous le souhaitez.';
+        }
+        $blocks[] = ['type' => 'domains', 'data' => ['intro' => 'La culture comme héritage, l\'art comme métier', 'panels' => $panels]];
+        foreach (['stats', 'agenda', 'news', 'partners'] as $type) {
+            if ($block = collect($current)->firstWhere('type', $type)) {
+                $blocks[] = $block;
+            }
+        }
+
+        if ($home->hasUnpublishedChanges() && $home->draft_blocks !== null) {
+            $home->revisions()->create(['title' => $home->title.' (brouillon non publié)', 'blocks' => $home->draft_blocks]);
+        }
+        $home->update(['draft_blocks' => $blocks]);
+        $home->publish();
+        $this->report[] = 'Accueil republié avec '.($missing === [] ? 'le héros Cinéma et ' : '').'le triptyque des trois maisons ; l\'ancienne version reste dans l\'historique.';
+    }
+
+    /**
+     * Page EMSI : les univers et les réalisations (repris de l'ancien accueil, sinon textes de départ),
+     * juste après les cartes des campus ; le lieu du Grand Théâtre est retiré s'il est déjà sur /emsi/dakar.
+     * Un bloc que la page a déjà eu (dans son historique) et que l'équipe a retiré n'est pas remis.
+     * Brouillon en attente respecté ; nouvelle révision seulement si quelque chose change. Relançable.
+     */
+    private function completeEmsiPage(): void
+    {
+        $page = Page::where('slug', 'emsi')->first();
+        if (! $page) {
+            return;
+        }
+        $history = $page->revisions()->pluck('blocks')->flatten(1)->pluck('type')->filter()->unique();
+        $dakar = Page::where('slug', 'emsi/dakar')->first();
+        $venueAtDakar = collect([...($dakar?->blocks ?? []), ...($dakar?->draft_blocks ?? [])])->contains('type', 'venue');
+
+        $complete = function (?array $blocks) use ($history, $venueAtDakar): ?array {
+            if ($blocks === null) {
+                return null;
+            }
+            $blocks = array_values($blocks);
+            if ($venueAtDakar) {
+                $blocks = array_values(array_filter($blocks, fn ($block) => ($block['type'] ?? null) !== 'venue'));
+            }
+            $types = array_column($blocks, 'type');
+            $missing = array_values(array_filter(['rooms', 'artworks'], fn (string $type) => ! in_array($type, $types, true) && ! $history->contains($type)));
+            if ($missing === []) {
+                return $blocks;
+            }
+            $at = array_search('campuses', $types, true);
+            $at = $at === false ? min(1, count($blocks)) : $at + 1;
+            array_splice($blocks, $at, 0, array_map(fn (string $type) => ['type' => $type, 'data' => $this->formerHomeBlock($type)], $missing));
+
+            return $blocks;
+        };
+
+        $live = $complete($page->blocks);
+        $draft = $complete($page->draft_blocks);
+        if ($live === $page->blocks && $draft === $page->draft_blocks) {
+            return;
+        }
+        $this->saveBlocks($page, $draft, $live);
+        $this->report[] = 'Page « /emsi » complétée : univers et réalisations des étudiants'.($venueAtDakar ? ', lieu du Grand Théâtre laissé à /emsi/dakar' : '').'.';
+    }
+
+    /** Bloc de l'accueil actuel ou de son historique (le plus récent), sinon les textes de départ. */
+    private function formerHomeBlock(string $type): array
+    {
+        $home = Page::where('type', 'home')->orderBy('id')->first() ?? Page::where('slug', 'accueil')->first();
+        $versions = collect([$home?->blocks, $home?->draft_blocks])->merge($home?->revisions()->pluck('blocks') ?? []);
+        foreach ($versions as $blocks) {
+            $block = collect($blocks ?? [])->firstWhere('type', $type);
+            if (is_array($block['data'] ?? null)) {
+                return $block['data'];
+            }
+        }
+
+        return match ($type) {
+            'rooms' => ['eyebrow' => 'Cinq univers, une école', 'title' => 'Choisissez votre univers',
+                'text' => 'Chaque univers a sa lumière, ses outils et ses métiers. Explorez-les, puis trouvez la formation qui vous ressemble.'],
+            'artworks' => ['title' => 'Réalisations des étudiants', 'source' => 'latest', 'limit' => 6],
+        };
+    }
+
+    /** @return array{image: string, image_alt: ?string}|null Photo du premier héros (version en ligne) de la première de ces pages qui en a une. */
+    private function heroImage(array $slugs): ?array
+    {
+        foreach ($slugs as $slug) {
+            $page = Page::where('slug', $slug)->first();
+            $hero = collect($page?->blocks ?? $page?->draft_blocks ?? [])->firstWhere('type', 'hero')['data'] ?? [];
+            if (is_string($hero['image'] ?? null) && $hero['image'] !== '') {
+                return ['image' => $hero['image'], 'image_alt' => $hero['image_alt'] ?? null];
+            }
+        }
+
+        return null;
+    }
+
+    /** Formations sans campus coché : proposées dans tous les campus. Les sessions restent « les deux campus ». */
+    private function programCampuses(): void
+    {
+        $campuses = Place::campuses()->orderBy('position')->orderBy('id')->pluck('id');
+        if ($campuses->isEmpty()) {
+            return;
+        }
+        $programs = Program::whereDoesntHave('campuses')->get();
+        $programs->each(fn (Program $program) => $program->campuses()->sync($campuses));
+        if ($programs->isNotEmpty()) {
+            $this->report[] = "Formations proposées dans les {$campuses->count()} campus : {$programs->count()}.";
+        }
+    }
+
+    /**
+     * Menu principal (Maison et EMSI avec leurs sous-menus) et pied de page, construits une seule fois :
+     * s'ils existent déjà, l'équipe a pu les retoucher et on n'y touche plus. Les entrées existantes à la
+     * même adresse et au même libellé (Contact, Candidater…) sont réutilisées, les autres sont masquées (jamais supprimées).
+     */
+    private function menusV4(): void
+    {
+        if (MenuItem::where('location', 'main')->whereNull('parent_id')->where('url', '/maison-habib-faye')->whereHas('children')->exists()) {
+            $this->report[] = 'Menu principal : déjà en place, non modifié.';
+        } else {
+            $claimed = [];
+            $tree = [
+                ['Accueil', '/', false, []],
+                ['Maison Habib Faye', '/maison-habib-faye', false, [['La Maison', '/maison-habib-faye'], ['Programmation', '/maison-habib-faye/agenda'],
+                    ['Impact Live Studio', '/maison-habib-faye/studio'], ['Les espaces', '/maison-habib-faye/espaces']]],
+                ['EMSI', '/emsi', false, [['L\'école', '/emsi'], ['Campus de Dakar', '/emsi/dakar'], ['Campus de Saint-Louis', '/emsi/saint-louis'],
+                    ['Formations', '/emsi/formations'], ['VAE et professionnels', '/emsi/professionnels'], ['Réalisations', '/emsi/realisations']]],
+                ['Candidater', '/candidater', true, []],
+            ];
+            foreach ($tree as $position => [$label, $url, $button, $children]) {
+                $parent = $this->menuItem($claimed, 'main', $url, ['label' => $label, 'parent_id' => null, 'is_button' => $button, 'position' => $position]);
+                foreach ($children as $childPosition => [$childLabel, $childUrl]) {
+                    $this->menuItem($claimed, 'main', $childUrl, ['label' => $childLabel, 'parent_id' => $parent->id, 'is_button' => false, 'position' => $childPosition]);
+                }
+            }
+            MenuItem::where('location', 'main')->whereNotIn('id', $claimed)->update(['is_visible' => false]);
+            $this->report[] = 'Menu principal reconstruit (Accueil, Maison Habib Faye, EMSI, Candidater) ; les anciennes entrées sont masquées.';
+        }
+
+        if (MenuItem::where('location', 'footer')->where('url', '/mission')->exists()) {
+            $this->report[] = 'Pied de page : déjà en place, non modifié.';
+        } else {
+            $claimed = [];
+            $links = [['Mission et impact', '/mission'], ['Partenaires et soutiens', '/partenaires'], ['Nous soutenir', '/soutenir'],
+                ['Actualités', '/actualites'], ['Presse', '/presse'], ['Contact', '/contact']];
+            foreach ($links as $position => [$label, $url]) {
+                $this->menuItem($claimed, 'footer', $url, ['label' => $label, 'parent_id' => null, 'is_button' => false, 'position' => $position]);
+            }
+            MenuItem::where('location', 'footer')->whereNotIn('id', $claimed)->update(['is_visible' => false]);
+            $this->report[] = 'Pied de page reconstruit ; les anciennes entrées sont masquées.';
+        }
+    }
+
+    /** Réutilise la même entrée (même adresse, même libellé, pas encore prise), sinon la crée ; toujours visible. */
+    private function menuItem(array &$claimed, string $location, string $url, array $attributes): MenuItem
+    {
+        $item = MenuItem::where('location', $location)->where('url', $url)->where('label', $attributes['label'])->whereNotIn('id', $claimed)
+            ->orderByDesc('is_visible')->orderBy('id')->first() ?? new MenuItem(['location' => $location, 'url' => $url]);
+        $item->fill($attributes + ['is_visible' => true])->save();
+        $claimed[] = $item->id;
+
+        return $item;
+    }
+
+    /** Redirections de l'admin : cible directe vers la nouvelle adresse (pas de chaîne de redirections). */
+    private function rewriteRedirects(): void
+    {
+        $count = 0;
+        foreach (Redirect::orderBy('id')->get() as $redirect) {
+            $to = LegacyPaths::rewrite((string) $redirect->to_path);
+            if ($to !== $redirect->to_path) {
+                $redirect->update(['to_path' => $to]);
+                $count++;
+            }
+        }
+        if ($count) {
+            $this->report[] = "Redirections de l'admin mises à jour : {$count}.";
         }
     }
 }

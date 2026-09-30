@@ -1,4 +1,5 @@
 import type { Block, BookingType } from "@/lib/types";
+import { publicBookingType } from "@/lib/booking";
 import { FORM_ANCHOR } from "./ImpactBlocks";
 
 const items = (block: Block) => (Array.isArray(block.data.items) ? (block.data.items as { audio?: { url?: string } | null }[]) : []);
@@ -8,7 +9,7 @@ export function pageAnchors(blocks: Block[]): Set<string> {
   const anchors = new Set<string>();
   for (const block of blocks) {
     if (block.type === "productions" && items(block).some((item) => item.audio?.url)) anchors.add("productions");
-    if (block.type === "booking_form") anchors.add(FORM_ANCHOR[(block.data.bookingType as BookingType) ?? "equipment_rental"]);
+    if (block.type === "booking_form") anchors.add(FORM_ANCHOR[publicBookingType(block.data.bookingType as BookingType | undefined)]);
     if (block.type === "agenda" && block.data.scope !== "references" && items(block).length > 0) anchors.add("programmation");
     if (block.type === "rooms" && items(block).length > 0) anchors.add("univers");
   }

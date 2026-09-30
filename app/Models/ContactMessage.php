@@ -8,7 +8,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class ContactMessage extends Model
 {
-    protected $fillable = ['subject', 'name', 'email', 'phone', 'message', 'status', 'handled_by', 'ip_hash'];
+    protected $fillable = ['subject', 'name', 'email', 'phone', 'organization', 'message', 'status', 'handled_by', 'ip_hash'];
 
     protected $casts = ['status' => ContactMessageStatus::class];
 
@@ -17,6 +17,7 @@ class ContactMessage extends Model
         'partnership' => 'Partenariat',
         'press' => 'Presse',
         'visit' => 'Visite de l\'école',
+        'support' => 'Soutien / partenariat',
         'other' => 'Autre',
     ];
 

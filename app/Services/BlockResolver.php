@@ -2,6 +2,8 @@
 
 namespace App\Services;
 
+use App\Enums\Audience;
+use App\Enums\SiteDomain;
 use App\Http\Resources\Public\AgendaEventResource;
 use App\Http\Resources\Public\ArtworkResource;
 use App\Http\Resources\Public\EquipmentItemResource;
@@ -16,6 +18,8 @@ use App\Models\Artwork;
 use App\Models\EquipmentItem;
 use App\Models\Faq;
 use App\Models\News;
+use App\Models\Offering;
+use App\Models\Page;
 use App\Models\Partner;
 use App\Models\Place;
 use App\Models\Program;
@@ -24,6 +28,7 @@ use App\Models\Room;
 use App\Models\Service;
 use App\Models\Setting;
 use App\Support\Media;
+use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
 
 /**
@@ -84,7 +89,7 @@ class BlockResolver
             'productions' => [...$data, 'items' => ArtworkResource::collection(Artwork::published()->where('origin', 'studio')->with(['room', 'track'])
                 ->latest('published_at')->limit((int) ($data['limit'] ?? 6))->get())->resolve()],
             'ecosystem' => [...$data, 'items' => collect($data['items'] ?? [])->map(fn ($item) => $this->withImages($item))->values()->all()],
-            'campuses' => [...$data, 'items' => PlaceResource::collection(Place::published()->campuses()->orderBy('position')->get())->resolve()],
+            'campuses' => [...$data, 'items' => $this->campusCards()],
             'places' => [...$data, 'items' => PlaceResource::collection(Place::published()
                 ->when($data['kind'] ?? null, fn ($q, $kind) => $q->where('kind', $kind))->orderBy('position')->get())->resolve()],
             'equipment' => [...$data, 'groups' => collect($data['groups'] ?? [])->map(fn ($group) => $this->withImages($group))->values()->all()],
@@ -96,10 +101,39 @@ class BlockResolver
                 ->map(fn (Partner $p) => ['name' => $p->name, 'category' => $p->category, 'website' => $p->website, 'logo' => Media::image($p->logo, $p->name)])
                 ->all()],
             'contact' => [...$data, 'settings' => collect(Setting::current()->only(['phone', 'whatsapp', 'email', 'address', 'opening_hours', 'map_url']))->all()],
+            'domains' => [...$data, 'panels' => $this->domainPanels($data['panels'] ?? [])],
+            'campus_programs' => [...$data, ...$this->campusPrograms($data['campus_id'] ?? null)],
+            'downloads' => [...$data, 'files' => $this->downloads($data['files'] ?? [])],
             default => $data,
         };
 
         return $this->camelKeys($data);
+    }
+
+    /**
+     * Cartes des campus, avec l'adresse de la page du campus (« Découvrir le campus ») : la page publiée
+     * qui porte son bloc « Formations de ce campus », sinon /emsi/{ville} si elle est publiée, sinon aucune.
+     */
+    private function campusCards(): array
+    {
+        $pages = Page::published()->get(['slug', 'blocks']);
+        $byBlock = [];
+        foreach ($pages as $page) {
+            foreach ($page->blocks ?? [] as $block) {
+                $campusId = ($block['type'] ?? null) === 'campus_programs' ? ($block['data']['campus_id'] ?? null) : null;
+                if ($campusId !== null) {
+                    $byBlock[(int) $campusId] ??= '/'.$page->slug;
+                }
+            }
+        }
+        $slugs = $pages->pluck('slug')->flip();
+
+        return Place::published()->campuses()->orderBy('position')->get()->map(function (Place $place) use ($byBlock, $slugs) {
+            $citySlug = 'emsi/'.Str::slug((string) ($place->city ?: $place->name));
+
+            return [...(new PlaceResource($place))->resolve(),
+                'pageUrl' => $byBlock[$place->id] ?? ($slugs->has($citySlug) ? '/'.$citySlug : null)];
+        })->all();
     }
 
     /** Morceaux à écouter (bloc Audio, héros Studio) : fichier remplacé par son URL publique. */
@@ -132,6 +166,75 @@ class BlockResolver
                 && trim((string) ($p['label'] ?? '')) !== '')
             ->map(fn ($p) => ['x' => round((float) $p['x'], 1), 'y' => round((float) $p['y'], 1), 'label' => trim($p['label'])])
             ->values()->all();
+    }
+
+    /** Panneaux du triptyque : couleur du domaine ajoutée, photo remplacée par {url, alt}. */
+    private function domainPanels(array $panels): array
+    {
+        return collect($panels)->map(fn ($panel) => $this->withImages($panel))->map(fn ($panel) => [
+            'domain' => $panel['domain'] ?? SiteDomain::GENERAL->value,
+            'color' => (SiteDomain::tryFrom((string) ($panel['domain'] ?? '')) ?? SiteDomain::GENERAL)->color(),
+            'eyebrow' => $panel['eyebrow'] ?? null,
+            'title' => $panel['title'] ?? '',
+            'text' => $panel['text'] ?? null,
+            'image' => $panel['image'] ?? null,
+            'url' => $panel['url'] ?? '/',
+            'label' => $panel['label'] ?? null,
+        ])->values()->all();
+    }
+
+    /**
+     * Formations de l'école ouvertes à la candidature dans ce campus (Offering::availableAt),
+     * avec la prochaine rentrée du campus : la plus proche date de début à venir de leurs sessions.
+     *
+     * @return array{campus: array<string, mixed>|null, items: array<int, array<string, mixed>>}
+     */
+    private function campusPrograms(mixed $campusId): array
+    {
+        $campus = $campusId ? Place::published()->campuses()->find($campusId) : null;
+        if (! $campus) {
+            return ['campus' => null, 'items' => []];
+        }
+
+        $today = now()->startOfDay();
+        $items = Offering::availableAt($campus)->with('cohort.program')->get()
+            ->groupBy(fn (Offering $offering) => $offering->cohort->program_id)
+            ->map(function ($offerings) use ($campus, $today) {
+                $program = $offerings->first()->cohort->program;
+                $nextStart = $offerings->map(fn (Offering $o) => $o->cohort->starts_on)
+                    ->filter(fn ($date) => $date !== null && $date->gte($today))->sort()->first();
+
+                return $program->audience === Audience::SCHOOL ? [
+                    'position' => $program->position,
+                    'title' => $program->title,
+                    'slug' => $program->slug,
+                    'summary' => $program->summary,
+                    'cover' => Media::image($program->cover_image, $program->cover_alt),
+                    'next_start' => $nextStart?->toDateString(),
+                    'apply_url' => '/candidater?'.http_build_query(['campus' => $campus->slug, 'formation' => $program->slug]),
+                ] : null;
+            })
+            ->filter()->sortBy([['position', 'asc'], ['title', 'asc']])
+            ->map(fn (array $item) => collect($item)->except('position')->all())
+            ->values()->all();
+
+        return ['campus' => ['id' => $campus->id, 'name' => $campus->name, 'slug' => $campus->slug, 'city' => $campus->city], 'items' => $items];
+    }
+
+    /** Documents à télécharger : un fichier absent du disque est écarté ; poids en octets et extension. */
+    private function downloads(array $files): array
+    {
+        $disk = Storage::disk('public');
+
+        return collect($files)
+            ->filter(fn ($file) => filled($file['file'] ?? null) && $disk->exists($file['file']))
+            ->map(fn ($file) => [
+                'title' => $file['title'] ?? basename($file['file']),
+                'description' => $file['description'] ?? null,
+                'url' => Media::url($file['file']),
+                'size' => $disk->size($file['file']),
+                'extension' => strtolower(pathinfo($file['file'], PATHINFO_EXTENSION)),
+            ])->values()->all();
     }
 
     private function agenda(array $data)

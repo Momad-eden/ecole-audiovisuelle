@@ -4,7 +4,11 @@ namespace Tests\Feature\Api;
 
 use App\Enums\Audience;
 use App\Enums\PublicationStatus;
+use App\Models\AgendaEvent;
 use App\Models\Artwork;
+use App\Models\EquipmentCategory;
+use App\Models\EquipmentItem;
+use App\Models\Exhibition;
 use App\Models\MenuItem;
 use App\Models\News;
 use App\Models\Offering;
@@ -125,15 +129,31 @@ class PublicContentApiTest extends TestCase
         $this->getJson('/api/v1/public/news/programmee')->assertNotFound();
     }
 
-    public function test_sitemap_lists_published_urls(): void
+    public function test_sitemap_lists_published_urls_at_the_new_addresses(): void
     {
         Page::create(['title' => 'École', 'slug' => 'ecole', 'draft_blocks' => []])->publish();
+        Page::create(['title' => 'Accueil', 'slug' => 'accueil', 'type' => 'home', 'draft_blocks' => []])->publish();
         $this->room();
+        Program::create(['title' => 'Son live', 'slug' => 'son-live', 'kind' => 'short_course', 'audience' => Audience::SCHOOL, 'status' => PublicationStatus::PUBLISHED]);
+        Program::create(['title' => 'Mixage pro', 'slug' => 'mixage-pro', 'kind' => 'short_course', 'audience' => Audience::PROFESSIONAL, 'status' => PublicationStatus::PUBLISHED]);
+        Artwork::create(['title' => 'Une oeuvre', 'slug' => 'une-oeuvre', 'kind' => 'video', 'origin' => 'school', 'status' => PublicationStatus::PUBLISHED]);
+        AgendaEvent::create(['title' => 'Un concert', 'slug' => 'un-concert', 'activity' => 'space', 'starts_at' => now()->addWeek(), 'status' => PublicationStatus::PUBLISHED]);
+        Exhibition::create(['title' => 'Une expo', 'slug' => 'une-expo', 'status' => PublicationStatus::PUBLISHED]);
+        EquipmentItem::create(['name' => 'Enceinte', 'equipment_category_id' => EquipmentCategory::create(['name' => 'Son', 'position' => 0])->id, 'slug' => 'enceinte', 'usage' => 'rental', 'status' => PublicationStatus::PUBLISHED]);
 
-        $this->getJson('/api/v1/public/sitemap')
-            ->assertOk()
+        $response = $this->getJson('/api/v1/public/sitemap')->assertOk()
             ->assertJsonFragment(['path' => '/ecole'])
-            ->assertJsonFragment(['path' => '/univers/salle-du-son']);
+            ->assertJsonFragment(['path' => '/'])
+            ->assertJsonFragment(['path' => '/emsi/univers/salle-du-son'])
+            ->assertJsonFragment(['path' => '/emsi/formations/son-live'])
+            ->assertJsonFragment(['path' => '/emsi/professionnels/mixage-pro'])
+            ->assertJsonFragment(['path' => '/emsi/realisations/une-oeuvre'])
+            ->assertJsonFragment(['path' => '/maison-habib-faye/agenda/un-concert']);
+
+        $paths = collect($response->json('data'))->pluck('path');
+        foreach (['/univers/', '/formations/', '/realisations/', '/professionnels/', '/agenda/', '/events', '/expositions'] as $old) {
+            $this->assertEmpty($paths->filter(fn ($path) => str_starts_with($path, $old))->all(), "Ancienne adresse {$old} encore présente");
+        }
     }
 
     public function test_mosaic_hero_images_are_resolved(): void

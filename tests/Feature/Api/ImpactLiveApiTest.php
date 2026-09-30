@@ -31,6 +31,7 @@ class ImpactLiveApiTest extends TestCase
 
         // Retour arrière dans l'ordre réel : d'abord les migrations plus récentes qui dépendent des lieux.
         $later = [
+            require database_path('migrations/2026_09_29_100000_add_domains_and_campus_availability.php'),
             require database_path('migrations/2026_09_28_100000_add_presentation_to_places.php'),
             require database_path('migrations/2026_09_28_090000_add_campus_to_accounting.php'),
         ];

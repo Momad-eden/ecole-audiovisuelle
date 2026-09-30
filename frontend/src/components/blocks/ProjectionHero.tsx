@@ -60,7 +60,7 @@ export function ProjectionHero({ data, first }: { data: HeroData; first: boolean
       <canvas ref={canvasRef} className="absolute inset-0 -z-10 h-full w-full mix-blend-screen" aria-hidden />
 
       {/* Cadre d'exposition : il commence sous la barre de navigation (h-18), jamais à travers. */}
-      <div data-testid="projection-frame" className="pointer-events-none absolute inset-x-4 bottom-4 top-[5.25rem] border border-ink/15 sm:inset-x-6 sm:bottom-6 sm:top-[5.75rem]" aria-hidden>
+      <div data-testid="projection-frame" className="pointer-events-none absolute inset-x-4 bottom-4 top-[calc(var(--chrome-h)+0.75rem)] border border-ink/15 sm:inset-x-6 sm:bottom-6 sm:top-[calc(var(--chrome-h)+1.25rem)]" aria-hidden>
         {["left-0 top-0 border-l-2 border-t-2", "right-0 top-0 border-r-2 border-t-2", "bottom-0 left-0 border-b-2 border-l-2", "bottom-0 right-0 border-b-2 border-r-2"].map((corner) => (
           <span key={corner} className={cn("absolute size-5 border-brand", corner)} />
         ))}

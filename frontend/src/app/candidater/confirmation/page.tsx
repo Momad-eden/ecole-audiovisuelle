@@ -14,7 +14,7 @@ export default async function ConfirmationPage({ searchParams }: Props) {
       <h1 className="display mt-4 text-[clamp(2.2rem,5vw,3.8rem)] text-balance">Merci, nous avons bien reçu votre dossier.</h1>
       {ref && <p className="mt-6 text-lg">Votre numéro de dossier : <strong className="font-mono text-brand">{ref}</strong></p>}
       <p className="mx-auto mt-4 max-w-xl text-ink-muted">Notez-le : il vous sera demandé dans nos échanges. Si vous avez indiqué une adresse e-mail, un accusé de réception vous a été envoyé. Notre équipe vous recontactera pour la suite.</p>
-      <div className="mt-10 flex justify-center gap-3"><ButtonLink href="/realisations" variant="secondary">Voir les réalisations</ButtonLink><ButtonLink href="/">Retour à l&apos;accueil</ButtonLink></div>
+      <div className="mt-10 flex justify-center gap-3"><ButtonLink href="/emsi/realisations" variant="secondary">Voir les réalisations</ButtonLink><ButtonLink href="/">Retour à l&apos;accueil</ButtonLink></div>
     </div>
   );
 }

@@ -7,6 +7,7 @@ import { useFieldArray, useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import type { Offering, Place } from "@/lib/types";
+import { campusLabel, offeringsForCampus, wantedOffering } from "@/lib/application";
 import { fcfa, cn } from "@/lib/utils";
 import { Field, Honeypot, inputClass } from "./Field";
 
@@ -42,18 +43,22 @@ type Values = z.infer<typeof schema>;
 
 const STEPS = ["Formation", "Identité", "Coordonnées", "Parcours", "Envoi"];
 
-export function ApplicationForm({ offerings, audience, preselected, campuses = [], preselectedCampus }: { offerings: Offering[]; audience: "school" | "professional"; preselected?: string; campuses?: Place[]; preselectedCampus?: string }) {
+export function ApplicationForm({ offerings, audience, preselected, campuses = [], preselectedCampus, notice, wanted = [] }: { offerings: Offering[]; audience: "school" | "professional"; preselected?: string; campuses?: Place[]; preselectedCampus?: string; notice?: string; wanted?: number[] }) {
   const router = useRouter();
   const draftKey = `emsi-candidature-${audience}`;
   const [step, setStep] = useState(0);
   const [serverError, setServerError] = useState<string | null>(null);
+  const [campusNotice, setCampusNotice] = useState<string | undefined>(notice);
+  // Formation demandée depuis sa fiche : gardée jusqu'à ce que le candidat en choisisse une autre.
+  const [wantedIds, setWantedIds] = useState<number[]>(wanted);
   const professional = audience === "professional";
+  const chooseCampus = campuses.length > 1;
 
   const form = useForm<Values>({
     resolver: zodResolver(schema),
     mode: "onTouched",
     defaultValues: {
-      offeringId: preselected ?? (offerings.length === 1 ? String(offerings[0].id) : ""),
+      offeringId: preselected ?? (offerings.length === 1 && !chooseCampus ? String(offerings[0].id) : ""),
       placeId: preselectedCampus ?? (campuses.length === 1 ? String(campuses[0].id) : ""),
       nationality: "Sénégalaise", gender: "", whatsapp: "", email: "", portfolioUrl: "",
       experience: [], documents: professional ? [{ type: "diploma", file: undefined as unknown as FileList }, { type: "id_card", file: undefined as unknown as FileList }] : [],
@@ -67,7 +72,11 @@ export function ApplicationForm({ offerings, audience, preselected, campuses = [
   useEffect(() => {
     try {
       const saved = localStorage.getItem(draftKey);
-      if (saved) reset({ ...form.getValues(), ...JSON.parse(saved), documents: form.getValues("documents"), consent: undefined as never });
+      if (saved) {
+        const current = form.getValues();
+        // Les choix venus de l'adresse (campus, formation) priment sur le brouillon.
+        reset({ ...current, ...JSON.parse(saved), ...(preselectedCampus ? { placeId: preselectedCampus } : {}), ...(preselected ? { offeringId: preselected } : {}), documents: current.documents, consent: undefined as never });
+      }
     } catch {}
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
@@ -84,6 +93,24 @@ export function ApplicationForm({ offerings, audience, preselected, campuses = [
     return () => subscription.unsubscribe();
   }, [watch, draftKey]);
 
+  // Une formation choisie qui n'existe pas dans le campus retenu est retirée ; la formation demandée
+  // depuis sa fiche est resélectionnée dès qu'un campus qui la propose est choisi (message sinon).
+  const placeId = watch("placeId");
+  const offeringId = watch("offeringId");
+  const visibleOfferings = chooseCampus ? offeringsForCampus(offerings, placeId) : offerings;
+  useEffect(() => {
+    if (!chooseCampus) return;
+    const kept = !!offeringId && visibleOfferings.some((o) => String(o.id) === offeringId);
+    if (kept || !placeId) {
+      if (offeringId && !kept) form.setValue("offeringId", "");
+      return;
+    }
+    const wantedHere = wantedOffering({ offerings, campuses, campusId: placeId, wantedIds });
+    form.setValue("offeringId", wantedHere.offeringId ?? "");
+    if (wantedHere.notice) setCampusNotice(wantedHere.notice);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [placeId, offeringId]);
+
   const stepFields: (keyof Values)[][] = [
     ["offeringId"],
     ["firstName", "lastName", "gender", "birthDate"],
@@ -93,12 +120,12 @@ export function ApplicationForm({ offerings, audience, preselected, campuses = [
   ];
 
   const next = async () => {
-    const valid = await trigger(stepFields[step]);
-    // Plusieurs campus : le candidat choisit le sien (mêmes formations à Dakar et à Saint-Louis).
-    if (step === 0 && campuses.length > 1 && !watch("placeId")) {
+    // Plusieurs campus : le candidat choisit d'abord le sien, puis une formation qui y est proposée.
+    if (step === 0 && chooseCampus && !watch("placeId")) {
       setError("placeId", { message: "Choisissez votre campus." });
       return;
     }
+    const valid = await trigger(stepFields[step]);
     if (valid) setStep((s) => Math.min(s + 1, STEPS.length - 1));
   };
 
@@ -156,6 +183,13 @@ export function ApplicationForm({ offerings, audience, preselected, campuses = [
     }
     if (response.status === 422) {
       const { errors: fieldErrors } = (await response.json()) as { errors: Record<string, string[]> };
+      // Formation ou campus refusés : l'erreur s'affiche sur le champ concerné, à la première étape.
+      const onStepOne = (["offeringId", "placeId"] as const).find((field) => fieldErrors[field]?.length);
+      if (onStepOne) {
+        setError(onStepOne, { message: fieldErrors[onStepOne][0] });
+        setStep(0);
+        return;
+      }
       setServerError(Object.values(fieldErrors).flat()[0] ?? "Certaines informations sont invalides.");
       return;
     }
@@ -177,36 +211,41 @@ export function ApplicationForm({ offerings, audience, preselected, campuses = [
 
       <div className="rounded-3xl border border-line bg-night-2 p-6 sm:p-10">
         {step === 0 && (
-          <fieldset className="space-y-4">
-            <legend className="display mb-6 text-2xl sm:text-3xl">Quelle formation vous intéresse ?</legend>
-            {errors.offeringId && <p role="alert" className="text-sm text-rec">{errors.offeringId.message}</p>}
-            {offerings.map((offering) => (
-              <label key={offering.id} className="flex cursor-pointer items-start gap-4 rounded-2xl border border-line p-5 has-[:checked]:border-brand">
-                <input type="radio" value={String(offering.id)} className="mt-1 size-4 accent-brand" {...register("offeringId")} />
-                <span>
-                  <span className="block font-medium">{offering.label}</span>
-                  <span className="text-sm text-ink-muted">
-                    {offering.capacity ? `${offering.capacity} places · ` : ""}
-                    {offering.feeAmount > 0 ? fcfa(offering.feeAmount) : offering.fundingLabel}
-                  </span>
-                </span>
-              </label>
-            ))}
-            {campuses.length > 1 && (
-              <div className="pt-6">
-                <p className="display mb-4 text-xl sm:text-2xl">Dans quel campus ?</p>
+          <div className="space-y-10">
+            {chooseCampus && (
+              <fieldset>
+                <legend className="display mb-6 text-2xl sm:text-3xl">Dans quel campus ?</legend>
                 {errors.placeId && <p role="alert" className="mb-3 text-sm text-rec">{errors.placeId.message}</p>}
                 <div className="grid gap-3 sm:grid-cols-2">
                   {campuses.map((campus) => (
                     <label key={campus.id} className="flex cursor-pointer items-start gap-4 rounded-2xl border border-line p-5 has-[:checked]:border-brand">
-                      <input type="radio" value={String(campus.id)} className="mt-1 size-4 accent-brand" {...register("placeId")} />
-                      <span><span className="block font-medium">{campus.city ?? campus.name}</span><span className="text-sm text-ink-muted">{campus.address ?? campus.name}</span></span>
+                      <input type="radio" value={String(campus.id)} className="mt-1 size-4 accent-brand" {...register("placeId", { onChange: () => setCampusNotice(undefined) })} />
+                      <span><span className="block font-medium">{campusLabel(campus)}</span><span className="text-sm text-ink-muted">{campus.address ?? campus.name}</span></span>
                     </label>
                   ))}
                 </div>
-              </div>
+              </fieldset>
             )}
-          </fieldset>
+            <fieldset className="space-y-4">
+              <legend className="display mb-6 text-2xl sm:text-3xl">Quelle formation vous intéresse ?</legend>
+              {campusNotice && <p role="status" className="rounded-2xl border border-line p-4 text-sm">{campusNotice}</p>}
+              {errors.offeringId && <p role="alert" className="text-sm text-rec">{errors.offeringId.message}</p>}
+              {chooseCampus && !placeId && <p className="text-sm text-ink-muted">Choisissez d&apos;abord votre campus pour voir les formations qui y sont proposées.</p>}
+              {chooseCampus && placeId && visibleOfferings.length === 0 && <p className="text-sm text-ink-muted">Aucune formation n&apos;est ouverte dans ce campus pour le moment.</p>}
+              {visibleOfferings.map((offering) => (
+                <label key={offering.id} className="flex cursor-pointer items-start gap-4 rounded-2xl border border-line p-5 has-[:checked]:border-brand">
+                  <input type="radio" value={String(offering.id)} className="mt-1 size-4 accent-brand" {...register("offeringId", { onChange: (e) => { setCampusNotice(undefined); if (!wantedIds.includes(Number(e.target.value))) setWantedIds([]); } })} />
+                  <span>
+                    <span className="block font-medium">{offering.label}</span>
+                    <span className="text-sm text-ink-muted">
+                      {offering.capacity ? `${offering.capacity} places · ` : ""}
+                      {offering.feeAmount > 0 ? fcfa(offering.feeAmount) : offering.fundingLabel}
+                    </span>
+                  </span>
+                </label>
+              ))}
+            </fieldset>
+          </div>
         )}
 
         {step === 1 && (

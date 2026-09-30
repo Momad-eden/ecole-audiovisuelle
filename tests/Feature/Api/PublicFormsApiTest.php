@@ -125,6 +125,7 @@ class PublicFormsApiTest extends TestCase
         $dakar = Place::create(['name' => 'EMSI Dakar', 'kind' => 'campus', 'city' => 'Dakar', 'status' => PublicationStatus::PUBLISHED]);
         $saintLouis = Place::create(['name' => 'EMSI Saint-Louis', 'kind' => 'campus', 'city' => 'Saint-Louis', 'status' => PublicationStatus::PUBLISHED]);
         $studio = Place::create(['name' => 'Impact Live Studio', 'kind' => 'studio', 'city' => 'Saint-Louis', 'status' => PublicationStatus::PUBLISHED]);
+        $offering->cohort->program->campuses()->attach([$dakar->id, $saintLouis->id]);
 
         $this->postJson('/api/v1/public/applications', $this->payload($offering))->assertUnprocessable()->assertJsonValidationErrors('placeId');
         $this->postJson('/api/v1/public/applications', $this->payload($offering, ['placeId' => $studio->id]))->assertUnprocessable()->assertJsonValidationErrors('placeId');

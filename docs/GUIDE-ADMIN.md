@@ -12,7 +12,7 @@ Mot de passe oublié : lien « Mot de passe oublié ? » sur la page de connexio
 | **Directeur** | Tout, y compris les comptes et les paramètres du site |
 | **Gestionnaire** | Candidatures (y compris la décision), étudiants, caisse et clôtures, formations et sessions |
 | **Secrétaire** | Candidatures (sans la décision finale), étudiants, encaissements et reçus |
-| **Commercial (Impact Live)** | Demandes de devis et de réservation, matériel, packs, services, agenda, productions du studio |
+| **Commercial (Impact Live)** | Demandes de réservation (studio, espaces), services, agenda, productions du studio |
 | **Communication** | Pages du site, actualités, univers et réalisations (univers, expositions, réalisations des étudiants), partenaires, FAQ, menus, messages reçus, paramètres du site |
 
 Le menu de gauche n'affiche que ce que votre rôle permet d'ouvrir.
@@ -124,15 +124,41 @@ On ne modifie jamais une opération enregistrée. Ouvrez-la › **Annuler cette 
 
 **Exporter le journal** : Journal de caisse › **Exporter le journal** (fichier CSV qui s'ouvre dans Excel).
 
+### Les trois domaines du site
+
+Le site présente trois « maisons » : la **Maison de la culture Habib Faye** (avec Impact Live Studio), l'**EMSI** (campus de Dakar et de Saint-Louis) et des pages générales (mission, partenaires, soutenir, presse). Le Grand Théâtre est présenté comme partenaire qui accueille le campus de Dakar.
+
+- **Domaine d'une page** : dans **Site › Pages du site**, chaque page a un champ **Domaine** (Général, Maison Habib Faye, EMSI ou Impact Live Studio). Il règle la couleur, le fil d'Ariane et la sous-navigation. Quand vous saisissez l'adresse, le domaine se choisit tout seul : `maison-habib-faye/studio/…` → Impact Live Studio, `maison-habib-faye/…` → Maison Habib Faye, `emsi/…` → EMSI ; pour une autre adresse, il reste sur Général (ou sur ce que vous aviez choisi). Vous pouvez toujours le changer ensuite.
+- **Sous-menus** : dans **Site › Menus du site**, un lien du **Menu principal** peut être placé dans un **Sous-menu de** : la liste propose les éléments de premier niveau (Accueil, Maison Habib Faye, EMSI…), sauf les boutons comme « Candidater ». Le lien apparaît alors dans le menu déroulant de ce parent. Un élément qui a déjà des sous-menus ne peut pas devenir lui-même un sous-menu. Un lien placé au **Pied de page** ou dans les **Liens légaux** quitte automatiquement son sous-menu. Le menu principal est : Accueil · Maison Habib Faye ▾ · EMSI ▾ · Candidater.
+- **Campus des formations** : sur une formation, **Disponible à** permet de cocher Dakar, Saint-Louis ou les deux ; une nouvelle formation a tous les campus cochés par défaut (sans campus coché, personne ne peut y candidater). Sur une session, le champ **Campus** dit où elle a lieu. Le formulaire de candidature ne propose que les formations du campus choisi.
+
+### Les nouveaux blocs
+
+Dans **Ajouter un bloc** d'une page :
+
+- **Nos trois maisons** : trois grands panneaux cliquables (Maison Habib Faye, EMSI, Impact Live Studio) avec photo, titre et texte. C'est le premier bloc de l'accueil.
+- **Formations de ce campus** : la liste des formations proposées dans le campus choisi (à placer sur la page du campus).
+- **Documents à télécharger** : des fichiers PDF (dossier de présentation, dossier de presse…) à ajouter depuis la médiathèque, avec un titre.
+- **Nous soutenir** : formulaire pour les financeurs et partenaires. Les messages arrivent dans **Site › Messages reçus** avec le type **Soutien / partenariat** (et le type de soutien choisi : partenariat, mécénat, don) ; traitez-les comme les autres (Lire › Marquer comme traité).
+
+### Compléter le site
+
+- **Textes « À compléter »** : plusieurs pages créées à la mise à niveau (Programmation, Espaces, Campus de Dakar, Campus de Saint-Louis, Mission, Partenaires, Nous soutenir, Presse) contiennent un texte commençant par « À compléter ». Ouvrez la page dans **Site › Pages du site**, remplacez-le par votre texte, puis **Publier**. Ne laissez pas ces textes en ligne.
+- **Photos de la Maison** : ajoutez-les dans la médiathèque, puis dans la page **Maison Habib Faye** (bloc Grand titre › Photo). Quand vous avez de belles photos, vous pouvez mettre sur l'accueil, avant « Nos trois maisons », un **Grand titre** en mise en page **Cinéma** (diaporama de 2 à 5 photos).
+- **Page EMSI** : elle présente l'école, ses univers (Son, Image…), les réalisations des étudiants et les deux campus ; chaque carte de campus mène à la page du campus (« Découvrir le campus ») et à la candidature. Le bloc « Le lieu » (Grand Théâtre) est sur la page **Campus de Dakar**.
+- **Agenda** : la page **Programmation** (Maison Habib Faye) affiche les événements publiés dans Impact Live › Agenda et références. L'ancienne page « Events » (location de sono) n'est plus sur le site.
+
 ---
 
-## Impact Live : studio, événementiel, Espace Habib Faye
+## Impact Live : studio, agenda et Espace Habib Faye
 
 Menu **Impact Live** (rôles Directeur et Commercial ; la Communication peut aussi mettre à jour la vitrine).
 
-### Traiter une demande de devis ou de réservation
+### Traiter une demande de réservation
 
-1. **Impact Live › Demandes** : le chiffre à côté du menu indique les nouvelles demandes. Chaque demande a une référence (ex. `DEM-2026-00012`), le matériel choisi par le client, ses dates, son lieu et son message.
+Depuis le site, on ne peut demander qu'une **séance au studio** ou la **location d'un espace** de la Maison (la location de matériel et les prestations d'Impact Live Events ne sont plus proposées).
+
+1. **Impact Live › Demandes** : le chiffre à côté du menu indique les nouvelles demandes. Chaque demande a une référence (ex. `DEM-2026-00012`), ses dates, son lieu, le public attendu et le message du client.
 2. Rappelez le client (bouton WhatsApp ou téléphone sur la fiche). Consignez l'échange avec **⋮ › Ajouter une note**.
 3. **Devis envoyé** : indiquez le montant. Puis **Confirmer**, et après l'événement **Marquer réalisée**. Une demande abandonnée : **⋮ › Annuler la demande** (motif obligatoire).
 4. Une demande reçue par téléphone se saisit avec **Saisir une demande (téléphone)**.
@@ -141,15 +167,14 @@ Menu **Impact Live** (rôles Directeur et Commercial ; la Communication peut aus
 
 Menu **Impact Live › Productions du studio** › **Ajouter un titre à écouter** : titre, fichier son (MP3, WAV, M4A ou OGG, 50 Mo maximum), pochette et crédits. Choisissez « Publié » : le titre s'écoute aussitôt sur la page Studio, avec sa forme d'onde, dans le lecteur qui suit le visiteur de page en page.
 
-### Mettre à jour la vitrine
+### Mettre à jour les pages de la Maison et du studio
 
-- **Matériel** : nom, marque, catégorie, photos, caractéristiques (ex. « Puissance — 2 × 1 000 W »), quantité et **prix « à partir de »** par jour. Laissez le prix vide pour afficher « Sur devis ». « Usage » : *à louer* (catalogue Impact Live Events) ou *équipement du studio* (fiche technique de la page Studio).
-- **Packs** : un nom, « pour qui » (ex. jusqu'à 500 personnes), le contenu et un prix indicatif.
-- **Services** : les services du studio (enregistrement, mixage, mastering…), les prestations événementielles et la location de l'Espace Habib Faye, avec leur prix indicatif.
-- **Agenda et références** : les prochains événements (dates, lieu, billetterie) et, en cochant « Référence », les prestations réalisées (ex. Festival de Saint-Louis) qui s'affichent dans « Ils nous ont fait confiance ».
-- **Productions du studio** : dans Univers & réalisations › Réalisations, choisissez « Réalisée par : Impact Live Studio » et ajoutez le fichier son ; elle s'écoute sur la page Studio.
-- **Pages Studio, Events et Espace Habib Faye** : Site › Pages du site, comme la page d'accueil (titres, textes, ordre des blocs).
-- **Lieux** (Administration › Lieux) : adresses, téléphones, horaires et photos des campus de Dakar et de Saint-Louis, du studio et de l'Espace Habib Faye.
+- **Services** : les services du studio (enregistrement, mixage, mastering…) et la location des espaces de la Maison, avec leur prix indicatif (laissez-le vide pour « Sur devis »).
+- **Agenda et références** : les prochains événements de la Maison (dates, lieu, billetterie), affichés sur la page **Programmation**, et, en cochant « Référence », les réalisations passées (ex. Festival de Saint-Louis) qui s'affichent dans « Ils nous ont fait confiance ».
+- **Productions du studio** : dans Univers & réalisations › Réalisations, choisissez « Réalisée par : Impact Live Studio » et ajoutez le fichier son ; elle s'écoute sur la page Impact Live Studio.
+- **Équipement du studio** : la fiche technique de la page Impact Live Studio. Le matériel à louer et les packs d'Impact Live Events ne sont plus affichés sur le site (leurs fiches restent en base, hors du menu).
+- **Pages de la Maison et du studio** : dans Site › Pages du site, les pages **Maison Habib Faye**, **Programmation**, **Impact Live Studio** et **Les espaces** se modifient comme la page d'accueil (titres, textes, ordre des blocs).
+- **Lieux** (Administration › Lieux) : adresses, téléphones, horaires et photos des campus de Dakar et de Saint-Louis, du studio et de la Maison Habib Faye.
 
 ---
 

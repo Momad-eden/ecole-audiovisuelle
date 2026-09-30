@@ -40,6 +40,12 @@ class RentalPackResource extends Resource
 
     protected static ?string $recordTitleAttribute = 'name';
 
+    /** Impact Live Events n'est plus proposé sur le site : les données restent, l'écran est masqué du menu. */
+    public static function shouldRegisterNavigation(): bool
+    {
+        return false;
+    }
+
     public static function form(Schema $schema): Schema
     {
         return $schema->columns(1)->components([

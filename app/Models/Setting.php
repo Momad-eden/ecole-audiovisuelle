@@ -31,6 +31,9 @@ class Setting extends Model
         'whatsapp',
     ];
 
+    /** site_version : repère posé par les commandes de mise à niveau (emsi:site-v4 → 4), jamais par le formulaire. */
+    protected $casts = ['site_version' => 'integer'];
+
     /** Paramètres uniques du site (créés à la première lecture). */
     public static function current(): self
     {

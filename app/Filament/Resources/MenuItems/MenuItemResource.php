@@ -15,6 +15,7 @@ use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Toggle;
 use Filament\Resources\Resource;
 use Filament\Schemas\Components\Section;
+use Filament\Schemas\Components\Utilities\Get;
 use Filament\Schemas\Schema;
 use Filament\Support\Icons\Heroicon;
 use Filament\Tables\Columns\IconColumn;
@@ -44,7 +45,17 @@ class MenuItemResource extends Resource
     {
         return $schema->columns(1)->components([
             Section::make()->columns(2)->schema([
-                Select::make('location')->label('Emplacement')->options(MenuItem::LOCATIONS)->default('main')->required(),
+                Select::make('location')->label('Emplacement')->options(MenuItem::LOCATIONS)->default('main')->required()->live(),
+                Select::make('parent_id')->label('Sous-menu de')->placeholder('Aucun (lien de premier niveau)')
+                    ->options(fn (?MenuItem $record) => MenuItem::where(fn ($q) => $q
+                        ->where(fn ($q) => $q->where('location', 'main')->whereNull('parent_id')->where('is_button', false))
+                        ->when($record?->parent_id, fn ($q, $parentId) => $q->orWhereKey($parentId)))
+                        ->when($record, fn ($q) => $q->whereKeyNot($record->id))->orderBy('position')->orderBy('id')->pluck('label', 'id'))
+                    ->helperText(fn (?MenuItem $record) => $record?->children()->exists()
+                        ? 'Cet élément a déjà des sous-menus.'
+                        : 'Choisissez un lien du menu principal pour l\'afficher dans son sous-menu.')
+                    ->disabled(fn (?MenuItem $record) => (bool) $record?->children()->exists())
+                    ->visible(fn (Get $get) => $get('location') === 'main')->live(),
                 TextInput::make('label')->label('Texte du lien')->required()->maxLength(40),
                 LinkTargets::field('url', 'Destination')->required(),
                 Toggle::make('is_button')->label('Afficher comme bouton')->helperText('Ex. « Candidater »')->inline(false),

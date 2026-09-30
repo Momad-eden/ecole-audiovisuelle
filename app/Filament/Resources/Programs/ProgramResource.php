@@ -12,9 +12,11 @@ use App\Filament\Resources\Programs\RelationManagers\CohortsRelationManager;
 use App\Filament\Support\Fields;
 use App\Filament\Support\FrenchLabels;
 use App\Filament\Support\RichText\TypographyPlugin;
+use App\Models\Place;
 use App\Models\Program;
 use BackedEnum;
 use Filament\Actions\EditAction;
+use Filament\Forms\Components\CheckboxList;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\TagsInput;
 use Filament\Forms\Components\Textarea;
@@ -62,6 +64,10 @@ class ProgramResource extends Resource
                         Select::make('audience')->label('Public')->options(Audience::class)->required()
                             ->helperText('« Professionnels » : visible uniquement dans l\'Espace Professionnels.'),
                         Select::make('kind')->label('Type')->options(ProgramKind::class)->required(),
+                        CheckboxList::make('campuses')->label('Disponible à')->relationship('campuses', 'name', fn (Builder $query) => $query->campuses()->published())
+                            // Nouvelle formation : proposée partout par défaut, pour qu'elle ne soit jamais invisible des candidats.
+                            ->default(fn () => Place::campuses()->published()->orderBy('position')->orderBy('id')->pluck('id')->all())
+                            ->helperText('Cochez les campus où cette formation est proposée. Sans campus coché, personne ne peut y candidater.')->columnSpanFull(),
                         TextInput::make('level_label')->label('Niveau / titre délivré')->placeholder('Ex. Certification de niveau BTS (Bac+2)'),
                         TextInput::make('duration_label')->label('Durée')->placeholder('Ex. 9 mois (1 080 h)'),
                         Textarea::make('summary')->label('Résumé (cartes et référencement)')->rows(3)->maxLength(300)->columnSpanFull(),

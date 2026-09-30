@@ -2,6 +2,7 @@
 
 namespace App\Filament\Resources\Pages;
 
+use App\Enums\SiteDomain;
 use App\Filament\Resources\Pages\Pages\CreatePage;
 use App\Filament\Resources\Pages\Pages\EditPage;
 use App\Filament\Resources\Pages\Pages\ListPages;
@@ -16,6 +17,7 @@ use Filament\Forms\Components\Select;
 use Filament\Forms\Components\TextInput;
 use Filament\Resources\Resource;
 use Filament\Schemas\Components\Section;
+use Filament\Schemas\Components\Utilities\Set;
 use Filament\Schemas\Schema;
 use Filament\Support\Icons\Heroicon;
 use Filament\Tables\Columns\TextColumn;
@@ -49,12 +51,17 @@ class PageResource extends Resource
     public static function form(Schema $schema): Schema
     {
         return $schema->columns(1)->components([
-            Section::make()->columns(3)->schema([
+            Section::make()->columns(4)->schema([
                 TextInput::make('title')->label('Titre de la page')->required()->maxLength(120),
                 TextInput::make('slug')->label('Adresse')->prefix('/')
                     ->helperText('Générée automatiquement si vide.')
+                    // Le domaine suit l'adresse (maison-habib-faye/…, emsi/…) ; il reste modifiable ensuite.
+                    ->live(onBlur: true)
+                    ->afterStateUpdated(fn (?string $state, Set $set) => ($domain = SiteDomain::forPath($state)) ? $set('domain', $domain->value) : null)
                     ->unique(ignoreRecord: true)->regex('/^[a-z0-9]+(?:[-\/][a-z0-9]+)*$/')
                     ->disabled(fn (?Page $record) => $record?->is_locked),
+                Select::make('domain')->label('Domaine')->options(SiteDomain::class)->default(SiteDomain::GENERAL->value)->required()
+                    ->helperText('Donne sa couleur et son menu à la page. Choisi d\'après l\'adresse (maison-habib-faye/…, emsi/…), modifiable.'),
                 Select::make('type')->label('Type')->options(self::TYPES)->default('free')->required()
                     ->disabled(fn (?Page $record) => $record?->is_locked),
             ]),

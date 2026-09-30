@@ -74,8 +74,16 @@
 :root[data-theme="light"] [style*="--accent-on"] {
   --color-on-accent: var(--accent-on-light);
 }
+/* Hauteur totale de l'en-tête fixe : 4,5 rem, plus la rangée de repères de domaine (2,75 rem) quand la page en a une. */
+:root {
+  --chrome-h: 4.5rem;
+}
+html:has([data-domain-row]) {
+  --chrome-h: 7.25rem;
+}
 /* Une affiche en haut de page est un aplat de couleur : l'en-tête garde son fond pour que le menu reste lisible. */
-html:has(.poster-hero[data-first]) .site-header {
+html:has(.poster-hero[data-first]) .site-header,
+html:has(.poster-hero[data-first]) [data-domain-row] {
   border-bottom-color: var(--color-line);
   background: color-mix(in oklab, var(--color-night) 85%, transparent);
   backdrop-filter: blur(12px);
@@ -110,7 +118,8 @@ html:has(.poster-hero[data-first]) .site-header {
 :root[data-theme="light"] .scene-dark[style*="--accent-on"] {
   --color-on-accent: var(--accent-on);
 }
-:root[data-theme="light"]:has(.scene-dark[data-first]) .site-header {
+:root[data-theme="light"]:has(.scene-dark[data-first]) .site-header,
+:root[data-theme="light"]:has(.scene-dark[data-first]) [data-domain-row] {
   border-bottom-color: var(--color-line);
   background: color-mix(in oklab, var(--color-night) 85%, transparent);
   backdrop-filter: blur(12px);
@@ -439,4 +448,15 @@ body[data-player] .floating-action { bottom: 7rem; }
   width: min(76vw, 1040px);
   height: clamp(380px, calc(100svh - 390px), 540px);
   flex: none;
+}
+
+/*
+ * Triptyque « Nos trois maisons » : à la souris (pas au doigt), le panneau survolé s'élargit ;
+ * sans transition si l'internaute limite les animations.
+ */
+@media (min-width: 1024px) and (hover: hover) and (pointer: fine) {
+  .domains-panel:hover { flex-grow: 1.6; }
+}
+@media (min-width: 1024px) and (prefers-reduced-motion: no-preference) {
+  .domains-panel { transition: flex-grow 700ms cubic-bezier(0.2, 0.7, 0.2, 1); }
 }

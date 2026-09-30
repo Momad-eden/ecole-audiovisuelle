@@ -5,10 +5,12 @@ namespace App\Filament\Support;
 use App\Enums\Audience;
 use App\Enums\BookingType;
 use App\Enums\PlaceKind;
+use App\Enums\SiteDomain;
 use App\Filament\Forms\Components\HotspotPicker;
 use App\Filament\Support\RichText\TypographyPlugin;
 use App\Models\Faq;
 use App\Models\Partner;
+use App\Models\Place;
 use App\Models\Room;
 use Filament\Forms\Components\Builder\Block;
 use Filament\Forms\Components\ColorPicker;
@@ -20,7 +22,6 @@ use Filament\Forms\Components\Select;
 use Filament\Forms\Components\TagsInput;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
-use Filament\Forms\Components\Toggle;
 
 /**
  * Catalogue des blocs de page. Chaque bloc a des champs limités (aucun HTML libre) ;
@@ -36,8 +37,9 @@ final class PageBlocks
             self::gallery(), self::video(), self::audio(), self::stats(), self::quote(), self::cta(), self::cards(),
             self::timeline(), self::faq(), self::programs(), self::artworks(), self::rooms(), self::news(),
             self::partners(), self::professionalSpace(), self::contact(),
-            self::ecosystem(), self::services(), self::equipmentList(), self::packs(), self::productions(),
+            self::ecosystem(), self::services(), self::productions(),
             self::agenda(), self::bookingForm(), self::places(), self::campuses(),
+            self::domains(), self::campusPrograms(), self::downloads(), self::supportForm(),
         ];
     }
 
@@ -68,25 +70,6 @@ final class PageBlocks
         ]);
     }
 
-    private static function equipmentList(): Block
-    {
-        return Block::make('equipment_list')->label('Catalogue de matériel')->icon('heroicon-o-speaker-wave')->schema([
-            TextInput::make('title')->label('Titre')->maxLength(80),
-            Textarea::make('text')->label('Texte')->rows(2)->maxLength(300),
-            Radio::make('usage')->label('Matériel')->options(['rental' => 'À louer', 'studio' => 'Équipement du studio'])->default('rental')->inline(),
-            Toggle::make('featured_only')->label('Seulement le matériel mis en avant'),
-            TextInput::make('limit')->label('Nombre maximum')->numeric()->minValue(1)->maxValue(48)->default(12),
-        ]);
-    }
-
-    private static function packs(): Block
-    {
-        return Block::make('packs')->label('Packs de location')->icon('heroicon-o-cube')->schema([
-            TextInput::make('title')->label('Titre')->maxLength(80)->default('Nos packs'),
-            Textarea::make('text')->label('Texte')->rows(2)->maxLength(300),
-        ]);
-    }
-
     private static function productions(): Block
     {
         return Block::make('productions')->label('Productions du studio (écoute)')->icon('heroicon-o-musical-note')->schema([
@@ -111,7 +94,10 @@ final class PageBlocks
         return Block::make('booking_form')->label('Formulaire de demande (devis, réservation)')->icon('heroicon-o-inbox-arrow-down')->schema([
             TextInput::make('title')->label('Titre')->maxLength(80)->default('Demander un devis'),
             Textarea::make('text')->label('Texte')->rows(2)->maxLength(300),
-            Select::make('booking_type')->label('Type de demande')->options(BookingType::class)->required()->default('equipment_rental')
+            Select::make('booking_type')->label('Type de demande')->options([
+                BookingType::STUDIO_SESSION->value => BookingType::STUDIO_SESSION->getLabel(),
+                BookingType::SPACE_RENTAL->value => BookingType::SPACE_RENTAL->getLabel(),
+            ])->required()->default('studio_session')
                 ->helperText('Les demandes arrivent dans Impact Live › Demandes.'),
         ]);
     }
@@ -131,6 +117,60 @@ final class PageBlocks
         return Block::make('places')->label('Nos lieux (adresses)')->icon('heroicon-o-map-pin')->schema([
             TextInput::make('title')->label('Titre')->maxLength(80)->default('Nous trouver'),
             Select::make('kind')->label('Lieux affichés')->options(PlaceKind::class)->placeholder('Tous les lieux'),
+        ]);
+    }
+
+    private static function domains(): Block
+    {
+        return Block::make('domains')->label('Nos trois maisons (triptyque)')->icon('heroicon-o-view-columns')->schema([
+            Repeater::make('panels')->label('Panneaux')->minItems(3)->maxItems(3)->defaultItems(3)
+                ->addActionLabel('Ajouter un panneau')->reorderable()
+                ->helperText('Trois grands panneaux côte à côte (empilés sur téléphone), un par domaine. Tout le panneau est cliquable.')
+                ->schema([
+                    Select::make('domain')->label('Domaine (donne la couleur)')->options(SiteDomain::class)->required(),
+                    TextInput::make('eyebrow')->label('Surtitre')->maxLength(60)->placeholder('Ex. Centre culturel · Saint-Louis'),
+                    TextInput::make('title')->label('Titre')->required()->maxLength(40),
+                    Textarea::make('text')->label('Texte court')->rows(2)->maxLength(160),
+                    ...self::image('image', 'Photo'),
+                    LinkTargets::field('url', 'Lien')->required(),
+                    TextInput::make('label')->label('Texte du lien')->maxLength(30)->default('Découvrir'),
+                ]),
+            Textarea::make('intro')->label('Phrase d\'intention (sous les panneaux)')->rows(2)->maxLength(160)
+                ->placeholder('Ex. La culture comme héritage, l\'art comme métier'),
+        ]);
+    }
+
+    private static function campusPrograms(): Block
+    {
+        return Block::make('campus_programs')->label('Formations de ce campus')->icon('heroicon-o-academic-cap')->schema([
+            TextInput::make('title')->label('Titre')->maxLength(80)->default('Les formations de ce campus'),
+            Select::make('campus_id')->label('Campus')->required()
+                ->options(fn () => Place::published()->campuses()->orderBy('position')->pluck('name', 'id')->all())
+                ->helperText('Affiche les formations ouvertes à la candidature dans ce campus, avec la prochaine rentrée. Formations et sessions se gèrent dans le menu Formations.'),
+        ]);
+    }
+
+    private static function downloads(): Block
+    {
+        return Block::make('downloads')->label('Documents à télécharger')->icon('heroicon-o-arrow-down-tray')->schema([
+            TextInput::make('title')->label('Titre')->maxLength(80)->default('Documents à télécharger'),
+            Repeater::make('files')->label('Documents')->minItems(1)->maxItems(20)->addActionLabel('Ajouter un document')->reorderable()
+                ->schema([
+                    FileUpload::make('file')->label('Fichier PDF')->required()->disk('public')->directory('pages/documents')->visibility('public')
+                        ->acceptedFileTypes(['application/pdf'])->maxSize(20480)->preserveFilenames()
+                        ->helperText('PDF uniquement, 20 Mo maximum.'),
+                    TextInput::make('title')->label('Titre')->required()->maxLength(90)->placeholder('Ex. Brochure des formations 2026'),
+                    Textarea::make('description')->label('Description (facultatif)')->rows(2)->maxLength(200),
+                ]),
+        ]);
+    }
+
+    private static function supportForm(): Block
+    {
+        return Block::make('support_form')->label('Nous soutenir (formulaire)')->icon('heroicon-o-heart')->schema([
+            TextInput::make('title')->label('Titre')->maxLength(80)->default('Nous soutenir'),
+            Textarea::make('text')->label('Texte')->rows(3)->maxLength(400)
+                ->helperText('Les messages arrivent dans Site › Messages reçus, avec le type de soutien choisi.'),
         ]);
     }
 

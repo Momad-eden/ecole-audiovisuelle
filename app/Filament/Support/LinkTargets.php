@@ -11,38 +11,38 @@ use Filament\Forms\Components\Select;
 use Illuminate\Support\Str;
 
 /**
- * Destinations des boutons et des liens, présentées par leur nom (« Studio › Réserver une session »)
+ * Destinations des boutons et des liens, présentées par leur nom (« Maison Habib Faye › Impact Live Studio › Réserver une séance »)
  * plutôt que par une adresse à taper. Une adresse libre reste possible (WhatsApp, YouTube…).
  */
 final class LinkTargets
 {
     /** Sections repérables dans les pages (identifiants posés par les blocs du site). */
     private const SECTIONS = [
-        '/studio#reserver' => 'Studio › Réserver une session',
-        '/studio#productions' => 'Studio › Écouter les productions',
-        '/events#devis' => 'Events › Demander un devis (formulaire)',
-        '/espace-habib-faye#programmation' => 'Espace Habib Faye › Programmation',
-        '/espace-habib-faye#louer' => 'Espace Habib Faye › Louer la salle',
-        '/#univers' => 'Accueil › Les univers',
+        '/maison-habib-faye/studio#reserver' => 'Maison Habib Faye › Impact Live Studio › Réserver une séance',
+        '/maison-habib-faye/studio#productions' => 'Maison Habib Faye › Impact Live Studio › Écouter les productions',
+        '/maison-habib-faye#programmation' => 'Maison Habib Faye › La Maison › Programmation',
+        '/maison-habib-faye/espaces#louer' => 'Maison Habib Faye › Les espaces › Louer un espace',
     ];
 
     private const PAGES = [
         '/' => 'Accueil',
-        '/univers' => 'Les univers',
-        '/formations' => 'Formations',
-        '/ecole' => 'L\'École',
+        '/maison-habib-faye' => 'Maison Habib Faye › La Maison',
+        '/maison-habib-faye/agenda' => 'Maison Habib Faye › Programmation',
+        '/maison-habib-faye/studio' => 'Maison Habib Faye › Impact Live Studio',
+        '/maison-habib-faye/espaces' => 'Maison Habib Faye › Les espaces',
+        '/emsi' => 'EMSI › L\'école',
+        '/emsi/dakar' => 'EMSI › Campus de Dakar',
+        '/emsi/saint-louis' => 'EMSI › Campus de Saint-Louis',
+        '/emsi/formations' => 'EMSI › Formations',
+        '/emsi/professionnels' => 'EMSI › VAE et professionnels',
+        '/emsi/professionnels/candidater' => 'EMSI › VAE et professionnels › Candidater',
+        '/emsi/realisations' => 'EMSI › Réalisations des étudiants',
         '/candidater' => 'Candidater',
-        '/studio' => 'Impact Live Studio',
-        '/events' => 'Impact Live Events',
-        '/events/materiel' => 'Events › Le matériel à louer',
-        '/demande' => 'Ma demande de devis',
-        '/espace-habib-faye' => 'Espace Habib Faye',
-        '/agenda' => 'Agenda',
-        '/realisations' => 'Réalisations des étudiants',
-        '/expositions' => 'Expositions',
+        '/mission' => 'Mission et impact',
+        '/partenaires' => 'Partenaires et soutiens',
+        '/soutenir' => 'Nous soutenir',
+        '/presse' => 'Presse',
         '/actualites' => 'Actualités',
-        '/professionnels' => 'Espace Professionnels',
-        '/professionnels/candidater' => 'Espace Professionnels › Candidater',
         '/contact' => 'Contact',
     ];
 
@@ -53,13 +53,15 @@ final class LinkTargets
             'Pages du site' => self::PAGES,
             'Sections de page' => self::SECTIONS,
             'Candidater dans un campus' => Place::published()->campuses()->orderBy('position')->get()
-                ->mapWithKeys(fn (Place $p) => ["/candidater?campus={$p->slug}" => 'Candidater à '.($p->city ?? $p->name)])->all(),
+                ->mapWithKeys(fn (Place $p) => ["/candidater?campus={$p->slug}" => 'EMSI › Candidater à '.($p->city ?? $p->name)])->all(),
             'Univers' => Room::published()->orderBy('position')->get()
-                ->mapWithKeys(fn (Room $r) => ["/univers/{$r->slug}" => "Univers › {$r->name}"])->all(),
+                ->mapWithKeys(fn (Room $r) => ["/emsi/univers/{$r->slug}" => "EMSI › Univers › {$r->name}"])->all(),
             'Formations' => Program::published()->orderBy('position')->get()
-                ->mapWithKeys(fn (Program $p) => [($p->audience?->value === 'professional' ? '/professionnels/' : '/formations/').$p->slug => $p->title])->all(),
-            'Événements' => AgendaEvent::published()->where('is_reference', false)->latest('starts_at')->limit(30)->get()
-                ->mapWithKeys(fn (AgendaEvent $e) => ["/agenda/{$e->slug}" => "Agenda › {$e->title}"])->all(),
+                ->mapWithKeys(fn (Program $p) => $p->audience?->value === 'professional'
+                    ? ["/emsi/professionnels/{$p->slug}" => "EMSI › VAE et professionnels › {$p->title}"]
+                    : ["/emsi/formations/{$p->slug}" => "EMSI › Formations › {$p->title}"])->all(),
+            'Programmation de la Maison' => AgendaEvent::published()->where('is_reference', false)->latest('starts_at')->limit(30)->get()
+                ->mapWithKeys(fn (AgendaEvent $e) => ["/maison-habib-faye/agenda/{$e->slug}" => "Maison Habib Faye › Programmation › {$e->title}"])->all(),
             'Autres pages' => Page::where('type', 'free')->orderBy('title')->get()
                 ->mapWithKeys(fn (Page $p) => ["/{$p->slug}" => $p->title])->all(),
         ];

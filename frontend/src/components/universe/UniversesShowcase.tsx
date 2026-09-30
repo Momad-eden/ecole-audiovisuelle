@@ -190,7 +190,7 @@ function UniversePanel({
     const tracks = universe.tracks ?? [];
     return (
         <Link
-            href={`/univers/${universe.slug}`}
+            href={`/emsi/univers/${universe.slug}`}
             onFocus={onFocus}
             className="universe-panel group relative grid overflow-hidden rounded-[2rem] border border-line bg-night-2 transition duration-500 hover:border-[var(--accent)] md:grid-cols-[1.05fr_1fr]"
             style={{ ["--accent" as string]: universe.accentColor }}

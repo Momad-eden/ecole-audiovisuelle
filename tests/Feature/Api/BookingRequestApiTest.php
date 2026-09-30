@@ -21,7 +21,7 @@ class BookingRequestApiTest extends TestCase
     private function payload(array $overrides = []): array
     {
         return $overrides + [
-            'type' => 'equipment_rental',
+            'type' => 'studio_session',
             'name' => 'Awa Ndiaye',
             'organization' => 'Festival du Fleuve',
             'phone' => '+221 77 123 45 67',
@@ -89,5 +89,15 @@ class BookingRequestApiTest extends TestCase
 
         $this->postJson('/api/v1/public/booking-requests', $this->payload(['type' => 'studio_session']))->assertCreated();
         $this->assertSame(1, BookingRequest::count());
+    }
+
+    public function test_booking_api_rejects_equipment_rental_and_event_service(): void
+    {
+        foreach (['equipment_rental', 'event_service'] as $type) {
+            $this->postJson('/api/v1/public/booking-requests', $this->payload(['type' => $type]))
+                ->assertUnprocessable()->assertJsonValidationErrors('type');
+        }
+
+        $this->postJson('/api/v1/public/booking-requests', $this->payload(['type' => 'space_rental']))->assertCreated();
     }
 }
