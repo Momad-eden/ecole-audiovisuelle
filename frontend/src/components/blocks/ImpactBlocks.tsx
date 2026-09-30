@@ -5,11 +5,11 @@ import { ArtworkWaveform } from "@/components/museum/ArtworkWaveform";
 import { InView } from "@/components/motion/InView";
 import { Reveal } from "@/components/motion/Reveal";
 import { LazyBookingForm } from "@/components/forms/LazyBookingForm";
-import { AddToQuote } from "@/components/quote/AddToQuote";
 import { MediaImage } from "@/components/ui/MediaImage";
 import { Section, SectionTitle } from "@/components/ui/Section";
 import { UniverseVisual } from "@/components/universe/UniverseVisual";
 import type { Activity, AgendaEvent, ArtworkSummary, BookingType, EquipmentItem, Image, Place, RentalPack, Service, UniverseVisualKind } from "@/lib/types";
+import { publicBookingType } from "@/lib/booking";
 import { cn } from "@/lib/utils";
 
 /** Lumière de chaque activité de l'écosystème. */
@@ -83,7 +83,6 @@ export function ServicesBlock({ data }: { data: { title?: string; text?: string;
               {service.summary && <p className="mt-3 text-ink-muted">{service.summary}</p>}
               <div className="mt-auto flex flex-wrap items-center justify-between gap-3 pt-6">
                 <span className="rounded-full border border-line px-3 py-1.5 font-mono text-xs">{service.priceLabel}</span>
-                {service.activity === "events" && <AddToQuote item={{ kind: "service", id: service.id, name: service.name }} compact />}
               </div>
             </Reveal>
           ))}
@@ -105,15 +104,12 @@ export function EquipmentCard({ item }: { item: EquipmentItem }) {
           )}
           {item.category && <span className="cartel absolute left-4 top-4 rounded-full bg-night/80 px-3 py-1">{item.category.name}</span>}
         </div>
-        <div className="p-6 pb-0">
+        <div className="p-6">
           {item.brand && <p className="cartel">{item.brand}</p>}
           <h3 className="display mt-1 text-xl leading-tight transition group-hover:text-[var(--accent-ink)]">{item.name}</h3>
           <p className="mt-2 font-mono text-xs text-ink-muted">{item.priceLabel}</p>
         </div>
       </Link>
-      <div className="mt-auto p-6">
-        <AddToQuote item={{ kind: "equipment", id: item.id, name: item.name }} compact />
-      </div>
     </article>
   );
 }
@@ -191,7 +187,6 @@ export function PacksBlock({ data }: { data: { title?: string; text?: string; it
                 )}
                 <div className="mt-auto flex flex-wrap items-center justify-between gap-3 pt-6">
                   <span className="font-mono text-xs text-ink-muted">{pack.priceLabel}</span>
-                  <AddToQuote item={{ kind: "pack", id: pack.id, name: pack.name }} compact />
                 </div>
               </div>
             </Reveal>
@@ -307,7 +302,7 @@ export const FORM_ANCHOR: Record<BookingType, string> = { studio_session: "reser
 const FORM_ACTIVITY: Record<BookingType, Activity> = { studio_session: "studio", space_rental: "space", equipment_rental: "events", event_service: "events" };
 
 export function BookingFormBlock({ data }: { data: { title?: string; text?: string; bookingType?: BookingType } }) {
-  const type = data.bookingType ?? "equipment_rental";
+  const type = publicBookingType(data.bookingType);
   return (
     <Section id={FORM_ANCHOR[type]}>
       <div className="grid gap-12 lg:grid-cols-[1fr_1.4fr]" style={accent(FORM_ACTIVITY[type])}>
