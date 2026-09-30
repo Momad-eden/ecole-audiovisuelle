@@ -41,7 +41,7 @@ Unique sur (`translatable_type`, `translatable_id`, `field`, `locale`). Suppress
 | `Track` | `name`, `short_name`, `summary`, `description`, `skills`, `outcomes` |
 | `Room` | `name`, `tagline`, `intro`, `cover_alt` |
 | `Artwork` | `title`, `summary`, `creation_story`, `equipment`, `transcript`, `cover_alt` |
-| `News` | `title`, `excerpt`, `content`, `cover_alt`, `seo` |
+| `News` | `title`, `excerpt`, `content` |
 | `Faq` | `question`, `answer` |
 | `AgendaEvent` | `title`, `summary`, `content`, `venue`, `image_alt` |
 | `Service` | `name`, `summary`, `description`, `image_alt` (l'unité de prix est une énumération : libellé traduit par le site) |
