@@ -7,6 +7,7 @@ use App\Jobs\TranslateRecord;
 use App\Models\Setting;
 use App\Models\Translation;
 use App\Services\Translation\Translator;
+use App\Support\Translation\BlockTexts;
 use Illuminate\Database\Eloquent\Relations\MorphMany;
 use Illuminate\Support\Facades\DB;
 
@@ -80,6 +81,55 @@ trait HasTranslations
         return in_array($cast, ['array', 'json', 'object', 'collection'], true);
     }
 
+    /** Champ traduit texte par texte (blocs, listes, SEO) : état par clé dans `translations.leaves`. */
+    public function hasStructuredTranslation(string $field): bool
+    {
+        return $this->isStructuredField($field);
+    }
+
+    /**
+     * Textes français d'un champ structuré, par clé : clé stable des blocs, rang d'une liste, `title` /
+     * `description` du SEO. Textes vides (y compris HTML vide) exclus.
+     *
+     * @return array<string, string>
+     */
+    public function frenchLeaves(string $field): array
+    {
+        $value = $this->frenchValue($field);
+        if (! is_array($value)) {
+            return [];
+        }
+
+        $texts = match (true) {
+            $field === 'blocks' => BlockTexts::keyed($value),
+            $field === 'seo' => array_intersect_key($value, ['title' => true, 'description' => true]),
+            default => $value,
+        };
+
+        $out = [];
+        foreach ($texts as $key => $text) {
+            if (is_string($text) && ! self::isBlankText($text)) {
+                $out[(string) $key] = $text;
+            }
+        }
+
+        return $out;
+    }
+
+    /** Empreinte d'un texte (même normalisation que sourceHash). */
+    public static function leafHash(string $text): string
+    {
+        return hash('sha256', trim($text));
+    }
+
+    /** Vide, espaces insécables compris, une fois les balises retirées (« <p></p> », « <p>&nbsp;</p> »). */
+    public static function isBlankText(?string $text): bool
+    {
+        $plain = html_entity_decode(strip_tags((string) $text), ENT_QUOTES | ENT_HTML5, 'UTF-8');
+
+        return trim(str_replace("\u{00A0}", ' ', $plain)) === '';
+    }
+
     public function translated(string $field, string $locale): mixed
     {
         $french = $this->frenchValue($field);
@@ -134,13 +184,13 @@ trait HasTranslations
 
     protected function hasFrenchContent(string $field): bool
     {
-        $value = $this->frenchValue($field);
-
-        if (is_array($value)) {
-            return $value !== [];
+        if ($this->isStructuredField($field)) {
+            return $this->frenchLeaves($field) !== [];
         }
 
-        return trim((string) ($value ?? '')) !== '';
+        $value = $this->frenchValue($field);
+
+        return ! is_array($value) && ! self::isBlankText(is_scalar($value) ? (string) $value : null);
     }
 
     /** Champs au français non vide sans traduction à jour (absente, empreinte différente ou échec). */

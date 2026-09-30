@@ -9,16 +9,20 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\MorphTo;
 use Illuminate\Support\Facades\DB;
 
-/** Traduction d'un champ d'une fiche ; `value` est du texte brut (JSON pour blocs et tableaux). */
+/**
+ * Traduction d'un champ d'une fiche ; `value` est du texte brut (JSON pour blocs et tableaux).
+ * Champs structurés : `leaves` = état par texte `{clé: {h, s}}`, `previous_value` = `{clé: ancienne version relue}`.
+ */
 class Translation extends Model
 {
     protected $fillable = [
-        'translatable_type', 'translatable_id', 'field', 'locale', 'value', 'source_hash', 'status',
+        'translatable_type', 'translatable_id', 'field', 'locale', 'value', 'source_hash', 'status', 'leaves',
         'previous_value', 'translated_at', 'reviewed_at', 'reviewed_by',
     ];
 
     protected $casts = [
         'status' => TranslationStatus::class,
+        'leaves' => 'array',
         'translated_at' => 'datetime',
         'reviewed_at' => 'datetime',
     ];

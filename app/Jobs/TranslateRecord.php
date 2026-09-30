@@ -11,6 +11,7 @@ use App\Services\Translation\Exceptions\TranslationFailed;
 use App\Services\Translation\TranslationQuota;
 use App\Services\Translation\Translator;
 use App\Support\Translation\BlockTexts;
+use App\Support\Translation\TranslationLeaves;
 use Illuminate\Contracts\Queue\ShouldBeUniqueUntilProcessing;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Database\Eloquent\Model;
@@ -75,9 +76,17 @@ class TranslateRecord implements ShouldBeUniqueUntilProcessing, ShouldQueue
         $htmlKeys = [];
         $prepared = [];
         foreach ($fields as $field) {
-            $source = $record->frenchValue($field);
-            $prepared[$field] = ['source' => $source, 'hash' => $record->sourceHash($field)];
-            foreach ($this->textsOf($field, $source) as $key => $text) {
+            $prepared[$field] = ['hash' => $record->sourceHash($field), 'leaves' => []];
+            if ($record->hasStructuredTranslation($field)) {
+                // Champ structuré : seuls les textes sans traduction à jour partent (spec R2 §3.3).
+                $french = $record->frenchLeaves($field);
+                $states = TranslationLeaves::states($record, $field, $record->translation($field, 'en'));
+                $toSend = array_intersect_key($french, array_flip(TranslationLeaves::pending($record, $field, $states)));
+                $prepared[$field]['leaves'] = array_map(fn (string $text) => $record::leafHash($text), $toSend);
+            } else {
+                $toSend = ['' => (string) $record->frenchValue($field)];
+            }
+            foreach ($toSend as $key => $text) {
                 $texts["{$field}::{$key}"] = $text;
                 if ($this->isHtml($field, (string) $key, $text)) {
                     $htmlKeys[] = "{$field}::{$key}";
@@ -111,14 +120,16 @@ class TranslateRecord implements ShouldBeUniqueUntilProcessing, ShouldQueue
             $translated = [];
         }
 
-        foreach ($prepared as $field => ['source' => $source, 'hash' => $hash]) {
+        foreach ($prepared as $field => ['hash' => $hash, 'leaves' => $leafHashes]) {
             $mine = [];
             foreach ($translated as $key => $text) {
                 if (str_starts_with($key, "{$field}::")) {
                     $mine[substr($key, strlen($field) + 2)] = $text;
                 }
             }
-            $this->store($record, $field, $this->valueOf($field, $source, $mine), $hash);
+            $record->hasStructuredTranslation($field)
+                ? $this->storeLeaves($record, $field, $mine, $leafHashes, $hash)
+                : $this->store($record, $field, $mine[''] ?? (string) $record->frenchValue($field), $hash);
         }
 
         app(FrontendRevalidator::class)->queue(['content']);
@@ -140,6 +151,11 @@ class TranslateRecord implements ShouldBeUniqueUntilProcessing, ShouldQueue
         }
 
         foreach ($record->load('translations')->outdatedFields('en') as $field) {
+            if ($record->hasStructuredTranslation($field)) {
+                $this->markLeavesFailed($record, $field);
+
+                continue;
+            }
             $row = $record->translation($field, 'en');
             if ($row) {
                 $row->update([
@@ -179,53 +195,9 @@ class TranslateRecord implements ShouldBeUniqueUntilProcessing, ShouldQueue
         }
     }
 
-    /**
-     * Textes à envoyer pour un champ, par clé locale.
-     *
-     * @return array<string|int, string>
-     */
-    private function textsOf(string $field, mixed $source): array
-    {
-        if (! is_array($source)) {
-            return ['' => (string) $source];
-        }
-
-        if ($field === 'blocks') {
-            return BlockTexts::keyed($source);
-        }
-
-        $keys = $field === 'seo' ? ['title', 'description'] : array_keys($source);
-        $out = [];
-        foreach ($keys as $key) {
-            if (is_string($source[$key] ?? null) && trim($source[$key]) !== '') {
-                $out[$key] = $source[$key];
-            }
-        }
-
-        return $out;
-    }
-
     private function isHtml(string $field, string $key, string $text): bool
     {
         return $field === 'blocks' ? BlockTexts::isHtml($key, $text) : BlockTexts::isHtml($field, $text);
-    }
-
-    /** Valeur anglaise à ranger : texte, ou JSON (carte des blocs, tableau, SEO complet). */
-    private function valueOf(string $field, mixed $source, array $translated): string
-    {
-        if (! is_array($source)) {
-            return $translated[''] ?? (string) $source;
-        }
-
-        if ($field === 'blocks') {
-            return json_encode($translated, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
-        }
-
-        foreach ($translated as $key => $text) {
-            $source[$key] = $text;
-        }
-
-        return json_encode($source, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
     }
 
     /**
@@ -252,6 +224,61 @@ class TranslateRecord implements ShouldBeUniqueUntilProcessing, ShouldQueue
                 $attributes['previous_value'] = $row->value;
             }
             $row->update($attributes);
+        });
+    }
+
+    /**
+     * Champ structuré : fusionne les textes traduits dans l'état relu sous verrou. Un texte relu entre-temps
+     * sur le même français est gardé ; un texte relu d'un ancien français passe dans previous_value[clé].
+     *
+     * @param  array<string, string>  $translated
+     * @param  array<string, string>  $leafHashes  empreinte du français envoyé, par clé
+     */
+    private function storeLeaves(Model $record, string $field, array $translated, array $leafHashes, string $hash): void
+    {
+        DB::transaction(function () use ($record, $field, $translated, $leafHashes, $hash) {
+            $row = $record->translations()->where('field', $field)->where('locale', 'en')->lockForUpdate()->first();
+            $states = TranslationLeaves::states($record, $field, $row);
+            $english = TranslationLeaves::english($record, $field, $row);
+            $previous = TranslationLeaves::previous($row);
+
+            foreach ($translated as $key => $text) {
+                $key = (string) $key;
+                $state = $states[$key] ?? null;
+                if ($state && $state['s'] === TranslationStatus::REVIEWED->value) {
+                    if ($state['h'] === $leafHashes[$key]) {
+                        continue;
+                    }
+                    if (isset($english[$key])) {
+                        $previous[$key] = $english[$key];
+                    }
+                }
+                $english[$key] = $text;
+                $states[$key] = ['h' => $leafHashes[$key], 's' => TranslationStatus::AUTO->value];
+            }
+
+            TranslationLeaves::persist($record, $field, $row, $english, $states, $previous, ['source_hash' => $hash, 'translated_at' => now()]);
+        });
+    }
+
+    /** Champ structuré en échec : seuls les textes à traduire passent en « Échec » (un texte relu va dans previous_value). */
+    private function markLeavesFailed(Model $record, string $field): void
+    {
+        DB::transaction(function () use ($record, $field) {
+            $row = $record->translations()->where('field', $field)->where('locale', 'en')->lockForUpdate()->first();
+            $states = TranslationLeaves::states($record, $field, $row);
+            $english = TranslationLeaves::english($record, $field, $row);
+            $previous = TranslationLeaves::previous($row);
+
+            foreach (TranslationLeaves::pending($record, $field, $states) as $key) {
+                $state = $states[$key] ?? null;
+                if ($state && $state['s'] === TranslationStatus::REVIEWED->value && isset($english[$key])) {
+                    $previous[$key] = $english[$key];
+                }
+                $states[$key] = ['h' => $state['h'] ?? null, 's' => TranslationStatus::FAILED->value];
+            }
+
+            TranslationLeaves::persist($record, $field, $row, $english, $states, $previous);
         });
     }
 }
