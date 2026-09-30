@@ -22,6 +22,20 @@ enum SiteDomain: string implements HasLabel
         };
     }
 
+    /** Domaine déduit de l'adresse d'une page (maison-habib-faye/studio…, maison-habib-faye…, emsi…), sinon null. */
+    public static function forPath(?string $path): ?self
+    {
+        $path = trim((string) $path, '/');
+        $under = fn (string $prefix) => $path === $prefix || str_starts_with($path, $prefix.'/');
+
+        return match (true) {
+            $under('maison-habib-faye/studio') => self::STUDIO,
+            $under('maison-habib-faye') => self::MAISON,
+            $under('emsi') => self::EMSI,
+            default => null,
+        };
+    }
+
     public function getLabel(): string
     {
         return $this->label();

@@ -13,6 +13,7 @@ use App\Filament\Resources\MenuItems\MenuItemResource;
 use App\Filament\Resources\MenuItems\Pages\CreateMenuItem;
 use App\Filament\Resources\MenuItems\Pages\EditMenuItem;
 use App\Filament\Resources\Pages\PageResource;
+use App\Filament\Resources\Pages\Pages\CreatePage;
 use App\Filament\Resources\Pages\Pages\EditPage;
 use App\Filament\Resources\Programs\Pages\CreateProgram;
 use App\Filament\Resources\Programs\ProgramResource;
@@ -197,5 +198,38 @@ class DomainsAdminTest extends TestCase
         Livewire::test(EditMenuItem::class, ['record' => $child->id])
             ->assertFormSet(['parent_id' => $parent->id])
             ->assertFormFieldExists('parent_id', fn (Select $f) => $f->getOptions() === [$parent->id => 'Parent', $other->id => 'Autre']);
+    }
+
+    public function test_a_new_program_is_offered_in_every_published_campus_by_default(): void
+    {
+        $dakar = $this->campus('Dakar');
+        $saintLouis = $this->campus('Saint-Louis');
+        $this->campus('Campus fantome', PublicationStatus::DRAFT);
+
+        Livewire::test(CreateProgram::class)
+            ->assertFormSet(['campuses' => [$dakar->id, $saintLouis->id]])
+            ->fillForm(['title' => 'Lumière', 'audience' => 'school', 'kind' => 'certificate', 'status' => 'published'])
+            ->call('create')->assertHasNoFormErrors();
+
+        $this->assertSame([$dakar->id, $saintLouis->id], Program::where('title', 'Lumière')->firstOrFail()->campuses()->orderBy('places.id')->pluck('places.id')->all());
+    }
+
+    public function test_the_page_domain_follows_its_address_and_stays_changeable(): void
+    {
+        $page = Livewire::test(CreatePage::class);
+        foreach ([
+            'maison-habib-faye/studio/tarifs' => 'studio', 'maison-habib-faye/studio' => 'studio', 'maison-habib-faye/residences' => 'maison',
+            'emsi/campus-thies' => 'emsi', 'emsi' => 'emsi', 'maison-habib-faye' => 'maison',
+        ] as $slug => $domain) {
+            $page->fillForm(['slug' => $slug])->assertFormSet(['domain' => SiteDomain::from($domain)]);
+        }
+        // Autre adresse : le domaine choisi n'est pas changé ; l'équipe peut toujours le modifier.
+        $page->fillForm(['domain' => 'maison'])->fillForm(['slug' => 'presse-2026'])->assertFormSet(['domain' => SiteDomain::MAISON]);
+        $page->fillForm(['title' => 'Résidences', 'slug' => 'maison-habib-faye/residences'])->fillForm(['domain' => 'general'])
+            ->call('create')->assertHasNoFormErrors();
+
+        $this->assertSame(SiteDomain::GENERAL, Page::where('slug', 'maison-habib-faye/residences')->firstOrFail()->domain);
+        $this->assertNull(SiteDomain::forPath('emsiplus'));
+        $this->assertSame(SiteDomain::STUDIO, SiteDomain::forPath('/maison-habib-faye/studio'));
     }
 }
