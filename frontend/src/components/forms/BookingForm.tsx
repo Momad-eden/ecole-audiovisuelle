@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { useLocale } from "@/components/i18n/LocaleProvider";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
@@ -31,6 +32,7 @@ type Values = z.infer<typeof schema>;
 
 /** Demande de réservation : séance au studio ou location de l'Espace Habib Faye. */
 export function BookingForm({ type }: { type?: BookingType }) {
+  const locale = useLocale();
   const [result, setResult] = useState<{ reference: string | null } | null>(null);
   const [error, setError] = useState<string | null>(null);
   const today = new Date().toISOString().slice(0, 10);
@@ -42,7 +44,7 @@ export function BookingForm({ type }: { type?: BookingType }) {
 
   const onSubmit = async ({ attendees, ...values }: Values) => {
     setError(null);
-    const response = await fetch("/api/v1/public/booking-requests", {
+    const response = await fetch(`/api/v1/public/booking-requests?locale=${locale}`, {
       method: "POST",
       headers: { "Content-Type": "application/json", Accept: "application/json" },
       body: JSON.stringify({

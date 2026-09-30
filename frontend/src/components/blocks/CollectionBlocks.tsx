@@ -1,4 +1,4 @@
-import Link from "next/link";
+import { LocaleLink } from "@/components/i18n/LocaleLink";
 import { ArrowRight } from "lucide-react";
 import { ButtonLink } from "@/components/ui/ButtonLink";
 import { MediaImage } from "@/components/ui/MediaImage";
@@ -14,9 +14,9 @@ import type { ArtworksData, NewsData, PartnersData, ProfessionalSpaceData, Progr
 
 function SeeAll({ href, children }: { href: string; children: React.ReactNode }) {
   return (
-    <Link href={href} className="group mb-12 inline-flex items-center gap-2 text-sm font-semibold text-brand">
+    <LocaleLink href={href} className="group mb-12 inline-flex items-center gap-2 text-sm font-semibold text-brand">
       {children} <ArrowRight className="size-4 transition-transform group-hover:translate-x-1" aria-hidden />
-    </Link>
+    </LocaleLink>
   );
 }
 

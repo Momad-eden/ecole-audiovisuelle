@@ -1,4 +1,4 @@
-import Link from "next/link";
+import { LocaleLink } from "@/components/i18n/LocaleLink";
 import { MediaImage } from "@/components/ui/MediaImage";
 import type { Site } from "@/lib/types";
 
@@ -39,7 +39,7 @@ export function SiteFooter({ site }: { site: Site }) {
           <p className="cartel mb-5">Explorer</p>
           <ul className="space-y-1 text-sm">
             {explore.map((link) => (
-              <li key={`${link.url}-${link.label}`}><Link href={link.url} className="inline-flex min-h-8 items-center text-ink/80 transition hover:text-brand">{link.label}</Link></li>
+              <li key={`${link.url}-${link.label}`}><LocaleLink href={link.url} className="inline-flex min-h-8 items-center text-ink/80 transition hover:text-brand">{link.label}</LocaleLink></li>
             ))}
           </ul>
         </nav>
@@ -50,10 +50,10 @@ export function SiteFooter({ site }: { site: Site }) {
             <ul className="space-y-1 text-sm">
               {site.rooms.map((universe) => (
                 <li key={universe.id}>
-                  <Link href={`/emsi/univers/${universe.slug}`} className="inline-flex min-h-8 items-center gap-2 text-ink/80 transition hover:text-ink" style={{ ["--accent" as string]: universe.accentColor }}>
+                  <LocaleLink href={`/emsi/univers/${universe.slug}`} className="inline-flex min-h-8 items-center gap-2 text-ink/80 transition hover:text-ink" style={{ ["--accent" as string]: universe.accentColor }}>
                     <span className="size-1.5 rounded-full bg-[var(--accent-ink)]" aria-hidden />
                     {universe.name}
-                  </Link>
+                  </LocaleLink>
                 </li>
               ))}
             </ul>
@@ -85,7 +85,7 @@ export function SiteFooter({ site }: { site: Site }) {
           <p>© {new Date().getFullYear()} {settings.schoolName}</p>
           <ul className="flex flex-wrap gap-4">
             {menus.legal.map((link) => (
-              <li key={link.url}><Link href={link.url} className="inline-flex min-h-8 items-center hover:text-ink">{link.label}</Link></li>
+              <li key={link.url}><LocaleLink href={link.url} className="inline-flex min-h-8 items-center hover:text-ink">{link.label}</LocaleLink></li>
             ))}
           </ul>
         </div>

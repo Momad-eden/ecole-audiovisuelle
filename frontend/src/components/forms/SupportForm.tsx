@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
+import { useLocale } from "@/components/i18n/LocaleProvider";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
@@ -26,6 +27,7 @@ type Values = z.infer<typeof schema>;
 
 /** Formulaire « Nous soutenir » (partenariat, mécénat, don) : arrive dans les messages reçus de l'admin. */
 export function SupportForm() {
+  const locale = useLocale();
   const [status, setStatus] = useState<"idle" | "sent" | "error">("idle");
   const confirmation = useRef<HTMLDivElement>(null);
   const { register, handleSubmit, formState: { errors, isSubmitting } } = useForm<Values>({
@@ -40,7 +42,7 @@ export function SupportForm() {
   const onSubmit = async (values: Values) => {
     setStatus("idle");
     try {
-      const response = await fetch("/api/v1/public/support", {
+      const response = await fetch(`/api/v1/public/support?locale=${locale}`, {
         method: "POST",
         headers: { "Content-Type": "application/json", Accept: "application/json" },
         body: JSON.stringify(values),

@@ -3,14 +3,15 @@ import { ButtonLink } from "@/components/ui/ButtonLink";
 import { PageHeader } from "@/components/ui/PageHeader";
 import { api } from "@/lib/api";
 import { resolvePreselection } from "@/lib/application";
+import type { Locale } from "@/lib/i18n/locales";
 
-type Props = { audience: "school" | "professional"; formation?: string; campus?: string };
+type Props = { locale: Locale; audience: "school" | "professional"; formation?: string; campus?: string };
 
-export async function ApplicationPage({ audience, formation, campus }: Props) {
-  const [offerings, site] = await Promise.all([api.offerings(audience), api.site()]);
+export async function ApplicationPage({ locale, audience, formation, campus }: Props) {
+  const [offerings, site] = await Promise.all([api.offerings(audience, locale), api.site(locale)]);
   const campuses = site.places.filter((place) => place.kind === "campus");
   // La formation demandée n'est qu'un indice : toute erreur revient à « pas de présélection ».
-  const program = formation ? await api.program(formation).catch(() => null) : null;
+  const program = formation ? await api.program(formation, locale).catch(() => null) : null;
   const programOfferingIds = (program?.cohorts?.flatMap((c) => c.offerings ?? []) ?? []).map((o) => o.id);
   const { campusId, offeringId, notice } = resolvePreselection({ offerings, campuses, campusSlug: campus, programOfferingIds });
   const professional = audience === "professional";

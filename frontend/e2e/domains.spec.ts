@@ -120,7 +120,7 @@ test.describe("nouveaux blocs", () => {
   test("« Nous soutenir » : le formulaire est envoyé puis remplacé par un message de confirmation", async ({ page }) => {
     // Aucun message réel n'est enregistré : la réponse de l'API est simulée.
     let envoi: Record<string, unknown> | null = null;
-    await page.route("**/api/v1/public/support", async (route) => {
+    await page.route("**/api/v1/public/support*", async (route) => {
       envoi = route.request().postDataJSON();
       await route.fulfill({ status: 201, json: { data: { ok: true } } });
     });

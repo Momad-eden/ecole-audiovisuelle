@@ -1,6 +1,6 @@
 "use client";
 
-import Link from "next/link";
+import { LocaleLink } from "@/components/i18n/LocaleLink";
 import { useEffect, useRef } from "react";
 import { ArrowRight } from "lucide-react";
 import type { ScrollTrigger } from "gsap/ScrollTrigger";
@@ -189,7 +189,7 @@ function UniversePanel({
 }) {
     const tracks = universe.tracks ?? [];
     return (
-        <Link
+        <LocaleLink
             href={`/emsi/univers/${universe.slug}`}
             onFocus={onFocus}
             className="universe-panel group relative grid overflow-hidden rounded-[2rem] border border-line bg-night-2 transition duration-500 hover:border-[var(--accent)] md:grid-cols-[1.05fr_1fr]"
@@ -255,6 +255,6 @@ function UniversePanel({
                     <UniverseVisual kind={universe.visual} />
                 </InView>
             </div>
-        </Link>
+        </LocaleLink>
     );
 }

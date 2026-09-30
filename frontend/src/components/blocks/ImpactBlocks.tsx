@@ -1,4 +1,4 @@
-import Link from "next/link";
+import { LocaleLink } from "@/components/i18n/LocaleLink";
 import { ArrowRight, Clock, Disc3, Mail, MapPin, Phone } from "lucide-react";
 import { PlayButton } from "@/components/audio/PlayButton";
 import { ArtworkWaveform } from "@/components/museum/ArtworkWaveform";
@@ -52,7 +52,7 @@ export function EcosystemBlock({ data }: { data: EcosystemData }) {
           return (
             <Reveal as="li" key={item.name} delay={(index % 2) * 120} className="h-full">
               {item.url ? (
-                <Link href={item.url} className="group block h-full overflow-hidden rounded-[2rem] border border-line bg-night-2 transition duration-500 hover:-translate-y-1 hover:border-[var(--accent)]" style={accent(item.activity)}>{body}</Link>
+                <LocaleLink href={item.url} className="group block h-full overflow-hidden rounded-[2rem] border border-line bg-night-2 transition duration-500 hover:-translate-y-1 hover:border-[var(--accent)]" style={accent(item.activity)}>{body}</LocaleLink>
               ) : (
                 <div className="h-full overflow-hidden rounded-[2rem] border border-line bg-night-2" style={accent(item.activity)}>{body}</div>
               )}
@@ -97,7 +97,7 @@ export function ServicesBlock({ data }: { data: { title?: string; text?: string;
 export function EquipmentCard({ item }: { item: EquipmentItem }) {
   return (
     <article className="group flex h-full flex-col overflow-hidden rounded-3xl border border-line bg-night-2 transition duration-500 hover:border-[var(--accent)]">
-      <Link href={"/maison-habib-faye"} className="block">
+      <LocaleLink href={"/maison-habib-faye"} className="block">
         <div className="relative aspect-[4/3] overflow-hidden border-b border-line bg-night-3">
           {item.image ? <MediaImage image={item.image} sizes="(min-width: 1024px) 25vw, (min-width: 640px) 50vw, 100vw" className="transition duration-700 group-hover:scale-105" /> : (
             <div className="absolute inset-0 grid place-items-center p-6 text-center" aria-hidden><span className="display text-3xl text-ink/15">{item.brand ?? item.name}</span></div>
@@ -109,7 +109,7 @@ export function EquipmentCard({ item }: { item: EquipmentItem }) {
           <h3 className="display mt-1 text-xl leading-tight transition group-hover:text-[var(--accent-ink)]">{item.name}</h3>
           <p className="mt-2 font-mono text-xs text-ink-muted">{item.priceLabel}</p>
         </div>
-      </Link>
+      </LocaleLink>
     </article>
   );
 }
@@ -151,7 +151,7 @@ export function EquipmentListBlock({ data }: { data: { title?: string; text?: st
       <div style={accent("events")}>
         <div className="flex flex-wrap items-end justify-between gap-6">
           <SectionTitle eyebrow="Location" title={data.title} text={data.text} />
-          <Link href="/maison-habib-faye" className="group mb-12 inline-flex items-center gap-2 text-sm font-semibold text-[var(--accent-ink)]">Tout le matériel <ArrowRight className="size-4 transition-transform group-hover:translate-x-1" aria-hidden /></Link>
+          <LocaleLink href="/maison-habib-faye" className="group mb-12 inline-flex items-center gap-2 text-sm font-semibold text-[var(--accent-ink)]">Tout le matériel <ArrowRight className="size-4 transition-transform group-hover:translate-x-1" aria-hidden /></LocaleLink>
         </div>
         <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
           {items.map((item) => <EquipmentCard key={item.id} item={item} />)}
@@ -217,7 +217,7 @@ export function ProductionsBlock({ data }: { data: { title?: string; items?: Art
                     {item.cover ? <MediaImage image={item.cover} sizes="64px" /> : <Disc3 className="size-8 text-[var(--accent-ink)]" aria-hidden />}
                   </span>
                   <span>
-                    <Link href={`/emsi/realisations/${item.slug}`} className="display block text-lg leading-tight hover:text-[var(--accent-ink)]">{item.title}</Link>
+                    <LocaleLink href={`/emsi/realisations/${item.slug}`} className="display block text-lg leading-tight hover:text-[var(--accent-ink)]">{item.title}</LocaleLink>
                     {item.summary && <span className="mt-1 line-clamp-1 block text-sm text-ink-muted">{item.summary}</span>}
                   </span>
                 </div>
@@ -243,7 +243,7 @@ const timeFormat = new Intl.DateTimeFormat("fr-FR", { weekday: "long", hour: "2-
 export function AgendaCard({ event }: { event: AgendaEvent }) {
   const start = event.startsAt ? new Date(event.startsAt) : null;
   return (
-    <Link href={`/maison-habib-faye/agenda/${event.slug}`} className="group flex h-full gap-5 rounded-3xl border border-line bg-night-2 p-5 transition duration-500 hover:border-[var(--accent)]" style={accent(event.activity)}>
+    <LocaleLink href={`/maison-habib-faye/agenda/${event.slug}`} className="group flex h-full gap-5 rounded-3xl border border-line bg-night-2 p-5 transition duration-500 hover:border-[var(--accent)]" style={accent(event.activity)}>
       <div className="grid w-20 shrink-0 place-items-center rounded-2xl border border-line bg-night py-3 text-center">
         {start ? (
           <span><span className="display block text-3xl text-[var(--accent-ink)]">{dayFormat.format(start)}</span><span className="cartel">{monthFormat.format(start).replace(".", "")}</span></span>
@@ -254,7 +254,7 @@ export function AgendaCard({ event }: { event: AgendaEvent }) {
         <h3 className="display mt-1 text-xl leading-tight group-hover:text-[var(--accent-ink)]">{event.title}</h3>
         <p className="mt-2 text-sm text-ink-muted">{[start ? timeFormat.format(start) : null, event.venue, event.city].filter(Boolean).join(" · ")}</p>
       </div>
-    </Link>
+    </LocaleLink>
   );
 }
 
@@ -287,7 +287,7 @@ export function AgendaBlock({ data }: { data: { title?: string; scope?: "upcomin
     <Section id="programmation">
       <div className="flex flex-wrap items-end justify-between gap-6">
         <SectionTitle eyebrow="Agenda" title={data.title} />
-        <Link href="/maison-habib-faye/agenda" className="group mb-12 inline-flex items-center gap-2 text-sm font-semibold text-brand">Tout l&apos;agenda <ArrowRight className="size-4 transition-transform group-hover:translate-x-1" aria-hidden /></Link>
+        <LocaleLink href="/maison-habib-faye/agenda" className="group mb-12 inline-flex items-center gap-2 text-sm font-semibold text-brand">Tout l&apos;agenda <ArrowRight className="size-4 transition-transform group-hover:translate-x-1" aria-hidden /></LocaleLink>
       </div>
       <ul className="grid gap-4 md:grid-cols-2">
         {items.map((event) => <li key={event.id}><AgendaCard event={event} /></li>)}

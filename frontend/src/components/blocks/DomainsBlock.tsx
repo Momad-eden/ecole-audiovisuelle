@@ -1,4 +1,4 @@
-import Link from "next/link";
+import { LocaleLink } from "@/components/i18n/LocaleLink";
 import { ArrowRight } from "lucide-react";
 import { MediaImage } from "@/components/ui/MediaImage";
 import { accentVars } from "@/lib/contrast";
@@ -71,7 +71,7 @@ function Panel({ panel, index, priority }: { panel: DomainPanel; index: number; 
           {external ? (
             <a href={panel.url} target="_blank" rel="noopener noreferrer" className={linkClass}>{title}</a>
           ) : (
-            <Link href={panel.url} className={linkClass}>{title}</Link>
+            <LocaleLink href={panel.url} className={linkClass}>{title}</LocaleLink>
           )}
         </h2>
         {panel.text && <p className="mt-5 max-w-sm text-base text-ink/85 sm:text-lg">{frenchSpacing(panel.text)}</p>}

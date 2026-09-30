@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { useLocale } from "@/components/i18n/LocaleProvider";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
@@ -23,12 +24,13 @@ const schema = z
 type Values = z.infer<typeof schema>;
 
 export function ContactForm() {
+  const locale = useLocale();
   const [status, setStatus] = useState<"idle" | "sent" | "error">("idle");
   const { register, handleSubmit, formState: { errors, isSubmitting } } = useForm<Values>({ resolver: zodResolver(schema), defaultValues: { subject: "information", email: "", phone: "" } });
 
   const onSubmit = async (values: Values) => {
     setStatus("idle");
-    const response = await fetch("/api/v1/public/contact-messages", {
+    const response = await fetch(`/api/v1/public/contact-messages?locale=${locale}`, {
       method: "POST",
       headers: { "Content-Type": "application/json", Accept: "application/json" },
       body: JSON.stringify(values),

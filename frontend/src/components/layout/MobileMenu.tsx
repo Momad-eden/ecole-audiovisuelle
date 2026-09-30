@@ -1,6 +1,6 @@
 "use client";
 
-import Link from "next/link";
+import { LocaleLink } from "@/components/i18n/LocaleLink";
 import { useEffect, useRef, useState } from "react";
 import { ArrowRight, Menu, X } from "lucide-react";
 import { ChevronDown } from "lucide-react";
@@ -86,18 +86,18 @@ export function MobileMenu({ links }: { links: MenuLink[] }) {
                                                 <ul id={`mobile-sub-${index}`} hidden={!isOpen} className="pb-3">
                                                     {children.map((child) => (
                                                         <li key={child.url}>
-                                                            <Link href={child.url} onClick={close} className="flex min-h-11 items-center pl-3 text-lg text-ink/85">
+                                                            <LocaleLink href={child.url} onClick={close} className="flex min-h-11 items-center pl-3 text-lg text-ink/85">
                                                                 {child.label}
-                                                            </Link>
+                                                            </LocaleLink>
                                                         </li>
                                                     ))}
                                                 </ul>
                                             </>
                                         ) : (
-                                            <Link href={link.url} onClick={close} className="flex items-baseline justify-between py-4">
+                                            <LocaleLink href={link.url} onClick={close} className="flex items-baseline justify-between py-4">
                                                 <span className="display text-3xl">{link.label}</span>
                                                 {number}
-                                            </Link>
+                                            </LocaleLink>
                                         )}
                                     </li>
                                 );
@@ -106,14 +106,14 @@ export function MobileMenu({ links }: { links: MenuLink[] }) {
                     </nav>
 
                     {cta && (
-                        <Link
+                        <LocaleLink
                             href={cta.url}
                             onClick={close}
                             className="mt-auto flex min-h-14 items-center justify-center gap-2 rounded-full bg-brand font-semibold text-on-accent"
                         >
                             {cta.label}{" "}
                             <ArrowRight className="size-4" aria-hidden />
-                        </Link>
+                        </LocaleLink>
                     )}
                 </div>
             </dialog>

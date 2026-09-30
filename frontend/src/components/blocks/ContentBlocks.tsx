@@ -1,4 +1,4 @@
-import Link from "next/link";
+import { LocaleLink } from "@/components/i18n/LocaleLink";
 import { ArrowRight, Award, AudioLines, Briefcase, Calendar, Clapperboard, GraduationCap, Lightbulb, MapPin, Palette, Plus, Sparkles, Users, Video } from "lucide-react";
 import { ButtonLink } from "@/components/ui/ButtonLink";
 import { MediaImage } from "@/components/ui/MediaImage";
@@ -162,7 +162,7 @@ export function CardsBlock({ data }: { data: CardsData }) {
           return (
             <Reveal as="li" key={item.title} delay={(index % 3) * 100} className="h-full">
               {item.url ? (
-                <Link href={item.url} className="group block h-full rounded-3xl border border-line bg-night-2 p-8 transition duration-500 hover:-translate-y-1 hover:border-[var(--accent)]">{body}</Link>
+                <LocaleLink href={item.url} className="group block h-full rounded-3xl border border-line bg-night-2 p-8 transition duration-500 hover:-translate-y-1 hover:border-[var(--accent)]">{body}</LocaleLink>
               ) : (
                 <div className="h-full rounded-3xl border border-line bg-night-2 p-8">{body}</div>
               )}

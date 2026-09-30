@@ -1,4 +1,4 @@
-import Link from "next/link";
+import { LocaleLink } from "@/components/i18n/LocaleLink";
 import { CalendarDays } from "lucide-react";
 import { ButtonLink } from "@/components/ui/ButtonLink";
 import { MediaImage } from "@/components/ui/MediaImage";
@@ -38,7 +38,7 @@ export function CampusProgramsBlock({ data, id }: { data: CampusProgramsData; id
                   </div>
                   <div className="flex flex-1 flex-col p-7">
                     <h3 className="display text-2xl leading-tight">
-                      <Link href={`/emsi/formations/${program.slug}`} className="hover:text-[var(--accent-ink)]">{frenchSpacing(program.title)}</Link>
+                      <LocaleLink href={`/emsi/formations/${program.slug}`} className="hover:text-[var(--accent-ink)]">{frenchSpacing(program.title)}</LocaleLink>
                     </h3>
                     {program.summary && <p className="mt-3 text-ink-muted">{frenchSpacing(program.summary)}</p>}
                     {program.nextStart && (

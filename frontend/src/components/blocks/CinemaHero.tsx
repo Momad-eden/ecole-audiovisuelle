@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
-import Link from "next/link";
+import { LocaleLink } from "@/components/i18n/LocaleLink";
 import { ArrowRight, Pause, Play } from "lucide-react";
 import { ButtonLink } from "@/components/ui/ButtonLink";
 import { MediaImage } from "@/components/ui/MediaImage";
@@ -123,9 +123,9 @@ export function CinemaHero({ data, first }: { data: HeroData; first: boolean }) 
                     {frenchSpacing(slide.title || (i === 0 ? data.title : ""))}
                   </SlideHeading>
                   {slide.link && (
-                    <Link href={slide.link.url} tabIndex={i === index ? undefined : -1} className="mt-6 inline-flex items-center gap-2 font-semibold text-ink underline-offset-4 hover:underline">
+                    <LocaleLink href={slide.link.url} tabIndex={i === index ? undefined : -1} className="mt-6 inline-flex items-center gap-2 font-semibold text-ink underline-offset-4 hover:underline">
                       {slide.link.label || "Découvrir"} <ArrowRight className="size-4" aria-hidden />
-                    </Link>
+                    </LocaleLink>
                   )}
                 </div>
               );

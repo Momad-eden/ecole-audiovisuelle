@@ -1,11 +1,13 @@
 "use client";
 
-import Link from "next/link";
+import { LocaleLink } from "@/components/i18n/LocaleLink";
 import { useEffect, useState } from "react";
 import { ChevronRight } from "lucide-react";
 import type { DomainSection } from "@/lib/domains";
 import { cn } from "@/lib/utils";
 import { siteUrl } from "@/lib/utils";
+import { useLocale } from "@/components/i18n/LocaleProvider";
+import { localizedPath } from "@/lib/i18n/locales";
 import { useCrumbTitle } from "./domain-crumb";
 
 /**
@@ -14,6 +16,7 @@ import { useCrumbTitle } from "./domain-crumb";
  */
 export function DomainRow({ section, path }: { section: DomainSection; path: string }) {
   const title = useCrumbTitle();
+  const locale = useLocale();
   const [scrolled, setScrolled] = useState(false);
 
   useEffect(() => {
@@ -33,7 +36,7 @@ export function DomainRow({ section, path }: { section: DomainSection; path: str
     ? {
         "@context": "https://schema.org",
         "@type": "BreadcrumbList",
-        itemListElement: crumbs.map((crumb, index) => ({ "@type": "ListItem", position: index + 1, name: crumb.label, item: `${siteUrl}${crumb.url}` })),
+        itemListElement: crumbs.map((crumb, index) => ({ "@type": "ListItem", position: index + 1, name: crumb.label, item: `${siteUrl}${localizedPath(crumb.url, locale)}` })),
       }
     : null;
   const siblings = section.parent.children ?? [];
@@ -48,7 +51,7 @@ export function DomainRow({ section, path }: { section: DomainSection; path: str
               return (
                 <li key={crumb.url + crumb.label} className="flex min-w-0 items-center gap-1.5">
                   {index > 0 && <ChevronRight className="size-3 shrink-0" aria-hidden />}
-                  {last && atCurrent ? <span aria-current="page" className="truncate text-ink">{crumb.label}</span> : <Link href={crumb.url} className="hover:text-ink">{crumb.label}</Link>}
+                  {last && atCurrent ? <span aria-current="page" className="truncate text-ink">{crumb.label}</span> : <LocaleLink href={crumb.url} className="hover:text-ink">{crumb.label}</LocaleLink>}
                 </li>
               );
             })}
@@ -61,13 +64,13 @@ export function DomainRow({ section, path }: { section: DomainSection; path: str
                 const here = item.url === section.current?.url;
                 return (
                   <li key={item.url + item.label} className="shrink-0">
-                    <Link
+                    <LocaleLink
                       href={item.url}
                       aria-current={here ? (item.url === clean ? "page" : "location") : undefined}
                       className={cn("inline-flex min-h-8 items-center rounded-full px-3 text-xs transition", here ? "bg-[var(--accent)] font-semibold text-on-accent" : "text-ink/80 hover:text-ink")}
                     >
                       {item.label}
-                    </Link>
+                    </LocaleLink>
                   </li>
                 );
               })}

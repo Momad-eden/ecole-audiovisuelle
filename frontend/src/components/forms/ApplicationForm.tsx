@@ -1,12 +1,14 @@
 "use client";
 
-import Link from "next/link";
+import { LocaleLink } from "@/components/i18n/LocaleLink";
+import { useLocale } from "@/components/i18n/LocaleProvider";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import { useFieldArray, useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import type { Offering, Place } from "@/lib/types";
+import { localizedPath } from "@/lib/i18n/locales";
 import { campusLabel, offeringsForCampus, wantedOffering } from "@/lib/application";
 import { fcfa, cn } from "@/lib/utils";
 import { Field, Honeypot, inputClass } from "./Field";
@@ -45,6 +47,7 @@ const STEPS = ["Formation", "Identité", "Coordonnées", "Parcours", "Envoi"];
 
 export function ApplicationForm({ offerings, audience, preselected, campuses = [], preselectedCampus, notice, wanted = [] }: { offerings: Offering[]; audience: "school" | "professional"; preselected?: string; campuses?: Place[]; preselectedCampus?: string; notice?: string; wanted?: number[] }) {
   const router = useRouter();
+  const locale = useLocale();
   const draftKey = `emsi-candidature-${audience}`;
   const [step, setStep] = useState(0);
   const [serverError, setServerError] = useState<string | null>(null);
@@ -173,12 +176,12 @@ export function ApplicationForm({ offerings, audience, preselected, campuses = [
     body.append("consent", "1");
     append("website", values.website);
 
-    const response = await fetch("/api/v1/public/applications", { method: "POST", body, headers: { Accept: "application/json" } });
+    const response = await fetch(`/api/v1/public/applications?locale=${locale}`, { method: "POST", body, headers: { Accept: "application/json" } });
 
     if (response.status === 201) {
       const { data } = (await response.json()) as { data: { reference: string | null } };
       try { localStorage.removeItem(draftKey); } catch {}
-      router.push(`/candidater/confirmation?ref=${encodeURIComponent(data.reference ?? "")}`);
+      router.push(localizedPath(`/candidater/confirmation?ref=${encodeURIComponent(data.reference ?? "")}`, locale));
       return;
     }
     if (response.status === 422) {
@@ -324,7 +327,7 @@ export function ApplicationForm({ offerings, audience, preselected, campuses = [
             <Field id="consent" label="" error={errors.consent?.message}>
               <label className="flex items-start gap-3 text-sm text-ink-muted">
                 <input id="consent" type="checkbox" className="mt-1 size-4 accent-brand" {...register("consent")} />
-                <span>J&apos;accepte que l&apos;EMSI traite ces informations pour étudier ma candidature et me contacter. Elles ne sont utilisées qu&apos;à cette fin. Voir la page <Link href="/confidentialite" className="text-brand underline">Protection des données</Link>.</span>
+                <span>J&apos;accepte que l&apos;EMSI traite ces informations pour étudier ma candidature et me contacter. Elles ne sont utilisées qu&apos;à cette fin. Voir la page <LocaleLink href="/confidentialite" className="text-brand underline">Protection des données</LocaleLink>.</span>
               </label>
             </Field>
             {serverError && <p role="alert" className="text-sm text-rec">{serverError}</p>}

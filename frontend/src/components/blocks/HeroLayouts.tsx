@@ -1,3 +1,4 @@
+import { LocaleLink } from "@/components/i18n/LocaleLink";
 import { ButtonLink } from "@/components/ui/ButtonLink";
 import { MediaImage } from "@/components/ui/MediaImage";
 import { InView } from "@/components/motion/InView";
@@ -109,7 +110,7 @@ export function PosterHero({ data, first }: Props) {
           {data.buttons?.length ? (
             <div className="flex flex-wrap gap-3">
               {data.buttons.map((button, i) => (
-                <a key={button.url + button.label} href={button.url} className={cn("inline-flex min-h-14 items-center rounded-full px-7 font-semibold transition", i === 0 ? "bg-current hover:opacity-90" : "border border-current/50 hover:bg-current/10")}>{i === 0 ? <span className="text-[var(--accent-ink)]">{button.label}</span> : button.label}</a>
+                <LocaleLink key={button.url + button.label} href={button.url} className={cn("inline-flex min-h-14 items-center rounded-full px-7 font-semibold transition", i === 0 ? "bg-current hover:opacity-90" : "border border-current/50 hover:bg-current/10")}>{i === 0 ? <span className="text-[var(--accent-ink)]">{button.label}</span> : button.label}</LocaleLink>
               ))}
             </div>
           ) : null}

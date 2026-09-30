@@ -1,4 +1,4 @@
-import Link from "next/link";
+import { LocaleLink } from "@/components/i18n/LocaleLink";
 import { AudioLines, Film } from "lucide-react";
 import type { ArtworkSummary } from "@/lib/types";
 import { MediaImage } from "@/components/ui/MediaImage";
@@ -10,7 +10,7 @@ export function ArtworkCard({ artwork }: { artwork: ArtworkSummary }) {
 
   return (
     <article className="group relative" style={{ ["--accent" as string]: accent }}>
-      <Link href={`/emsi/realisations/${artwork.slug}`} className="block">
+      <LocaleLink href={`/emsi/realisations/${artwork.slug}`} className="block">
         <div className="relative aspect-[4/5] overflow-hidden rounded-2xl border border-line bg-night-3">
           {artwork.cover ? (
             <MediaImage image={artwork.cover} sizes="(min-width: 1024px) 33vw, (min-width: 640px) 50vw, 100vw" className="transition duration-700 group-hover:scale-[1.03]" fallbackAlt={artwork.title} />
@@ -31,7 +31,7 @@ export function ArtworkCard({ artwork }: { artwork: ArtworkSummary }) {
           <h3 className="display mt-2 text-xl leading-snug group-hover:text-[var(--accent-ink)]">{artwork.title}</h3>
           {artwork.summary && <p className="mt-2 line-clamp-2 text-sm text-ink-muted">{artwork.summary}</p>}
         </div>
-      </Link>
+      </LocaleLink>
     </article>
   );
 }

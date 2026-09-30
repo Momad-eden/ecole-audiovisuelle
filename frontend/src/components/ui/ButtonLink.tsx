@@ -1,4 +1,4 @@
-import Link from "next/link";
+import { LocaleLink } from "@/components/i18n/LocaleLink";
 import { ArrowRight, ArrowUpRight } from "lucide-react";
 import { cn, isExternal } from "@/lib/utils";
 
@@ -25,9 +25,9 @@ export function ButtonLink({ href, children, variant = "primary", size = "md", c
   }
 
   return (
-    <Link href={href} className={classes}>
+    <LocaleLink href={href} className={classes}>
       {children}
       <ArrowRight className="size-4 transition-transform duration-300 group-hover:translate-x-1" aria-hidden />
-    </Link>
+    </LocaleLink>
   );
 }

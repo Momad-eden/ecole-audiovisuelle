@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect } from "react";
-import Link from "next/link";
+import { LocaleLink } from "@/components/i18n/LocaleLink";
 import { Pause, Play, X } from "lucide-react";
 import { formatDuration } from "@/lib/utils";
 import { useAudio } from "./AudioProvider";
@@ -40,7 +40,7 @@ export function PlayerBar() {
         <div className="min-w-0 flex-1">
           <div className="flex items-baseline justify-between gap-3">
             <p className="truncate text-sm font-medium">
-              {track.href ? <Link href={track.href} className="hover:underline">{track.title}</Link> : track.title}
+              {track.href ? <LocaleLink href={track.href} className="hover:underline">{track.title}</LocaleLink> : track.title}
               {track.subtitle && <span className="ml-2 text-ink-muted">{track.subtitle}</span>}
             </p>
             <span className="cartel shrink-0">
