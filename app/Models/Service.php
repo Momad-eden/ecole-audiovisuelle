@@ -5,6 +5,7 @@ namespace App\Models;
 use App\Enums\Activity;
 use App\Enums\PriceUnit;
 use App\Models\Concerns\HasPublication;
+use App\Models\Concerns\HasTranslations;
 use App\Models\Concerns\HasUniqueSlug;
 use App\Models\Concerns\RevalidatesFrontend;
 use App\Support\Price;
@@ -13,7 +14,9 @@ use Illuminate\Database\Eloquent\Model;
 /** Service proposé par le studio, l'événementiel ou l'Espace Habib Faye. */
 class Service extends Model
 {
-    use HasPublication, HasUniqueSlug, RevalidatesFrontend;
+    use HasPublication, HasTranslations, HasUniqueSlug, RevalidatesFrontend;
+
+    protected array $translatable = ['name', 'summary', 'description', 'image_alt'];
 
     protected $fillable = ['activity', 'name', 'slug', 'summary', 'description', 'price_from', 'price_unit', 'icon', 'image', 'image_alt', 'position', 'status', 'published_at'];
 

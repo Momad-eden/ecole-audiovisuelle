@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use App\Models\Concerns\HasPublication;
+use App\Models\Concerns\HasTranslations;
 use App\Models\Concerns\HasUniqueSlug;
 use App\Models\Concerns\RevalidatesFrontend;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
@@ -12,7 +13,7 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 /** Univers de l'école (Son, Image, Infographie & design, Scène, Cinéma…), anciennement « salle » du musée. */
 class Room extends Model
 {
-    use HasFactory, HasPublication, HasUniqueSlug, RevalidatesFrontend;
+    use HasFactory, HasPublication, HasTranslations, HasUniqueSlug, RevalidatesFrontend;
 
     /** Signature visuelle animée de chaque univers sur le site. */
     public const VISUALS = [
@@ -22,6 +23,8 @@ class Room extends Model
         'stage' => 'Scène (faisceaux de lumière)',
         'cinema' => 'Cinéma (pellicule)',
     ];
+
+    protected array $translatable = ['name', 'tagline', 'intro', 'cover_alt'];
 
     protected $fillable = ['name', 'slug', 'tagline', 'intro', 'accent_color', 'visual', 'is_upcoming', 'cover_image', 'cover_alt', 'position', 'status', 'published_at'];
 

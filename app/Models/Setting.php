@@ -2,13 +2,16 @@
 
 namespace App\Models;
 
+use App\Models\Concerns\HasTranslations;
 use App\Models\Concerns\RevalidatesFrontend;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
 class Setting extends Model
 {
-    use HasFactory, RevalidatesFrontend;
+    use HasFactory, HasTranslations, RevalidatesFrontend;
+
+    protected array $translatable = ['description', 'opening_hours', 'seo_title', 'seo_description'];
 
     protected $fillable = [
         'school_name',
