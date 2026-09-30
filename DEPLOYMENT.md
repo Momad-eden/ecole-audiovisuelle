@@ -163,7 +163,9 @@ tar xzf /tmp/emsi-medias.tgz -C /var/www/emsi/storage/app
 php artisan migrate --force && php artisan storage:link
 ```
 
-La base locale est déjà au niveau du site des trois domaines : **ne relancez pas** `emsi:site-v4` après ce transfert. En revanche, sur une installation faite avec `db:seed`, lancez `php artisan migrate --force` puis `php artisan emsi:site-v4 --home` (relançable sans risque : il ne réécrit pas ce qui a déjà été modifié dans l'admin ; `--home` remplace l'accueil par les trois maisons).
+La base locale est déjà au niveau du site des trois domaines : après ce transfert, `emsi:site-v4` n'est pas nécessaire. Sur une installation faite avec `db:seed`, lancez `php artisan migrate --force` puis `php artisan emsi:site-v4 --home` (`--home` remplace l'accueil par les trois maisons ; l'ancien reste dans l'historique).
+
+Le premier passage de `emsi:site-v4` est noté dans les paramètres du site (repère de version). **Relancée ensuite**, la commande ne fait plus que réécrire les liens vers les anciennes adresses et compléter la page EMSI (univers, réalisations) : elle ne recrée ni les pages que l'équipe a renommées ou supprimées, ni les menus, ni les campus décochés sur une formation. `--force` reprend toute la mise à niveau (pages, menus et campus manquants) : ne l'utilisez pas une fois que l'équipe a retouché le site. Une base mise à niveau avant l'ajout du repère est reconnue (pages `/emsi` et `/maison-habib-faye/studio` présentes) et reçoit le repère.
 
 Supprimer ensuite les comptes de test et vérifier ceux de l'équipe (Administration › Comptes).
 Aucun compte n'est créé par défaut. Les documents des candidats sont stockés dans `storage/app/private` (jamais publics).
@@ -250,7 +252,7 @@ Copier ensuite `/var/backups/emsi` hors du serveur (ex. `rclone sync` vers un st
 
 `./deploy.sh` depuis `/var/www/emsi` (maintenance, `git pull`, dépendances, migrations, caches, file d'attente, compilation et redémarrage du site).
 
-Pour une base installée avant ces versions, une seule fois chacune : `php artisan emsi:site-v2`, `emsi:impact-live`, `emsi:site-v3`, puis `emsi:site-v4 --home` (site des trois domaines, après `php artisan migrate`).
+Pour une base installée avant ces versions, une seule fois chacune : `php artisan emsi:site-v2`, `emsi:impact-live`, `emsi:site-v3`, puis `emsi:site-v4 --home` (site des trois domaines, après `php artisan migrate` ; relancée, elle ne refait que les liens et la page EMSI, voir § 6).
 
 ## 12. Vérifications après déploiement
 
