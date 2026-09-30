@@ -3,9 +3,10 @@
 use App\Http\Controllers\Api\Public\ContentController;
 use App\Http\Controllers\Api\Public\FormController;
 use App\Http\Controllers\Api\Public\ImpactLiveController;
+use App\Http\Middleware\SetPublicLocale;
 use Illuminate\Support\Facades\Route;
 
-Route::prefix('v1/public')->middleware('throttle:public-api')->group(function () {
+Route::prefix('v1/public')->middleware(['throttle:public-api', SetPublicLocale::class])->group(function () {
     Route::controller(ContentController::class)->group(function () {
         Route::get('site', 'site');
         Route::get('pages/{slug}', 'page')->where('slug', '[a-z0-9/-]+');

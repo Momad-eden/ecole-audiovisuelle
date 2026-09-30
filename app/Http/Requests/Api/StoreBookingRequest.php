@@ -41,15 +41,24 @@ class StoreBookingRequest extends FormRequest
                 $kind = $this->input(str_replace('.id', '.kind', $attribute));
                 $model = self::ITEM_KINDS[$kind] ?? null;
                 if (! $model || ! $model::published()->whereKey($value)->exists()) {
-                    $fail('Cet élément n\'est plus disponible.');
+                    $fail(__('Cet élément n\'est plus disponible.'));
                 }
             }],
             'consent' => ['accepted'],
         ];
     }
 
+    /** Noms des champs dans les messages, dans la langue de la requête (?locale=en : anglais). */
     public function attributes(): array
     {
+        if (app()->getLocale() === 'en') {
+            return [
+                'type' => 'request type', 'name' => 'name', 'organization' => 'organisation', 'phone' => 'phone', 'email' => 'email address',
+                'startsOn' => 'start date', 'endsOn' => 'end date', 'location' => 'location', 'attendees' => 'number of people',
+                'message' => 'message', 'consent' => 'consent',
+            ];
+        }
+
         return [
             'type' => 'type de demande', 'name' => 'nom', 'organization' => 'structure', 'phone' => 'téléphone', 'email' => 'adresse e-mail',
             'startsOn' => 'date de début', 'endsOn' => 'date de fin', 'location' => 'lieu', 'attendees' => 'nombre de personnes',
@@ -59,7 +68,7 @@ class StoreBookingRequest extends FormRequest
 
     public function messages(): array
     {
-        return ['phone.regex' => 'Numéro invalide (ex. +221 77 123 45 67).'];
+        return ['phone.regex' => __('Numéro invalide (ex. +221 77 123 45 67).')];
     }
 
     /** @return array<int, array{kind: string, id: int, name: string, quantity: int}> Éléments avec leur nom au moment de la demande. */

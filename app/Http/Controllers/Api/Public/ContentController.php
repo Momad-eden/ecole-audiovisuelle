@@ -29,6 +29,8 @@ use App\Models\Track;
 use App\Services\BlockResolver;
 use App\Support\Media;
 use App\Support\PreviewToken;
+use App\Support\Translation\BlockTexts;
+use App\Support\Translation\Localized;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
@@ -47,26 +49,28 @@ class ContentController extends Controller
         $unpublished = Page::whereNotIn('slug', $published)->pluck('slug')->all();
 
         $settings = Setting::current();
+        $settings->loadMissing(Localized::eager());
+        $t = fn (string $field) => Localized::value($settings, $field);
 
         return response()->json(['data' => [
             'settings' => [
                 'schoolName' => $settings->school_name,
-                'description' => $settings->description,
+                'description' => $t('description'),
                 'logo' => Media::image($settings->logo, $settings->school_name),
                 'phone' => $settings->phone,
                 'whatsapp' => $settings->whatsapp,
                 'email' => $settings->email,
                 'address' => $settings->address,
-                'openingHours' => $settings->opening_hours,
+                'openingHours' => $t('opening_hours'),
                 'mapUrl' => $settings->map_url,
-                'seoTitle' => $settings->seo_title,
-                'seoDescription' => $settings->seo_description,
+                'seoTitle' => $t('seo_title'),
+                'seoDescription' => $t('seo_description'),
                 'social' => collect($settings->only(['facebook', 'instagram', 'youtube', 'tiktok', 'linkedin', 'twitter']))->filter()->all(),
             ],
             'menus' => $this->menus($unpublished),
-            'domains' => collect(SiteDomain::cases())->mapWithKeys(fn (SiteDomain $d) => [$d->value => ['label' => $d->label(), 'color' => $d->color()]])->all(),
-            'rooms' => RoomResource::collection(Room::published()->orderBy('position')->get())->resolve(),
-            'places' => PlaceResource::collection(Place::published()->orderBy('position')->get())->resolve(),
+            'domains' => collect(SiteDomain::cases())->mapWithKeys(fn (SiteDomain $d) => [$d->value => ['label' => $d->labelFor(Localized::locale()), 'color' => $d->color()]])->all(),
+            'rooms' => RoomResource::collection(Room::published()->with(Localized::eager())->orderBy('position')->get())->resolve(),
+            'places' => PlaceResource::collection(Place::published()->with(Localized::eager())->orderBy('position')->get())->resolve(),
             'hasSchoolPrograms' => Program::published()->where('audience', 'school')->exists(),
         ]]);
     }
@@ -74,7 +78,7 @@ class ContentController extends Controller
     /** Menus à un seul niveau de sous-menus ; jamais de lien vers une page encore en brouillon. */
     private function menus(array $unpublished): array
     {
-        $visible = MenuItem::where('is_visible', true)->orderBy('position')->orderBy('id')->get()
+        $visible = MenuItem::where('is_visible', true)->with(Localized::eager())->orderBy('position')->orderBy('id')->get()
             ->reject(fn (MenuItem $i) => in_array(ltrim($i->url, '/'), $unpublished, true));
 
         $children = $visible->whereNotNull('parent_id')->groupBy('parent_id');
@@ -82,19 +86,19 @@ class ContentController extends Controller
         return $visible->whereNull('parent_id')
             ->groupBy('location')
             ->map(fn ($items) => $items->map(fn (MenuItem $i) => [
-                'label' => $i->label,
+                'label' => Localized::value($i, 'label'),
                 'url' => $i->url,
                 'isButton' => $i->is_button,
-                'children' => ($children[$i->id] ?? collect())->map(fn (MenuItem $c) => ['label' => $c->label, 'url' => $c->url])->values()->all(),
+                'children' => ($children[$i->id] ?? collect())->map(fn (MenuItem $c) => ['label' => Localized::value($c, 'label'), 'url' => $c->url])->values()->all(),
             ])->values())
             ->all() + ['main' => [], 'footer' => [], 'legal' => []];
     }
 
     public function page(string $slug): JsonResponse
     {
-        $page = Page::published()->where('slug', $slug)->firstOrFail();
+        $page = Page::published()->where('slug', $slug)->with(Localized::eager())->firstOrFail();
 
-        return $this->pageResponse($page, $page->blocks);
+        return $this->pageResponse($page, $page->blocks, Localized::locale());
     }
 
     public function preview(Request $request): JsonResponse
@@ -104,48 +108,66 @@ class ContentController extends Controller
 
         $page = Page::findOrFail($target['id']);
 
-        return $this->pageResponse($page, $page->draft_blocks);
+        // L'aperçu du brouillon reste en français : seuls les blocs publiés sont traduits.
+        return $this->pageResponse($page, $page->draft_blocks, 'fr');
     }
 
-    private function pageResponse(Page $page, ?array $blocks): JsonResponse
+    /**
+     * Page dans la langue demandée : textes anglais appliqués d'abord sur les blocs français (clés stables),
+     * puis blocs résolus, pour que les données incluses (formations, actualités…) suivent la même langue.
+     */
+    private function pageResponse(Page $page, ?array $blocks, string $locale): JsonResponse
     {
+        $translated = $locale !== 'fr' && filled($page->translation('title', $locale)?->value);
+
+        if ($locale !== 'fr' && $blocks !== null && $page->translation('blocks', $locale)) {
+            $keyed = $page->translated('blocks', $locale);
+            $blocks = BlockTexts::applyKeyed($blocks, array_is_list($keyed) ? [] : $keyed);
+        }
+
+        $isHome = $page->type === 'home' || $page->slug === 'accueil';
+
         return response()->json(['data' => [
-            'title' => $page->title,
+            'title' => $page->translated('title', $locale),
             'slug' => $page->slug,
             'type' => $page->type,
             'domain' => ($page->domain ?? SiteDomain::GENERAL)->value,
-            'seo' => $page->seo,
+            'seo' => $page->translated('seo', $locale),
             'blocks' => $this->blocks->resolve($blocks),
             'updatedAt' => $page->updated_at?->toIso8601String(),
+            'locale' => Localized::locale(),
+            'contentLocale' => $translated ? $locale : 'fr',
+            'alternates' => $isHome ? ['fr' => '/', 'en' => '/en'] : ['fr' => '/'.$page->slug, 'en' => '/en/'.$page->slug],
         ]]);
     }
 
     public function rooms(): AnonymousResourceCollection
     {
         return RoomResource::collection(Room::published()->withCount(['artworks' => fn ($q) => $q->published()])
-            ->with(['tracks' => fn ($q) => $q->where('is_active', true)])->orderBy('position')->get());
+            ->with(['tracks' => fn ($q) => $q->where('is_active', true), ...Localized::eager('', 'tracks')])->orderBy('position')->get());
     }
 
     public function room(string $slug): RoomResource
     {
         $room = Room::published()->where('slug', $slug)
             ->with([
-                'artworks' => fn ($q) => $q->published()->with(['room', 'track']),
+                'artworks' => fn ($q) => $q->published()->with(['room', 'track', ...Localized::eager('', 'room', 'track')]),
                 'tracks' => fn ($q) => $q->where('is_active', true),
+                ...Localized::eager('', 'tracks'),
             ])
             ->firstOrFail();
 
         // Les formations publiées qui enseignent au moins une filière de l'univers.
         $room->setRelation('programs', Program::published()
             ->whereHas('cohorts.offerings', fn (Builder $q) => $q->whereIn('track_id', $room->tracks->pluck('id')))
-            ->orderBy('position')->get());
+            ->with(Localized::eager())->orderBy('position')->get());
 
         return new RoomResource($room);
     }
 
     public function artworks(Request $request): AnonymousResourceCollection
     {
-        $artworks = Artwork::published()->with(['room', 'track'])
+        $artworks = Artwork::published()->with(['room', 'track', ...Localized::eager('', 'room', 'track')])
             // Réalisations des étudiants par défaut ; ?origin=studio pour les productions d'Impact Live Studio.
             ->where('origin', $request->query('origin') === 'studio' ? 'studio' : 'school')
             ->when($request->query('room'), fn (Builder $q, $slug) => $q->whereHas('room', fn ($r) => $r->where('slug', $slug)))
@@ -161,7 +183,7 @@ class ContentController extends Controller
     public function artwork(string $slug): ArtworkResource
     {
         $artwork = Artwork::published()->where('slug', $slug)
-            ->with(['room', 'track', 'cohort', 'credits', 'exhibitions' => fn ($q) => $q->published()])
+            ->with(['room', 'track', 'cohort', 'credits', 'exhibitions' => fn ($q) => $q->published(), ...Localized::eager('', 'room', 'track')])
             ->firstOrFail();
 
         return (new ArtworkResource($artwork))->full();
@@ -181,20 +203,20 @@ class ContentController extends Controller
     public function exhibition(string $slug): ExhibitionResource
     {
         return new ExhibitionResource(Exhibition::published()->where('slug', $slug)
-            ->with(['artworks' => fn ($q) => $q->published()->with(['room', 'track'])])->firstOrFail());
+            ->with(['artworks' => fn ($q) => $q->published()->with(['room', 'track', ...Localized::eager('', 'room', 'track')])])->firstOrFail());
     }
 
     public function programs(Request $request): AnonymousResourceCollection
     {
         return ProgramResource::collection(Program::published()
             ->when($request->query('audience'), fn (Builder $q, $audience) => $q->where('audience', $audience))
-            ->orderBy('position')->get());
+            ->with(Localized::eager())->orderBy('position')->get());
     }
 
     public function program(string $slug): ProgramResource
     {
         $program = Program::published()->where('slug', $slug)
-            ->with(['cohorts' => fn ($q) => $q->whereNotIn('status', ['cancelled'])->with(['offerings.track'])])
+            ->with(['cohorts' => fn ($q) => $q->whereNotIn('status', ['cancelled'])->with(['offerings.track', ...Localized::eager('offerings.track')]), ...Localized::eager()])
             ->firstOrFail();
 
         return new ProgramResource($program);
@@ -202,11 +224,12 @@ class ContentController extends Controller
 
     public function tracks(): JsonResponse
     {
-        return response()->json(['data' => Track::where('is_active', true)->with('room')->orderBy('position')->get()
+        return response()->json(['data' => Track::where('is_active', true)->with(['room', ...Localized::eager('', 'room')])->orderBy('position')->get()
             ->map(fn (Track $t) => [
-                'name' => $t->name, 'slug' => $t->slug, 'shortName' => $t->short_name, 'summary' => $t->summary,
-                'description' => $t->description, 'skills' => $t->skills ?? [], 'outcomes' => $t->outcomes ?? [],
-                'room' => $t->room ? ['name' => $t->room->name, 'slug' => $t->room->slug, 'accentColor' => $t->room->accent_color] : null,
+                'name' => Localized::value($t, 'name'), 'slug' => $t->slug, 'shortName' => Localized::value($t, 'short_name'),
+                'summary' => Localized::value($t, 'summary'), 'description' => Localized::value($t, 'description'),
+                'skills' => Localized::value($t, 'skills') ?? [], 'outcomes' => Localized::value($t, 'outcomes') ?? [],
+                'room' => $t->room ? ['name' => Localized::value($t->room, 'name'), 'slug' => $t->room->slug, 'accentColor' => $t->room->accent_color] : null,
             ])]);
     }
 
@@ -225,7 +248,7 @@ class ContentController extends Controller
         }
 
         $offerings = $query
-            ->with(['cohort.program.campuses', 'track'])
+            ->with(['cohort.program.campuses', 'track', ...Localized::eager('cohort.program', 'track')])
             ->when($request->query('audience'), fn (Builder $q, $audience) => $q->whereHas('cohort.program', fn ($p) => $p->where('audience', $audience)))
             ->get();
 
@@ -243,7 +266,7 @@ class ContentController extends Controller
 
     public function news(Request $request): AnonymousResourceCollection
     {
-        return NewsResource::collection(News::published()->latest('published_at')->paginate(min((int) $request->query('perPage', 12), 48)));
+        return NewsResource::collection(News::published()->with(Localized::eager())->latest('published_at')->paginate(min((int) $request->query('perPage', 12), 48)));
     }
 
     public function newsItem(string $slug): NewsResource
@@ -255,7 +278,8 @@ class ContentController extends Controller
     {
         return response()->json(['data' => Faq::where('is_visible', true)
             ->when($request->query('group'), fn (Builder $q, $group) => $q->where('group', $group))
-            ->orderBy('position')->get(['group', 'question', 'answer'])]);
+            ->with(Localized::eager())->orderBy('position')->get()
+            ->map(fn (Faq $f) => ['group' => $f->group, 'question' => Localized::value($f, 'question'), 'answer' => Localized::value($f, 'answer')])]);
     }
 
     public function partners(): JsonResponse

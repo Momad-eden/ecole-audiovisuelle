@@ -2,6 +2,7 @@
 
 namespace App\Http\Resources\Public;
 
+use App\Http\Resources\Public\Concerns\TranslatesFields;
 use App\Models\Place;
 use App\Support\Media;
 use Illuminate\Http\Request;
@@ -10,6 +11,8 @@ use Illuminate\Http\Resources\Json\JsonResource;
 /** @mixin Place */
 class PlaceResource extends JsonResource
 {
+    use TranslatesFields;
+
     public function toArray(Request $request): array
     {
         return [
@@ -23,11 +26,11 @@ class PlaceResource extends JsonResource
             'whatsapp' => $this->whatsapp,
             'email' => $this->email,
             'mapUrl' => $this->map_url,
-            'openingHours' => $this->opening_hours,
-            'tagline' => $this->tagline,
-            'description' => $this->description,
-            'highlights' => $this->highlights ?? [],
-            'image' => Media::image($this->image, $this->image_alt ?: $this->name),
+            'openingHours' => $this->t('opening_hours'),
+            'tagline' => $this->t('tagline'),
+            'description' => $this->t('description'),
+            'highlights' => $this->t('highlights') ?? [],
+            'image' => Media::image($this->image, $this->t('image_alt') ?: $this->name),
         ];
     }
 }

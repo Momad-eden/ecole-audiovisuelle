@@ -28,6 +28,7 @@ use App\Models\Room;
 use App\Models\Service;
 use App\Models\Setting;
 use App\Support\Media;
+use App\Support\Translation\Localized;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
 
@@ -71,36 +72,37 @@ class BlockResolver
             ])->values()->all()],
             'audio' => [...$data, 'tracks' => $this->tracks($data['tracks'] ?? [])],
             'faq' => [...$data, 'items' => Faq::where('group', $data['group'] ?? 'general')->where('is_visible', true)
-                ->orderBy('position')->get(['question', 'answer'])->toArray()],
+                ->with(Localized::eager())->orderBy('position')->get()
+                ->map(fn (Faq $f) => ['question' => Localized::value($f, 'question'), 'answer' => Localized::value($f, 'answer')])->all()],
             'programs' => [...$data, 'items' => ProgramResource::collection(Program::published()
-                ->where('audience', $data['audience'] ?? 'school')->orderBy('position')
+                ->where('audience', $data['audience'] ?? 'school')->with(Localized::eager())->orderBy('position')
                 ->limit((int) ($data['limit'] ?? 6))->get())->resolve()],
             'artworks' => [...$data, 'items' => ArtworkResource::collection($this->artworks($data))->resolve()],
             'rooms' => [...$data, 'items' => RoomResource::collection(Room::published()->withCount(['artworks' => fn ($q) => $q->published()])
-                ->with(['tracks' => fn ($q) => $q->where('is_active', true)])->orderBy('position')->get())->resolve()],
+                ->with(['tracks' => fn ($q) => $q->where('is_active', true), ...Localized::eager('', 'tracks')])->orderBy('position')->get())->resolve()],
             'services' => [...$data, 'items' => ServiceResource::collection(Service::published()->where('activity', $data['activity'] ?? 'studio')
-                ->orderBy('position')->get())->resolve()],
+                ->with(Localized::eager())->orderBy('position')->get())->resolve()],
             'equipment_list' => [...$data, 'items' => EquipmentItemResource::collection(EquipmentItem::published()->with('category')
                 ->where('usage', $data['usage'] ?? 'rental')
                 ->when($data['featured_only'] ?? false, fn ($q) => $q->where('is_featured', true))
                 ->orderBy('position')->limit((int) ($data['limit'] ?? 24))->get())->resolve()],
             'packs' => [...$data, 'items' => RentalPackResource::collection(RentalPack::published()->orderBy('position')->get())->resolve()],
             'agenda' => [...$data, 'items' => AgendaEventResource::collection($this->agenda($data))->resolve()],
-            'productions' => [...$data, 'items' => ArtworkResource::collection(Artwork::published()->where('origin', 'studio')->with(['room', 'track'])
+            'productions' => [...$data, 'items' => ArtworkResource::collection(Artwork::published()->where('origin', 'studio')->with(['room', 'track', ...Localized::eager('', 'room', 'track')])
                 ->latest('published_at')->limit((int) ($data['limit'] ?? 6))->get())->resolve()],
             'ecosystem' => [...$data, 'items' => collect($data['items'] ?? [])->map(fn ($item) => $this->withImages($item))->values()->all()],
             'campuses' => [...$data, 'items' => $this->campusCards()],
-            'places' => [...$data, 'items' => PlaceResource::collection(Place::published()
+            'places' => [...$data, 'items' => PlaceResource::collection(Place::published()->with(Localized::eager())
                 ->when($data['kind'] ?? null, fn ($q, $kind) => $q->where('kind', $kind))->orderBy('position')->get())->resolve()],
             'equipment' => [...$data, 'groups' => collect($data['groups'] ?? [])->map(fn ($group) => $this->withImages($group))->values()->all()],
-            'news' => [...$data, 'items' => NewsResource::collection(News::published()->latest('published_at')
+            'news' => [...$data, 'items' => NewsResource::collection(News::published()->with(Localized::eager())->latest('published_at')
                 ->limit((int) ($data['limit'] ?? 3))->get())->resolve()],
             'partners' => [...$data, 'items' => Partner::where('is_active', true)
                 ->when($data['categories'] ?? null, fn ($q, $categories) => $q->whereIn('category', $categories))
                 ->orderBy('position')->get()
                 ->map(fn (Partner $p) => ['name' => $p->name, 'category' => $p->category, 'website' => $p->website, 'logo' => Media::image($p->logo, $p->name)])
                 ->all()],
-            'contact' => [...$data, 'settings' => collect(Setting::current()->only(['phone', 'whatsapp', 'email', 'address', 'opening_hours', 'map_url']))->all()],
+            'contact' => [...$data, 'settings' => $this->contactSettings()],
             'domains' => [...$data, 'panels' => $this->domainPanels($data['panels'] ?? [])],
             'campus_programs' => [...$data, ...$this->campusPrograms($data['campus_id'] ?? null)],
             'downloads' => [...$data, 'files' => $this->downloads($data['files'] ?? [])],
@@ -128,7 +130,7 @@ class BlockResolver
         }
         $slugs = $pages->pluck('slug')->flip();
 
-        return Place::published()->campuses()->orderBy('position')->get()->map(function (Place $place) use ($byBlock, $slugs) {
+        return Place::published()->campuses()->with(Localized::eager())->orderBy('position')->get()->map(function (Place $place) use ($byBlock, $slugs) {
             $citySlug = 'emsi/'.Str::slug((string) ($place->city ?: $place->name));
 
             return [...(new PlaceResource($place))->resolve(),
@@ -197,7 +199,7 @@ class BlockResolver
         }
 
         $today = now()->startOfDay();
-        $items = Offering::availableAt($campus)->with('cohort.program')->get()
+        $items = Offering::availableAt($campus)->with(['cohort.program', ...Localized::eager('cohort.program')])->get()
             ->groupBy(fn (Offering $offering) => $offering->cohort->program_id)
             ->map(function ($offerings) use ($campus, $today) {
                 $program = $offerings->first()->cohort->program;
@@ -206,9 +208,9 @@ class BlockResolver
 
                 return $program->audience === Audience::SCHOOL ? [
                     'position' => $program->position,
-                    'title' => $program->title,
+                    'title' => Localized::value($program, 'title'),
                     'slug' => $program->slug,
-                    'summary' => $program->summary,
+                    'summary' => Localized::value($program, 'summary'),
                     'cover' => Media::image($program->cover_image, $program->cover_alt),
                     'next_start' => $nextStart?->toDateString(),
                     'apply_url' => '/candidater?'.http_build_query(['campus' => $campus->slug, 'formation' => $program->slug]),
@@ -239,7 +241,7 @@ class BlockResolver
 
     private function agenda(array $data)
     {
-        $query = AgendaEvent::published()->with('place')
+        $query = AgendaEvent::published()->with(['place', ...Localized::eager()])
             ->when($data['activity'] ?? null, fn ($q, $activity) => $q->where('activity', $activity))
             ->limit((int) ($data['limit'] ?? 6));
 
@@ -250,13 +252,22 @@ class BlockResolver
 
     private function artworks(array $data)
     {
-        $query = Artwork::published()->where('origin', 'school')->with(['room', 'track'])->limit((int) ($data['limit'] ?? 6));
+        $query = Artwork::published()->where('origin', 'school')->with(['room', 'track', ...Localized::eager('', 'room', 'track')])->limit((int) ($data['limit'] ?? 6));
 
         return match ($data['source'] ?? 'featured') {
             'room' => $query->where('room_id', $data['room_id'] ?? 0)->orderBy('position')->get(),
             'latest' => $query->latest('published_at')->get(),
             default => $query->where('is_featured', true)->latest('published_at')->get(),
         };
+    }
+
+    /** Coordonnées du bloc Contact ; les horaires suivent la langue de la requête. */
+    private function contactSettings(): array
+    {
+        $settings = Setting::current();
+
+        return [...$settings->only(['phone', 'whatsapp', 'email', 'address', 'opening_hours', 'map_url']),
+            'opening_hours' => Localized::value($settings, 'opening_hours')];
     }
 
     /** Remplace chaque champ image (et son texte alternatif) par {url, alt}. */
