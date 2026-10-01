@@ -88,6 +88,11 @@ class HeroShowcaseCommand extends Command
                 'button_label' => 'Voir la programmation', 'button_url' => '/centre-culturel/agenda',
             ]],
             ['type' => 'stats', 'data' => ['title' => 'Repères', 'items' => [['value' => '2016', 'label' => 'création'], ['value' => '+300', 'label' => 'diplômés']]]],
+            ['type' => 'institution', 'data' => [
+                'eyebrow' => 'Notre engagement', 'title' => 'Former, créer, *transmettre*',
+                'pillars' => [['title' => 'Notre mission', 'text' => 'Former.'], ['title' => 'Notre vision', 'text' => 'Rayonner.'], ['title' => 'Nos valeurs', 'text' => 'Transmettre.']],
+                'quote' => 'Un rêve peut devenir réalité.', 'author' => 'Boubacar Tall', 'role' => 'Fondateur',
+            ]],
             ['type' => 'statement', 'data' => [
                 'eyebrow' => 'Saint-Louis · Dakar', 'text' => 'Un *centre culturel*, une école et un studio',
                 'facts' => [['value' => '3', 'label' => 'lieux']], 'images' => [$images['grande_salle'], $images['studio_son']],

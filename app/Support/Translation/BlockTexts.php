@@ -53,13 +53,14 @@ final class BlockTexts
         'downloads' => 'Documents à télécharger', 'support_form' => 'Nous soutenir (formulaire)',
         'showcase' => 'Vitrine photos et vidéos',
         'statement' => 'Manifeste (phrase, chiffres, bandeau de photos)',
+        'institution' => 'Présentation institutionnelle (mission, valeurs, mot du fondateur)',
     ];
 
     /** Libellés d'un élément de répéteur (au singulier). */
     private const ITEM_LABELS = [
         'slides' => 'Diapositive', 'facts' => 'Chiffre clé', 'hotspots' => 'Point sur la photo', 'tracks' => 'Morceau',
         'buttons' => 'Bouton', 'panels' => 'Panneau', 'items' => 'Élément', 'steps' => 'Étape', 'images' => 'Image',
-        'files' => 'Document', 'groups' => 'Catégorie', 'words' => 'Mot qui défile',
+        'files' => 'Document', 'groups' => 'Catégorie', 'words' => 'Mot qui défile', 'pillars' => 'Pilier',
     ];
 
     /** Libellés des champs ; `repeteur.champ` prime sur `champ`. */

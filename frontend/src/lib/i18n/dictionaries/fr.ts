@@ -116,6 +116,11 @@ export const fr = {
     scroll: "Découvrir",
   },
 
+  institution: {
+    supportedBy: "Avec le soutien de",
+    founderWord: "Le mot du fondateur",
+  },
+
   showcase: {
     open: (caption: string) => `Agrandir : ${caption}`,
     item: (index: number) => `Image ${index}`,

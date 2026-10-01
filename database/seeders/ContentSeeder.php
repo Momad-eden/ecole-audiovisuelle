@@ -478,7 +478,7 @@ class ContentSeeder extends Seeder
                 ['Podiums et structures de scène', 'Scènes et podiums de spectacle, montés en toute sécurité.', 'stage'],
             ],
             'space' => [
-                ['Location de la salle', 'Concerts, spectacles, résidences, conférences : accueillez votre public à l\'Centre culturel Habib Faye.', 'building'],
+                ['Location de la salle', 'Concerts, spectacles, résidences, conférences : accueillez votre public au Centre culturel Habib Faye.', 'building'],
             ],
         ];
         foreach ($services as $activity => $list) {
@@ -499,7 +499,7 @@ class ContentSeeder extends Seeder
             'status' => PublicationStatus::PUBLISHED, 'published_at' => now(),
         ]);
 
-        $dream = 'Impact Live Studio, l\'EMSI et l\'Centre culturel Habib Faye sont la preuve qu\'un rêve peut devenir réalité, même en Afrique.';
+        $dream = 'Impact Live Studio, l\'EMSI et le Centre culturel Habib Faye sont la preuve qu\'un rêve peut devenir réalité, même en Afrique.';
 
         $this->page('studio', 'Impact Live Studio', 'system', true, [
             ['hero', ['eyebrow' => 'Saint-Louis · Studio d\'enregistrement', 'title' => 'Ici, votre son', 'words' => ['prend vie', 'se raconte', 'se mixe', 'traverse les frontières'],
@@ -530,7 +530,7 @@ class ContentSeeder extends Seeder
             ['text', ['title' => 'Un lieu pour la création', 'body' => '<p>'.$dream.'</p><p>Présentation détaillée du lieu à compléter par l\'équipe.</p>']],
             ['agenda', ['title' => 'Programmation', 'scope' => 'upcoming', 'activity' => 'space', 'limit' => 12]],
             ['services', ['title' => 'Accueillir votre événement', 'activity' => 'space']],
-            ['booking_form', ['title' => 'Louer l\'Centre culturel Habib Faye', 'booking_type' => 'space_rental']],
+            ['booking_form', ['title' => 'Louer le Centre culturel Habib Faye', 'booking_type' => 'space_rental']],
             ['places', ['title' => 'Nous trouver', 'kind' => 'cultural_center']],
         ]);
 
@@ -558,7 +558,7 @@ class ContentSeeder extends Seeder
                 'Les univers Son, Image, Infographie & design et Scène',
                 'Le programme professionnel EMSI × Grand Théâtre',
             ]],
-            'emsi-saint-louis' => ['À Saint-Louis, aux côtés d\'Impact Live Studio et de l\'Centre culturel Habib Faye', [
+            'emsi-saint-louis' => ['À Saint-Louis, aux côtés d\'Impact Live Studio et du Centre culturel Habib Faye', [
                 'Les mêmes formations qu\'à Dakar',
                 'Un studio d\'enregistrement et un centre culturel à proximité',
                 'Au contact des artistes et des événements de Saint-Louis',
@@ -588,7 +588,7 @@ class ContentSeeder extends Seeder
                     ['value' => '2', 'label' => 'campus', 'detail' => 'Dakar et Saint-Louis'],
                     ['value' => '5', 'label' => 'filières techniques', 'detail' => 'Son, lumière, régie, infographie, cadrage'],
                 ]]],
-                ['text', ['title' => 'Notre histoire', 'body' => '<p>Créée en 2016, l\'EMSI est une école de formations technico-artistiques. Elle a développé des Certificats de Spécialité (CS) et des BTS dans les métiers du spectacle vivant, et met à la disposition de ses apprenants un parc matériel professionnel, dont un studio de 154 m² et une scène live.</p><p>Fondée par Boubacar Tall, ingénieur du son sénégalais basé à Saint-Louis, l\'EMSI grandit aux côtés d\'Impact Live Studio, d\'Impact Live Events et de l\'Centre culturel Habib Faye.</p>']],
+                ['text', ['title' => 'Notre histoire', 'body' => '<p>Créée en 2016, l\'EMSI est une école de formations technico-artistiques. Elle a développé des Certificats de Spécialité (CS) et des BTS dans les métiers du spectacle vivant, et met à la disposition de ses apprenants un parc matériel professionnel, dont un studio de 154 m² et une scène live.</p><p>Fondée par Boubacar Tall, ingénieur du son sénégalais basé à Saint-Louis, l\'EMSI grandit aux côtés d\'Impact Live Studio, d\'Impact Live Events et du Centre culturel Habib Faye.</p>']],
                 ['cards', ['title' => 'Notre pédagogie', 'items' => [
                     ['icon' => 'sparkles', 'title' => 'La pratique d\'abord', 'text' => 'Les apprenants sont placés en situation réelle, sur du matériel professionnel.'],
                     ['icon' => 'users', 'title' => 'Un suivi individualisé', 'text' => 'Chaque parcours est accompagné par l\'équipe pédagogique de l\'EMSI.'],

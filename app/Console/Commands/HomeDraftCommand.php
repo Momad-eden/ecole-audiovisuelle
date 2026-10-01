@@ -7,7 +7,7 @@ use Illuminate\Console\Command;
 use Illuminate\Support\Facades\Storage;
 
 /**
- * Nouvelle page d'accueil, préparée en BROUILLON : film d'ouverture, manifeste (phrase, chiffres, bandeau de photos), les trois lieux, l'agenda, la vitrine
+ * Nouvelle page d'accueil, préparée en BROUILLON : film d'ouverture, manifeste, bandeau « Avec le soutien de », les trois lieux, présentation institutionnelle, l'agenda, la vitrine
  * photos et vidéos du centre, les actualités, l'appel au soutien et les partenaires.
  * Les blocs existants (trois lieux, actualités, partenaires, agenda) sont repris tels quels, les chiffres clés passent dans le manifeste ;
  * la version en ligne n'est jamais modifiée : l'équipe relit l'aperçu puis publie depuis l'admin.
@@ -75,7 +75,23 @@ class HomeDraftCommand extends Command
                 'button_label' => 'Notre mission',
                 'button_url' => '/mission',
             ]],
+            ['type' => 'partners', 'data' => ['title' => null, 'layout' => 'strip', 'categories' => ['co_organizer', 'institutional']]],
             $domains ? ['type' => 'domains', 'data' => [...$domains['data'], 'intro' => null]] : null,
+            ['type' => 'institution', 'data' => [
+                'eyebrow' => 'Notre engagement',
+                'title' => 'Former, créer, *transmettre*',
+                'text' => 'Le Centre culturel Habib Faye, l\'EMSI et Impact Live Studio forment un même écosystème au service des métiers de la culture au Sénégal : on y apprend, on y crée, on y partage.',
+                'pillars' => [
+                    ['title' => 'Notre mission', 'text' => 'Former aux métiers techniques et artistiques du son, de l\'image et de la scène, sur du matériel professionnel, et faire vivre la création.'],
+                    ['title' => 'Notre vision', 'text' => 'Faire de Saint-Louis et de Dakar des lieux de création et de formation reconnus, ouverts sur l\'Afrique et le monde.'],
+                    ['title' => 'Nos valeurs', 'text' => 'L\'exigence du métier, la transmission entre générations, l\'ouverture et l\'accès de tous à la culture.'],
+                ],
+                'quote' => 'Impact Live Studio, l\'EMSI et le Centre culturel Habib Faye sont la preuve qu\'un rêve peut devenir réalité, même en Afrique.',
+                'author' => 'Boubacar Tall',
+                'role' => 'Fondateur',
+                'button_label' => 'Mission et impact',
+                'button_url' => '/mission',
+            ]],
             ['type' => 'agenda', 'data' => [...($find('agenda')['data'] ?? ['scope' => 'upcoming', 'activity' => null]), 'title' => 'À l\'affiche', 'limit' => 4]],
             ['type' => 'showcase', 'data' => [
                 'eyebrow' => 'Le centre en images',

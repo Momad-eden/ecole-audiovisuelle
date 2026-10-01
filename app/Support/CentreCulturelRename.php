@@ -3,7 +3,7 @@
 namespace App\Support;
 
 /**
- * « Maison Habib Faye » devient « Centre culturel Habib Faye » (adresses /centre-culturel/…), et le site
+ * « Maison Habib Faye » (et l'ancien « Espace Habib Faye ») devient « Centre culturel Habib Faye » (adresses /centre-culturel/…), et le site
  * ne parle plus d'« héritage de Habib Faye » : le lieu porte son nom, sans plus. Règles appliquées une fois
  * au contenu enregistré (migration du 01/10/2026). La clé interne du domaine (« maison ») ne change pas.
  */
@@ -16,6 +16,13 @@ final class CentreCulturelRename
         'Le lieu, son histoire et l\'héritage de Habib Faye' => 'Le lieu, son projet et ses activités',
         'trois lieux réunis autour de l\'héritage de Habib Faye.' => 'trois lieux, un même projet.',
         ', réunis dans l\'héritage de Habib Faye.' => ', réunis.',
+        'à l\'Espace Habib Faye' => 'au Centre culturel Habib Faye',
+        'à l’Espace Habib Faye' => 'au Centre culturel Habib Faye',
+        'de l\'Espace Habib Faye' => 'du Centre culturel Habib Faye',
+        'de l’Espace Habib Faye' => 'du Centre culturel Habib Faye',
+        'l\'Espace Habib Faye' => 'le Centre culturel Habib Faye',
+        'l’Espace Habib Faye' => 'le Centre culturel Habib Faye',
+        'Espace Habib Faye' => 'Centre culturel Habib Faye',
         'Maison de la culture Habib Faye' => 'Centre culturel Habib Faye',
         'Maison Habib Faye' => 'Centre culturel Habib Faye',
         'Découvrir la Maison' => 'Découvrir le Centre culturel',

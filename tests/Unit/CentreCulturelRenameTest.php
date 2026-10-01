@@ -14,6 +14,9 @@ class CentreCulturelRenameTest extends TestCase
         $this->assertSame('Découvrir le Centre culturel', CentreCulturelRename::text('Découvrir la Maison'));
         $this->assertSame('Les dernières nouvelles du Centre culturel et de l\'EMSI', CentreCulturelRename::text('Les dernières nouvelles de la Maison et de l\'EMSI'));
         $this->assertSame('Nos trois lieux', CentreCulturelRename::text('Nos trois maisons'));
+        $this->assertSame('Louer le Centre culturel Habib Faye', CentreCulturelRename::text('Louer l\'Espace Habib Faye'));
+        $this->assertSame('accueillez votre public au Centre culturel Habib Faye.', CentreCulturelRename::text('accueillez votre public à l\'Espace Habib Faye.'));
+        $this->assertSame('Impact Live Studio, l\'EMSI et le Centre culturel Habib Faye', CentreCulturelRename::text('Impact Live Studio, l\'EMSI et l\'Espace Habib Faye'));
     }
 
     public function test_the_site_no_longer_claims_the_heritage_of_habib_faye(): void

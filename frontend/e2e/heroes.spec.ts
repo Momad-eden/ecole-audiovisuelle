@@ -190,3 +190,13 @@ test("Manifeste : grande phrase avec mot mis en valeur, chiffre et bandeau de ph
   await expect(statement.locator("dd .sr-only")).toHaveText("3");
   await expect(statement.locator(".statement-ribbon")).toHaveAttribute("aria-hidden", "true");
 });
+
+test("Présentation institutionnelle : piliers numérotés et mot du fondateur", async ({ page }) => {
+  await page.goto("/essai-heros-film");
+  const institution = page.getByTestId("institution");
+  await expect(institution.getByRole("heading", { level: 2 })).toHaveText("Former, créer, transmettre");
+  await expect(institution.getByRole("listitem")).toHaveCount(3);
+  await expect(institution.getByRole("heading", { level: 3, name: "Notre vision" })).toBeVisible();
+  await expect(institution.locator("blockquote")).toContainText("Un rêve peut devenir réalité.");
+  await expect(institution.locator("figcaption")).toContainText("Boubacar Tall");
+});

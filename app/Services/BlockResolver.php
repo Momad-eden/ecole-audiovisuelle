@@ -104,7 +104,8 @@ class BlockResolver
             'partners' => [...$data, 'items' => Partner::where('is_active', true)
                 ->when($data['categories'] ?? null, fn ($q, $categories) => $q->whereIn('category', $categories))
                 ->orderBy('position')->get()
-                ->map(fn (Partner $p) => ['name' => $p->name, 'category' => $p->category, 'website' => $p->website, 'logo' => Media::image($p->logo, $p->name)])
+                ->map(fn (Partner $p) => ['name' => $p->name, 'category' => $p->category, 'group' => Partner::groupLabel($p->category, app()->getLocale()),
+                    'website' => $p->website, 'logo' => Media::image($p->logo, $p->name)])
                 ->all()],
             'contact' => [...$data, 'settings' => $this->contactSettings()],
             'domains' => [...$data, 'panels' => $this->domainPanels($data['panels'] ?? [])],

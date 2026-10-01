@@ -22,6 +22,7 @@ use Filament\Forms\Components\Select;
 use Filament\Forms\Components\TagsInput;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
+use Filament\Schemas\Components\Section;
 
 /**
  * Catalogue des blocs de page. Chaque bloc a des champs limités (aucun HTML libre) ;
@@ -42,7 +43,7 @@ final class PageBlocks
             self::partners(), self::professionalSpace(), self::contact(),
             self::ecosystem(), self::services(), self::productions(),
             self::agenda(), self::bookingForm(), self::places(), self::campuses(),
-            self::domains(), self::campusPrograms(), self::downloads(), self::supportForm(), self::showcase(), self::statement(),
+            self::domains(), self::campusPrograms(), self::downloads(), self::supportForm(), self::showcase(), self::statement(), self::institution(),
         ];
     }
 
@@ -500,6 +501,10 @@ final class PageBlocks
             TextInput::make('title')->label('Titre')->maxLength(80)->default('Nos partenaires')->helperText(self::EMPHASIS_HELP),
             Select::make('categories')->label('Catégories affichées')->options(Partner::CATEGORIES)->multiple()
                 ->helperText('Laisser vide pour afficher tous les partenaires actifs.'),
+            Radio::make('layout')->label('Présentation')->options([
+                'wall' => 'Mur de logos (regroupés par catégorie)',
+                'strip' => 'Bandeau discret « Avec le soutien de » (haut de page)',
+            ])->default('wall')->inline(),
         ]);
     }
 
@@ -566,6 +571,29 @@ final class PageBlocks
             FileUpload::make('images')->label('Bandeau de photos (facultatif)')->image()->multiple()->reorderable()->maxFiles(12)
                 ->disk('public')->directory('pages')->maxSize(8192)
                 ->helperText('De 4 à 12 photos qui glissent lentement en continu (immobiles si le visiteur limite les animations).'),
+            TextInput::make('button_label')->label('Texte du bouton (facultatif)')->maxLength(40),
+            LinkTargets::field('button_url', 'Lien du bouton')->required(fn ($get) => filled($get('button_label'))),
+        ]);
+    }
+
+    private static function institution(): Block
+    {
+        return Block::make('institution')->label('Présentation institutionnelle (mission, valeurs, mot du fondateur)')->icon('heroicon-o-building-library')->schema([
+            TextInput::make('eyebrow')->label('Surtitre')->maxLength(60)->default('Notre engagement'),
+            TextInput::make('title')->label('Titre')->required()->maxLength(90)->helperText(self::EMPHASIS_HELP),
+            Textarea::make('text')->label('Présentation')->rows(3)->maxLength(400),
+            Repeater::make('pillars')->label('Piliers (ex. Mission, Vision, Valeurs)')->maxItems(4)->defaultItems(0)->columns(2)
+                ->addActionLabel('Ajouter un pilier')
+                ->schema([
+                    TextInput::make('title')->label('Titre')->required()->maxLength(40),
+                    Textarea::make('text')->label('Texte')->required()->rows(3)->maxLength(300),
+                ]),
+            Section::make('Le mot du fondateur (facultatif)')->collapsible()->schema([
+                Textarea::make('quote')->label('Citation')->rows(3)->maxLength(400),
+                TextInput::make('author')->label('Nom')->maxLength(80)->required(fn ($get) => filled($get('quote'))),
+                TextInput::make('role')->label('Fonction (ex. Fondateur)')->maxLength(80),
+                ...self::image('photo', 'Portrait (facultatif)'),
+            ]),
             TextInput::make('button_label')->label('Texte du bouton (facultatif)')->maxLength(40),
             LinkTargets::field('button_url', 'Lien du bouton')->required(fn ($get) => filled($get('button_label'))),
         ]);

@@ -4,6 +4,7 @@ namespace Tests\Feature;
 
 use App\Models\MenuItem;
 use App\Models\Page;
+use App\Models\Partner;
 use Database\Seeders\MenuDefaults;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Storage;
@@ -69,13 +70,14 @@ class HomepageV5Test extends TestCase
         $page->refresh();
         $this->assertSame($published, $page->blocks, 'La version en ligne ne change pas.');
         $types = array_column($page->draft_blocks, 'type');
-        $this->assertSame(['hero', 'statement', 'domains', 'agenda', 'showcase', 'cta', 'partners'], $types);
+        $this->assertSame(['hero', 'statement', 'partners', 'domains', 'institution', 'agenda', 'showcase', 'cta', 'partners'], $types);
         $this->assertSame('film', $page->draft_blocks[0]['data']['layout']);
         $this->assertSame('La culture comme héritage', $page->draft_blocks[0]['data']['title']);
         $this->assertSame(['pages/01M3R5AKQTX1B0PBT018R88CEN.jpg'], $page->draft_blocks[0]['data']['images']);
         $this->assertSame([['value' => '3', 'label' => 'lieux']], $page->draft_blocks[1]['data']['facts'], 'Chiffres du bloc « chiffres clés » repris (aucun ici), plus les trois lieux.');
-        $this->assertNull($page->draft_blocks[2]['data']['intro']);
-        $this->assertCount(1, $page->draft_blocks[4]['data']['items'], 'Seules les photos présentes sur le disque sont proposées.');
+        $this->assertSame('strip', $page->draft_blocks[2]['data']['layout']);
+        $this->assertNull($page->draft_blocks[3]['data']['intro']);
+        $this->assertCount(1, $page->draft_blocks[6]['data']['items'], 'Seules les photos présentes sur le disque sont proposées.');
     }
 
     public function test_a_draft_in_progress_is_never_replaced_without_force(): void
@@ -128,5 +130,33 @@ class HomepageV5Test extends TestCase
             ->assertJsonCount(2, 'data.blocks.0.data.images')
             ->assertJsonPath('data.blocks.0.data.images.0.alt', '')
             ->assertJsonPath('data.blocks.0.data.buttonUrl', '/mission');
+    }
+
+    public function test_the_institution_block_serves_pillars_and_the_founder_word(): void
+    {
+        $this->home([['type' => 'institution', 'data' => [
+            'title' => 'Former, créer, *transmettre*', 'pillars' => [['title' => 'Notre mission', 'text' => 'Former.']],
+            'quote' => 'Un rêve peut devenir réalité.', 'author' => 'Boubacar Tall', 'role' => 'Fondateur',
+            'photo' => 'pages/bt.jpg', 'photo_alt' => 'Boubacar Tall', 'button_label' => 'Mission et impact', 'button_url' => '/mission',
+        ]]]);
+
+        $this->getJson('/api/v1/public/pages/accueil')->assertOk()
+            ->assertJsonPath('data.blocks.0.type', 'institution')
+            ->assertJsonPath('data.blocks.0.data.pillars.0.title', 'Notre mission')
+            ->assertJsonPath('data.blocks.0.data.author', 'Boubacar Tall')
+            ->assertJsonPath('data.blocks.0.data.photo.alt', 'Boubacar Tall')
+            ->assertJsonPath('data.blocks.0.data.buttonUrl', '/mission');
+    }
+
+    public function test_partners_carry_their_group_title_in_the_page_language(): void
+    {
+        Partner::create(['name' => 'Ministère de la Culture', 'category' => 'institutional', 'is_active' => true]);
+        $this->home([['type' => 'partners', 'data' => ['layout' => 'strip', 'categories' => ['institutional']]]]);
+
+        $this->getJson('/api/v1/public/pages/accueil')->assertOk()
+            ->assertJsonPath('data.blocks.0.data.layout', 'strip')
+            ->assertJsonPath('data.blocks.0.data.items.0.group', 'Partenaires institutionnels');
+        $this->getJson('/api/v1/public/pages/accueil?locale=en')->assertOk()
+            ->assertJsonPath('data.blocks.0.data.items.0.group', 'Institutional partners');
     }
 }

@@ -3,7 +3,7 @@ import { ArrowRight } from "lucide-react";
 import { ButtonLink } from "@/components/ui/ButtonLink";
 import { cn } from "@/lib/utils";
 import { MediaImage } from "@/components/ui/MediaImage";
-import { Section, SectionTitle } from "@/components/ui/Section";
+import { Container, Section, SectionTitle } from "@/components/ui/Section";
 import { InView } from "@/components/motion/InView";
 import { Reveal } from "@/components/motion/Reveal";
 import { ArtworkGrid } from "@/components/museum/ArtworkCard";
@@ -77,46 +77,84 @@ export function NewsBlock({ data, locale }: BlockProps<NewsData>) {
   );
 }
 
+type Partner = NonNullable<PartnersData["items"]>[number];
+
+/**
+ * Partenaires. « Mur » : grille à filets fins, regroupée par catégorie quand il y en a plusieurs ; logo en gris
+ * qui prend ses couleurs au survol, sinon le nom. « Bandeau » : une ligne discrète « Avec le soutien de »,
+ * pour le haut de l'accueil.
+ */
 export function PartnersBlock({ data, locale }: BlockProps<PartnersData>) {
-  const t = getDictionary(locale).common;
+  const dictionary = getDictionary(locale);
   const items = data.items ?? [];
   if (items.length === 0) return null;
+
+  if (data.layout === "strip") {
+    return (
+      <section data-testid="partners-strip" className="border-y border-line py-8">
+        <Container className="flex flex-col gap-5 lg:flex-row lg:items-center lg:gap-10">
+          <p className="cartel shrink-0 text-ink-muted">{data.title || dictionary.institution.supportedBy}</p>
+          <ul className="flex flex-wrap items-center gap-x-8 gap-y-3">
+            {items.map((partner) => (
+              <li key={partner.name} className="flex items-center gap-8 [&+li]:before:size-1 [&+li]:before:rounded-full [&+li]:before:bg-ink/25 [&+li]:before:content-['']">
+                {partner.logo ? (
+                  <span className="relative block h-10 w-28 opacity-75 grayscale transition hover:opacity-100 hover:grayscale-0"><MediaImage image={partner.logo} sizes="112px" fit="contain" /></span>
+                ) : (
+                  <span className="text-sm font-semibold text-ink/75">{partner.name}</span>
+                )}
+              </li>
+            ))}
+          </ul>
+        </Container>
+      </section>
+    );
+  }
+
+  const groups = Object.entries(Object.groupBy(items, (partner) => partner.group ?? "")) as [string, Partner[]][];
+  const grouped = groups.length > 1;
+
   return (
     <Section>
       <SectionTitle title={data.title} />
-      {/* Mur de partenaires : grille à filets fins ; logo en gris qui prend ses couleurs au survol, sinon le nom. */}
-      <ul className={cn("grid grid-cols-2 gap-px overflow-hidden rounded-3xl border border-line bg-line sm:grid-cols-3", items.length % 3 === 0 ? "" : "lg:grid-cols-4")}>
-        {items.map((partner) => {
-          const content = partner.logo ? (
-            <span className="relative block h-16 w-full grayscale transition duration-300 group-hover:grayscale-0 group-focus-visible:grayscale-0 opacity-80 group-hover:opacity-100">
-              <MediaImage image={partner.logo} sizes="240px" fit="contain" />
-            </span>
-          ) : (
-            <span className="block text-balance text-center text-[0.95rem] font-semibold leading-snug text-ink/80 transition group-hover:text-ink sm:text-base">{partner.name}</span>
-          );
-          const cell = "group flex w-full min-h-36 items-center justify-center bg-night p-6 transition hover:bg-night-2 sm:p-8";
-          return (
-            <li key={partner.name} className="flex">
-              {partner.website ? (
-                <a href={partner.website} target="_blank" rel="noopener noreferrer" className={cell} aria-label={partner.logo ? partner.name : undefined}>
-                  {content}<span className="sr-only">{t.newTab}</span>
-                </a>
-              ) : (
-                <div className={cell} title={partner.name}>{content}{partner.logo && <span className="sr-only">{partner.name}</span>}</div>
-              )}
-            </li>
-          );
-        })}
-        {/* Cases vides pour finir la dernière rangée (sinon le fond des filets apparaît). */}
-        {[
-          { cols: 2, className: "sm:hidden" },
-          { cols: 3, className: cn("max-sm:hidden", items.length % 3 !== 0 && "lg:hidden") },
-          ...(items.length % 3 === 0 ? [] : [{ cols: 4, className: "max-lg:hidden" }]),
-        ].flatMap(({ cols, className }) =>
-          Array.from({ length: (cols - (items.length % cols)) % cols }, (_, i) => <li key={`vide-${cols}-${i}`} className={cn("bg-night", className)} aria-hidden />),
-        )}
-      </ul>
+      <div className="grid gap-12">
+        {groups.map(([group, partners]) => (
+          <div key={group}>
+            {grouped && group && <h3 className="cartel mb-5 text-ink">{group}</h3>}
+            <PartnerWall partners={partners} newTab={dictionary.common.newTab} />
+          </div>
+        ))}
+      </div>
     </Section>
+  );
+}
+
+function PartnerWall({ partners, newTab }: { partners: Partner[]; newTab: string }) {
+  const count = partners.length;
+  return (
+    // Cases qui s'élargissent pour finir chaque rangée (pas de case vide, même avec un seul partenaire).
+    <ul className="flex flex-wrap gap-px overflow-hidden rounded-3xl border border-line bg-line">
+      {partners.map((partner) => {
+        const content = partner.logo ? (
+          <span className="relative block h-16 w-full opacity-80 grayscale transition duration-300 group-hover:opacity-100 group-hover:grayscale-0 group-focus-visible:grayscale-0">
+            <MediaImage image={partner.logo} sizes="240px" fit="contain" />
+          </span>
+        ) : (
+          <span className="block text-balance text-center text-[0.95rem] font-semibold leading-snug text-ink/80 transition group-hover:text-ink sm:text-base">{partner.name}</span>
+        );
+        const cell = "group flex w-full min-h-36 items-center justify-center bg-night p-6 transition hover:bg-night-2 sm:p-8";
+        return (
+          <li key={partner.name} className={cn("flex grow basis-[calc(50%-1px)] sm:basis-[calc(33.333%-1px)]", count % 3 !== 0 && "lg:basis-[calc(25%-1px)]")}>
+            {partner.website ? (
+              <a href={partner.website} target="_blank" rel="noopener noreferrer" className={cell} aria-label={partner.logo ? partner.name : undefined}>
+                {content}<span className="sr-only">{newTab}</span>
+              </a>
+            ) : (
+              <div className={cell} title={partner.name}>{content}{partner.logo && <span className="sr-only">{partner.name}</span>}</div>
+            )}
+          </li>
+        );
+      })}
+    </ul>
   );
 }
 

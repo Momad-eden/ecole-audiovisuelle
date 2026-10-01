@@ -81,6 +81,9 @@ Un bouton qui mène à une section vide est masqué automatiquement : « Écoute
 
 - **Manifeste (phrase, chiffres, bandeau de photos)** : à placer juste après le grand titre de l'accueil. Une grande phrase qui présente le Centre culturel, l'école et le studio (mots mis en valeur avec des astérisques), jusqu'à 4 chiffres clés qui défilent jusqu'à leur valeur, et un bandeau de 4 à 12 photos qui glisse lentement en continu. Bouton facultatif (ex. « Notre mission »).
 
+- **Présentation institutionnelle (mission, valeurs, mot du fondateur)** : titre, courte présentation, jusqu'à 4 **piliers** numérotés (ex. Notre mission, Notre vision, Nos valeurs) et, en option, **le mot du fondateur** (citation, nom, fonction, portrait ; sans portrait, ses initiales s'affichent). Bouton facultatif (ex. « Mission et impact »).
+- **Partenaires**, présentation **Bandeau discret** : une ligne « Avec le soutien de » à placer en haut de l'accueil (choisissez les catégories, ex. institutionnels). La présentation **Mur de logos** regroupe les partenaires par catégorie (Partenaires institutionnels, Porteurs du programme…). Ajoutez les **logos** dans le menu Partenaires : ils s'affichent en gris et prennent leurs couleurs au survol.
+
 ### Mettre un mot en valeur dans un titre
 
 Dans le titre d'un bloc, entourez un ou plusieurs mots d'**astérisques** : `La culture comme *héritage*, l'art comme *métier*`. Sur le site, ils s'affichent en italique élégant, dans la couleur de la rubrique. Une ou deux mises en valeur par titre suffisent. La traduction anglaise garde la mise en valeur.

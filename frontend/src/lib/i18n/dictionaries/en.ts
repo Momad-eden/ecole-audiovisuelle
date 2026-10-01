@@ -110,6 +110,11 @@ export const en: Dictionary = {
     scroll: "Explore",
   },
 
+  institution: {
+    supportedBy: "With the support of",
+    founderWord: "A word from the founder",
+  },
+
   showcase: {
     open: (caption: string) => `Enlarge: ${caption}`,
     item: (index: number) => `Image ${index}`,
