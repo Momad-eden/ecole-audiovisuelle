@@ -5,6 +5,7 @@ import { getDictionary } from "@/lib/i18n";
 import type { Locale } from "@/lib/i18n/locales";
 import type { Site } from "@/lib/types";
 import { HeaderShell } from "./HeaderShell";
+import { LanguageSwitcher } from "./LanguageSwitcher";
 import { MobileMenu } from "./MobileMenu";
 import { NavDropdown } from "./NavDropdown";
 import { ThemeToggle } from "./ThemeToggle";
@@ -46,6 +47,7 @@ export function SiteHeader({ site, locale }: { site: Site; locale: Locale }) {
         </nav>
 
         <div className="flex items-center gap-2">
+          <LanguageSwitcher className="hidden sm:block" />
           <ThemeToggle className="hidden sm:grid" />
           {cta && (
             <LocaleLink href={cta.url} className="group hidden min-h-11 items-center gap-2 rounded-full bg-brand px-5 text-sm font-semibold text-on-accent shadow-[0_0_40px_-10px_var(--color-brand)] transition hover:brightness-110 sm:inline-flex">

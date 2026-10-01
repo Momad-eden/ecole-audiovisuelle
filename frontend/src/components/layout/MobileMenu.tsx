@@ -6,6 +6,7 @@ import { ArrowRight, Menu, X } from "lucide-react";
 import { ChevronDown } from "lucide-react";
 import { useT } from "@/components/i18n/LocaleProvider";
 import type { MenuLink } from "@/lib/types";
+import { LanguageSwitcher } from "./LanguageSwitcher";
 import { ThemeToggle } from "./ThemeToggle";
 
 export function MobileMenu({ links }: { links: MenuLink[] }) {
@@ -45,6 +46,7 @@ export function MobileMenu({ links }: { links: MenuLink[] }) {
                     <div className="flex items-center justify-between">
                         <span className="display text-2xl">EMSI</span>
                         <span className="flex items-center gap-2">
+                            <LanguageSwitcher />
                             <ThemeToggle />
                             <button
                                 type="button"

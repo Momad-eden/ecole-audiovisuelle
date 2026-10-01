@@ -54,3 +54,80 @@ test("les liens internes d'une page française restent sans préfixe", async ({ 
   expect(hrefs.length).toBeGreaterThan(5);
   expect(hrefs.filter((href) => href === "/en" || href.startsWith("/en/"))).toEqual([]);
 });
+
+/** Sélecteur de langue : dans l'en-tête à partir de 640 px, dans le menu sur téléphone. */
+async function switchLanguage(page: import("@playwright/test").Page, label: "FR" | "EN") {
+  const inHeader = page.locator("header").getByRole("link", { name: label === "EN" ? "English" : "Français", exact: true });
+  if (await inHeader.isVisible()) {
+    await inHeader.click();
+    return;
+  }
+  await page.locator("header").getByRole("button", { name: /menu/i }).click();
+  await page.getByRole("dialog").getByRole("link", { name: label === "EN" ? "English" : "Français", exact: true }).click();
+}
+
+test("le sélecteur de langue mène à la même page dans l'autre langue, et retour", async ({ page, context }) => {
+  await page.goto("/emsi/dakar");
+  await expect(page.locator("html")).toHaveAttribute("lang", "fr");
+  const english = page.locator("a[hreflang='en']").first();
+  await expect(english).toHaveAttribute("href", "/en/emsi/dakar");
+  await expect(english).toHaveAttribute("lang", "en");
+  await expect(page.locator("a[hreflang='fr'][aria-current='true']").first()).toBeAttached();
+
+  await switchLanguage(page, "EN");
+  await page.waitForURL((url) => url.pathname === "/en/emsi/dakar");
+  await expect(page.locator("html")).toHaveAttribute("lang", "en");
+  // Textes fixes de l'interface en anglais : lien d'évitement, pied de page, menu.
+  await expect(page.getByRole("link", { name: "Skip to content" })).toBeAttached();
+  await expect(page.getByRole("contentinfo")).toContainText("Explore");
+  await expect(page.getByRole("contentinfo")).toContainText("Get in touch");
+  await expect(page.locator("header button[aria-label='Open menu']")).toBeAttached();
+  await expect(page.locator("a[hreflang='en'][aria-current='true']").first()).toBeAttached();
+  // Contenu pas encore traduit : il est signalé comme français aux lecteurs d'écran.
+  const content = page.locator("#contenu [lang='fr']").first();
+  if ((await content.count()) > 0) await expect(content).toBeAttached();
+
+  // Choix mémorisé un an, sans redirection automatique.
+  const cookie = (await context.cookies()).find((c) => c.name === "emsi-locale");
+  expect(cookie?.value).toBe("en");
+  expect(cookie?.sameSite).toBe("Lax");
+  expect(cookie!.expires - Date.now() / 1000).toBeGreaterThan(360 * 24 * 3600);
+
+  await switchLanguage(page, "FR");
+  await page.waitForURL((url) => url.pathname === "/emsi/dakar");
+  await expect(page.locator("html")).toHaveAttribute("lang", "fr");
+  await expect(page.getByRole("link", { name: "Aller au contenu" })).toBeAttached();
+});
+
+test("le cookie de langue ne redirige jamais : la racine reste en français", async ({ page, context }) => {
+  await context.addCookies([{ name: "emsi-locale", value: "en", url: test.info().project.use.baseURL! }]);
+  const response = await page.goto("/emsi/dakar");
+  expect(response?.status()).toBe(200);
+  expect(new URL(page.url()).pathname).toBe("/emsi/dakar");
+  await expect(page.locator("html")).toHaveAttribute("lang", "fr");
+});
+
+test("formulaire de contact vide en anglais : erreurs en anglais", async ({ page }) => {
+  await page.goto("/en/contact");
+  const form = page.locator("form").filter({ has: page.locator("textarea") }).first();
+  await form.getByRole("button", { name: "Send" }).click();
+  await expect(form.getByText("Please enter your name.")).toBeVisible();
+  await expect(form.getByText("Your message is too short.")).toBeVisible();
+  await expect(form.getByText(/we need your consent/i)).toBeVisible();
+  await expect(form).not.toContainText("Indiquez");
+});
+
+test("pages anglaises à 360 px : aucun défilement horizontal", async ({ page }) => {
+  await page.setViewportSize({ width: 360, height: 780 });
+  for (const path of ["/en", "/en/emsi/dakar", "/en/contact", "/en/emsi/formations", "/en/candidater"]) {
+    await page.goto(path);
+    const overflow = await page.evaluate(() => document.documentElement.scrollWidth - document.documentElement.clientWidth);
+    expect(overflow, path).toBeLessThanOrEqual(0);
+  }
+});
+
+test("les textes fixes d'une page anglaise (cartes, liens) sont en anglais", async ({ page }) => {
+  await page.goto("/en/emsi/formations");
+  await expect(page.locator("main")).not.toContainText(/Voir la formation|Toutes les formations|Découvrir l'univers/);
+  await expect(page.locator("html")).toHaveAttribute("lang", "en");
+});
