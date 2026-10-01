@@ -40,7 +40,7 @@ export default async function CmsPage({ params }: Props) {
     <DomainChrome domain={page.domain ?? "general"} site={{ menus, domains }} path={`/${path}`} title={page.title}>
       {jsonLd && <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: jsonLdScript(jsonLd) }} />}
       <CurrentCrumb title={page.title} />
-      <BlockRenderer blocks={page.blocks} path={`/${path}`} title={page.title} />
+      <BlockRenderer blocks={page.blocks} path={`/${path}`} title={page.title} locale={locale} contentLocale={page.contentLocale} />
     </DomainChrome>
   );
 }

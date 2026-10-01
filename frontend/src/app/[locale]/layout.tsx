@@ -3,12 +3,13 @@ import { notFound } from "next/navigation";
 import { Archivo, Fraunces, Inter, JetBrains_Mono } from "next/font/google";
 import { AudioProvider } from "@/components/audio/AudioProvider";
 import { PlayerBar } from "@/components/audio/PlayerBar";
-import { LocaleProvider } from "@/components/i18n/LocaleProvider";
+import { I18nProvider } from "@/components/i18n/I18nProvider";
 import { SiteFooter } from "@/components/layout/SiteFooter";
 import { SiteHeader } from "@/components/layout/SiteHeader";
 import { WhatsAppButton } from "@/components/layout/WhatsAppButton";
 import { themeInitScript } from "@/components/layout/ThemeToggle";
 import { api } from "@/lib/api";
+import { getDictionary } from "@/lib/i18n";
 import { isLocale, LOCALES } from "@/lib/i18n/locales";
 import { DEFAULT_SHARE_IMAGE } from "@/lib/metadata";
 import { siteUrl } from "@/lib/utils";
@@ -40,7 +41,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
     metadataBase: new URL(siteUrl),
     title: { default: title, template: `%s — EMSI` },
     description,
-    openGraph: { type: "website", locale: "fr_SN", siteName: settings.schoolName, title, description, images: [DEFAULT_SHARE_IMAGE] },
+    openGraph: { type: "website", locale: getDictionary(locale).meta.ogLocale, siteName: settings.schoolName, title, description, images: [DEFAULT_SHARE_IMAGE] },
     twitter: { card: "summary_large_image" },
   };
 }
@@ -70,18 +71,18 @@ export default async function RootLayout({ children, params }: Props) {
         <script dangerouslySetInnerHTML={{ __html: themeInitScript }} />
       </head>
       <body className="min-h-dvh bg-night text-ink">
-        <LocaleProvider locale={locale}>
+        <I18nProvider locale={locale}>
           <a href="#contenu" className="sr-only focus:not-sr-only focus:fixed focus:left-4 focus:top-4 focus:z-[60] focus:rounded-full focus:bg-brand focus:px-5 focus:py-3 focus:text-on-accent">
-            Aller au contenu
+            {getDictionary(locale).header.skipToContent}
           </a>
           <AudioProvider>
-            <SiteHeader site={site} />
+            <SiteHeader site={site} locale={locale} />
             <main id="contenu">{children}</main>
-            <SiteFooter site={site} />
+            <SiteFooter site={site} locale={locale} />
             <PlayerBar />
-            <WhatsAppButton number={settings.whatsapp} />
+            <WhatsAppButton number={settings.whatsapp} locale={locale} />
           </AudioProvider>
-        </LocaleProvider>
+        </I18nProvider>
         <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd).replace(/</g, "\\u003c") }} />
       </body>
     </html>

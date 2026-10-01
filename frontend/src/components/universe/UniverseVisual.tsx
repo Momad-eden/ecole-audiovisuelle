@@ -1,11 +1,15 @@
+"use client";
+
 import type { CSSProperties } from "react";
 import type { UniverseVisualKind } from "@/lib/types";
+import { useT } from "@/components/i18n/LocaleProvider";
 import { cn } from "@/lib/utils";
 
 /**
  * Signature animée d'un univers, dessinée en SVG dans la couleur --accent.
  * Purement décorative (aria-hidden) ; animations CSS figées en mouvement réduit
- * et suspendues hors écran par <InView>.
+ * et suspendues hors écran par <InView>. Composant client : les quelques mentions techniques
+ * (« SCÈNE 1 », « BIENTÔT À L'EMSI »…) suivent la langue de la page.
  */
 export function UniverseVisual({ kind, className }: { kind: UniverseVisualKind; className?: string }) {
   const Visual = VISUALS[kind] ?? SoundVisual;
@@ -100,6 +104,7 @@ function DesignVisual() {
 
 /** Scène : projecteurs sur un pont, faisceaux et console DMX. */
 function StageVisual() {
+  const t = useT().universes;
   const fixtures = [70, 140, 210, 280, 350];
   const faders = [
     { x: 262, from: 0, to: -44, dur: 3.2 }, { x: 282, from: -30, to: 4, dur: 2.6 }, { x: 302, from: -10, to: -50, dur: 3.8 },
@@ -128,13 +133,14 @@ function StageVisual() {
           <rect className="uv-fader" x={f.x - 6} y="266" width="12" height="7" rx="1.5" fill="currentColor" style={{ ["--f-from" as string]: `${f.from}px`, ["--f-to" as string]: `${f.to}px`, ["--f-dur" as string]: `${f.dur}s` }} />
         </g>
       ))}
-      <text x="36" y="20" fill="currentColor" fillOpacity="0.8" style={mono}>DMX 512 · UNIVERS 1</text>
+      <text x="36" y="20" fill="currentColor" fillOpacity="0.8" style={mono}>{t.visualLighting}</text>
     </g>
   );
 }
 
 /** Cinéma : pellicule qui défile et clap (bientôt). */
 function CinemaVisual() {
+  const t = useT().universes;
   const frames = Array.from({ length: 12 }, (_, i) => i * 70);
   const holes = Array.from({ length: 48 }, (_, i) => i * 17.5);
   return (
@@ -159,11 +165,11 @@ function CinemaVisual() {
           <rect x="0" y="6" width="100" height="16" fill="var(--color-ink)" />
           {[0, 1, 2, 3, 4].map((i) => <path key={i} d={`M${i * 22} 6 L${i * 22 + 12} 6 L${i * 22 + 4} 22 L${i * 22 - 8} 22 Z`} fill="var(--color-night)" />)}
         </g>
-        <text x="10" y="50" fill="currentColor" style={mono}>SCÈNE 1</text>
-        <text x="10" y="70" fill="currentColor" fillOpacity="0.7" style={mono}>PRISE 1</text>
+        <text x="10" y="50" fill="currentColor" style={mono}>{t.visualScene}</text>
+        <text x="10" y="70" fill="currentColor" fillOpacity="0.7" style={mono}>{t.visualTake}</text>
       </g>
       <text x="24" y="40" fill="currentColor" style={mono}>● 24 FPS</text>
-      <text x="24" y="268" fill="currentColor" fillOpacity="0.7" style={mono}>BIENTÔT À L&apos;EMSI</text>
+      <text x="24" y="268" fill="currentColor" fillOpacity="0.7" style={mono}>{t.visualSoon}</text>
     </g>
   );
 }

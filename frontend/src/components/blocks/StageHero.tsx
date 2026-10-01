@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
+import { useT } from "@/components/i18n/LocaleProvider";
 import { ButtonLink } from "@/components/ui/ButtonLink";
 import { MediaImage } from "@/components/ui/MediaImage";
 import { useReducedMotion } from "@/components/motion/useReducedMotion";
@@ -41,6 +42,7 @@ const ACCENT: Record<Variant, string | undefined> = { stage: undefined, events: 
  */
 export function StageHero({ data, first, variant = "stage" }: { data: HeroData; first: boolean; variant?: Variant }) {
   const reducedMotion = useReducedMotion();
+  const t = useT().hero;
   const words = (data.words ?? []).filter(Boolean);
   const [index, setIndex] = useState(0);
   const sectionRef = useRef<HTMLElement>(null);
@@ -124,8 +126,8 @@ export function StageHero({ data, first, variant = "stage" }: { data: HeroData; 
             <span className="rec-dot size-2 rounded-full bg-rec" />
             REC <span ref={timecodeRef} className="tabular-nums">00:00:00:00</span>
           </span>
-          <span className="hidden sm:inline">{variant === "events" ? "Sonorisation · Lumière · Podiums" : "Son · Image · Lumière · Design · Scène"}</span>
-          <span>Défiler ↓</span>
+          <span className="hidden sm:inline">{variant === "events" ? t.eventsTagline : t.stageTagline}</span>
+          <span>{t.scroll}</span>
         </div>
       </div>
     </section>

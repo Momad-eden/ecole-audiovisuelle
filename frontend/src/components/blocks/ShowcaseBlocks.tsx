@@ -5,10 +5,11 @@ import { MediaImage } from "@/components/ui/MediaImage";
 import { Container, Section, SectionTitle } from "@/components/ui/Section";
 import { InView } from "@/components/motion/InView";
 import { Reveal } from "@/components/motion/Reveal";
-import type { EquipmentData, MarqueeData, VenueData } from "./types";
+import { getDictionary } from "@/lib/i18n";
+import type { BlockProps, EquipmentData, MarqueeData, VenueData } from "./types";
 
 /** Bandeau de grands mots qui défile (immobile en mouvement réduit). */
-export function MarqueeBlock({ data }: { data: MarqueeData }) {
+export function MarqueeBlock({ data }: BlockProps<MarqueeData>) {
   const words = (data.words ?? []).filter(Boolean);
   if (words.length === 0) return null;
   const sequence = [...words, ...words, ...words];
@@ -35,7 +36,7 @@ export function MarqueeBlock({ data }: { data: MarqueeData }) {
 }
 
 /** Le lieu : l'école au cœur du Grand Théâtre National. */
-export function VenueBlock({ data }: { data: VenueData }) {
+export function VenueBlock({ data }: BlockProps<VenueData>) {
   const facts = data.facts ?? [];
   return (
     <section className="relative isolate overflow-hidden py-24 sm:py-32" style={{ ["--accent" as string]: "var(--color-gold)" }}>
@@ -116,13 +117,13 @@ function TheatreArt() {
 }
 
 /** Le matériel, présenté comme une fiche technique. */
-export function EquipmentBlock({ data }: { data: EquipmentData }) {
+export function EquipmentBlock({ data, locale }: BlockProps<EquipmentData>) {
   const groups = (data.groups ?? []).filter((g) => g.items && g.items.length > 0);
   if (groups.length === 0) return null;
 
   return (
     <Section className="relative">
-      <SectionTitle eyebrow="Fiche technique" title={data.title} text={data.text} />
+      <SectionTitle eyebrow={getDictionary(locale).impact.techSheet} title={data.title} text={data.text} />
       <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
         {groups.map((group, index) => (
           <Reveal key={group.category} delay={(index % 3) * 100} className="group relative overflow-hidden rounded-3xl border border-line bg-night-2 transition duration-500 hover:border-brand/60">

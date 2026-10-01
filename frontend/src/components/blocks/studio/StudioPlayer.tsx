@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { Pause, Play } from "lucide-react";
 import { useAudio } from "@/components/audio/AudioProvider";
+import { useT } from "@/components/i18n/LocaleProvider";
 import { usePeaks } from "@/components/audio/peaks";
 import { Waveform } from "@/components/audio/Waveform";
 import { cn } from "@/lib/utils";
@@ -19,6 +20,7 @@ export function StudioPlayer({ tracks, accent }: { tracks: HeroTrack[]; accent?:
   const playable = tracks.filter((track): track is HeroTrack & { url: string } => Boolean(track.url));
   const [selected, setSelected] = useState(0);
   const audio = useAudio();
+  const t = useT().audio;
   const track = playable[Math.min(selected, playable.length - 1)];
   const isCurrent = Boolean(track) && audio.track?.src === track.url;
   // La forme d'onde n'est calculée qu'une fois le morceau lancé : pas de téléchargement avant le clic.
@@ -34,7 +36,7 @@ export function StudioPlayer({ tracks, accent }: { tracks: HeroTrack[]; accent?:
     <div className="rounded-2xl border border-line bg-night/75 p-3 shadow-2xl backdrop-blur-md sm:p-4" data-testid="studio-player">
       <div className="flex items-center gap-3 sm:gap-4">
         <button type="button" onClick={start}
-          aria-label={isPlaying ? `Mettre en pause « ${track.title} »` : `Écouter « ${track.title} »`}
+          aria-label={isPlaying ? t.pause(track.title) : t.play(track.title)}
           className="grid size-12 shrink-0 place-items-center rounded-full bg-[var(--accent-ink)] text-on-accent shadow-[0_0_30px_-8px_var(--accent)] transition hover:brightness-110">
           {isPlaying ? <Pause className="size-6" aria-hidden /> : <Play className="size-6 translate-x-0.5" aria-hidden />}
         </button>
@@ -43,7 +45,7 @@ export function StudioPlayer({ tracks, accent }: { tracks: HeroTrack[]; accent?:
           {track.credits && <p className="cartel truncate text-ink-muted">{track.credits}</p>}
         </div>
         <Waveform peaks={peaks} progress={progress} onSeek={isCurrent ? (ratio) => audio.seek(Math.min(1, Math.max(0, ratio))) : undefined}
-          label={`Progression de « ${track.title} »`} className="hidden flex-1 sm:block" />
+          label={t.progress(track.title)} className="hidden flex-1 sm:block" />
         <span className="cartel hidden shrink-0 tabular-nums text-ink-muted md:inline">
           {isCurrent && audio.duration > 0 ? `${time(audio.currentTime)} / ${time(audio.duration)}` : "—:—"}
         </span>

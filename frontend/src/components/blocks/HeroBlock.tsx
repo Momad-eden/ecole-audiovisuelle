@@ -9,9 +9,10 @@ import { ProjectionHero } from "./ProjectionHero";
 import { StudioHero } from "./StudioHero";
 import { CinemaHero } from "./CinemaHero";
 import { CompactHero, EditorialHero, MosaicHero, PosterHero, SpotlightHero, heroTitleSize } from "./HeroLayouts";
+import type { Locale } from "@/lib/i18n/locales";
 import type { HeroData } from "./types";
 
-export function HeroBlock({ data, first }: { data: HeroData; first: boolean }) {
+export function HeroBlock({ data, first, locale }: { data: HeroData; first: boolean; locale: Locale }) {
   switch (data.layout) {
     case "stage":
     case "events":
@@ -22,7 +23,7 @@ export function HeroBlock({ data, first }: { data: HeroData; first: boolean }) {
     case "cinema": return <CinemaHero data={data} first={first} />;
     case "spotlight": return <SpotlightHero data={data} first={first} />;
     case "editorial": return <EditorialHero data={data} first={first} />;
-    case "poster": return <PosterHero data={data} first={first} />;
+    case "poster": return <PosterHero data={data} first={first} locale={locale} />;
     case "mosaic": return <MosaicHero data={data} first={first} />;
     case "compact": return <CompactHero data={data} first={first} />;
   }

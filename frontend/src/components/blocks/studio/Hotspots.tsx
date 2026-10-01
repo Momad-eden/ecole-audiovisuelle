@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
+import { useT } from "@/components/i18n/LocaleProvider";
 import { cn } from "@/lib/utils";
 import type { Hotspot } from "../types";
 
@@ -107,8 +108,9 @@ function useCoverBox(rootRef: React.RefObject<HTMLDivElement | null>) {
 
 /** Libellés des points en liste numérotée, pour les petits écrans où les étiquettes ne tiennent pas. */
 export function HotspotList({ points }: { points: Hotspot[] }) {
+  const t = useT().studio;
   return (
-    <ol className="mt-6 grid gap-2 text-sm text-ink/85 sm:hidden" aria-label="Matériel du studio">
+    <ol className="mt-6 grid gap-2 text-sm text-ink/85 sm:hidden" aria-label={t.equipment}>
       {points.map((point, index) => (
         <li key={`${point.label}-${index}`} className="flex items-center gap-3">
           <span className="grid size-6 shrink-0 place-items-center rounded-full bg-[var(--accent-ink)] text-xs font-bold text-on-accent" aria-hidden>{index + 1}</span>

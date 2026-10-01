@@ -3,14 +3,18 @@ import { CalendarDays } from "lucide-react";
 import { ButtonLink } from "@/components/ui/ButtonLink";
 import { MediaImage } from "@/components/ui/MediaImage";
 import { Container } from "@/components/ui/Section";
-import { formatDate, frenchSpacing } from "@/lib/utils";
+import { getDictionary } from "@/lib/i18n";
+import { formatDate } from "@/lib/i18n/format";
+import type { Locale } from "@/lib/i18n/locales";
+import { frenchSpacing } from "@/lib/utils";
 import type { CampusProgramsData } from "./types";
 
 /** Formations ouvertes à la candidature dans un campus, avec la prochaine rentrée et « Candidater » prérempli. */
-export function CampusProgramsBlock({ data, id }: { data: CampusProgramsData; id: string }) {
+export function CampusProgramsBlock({ data, id, locale }: { data: CampusProgramsData; id: string; locale: Locale }) {
   if (!data.campus) return null;
+  const { campus: t, common } = getDictionary(locale);
   const items = data.items ?? [];
-  const title = data.title || `Les formations à ${data.campus.city ?? data.campus.name}`;
+  const title = data.title || t.programsTitle(data.campus.city ?? data.campus.name);
   const headingId = `${id}-titre`;
 
   return (
@@ -26,7 +30,7 @@ export function CampusProgramsBlock({ data, id }: { data: CampusProgramsData; id
 
         {items.length === 0 ? (
           <p className="max-w-2xl rounded-3xl border border-line bg-night-2 p-8 text-lg text-ink-muted">
-            Aucune formation n&apos;est ouverte pour le moment dans ce campus.
+            {t.noPrograms}
           </p>
         ) : (
           <ul className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
@@ -44,12 +48,12 @@ export function CampusProgramsBlock({ data, id }: { data: CampusProgramsData; id
                     {program.nextStart && (
                       <p className="mt-5 flex items-center gap-2 text-sm font-medium text-ink/90">
                         <CalendarDays className="size-4 shrink-0 text-[var(--accent-ink)]" aria-hidden />
-                        <span>Rentrée le {formatDate(program.nextStart)}</span>
+                        <span>{t.starts(formatDate(program.nextStart, locale))}</span>
                       </p>
                     )}
                     <div className="mt-auto pt-7">
                       <ButtonLink href={program.applyUrl}>
-                        Candidater<span className="sr-only"> — {program.title}</span>
+                        {common.apply}<span className="sr-only"> — {program.title}</span>
                       </ButtonLink>
                     </div>
                   </div>

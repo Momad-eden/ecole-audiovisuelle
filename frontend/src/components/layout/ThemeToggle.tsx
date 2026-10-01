@@ -2,6 +2,7 @@
 
 import { useSyncExternalStore } from "react";
 import { Moon, Sun } from "lucide-react";
+import { useT } from "@/components/i18n/LocaleProvider";
 import { cn } from "@/lib/utils";
 
 export const THEME_STORAGE_KEY = "emsi-theme";
@@ -21,6 +22,7 @@ const readTheme = (): Theme => (document.documentElement.dataset.theme === "ligh
 
 /** Bascule entre le thème sombre « Plein feux » (par défaut) et le thème clair « Plein jour ». */
 export function ThemeToggle({ className }: { className?: string }) {
+  const t = useT().header;
   const theme = useSyncExternalStore(subscribe, readTheme, () => "dark" as Theme);
   const next: Theme = theme === "dark" ? "light" : "dark";
 
@@ -38,8 +40,8 @@ export function ThemeToggle({ className }: { className?: string }) {
       type="button"
       onClick={toggle}
       className={cn("grid size-11 place-items-center rounded-full border border-line text-ink/80 transition hover:border-ink/40 hover:text-ink", className)}
-      aria-label={next === "light" ? "Passer au thème clair" : "Passer au thème sombre"}
-      title={next === "light" ? "Thème clair" : "Thème sombre"}
+      aria-label={next === "light" ? t.toLightTheme : t.toDarkTheme}
+      title={next === "light" ? t.lightTheme : t.darkTheme}
     >
       {theme === "dark" ? <Sun className="size-5" aria-hidden /> : <Moon className="size-5" aria-hidden />}
     </button>

@@ -7,8 +7,10 @@ import { MediaImage } from "@/components/ui/MediaImage";
 import { RichText } from "@/components/ui/RichText";
 import { ShareButtons } from "@/components/ui/ShareButtons";
 import { api } from "@/lib/api";
+import { getDictionary } from "@/lib/i18n";
+import { formatDate } from "@/lib/i18n/format";
 import type { Locale } from "@/lib/i18n/locales";
-import { formatDate, frenchSpacing } from "@/lib/utils";
+import { frenchSpacing } from "@/lib/utils";
 
 type Props = { params: Promise<{ locale: Locale; slug: string }> };
 
@@ -26,8 +28,8 @@ export default async function NewsItemPage({ params }: Props) {
 
   return (
     <article className="mx-auto max-w-3xl px-4 pt-36 sm:px-6">
-      <LocaleLink href="/actualites" className="cartel inline-flex items-center gap-2 hover:text-ink"><ArrowLeft className="size-4" aria-hidden /> Actualités</LocaleLink>
-      {news.publishedAt && <time dateTime={news.publishedAt} className="cartel mt-8 block">{formatDate(news.publishedAt)}</time>}
+      <LocaleLink href="/actualites" className="cartel inline-flex items-center gap-2 hover:text-ink"><ArrowLeft className="size-4" aria-hidden /> {getDictionary(locale).news.title}</LocaleLink>
+      {news.publishedAt && <time dateTime={news.publishedAt} className="cartel mt-8 block">{formatDate(news.publishedAt, locale)}</time>}
       <h1 className="display mt-4 text-[clamp(2.2rem,5vw,3.8rem)] text-balance">{frenchSpacing(news.title)}</h1>
       {news.excerpt && <p className="mt-6 text-xl text-ink/80">{news.excerpt}</p>}
       {news.image && (
@@ -35,7 +37,7 @@ export default async function NewsItemPage({ params }: Props) {
           <MediaImage image={news.image} sizes="(min-width: 768px) 768px, 100vw" priority />
         </div>
       )}
-      <RichText html={news.content} className="mt-10 text-lg" />
+      <RichText html={news.content} locale={locale} className="mt-10 text-lg" />
       <div className="mt-14 border-t border-line pt-8 pb-24"><ShareButtons path={`/actualites/${news.slug}`} title={news.title} /></div>
     </article>
   );

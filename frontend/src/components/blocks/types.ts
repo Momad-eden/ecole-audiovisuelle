@@ -1,4 +1,8 @@
+import type { Locale } from "@/lib/i18n/locales";
 import type { ArtworkSummary, Image, NewsItem, Program, RoomSummary } from "@/lib/types";
+
+/** Props communes des blocs : données saisies dans l'admin et langue de la page (textes fixes, dates, liens). */
+export type BlockProps<D> = { data: D; locale: Locale };
 
 export type ButtonData = { label: string; url: string; style?: "primary" | "secondary" };
 

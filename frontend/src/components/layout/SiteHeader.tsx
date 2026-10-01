@@ -1,13 +1,16 @@
 import { LocaleLink } from "@/components/i18n/LocaleLink";
 import { ArrowRight } from "lucide-react";
 import { MediaImage } from "@/components/ui/MediaImage";
+import { getDictionary } from "@/lib/i18n";
+import type { Locale } from "@/lib/i18n/locales";
 import type { Site } from "@/lib/types";
 import { HeaderShell } from "./HeaderShell";
 import { MobileMenu } from "./MobileMenu";
 import { NavDropdown } from "./NavDropdown";
 import { ThemeToggle } from "./ThemeToggle";
 
-export function SiteHeader({ site }: { site: Site }) {
+export function SiteHeader({ site, locale }: { site: Site; locale: Locale }) {
+  const t = getDictionary(locale).header;
   const links = site.menus.main;
   const navLinks = links.filter((link) => !link.isButton);
   const cta = links.find((link) => link.isButton);
@@ -15,7 +18,7 @@ export function SiteHeader({ site }: { site: Site }) {
   return (
     <HeaderShell>
       <div className="mx-auto flex h-18 max-w-7xl items-center justify-between gap-6 px-4 sm:px-6 lg:px-8">
-        <LocaleLink href="/" className="flex items-center gap-3" aria-label={`${site.settings.schoolName} — accueil`}>
+        <LocaleLink href="/" className="flex items-center gap-3" aria-label={t.home(site.settings.schoolName)}>
           {site.settings.logo ? (
             <span className="relative block size-12">
               <MediaImage image={site.settings.logo} sizes="48px" priority fit="contain" className="object-left" />
@@ -23,10 +26,10 @@ export function SiteHeader({ site }: { site: Site }) {
           ) : (
             <span className="display text-2xl">EMSI</span>
           )}
-          <span className="cartel hidden leading-tight xl:block" aria-hidden>Son · Image<br />Lumière · Scène</span>
+          <span className="cartel hidden leading-tight xl:block" aria-hidden>{t.taglineTop}<br />{t.taglineBottom}</span>
         </LocaleLink>
 
-        <nav aria-label="Navigation principale" className="hidden lg:block">
+        <nav aria-label={t.mainNav} className="hidden lg:block">
           <ul className="flex items-center gap-1">
             {navLinks.map((link) =>
               link.children?.length ? (

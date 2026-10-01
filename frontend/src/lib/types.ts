@@ -1,3 +1,4 @@
+import type { Locale } from "./i18n/locales";
 // Types des réponses de l'API publique Laravel (/api/v1/public).
 
 export type Image = { url: string; alt: string };
@@ -73,6 +74,10 @@ export type Page = {
   seo: { title?: string; description?: string } | null;
   blocks: Block[];
   updatedAt: string | null;
+  /** Langue demandée, langue réelle du contenu (« fr » tant que la page n'est pas traduite) et adresses dans chaque langue. */
+  locale?: Locale;
+  contentLocale?: Locale;
+  alternates?: Record<Locale, string>;
 };
 
 export type ArtworkSummary = {

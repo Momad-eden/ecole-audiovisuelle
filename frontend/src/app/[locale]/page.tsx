@@ -19,5 +19,5 @@ export default async function HomePage({ params }: Props) {
   const [page, { settings }] = await Promise.all([api.page("accueil", locale), api.site(locale)]);
   if (!page) notFound();
 
-  return <BlockRenderer blocks={page.blocks} path="/" title={settings.schoolName || page.title} />;
+  return <BlockRenderer blocks={page.blocks} path="/" title={settings.schoolName || page.title} locale={locale} contentLocale={page.contentLocale} />;
 }

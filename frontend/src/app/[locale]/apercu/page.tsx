@@ -20,7 +20,7 @@ export default async function PreviewPage({ params, searchParams }: Props) {
       <div role="status" className="sticky top-18 z-30 bg-brand px-4 py-2 text-center text-sm font-semibold text-on-accent">
         Aperçu du brouillon « {page.title} » — cette version n&apos;est pas encore publiée.
       </div>
-      <BlockRenderer blocks={page.blocks} path={`/${page.slug}`} title={page.title} />
+      <BlockRenderer blocks={page.blocks} path={`/${page.slug}`} title={page.title} locale="fr" />
     </>
   );
 }

@@ -1,9 +1,10 @@
 import { LocaleLink } from "@/components/i18n/LocaleLink";
 import type { NewsItem } from "@/lib/types";
 import { MediaImage } from "@/components/ui/MediaImage";
-import { formatDate } from "@/lib/utils";
+import { formatDate } from "@/lib/i18n/format";
+import type { Locale } from "@/lib/i18n/locales";
 
-export function NewsCard({ news }: { news: NewsItem }) {
+export function NewsCard({ news, locale }: { news: NewsItem; locale: Locale }) {
   return (
     <article className="group">
       <LocaleLink href={`/actualites/${news.slug}`} className="block">
@@ -16,7 +17,7 @@ export function NewsCard({ news }: { news: NewsItem }) {
             </div>
           )}
         </div>
-        {news.publishedAt && <time dateTime={news.publishedAt} className="cartel mt-4 block">{formatDate(news.publishedAt)}</time>}
+        {news.publishedAt && <time dateTime={news.publishedAt} className="cartel mt-4 block">{formatDate(news.publishedAt, locale)}</time>}
         <h3 className="display mt-2 text-xl leading-snug group-hover:text-brand">{news.title}</h3>
         {news.excerpt && <p className="mt-2 line-clamp-2 text-sm text-ink-muted">{news.excerpt}</p>}
       </LocaleLink>

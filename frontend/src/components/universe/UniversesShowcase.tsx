@@ -1,6 +1,7 @@
 "use client";
 
 import { LocaleLink } from "@/components/i18n/LocaleLink";
+import { useT } from "@/components/i18n/LocaleProvider";
 import { useEffect, useRef } from "react";
 import { ArrowRight } from "lucide-react";
 import type { ScrollTrigger } from "gsap/ScrollTrigger";
@@ -24,6 +25,7 @@ type Props = {
  * univers défilent horizontalement au fil du défilement ; ailleurs, simple pile verticale.
  */
 export function UniversesShowcase({ universes, eyebrow, title, text }: Props) {
+    const t = useT().universes;
     const sectionRef = useRef<HTMLElement>(null);
     const trackRef = useRef<HTMLDivElement>(null);
     const progressRef = useRef<HTMLDivElement>(null);
@@ -142,8 +144,7 @@ export function UniversesShowcase({ universes, eyebrow, title, text }: Props) {
                                 )}
                             </div>
                             <p className="cartel hidden tabular-nums lg:block">
-                                {String(universes.length).padStart(2, "0")}{" "}
-                                univers
+                                {t.count(String(universes.length).padStart(2, "0"))}
                             </p>
                         </div>
                         <div
@@ -187,6 +188,7 @@ function UniversePanel({
     index: number;
     onFocus: (event: React.FocusEvent<HTMLAnchorElement>) => void;
 }) {
+    const t = useT().universes;
     const tracks = universe.tracks ?? [];
     return (
         <LocaleLink
@@ -204,10 +206,10 @@ function UniversePanel({
                     <span className="tabular-nums text-[var(--accent-ink)]">
                         {String(index + 1).padStart(2, "0")}
                     </span>
-                    <span>Univers</span>
+                    <span>{t.universe}</span>
                     {universe.isUpcoming && (
                         <span className="rounded-full border border-[var(--accent)] px-2.5 py-0.5 text-[var(--accent-ink)]">
-                            Bientôt
+                            {t.upcoming}
                         </span>
                     )}
                 </p>
@@ -222,7 +224,7 @@ function UniversePanel({
                 {tracks.length > 0 && (
                     <ul
                         className="mt-6 flex flex-wrap gap-2"
-                        aria-label="Filières"
+                        aria-label={t.tracks}
                     >
                         {tracks.map((track) => (
                             <li
@@ -235,9 +237,7 @@ function UniversePanel({
                     </ul>
                 )}
                 <span className="mt-auto inline-flex items-center gap-2 pt-8 text-sm font-semibold text-[var(--accent-ink)]">
-                    {universe.isUpcoming
-                        ? "Découvrir le projet"
-                        : "Explorer l'univers"}
+                    {universe.isUpcoming ? t.discoverProject : t.explore}
                     <ArrowRight
                         className="size-4 transition-transform duration-300 group-hover:translate-x-1.5"
                         aria-hidden

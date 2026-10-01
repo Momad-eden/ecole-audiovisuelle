@@ -15,8 +15,9 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 }
 
 export default async function ProfessionalSpacePage({ params }: Props) {
-  const page = await professionalPage((await params).locale);
+  const { locale } = await params;
+  const page = await professionalPage(locale);
   if (!page) notFound();
 
-  return <div style={{ ["--accent" as string]: "var(--color-hmi)" }}><BlockRenderer blocks={page.blocks} path="/emsi/professionnels" title={page.title} /></div>;
+  return <div style={{ ["--accent" as string]: "var(--color-hmi)" }}><BlockRenderer blocks={page.blocks} path="/emsi/professionnels" title={page.title} locale={locale} contentLocale={page.contentLocale} /></div>;
 }

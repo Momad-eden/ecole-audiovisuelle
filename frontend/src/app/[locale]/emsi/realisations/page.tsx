@@ -5,15 +5,15 @@ import { MediaImage } from "@/components/ui/MediaImage";
 import { PageHeader } from "@/components/ui/PageHeader";
 import { Section, SectionTitle } from "@/components/ui/Section";
 import { api } from "@/lib/api";
+import { getDictionary } from "@/lib/i18n";
 import type { Locale } from "@/lib/i18n/locales";
-import { cn, formatDate } from "@/lib/utils";
-
-export const metadata: Metadata = {
-  title: "Réalisations",
-  description: "Films, photos, mixages, créations graphiques et spectacles : les réalisations des étudiants de l'EMSI.",
-};
+import { cn } from "@/lib/utils";
 
 type Props = { params: Promise<{ locale: Locale }>; searchParams: Promise<{ univers?: string }> };
+
+export async function generateMetadata({ params }: Props): Promise<Metadata> {
+  return getDictionary((await params).locale).meta.artworks;
+}
 
 export default async function RealisationsPage({ params, searchParams }: Props) {
   const { locale } = await params;
@@ -23,16 +23,17 @@ export default async function RealisationsPage({ params, searchParams }: Props) 
     api.artworks(`perPage=24${univers ? `&room=${encodeURIComponent(univers)}` : ""}`, locale),
   ]);
   const active = universes.find((u) => u.slug === univers);
+  const t = getDictionary(locale).artworksPage;
 
   return (
     <>
-      <PageHeader eyebrow="Réalisations" title="Faites par nos étudiants" text="Chaque réalisation raconte un métier : derrière un mixage, un plan, une affiche ou une lumière de scène, il y a une formation de l'EMSI." accent={active?.accentColor} />
+      <PageHeader eyebrow={t.eyebrow} title={t.title} text={t.text} accent={active?.accentColor} />
 
       <Section className="pt-0 sm:pt-0">
-        <nav aria-label="Filtrer par univers" className="mb-12">
+        <nav aria-label={t.filter} className="mb-12">
           <ul className="flex flex-wrap gap-2">
             <li>
-              <LocaleLink href="/emsi/realisations" aria-current={!active ? "page" : undefined} className={cn("inline-flex min-h-11 items-center rounded-full border px-5 text-sm transition", !active ? "border-brand bg-brand text-on-accent" : "border-line hover:border-ink/40")}>Tout</LocaleLink>
+              <LocaleLink href="/emsi/realisations" aria-current={!active ? "page" : undefined} className={cn("inline-flex min-h-11 items-center rounded-full border px-5 text-sm transition", !active ? "border-brand bg-brand text-on-accent" : "border-line hover:border-ink/40")}>{t.all}</LocaleLink>
             </li>
             {universes.filter((u) => !u.isUpcoming).map((universe) => {
               const selected = universe.slug === active?.slug;
@@ -52,7 +53,7 @@ export default async function RealisationsPage({ params, searchParams }: Props) 
             })}
           </ul>
         </nav>
-        <ArtworkGrid artworks={artworks.data} empty={active ? `Les réalisations de l'univers ${active.name} seront bientôt publiées.` : undefined} />
+        <ArtworkGrid artworks={artworks.data} empty={active ? t.emptyUniverse(active.name) : undefined} locale={locale} />
       </Section>
     </>
   );

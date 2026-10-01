@@ -23,7 +23,7 @@ export async function CmsPageContent({ slug, locale }: { slug: string; locale: L
     <>
       {jsonLd && <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: jsonLdScript(jsonLd) }} />}
       <CurrentCrumb title={page.title} />
-      <BlockRenderer blocks={page.blocks} path={`/${slug}`} title={page.title} />
+      <BlockRenderer blocks={page.blocks} path={`/${slug}`} title={page.title} locale={locale} contentLocale={page.contentLocale} />
     </>
   );
 }

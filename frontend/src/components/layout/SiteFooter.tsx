@@ -1,12 +1,15 @@
 import { LocaleLink } from "@/components/i18n/LocaleLink";
 import { MediaImage } from "@/components/ui/MediaImage";
+import { getDictionary } from "@/lib/i18n";
+import type { Locale } from "@/lib/i18n/locales";
 import type { Site } from "@/lib/types";
 
 const SOCIAL_LABELS: Record<string, string> = {
   facebook: "Facebook", instagram: "Instagram", youtube: "YouTube", tiktok: "TikTok", linkedin: "LinkedIn", twitter: "X",
 };
 
-export function SiteFooter({ site }: { site: Site }) {
+export function SiteFooter({ site, locale }: { site: Site; locale: Locale }) {
+  const { footer: t, common } = getDictionary(locale);
   const { settings, menus } = site;
   const whatsapp = settings.whatsapp?.replace(/[^0-9]/g, "");
   const explore = [...menus.main.filter((l) => !l.isButton), ...menus.footer].filter((link, index, all) => all.findIndex((l) => l.url === link.url) === index);
@@ -35,8 +38,8 @@ export function SiteFooter({ site }: { site: Site }) {
           )}
         </div>
 
-        <nav aria-label="Liens du pied de page">
-          <p className="cartel mb-5">Explorer</p>
+        <nav aria-label={t.nav}>
+          <p className="cartel mb-5">{t.explore}</p>
           <ul className="space-y-1 text-sm">
             {explore.map((link) => (
               <li key={`${link.url}-${link.label}`}><LocaleLink href={link.url} className="inline-flex min-h-8 items-center text-ink/80 transition hover:text-brand">{link.label}</LocaleLink></li>
@@ -45,8 +48,8 @@ export function SiteFooter({ site }: { site: Site }) {
         </nav>
 
         {site.rooms.length > 0 && (
-          <nav aria-label="Les univers">
-            <p className="cartel mb-5">Univers</p>
+          <nav aria-label={t.universesNav}>
+            <p className="cartel mb-5">{t.universes}</p>
             <ul className="space-y-1 text-sm">
               {site.rooms.map((universe) => (
                 <li key={universe.id}>
@@ -61,7 +64,7 @@ export function SiteFooter({ site }: { site: Site }) {
         )}
 
         <div>
-          <p className="cartel mb-5">Nous joindre</p>
+          <p className="cartel mb-5">{t.contact}</p>
           <address className="space-y-3 text-sm not-italic text-ink/80">
             {site.places.length > 0 ? (
               site.places.map((place) => (
@@ -72,7 +75,7 @@ export function SiteFooter({ site }: { site: Site }) {
             )}
             {settings.phone && <p><a href={`tel:${settings.phone.replace(/[^0-9+]/g, "")}`} className="hover:text-brand">{settings.phone}</a></p>}
             {settings.email && <p><a href={`mailto:${settings.email}`} className="hover:text-brand">{settings.email}</a></p>}
-            {whatsapp && <p><a href={`https://wa.me/${whatsapp}`} target="_blank" rel="noopener noreferrer" className="hover:text-brand">Écrire sur WhatsApp</a></p>}
+            {whatsapp && <p><a href={`https://wa.me/${whatsapp}`} target="_blank" rel="noopener noreferrer" className="hover:text-brand">{common.writeOnWhatsApp}</a></p>}
             {settings.openingHours && <p className="text-ink-muted">{settings.openingHours}</p>}
           </address>
         </div>

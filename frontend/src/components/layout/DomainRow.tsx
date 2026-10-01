@@ -6,7 +6,7 @@ import { ChevronRight } from "lucide-react";
 import type { DomainSection } from "@/lib/domains";
 import { cn } from "@/lib/utils";
 import { siteUrl } from "@/lib/utils";
-import { useLocale } from "@/components/i18n/LocaleProvider";
+import { useLocale, useT } from "@/components/i18n/LocaleProvider";
 import { localizedPath } from "@/lib/i18n/locales";
 import { useCrumbTitle } from "./domain-crumb";
 
@@ -17,6 +17,7 @@ import { useCrumbTitle } from "./domain-crumb";
 export function DomainRow({ section, path }: { section: DomainSection; path: string }) {
   const title = useCrumbTitle();
   const locale = useLocale();
+  const t = useT().breadcrumbs;
   const [scrolled, setScrolled] = useState(false);
 
   useEffect(() => {
@@ -27,7 +28,7 @@ export function DomainRow({ section, path }: { section: DomainSection; path: str
   }, []);
 
   const clean = path.length > 1 ? path.replace(/\/+$/, "") : path;
-  const crumbs: { label: string; url: string }[] = [{ label: "Accueil", url: "/" }, { label: section.parent.label, url: section.parent.url }];
+  const crumbs: { label: string; url: string }[] = [{ label: t.home, url: "/" }, { label: section.parent.label, url: section.parent.url }];
   if (section.current && section.current.url !== section.parent.url) crumbs.push(section.current);
   if (title && clean !== crumbs.at(-1)!.url) crumbs.push({ label: title, url: clean });
   // Sans titre de page, le dernier repère n'est « la page courante » que si le chemin est bien le sien.
@@ -44,7 +45,7 @@ export function DomainRow({ section, path }: { section: DomainSection; path: str
   return (
     <div data-domain-row className={cn("site-header fixed inset-x-0 top-18 z-40 transition-colors duration-500", scrolled ? "border-b border-line bg-night/85 backdrop-blur-md" : "border-b border-transparent")}>
       <div className="mx-auto flex h-11 max-w-7xl items-center justify-between gap-4 px-4 sm:px-6 lg:px-8">
-        <nav aria-label="Fil d'Ariane" className="hidden min-w-0 sm:block">
+        <nav aria-label={t.label} className="hidden min-w-0 sm:block">
           <ol className="flex items-center gap-1.5 whitespace-nowrap text-xs text-ink-muted">
             {crumbs.map((crumb, index) => {
               const last = index === crumbs.length - 1;
@@ -58,7 +59,7 @@ export function DomainRow({ section, path }: { section: DomainSection; path: str
           </ol>
         </nav>
         {siblings.length > 0 && (
-          <nav aria-label={`Rubriques ${section.parent.label}`} className="min-w-0 max-sm:w-full">
+          <nav aria-label={t.sections(section.parent.label)} className="min-w-0 max-sm:w-full">
             <ul className="flex items-center gap-1 overflow-x-auto">
               {siblings.map((item) => {
                 const here = item.url === section.current?.url;

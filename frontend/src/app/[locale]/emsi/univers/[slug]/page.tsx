@@ -13,6 +13,7 @@ import { PageHeader } from "@/components/ui/PageHeader";
 import { Section, SectionTitle } from "@/components/ui/Section";
 import { UniverseVisual } from "@/components/universe/UniverseVisual";
 import { api } from "@/lib/api";
+import { getDictionary } from "@/lib/i18n";
 import type { Locale } from "@/lib/i18n/locales";
 
 type Props = { params: Promise<{ locale: Locale; slug: string }> };
@@ -33,12 +34,13 @@ export default async function UniversePage({ params }: Props) {
   const artworks = universe.artworks ?? [];
   const position = all.findIndex((u) => u.slug === universe.slug);
   const next = all.length > 1 ? all[(position + 1) % all.length] : null;
+  const { universePage: t, common } = getDictionary(locale);
 
   return (
     <div style={{ ["--accent" as string]: universe.accentColor }}>
       <CurrentCrumb title={universe.name} />
       <PageHeader
-        eyebrow={universe.isUpcoming ? "Bientôt à l'EMSI" : `Univers ${String(position + 1).padStart(2, "0")}`}
+        eyebrow={universe.isUpcoming ? t.soon : t.number(String(position + 1).padStart(2, "0"))}
         title={universe.name}
         text={universe.tagline}
         accent={universe.accentColor}
@@ -48,15 +50,15 @@ export default async function UniversePage({ params }: Props) {
           </div>
         }
       >
-        <LocaleLink href="/emsi" className="cartel mt-8 inline-flex items-center gap-2 hover:text-ink"><ArrowLeft className="size-4" aria-hidden /> Tous les univers</LocaleLink>
+        <LocaleLink href="/emsi" className="cartel mt-8 inline-flex items-center gap-2 hover:text-ink"><ArrowLeft className="size-4" aria-hidden /> {t.all}</LocaleLink>
         {universe.intro && <p className="mt-8 max-w-2xl whitespace-pre-line text-ink/80">{universe.intro}</p>}
         <div className="mt-10 flex flex-wrap gap-3">
           {universe.isUpcoming ? (
-            <ButtonLink href="/contact" size="lg">Être informé de l&apos;ouverture</ButtonLink>
+            <ButtonLink href="/contact" size="lg">{t.notify}</ButtonLink>
           ) : (
             <>
-              <ButtonLink href="/candidater" size="lg">Candidater</ButtonLink>
-              {tracks.length > 0 && <ButtonLink href="#filieres" variant="secondary" size="lg">Voir les filières</ButtonLink>}
+              <ButtonLink href="/candidater" size="lg">{common.apply}</ButtonLink>
+              {tracks.length > 0 && <ButtonLink href="#filieres" variant="secondary" size="lg">{t.seeTracks}</ButtonLink>}
             </>
           )}
         </div>
@@ -64,19 +66,19 @@ export default async function UniversePage({ params }: Props) {
 
       {tracks.length > 0 && (
         <Section id="filieres">
-          <SectionTitle eyebrow="Filières" title="Ce que vous apprendrez" text="Des compétences pratiques, travaillées sur du matériel professionnel, et les métiers auxquels elles préparent." />
+          <SectionTitle eyebrow={t.tracksEyebrow} title={t.tracksTitle} text={t.tracksText} />
           <div className="space-y-6">
             {tracks.map((track, index) => (
               <Reveal key={track.id} className="grid gap-10 rounded-[2rem] border border-line bg-night-2 p-7 sm:p-10 lg:grid-cols-[1fr_1.3fr]">
                 <div>
-                  <p className="cartel tabular-nums text-[var(--accent-ink)]">{`${String(index + 1).padStart(2, "0")} · Filière`}</p>
+                  <p className="cartel tabular-nums text-[var(--accent-ink)]">{t.trackNumber(String(index + 1).padStart(2, "0"))}</p>
                   <h3 className="display mt-4 text-[clamp(1.8rem,3.4vw,2.8rem)]">{track.name}</h3>
                   {track.summary && <p className="mt-5 text-ink/80">{track.summary}</p>}
                 </div>
                 <div className="grid gap-8 sm:grid-cols-2">
                   {track.skills.length > 0 && (
                     <div>
-                      <p className="cartel mb-4">Vous apprendrez</p>
+                      <p className="cartel mb-4">{t.youWillLearn}</p>
                       <ul className="space-y-3">
                         {track.skills.map((skill) => (
                           <li key={skill} className="flex gap-3"><Check className="mt-0.5 size-4 shrink-0 text-[var(--accent-ink)]" aria-hidden />{skill}</li>
@@ -86,7 +88,7 @@ export default async function UniversePage({ params }: Props) {
                   )}
                   {track.outcomes.length > 0 && (
                     <div>
-                      <p className="cartel mb-4">Métiers visés</p>
+                      <p className="cartel mb-4">{t.jobs}</p>
                       <ul className="flex flex-wrap gap-2">
                         {track.outcomes.map((outcome) => (
                           <li key={outcome} className="rounded-full border border-[color-mix(in_oklab,var(--accent)_45%,transparent)] px-3 py-1.5 text-sm">{outcome}</li>
@@ -103,17 +105,17 @@ export default async function UniversePage({ params }: Props) {
 
       {programs.length > 0 && (
         <Section>
-          <SectionTitle eyebrow="Formations" title="Les formations de cet univers" />
+          <SectionTitle eyebrow={t.programsEyebrow} title={t.programsTitle} />
           <div className="grid gap-5 md:grid-cols-2 lg:grid-cols-3">
-            {programs.map((program) => <ProgramCard key={program.id} program={program} />)}
+            {programs.map((program) => <ProgramCard key={program.id} program={program} locale={locale} />)}
           </div>
         </Section>
       )}
 
       {artworks.length > 0 && (
         <Section>
-          <SectionTitle eyebrow="Réalisations" title="Faites par nos étudiants" />
-          <ArtworkGrid artworks={artworks} />
+          <SectionTitle eyebrow={t.artworksEyebrow} title={t.artworksTitle} />
+          <ArtworkGrid artworks={artworks} locale={locale} />
         </Section>
       )}
 
@@ -121,7 +123,7 @@ export default async function UniversePage({ params }: Props) {
         <section className="border-y border-line" style={{ ["--accent" as string]: next.accentColor }}>
           <LocaleLink href={`/emsi/univers/${next.slug}`} className="group mx-auto flex max-w-7xl items-center justify-between gap-6 px-4 py-14 sm:px-6 lg:px-8">
             <span>
-              <span className="cartel block">Univers suivant</span>
+              <span className="cartel block">{t.next}</span>
               <span className="display mt-3 block text-[clamp(2rem,5vw,4rem)] transition group-hover:text-[var(--accent-ink)]">{next.name}</span>
             </span>
             <ArrowRight className="size-10 shrink-0 text-[var(--accent-ink)] transition-transform duration-500 group-hover:translate-x-2" aria-hidden />
@@ -130,8 +132,8 @@ export default async function UniversePage({ params }: Props) {
       )}
 
       <CtaBlock data={universe.isUpcoming
-        ? { title: `${universe.name} : bientôt à l'EMSI`, text: "Laissez-nous vos coordonnées : nous vous préviendrons dès l'ouverture des inscriptions.", buttons: [{ label: "Nous écrire", url: "/contact", style: "primary" }] }
-        : { title: `Rejoignez l'univers ${universe.name}`, text: "Candidatez en ligne en quelques minutes : l'équipe de l'EMSI vous répond.", buttons: [{ label: "Candidater", url: "/candidater", style: "primary" }, { label: "Nous contacter", url: "/contact", style: "secondary" }] }} />
+        ? { title: t.soonTitle(universe.name), text: t.soonText, buttons: [{ label: t.writeUs, url: "/contact", style: "primary" }] }
+        : { title: t.joinTitle(universe.name), text: t.joinText, buttons: [{ label: common.apply, url: "/candidater", style: "primary" }, { label: common.contactUs, url: "/contact", style: "secondary" }] }} />
     </div>
   );
 }

@@ -1,20 +1,25 @@
 import type { Metadata } from "next";
 import { ButtonLink } from "@/components/ui/ButtonLink";
+import { getDictionary } from "@/lib/i18n";
+import type { Locale } from "@/lib/i18n/locales";
 
-export const metadata: Metadata = { title: "Candidature envoyée", robots: { index: false } };
+type Props = { params: Promise<{ locale: Locale }>; searchParams: Promise<{ ref?: string }> };
 
-type Props = { searchParams: Promise<{ ref?: string }> };
+export async function generateMetadata({ params }: Props): Promise<Metadata> {
+  return { title: getDictionary((await params).locale).meta.confirmation.title, robots: { index: false } };
+}
 
-export default async function ConfirmationPage({ searchParams }: Props) {
+export default async function ConfirmationPage({ params, searchParams }: Props) {
   const { ref } = await searchParams;
+  const t = getDictionary((await params).locale).confirmation;
 
   return (
     <div className="beam mx-auto max-w-3xl px-4 pb-24 pt-40 text-center sm:px-6">
-      <p className="cartel">Candidature envoyée</p>
-      <h1 className="display mt-4 text-[clamp(2.2rem,5vw,3.8rem)] text-balance">Merci, nous avons bien reçu votre dossier.</h1>
-      {ref && <p className="mt-6 text-lg">Votre numéro de dossier : <strong className="font-mono text-brand">{ref}</strong></p>}
-      <p className="mx-auto mt-4 max-w-xl text-ink-muted">Notez-le : il vous sera demandé dans nos échanges. Si vous avez indiqué une adresse e-mail, un accusé de réception vous a été envoyé. Notre équipe vous recontactera pour la suite.</p>
-      <div className="mt-10 flex justify-center gap-3"><ButtonLink href="/emsi/realisations" variant="secondary">Voir les réalisations</ButtonLink><ButtonLink href="/">Retour à l&apos;accueil</ButtonLink></div>
+      <p className="cartel">{t.eyebrow}</p>
+      <h1 className="display mt-4 text-[clamp(2.2rem,5vw,3.8rem)] text-balance">{t.title}</h1>
+      {ref && <p className="mt-6 text-lg">{t.reference}<strong className="font-mono text-brand">{ref}</strong></p>}
+      <p className="mx-auto mt-4 max-w-xl text-ink-muted">{t.text}</p>
+      <div className="mt-10 flex justify-center gap-3"><ButtonLink href="/emsi/realisations" variant="secondary">{t.seeArtworks}</ButtonLink><ButtonLink href="/">{t.home}</ButtonLink></div>
     </div>
   );
 }

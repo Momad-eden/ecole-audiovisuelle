@@ -6,6 +6,8 @@ import { UniverseVisual } from "@/components/universe/UniverseVisual";
 import { accentVars } from "@/lib/contrast";
 import { cn, frenchSpacing } from "@/lib/utils";
 import { HeroVideo } from "./HeroVideo";
+import { getDictionary } from "@/lib/i18n";
+import type { Locale } from "@/lib/i18n/locales";
 import type { HeroData } from "./types";
 
 type Props = { data: HeroData; first: boolean };
@@ -88,7 +90,7 @@ export function EditorialHero({ data, first }: Props) {
 }
 
 /** Affiche de concert : titre géant en capitales sur aplat de couleur, photo en bichromie. */
-export function PosterHero({ data, first }: Props) {
+export function PosterHero({ data, first, locale }: Props & { locale: Locale }) {
   const Heading = first ? "h1" : "h2";
   return (
     <section data-first={first || undefined} className="poster-hero relative isolate overflow-hidden bg-[var(--accent-ink)] pb-12 pt-32 text-on-accent sm:pt-36" style={accentStyle(data)}>
@@ -100,7 +102,7 @@ export function PosterHero({ data, first }: Props) {
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
         <div className="flex flex-wrap items-center justify-between gap-4 border-b border-current/25 pb-5 font-mono text-xs uppercase tracking-[0.2em]">
           <span>{data.eyebrow ?? "EMSI"}</span>
-          <span aria-hidden>Son · Image · Lumière · Scène</span>
+          <span aria-hidden>{getDictionary(locale).hero.posterTagline}</span>
         </div>
         <Heading className={cn("display-condensed mt-8 uppercase leading-[0.86] text-balance", data.title.length <= 30 ? "text-[clamp(3.4rem,13vw,12rem)]" : "text-[clamp(2.8rem,8.5vw,8rem)]")}>
           {frenchSpacing(data.title)}

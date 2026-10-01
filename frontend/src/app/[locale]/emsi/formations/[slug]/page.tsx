@@ -22,7 +22,7 @@ export default async function ProgramPage({ params }: Props) {
   return (
     <>
       <CurrentCrumb title={program.title} />
-      <ProgramDetail program={program} applyHref={`/candidater?formation=${program.slug}`} />
+      <ProgramDetail program={program} applyHref={`/candidater?formation=${program.slug}`} locale={locale} />
     </>
   );
 }

@@ -11,6 +11,7 @@ import { RichText } from "@/components/ui/RichText";
 import { ShareButtons } from "@/components/ui/ShareButtons";
 import { VideoEmbed } from "@/components/ui/VideoEmbed";
 import { api } from "@/lib/api";
+import { getDictionary } from "@/lib/i18n";
 import type { Locale } from "@/lib/i18n/locales";
 import { formatDuration, siteUrl } from "@/lib/utils";
 
@@ -32,6 +33,7 @@ export default async function ArtworkPage({ params }: Props) {
   const artwork = await api.artwork(slug, locale);
   if (!artwork) notFound();
 
+  const { artwork: t, audio } = getDictionary(locale);
   const learnHref = artwork.room ? `/emsi/univers/${artwork.room.slug}#filieres` : "/emsi/formations";
   const accent = artwork.room?.accentColor ?? "var(--color-brand)";
   const href = `/emsi/realisations/${artwork.slug}`;
@@ -54,7 +56,7 @@ export default async function ArtworkPage({ params }: Props) {
       <CurrentCrumb title={artwork.title} />
       <div className="mx-auto max-w-7xl px-4 pt-32 sm:px-6 lg:px-8">
         <LocaleLink href={artwork.room ? `/emsi/realisations?univers=${artwork.room.slug}` : "/emsi/realisations"} className="cartel inline-flex items-center gap-2 hover:text-ink">
-          <ArrowLeft className="size-4" aria-hidden /> Réalisations{artwork.room ? ` · ${artwork.room.name}` : ""}
+          <ArrowLeft className="size-4" aria-hidden /> {t.back}{artwork.room ? ` · ${artwork.room.name}` : ""}
         </LocaleLink>
       </div>
 
@@ -74,12 +76,12 @@ export default async function ArtworkPage({ params }: Props) {
             <div className="rounded-3xl border border-line bg-night-2 p-6">
               <div className="flex flex-wrap items-center gap-4">
                 <PlayButton track={track} />
-                {artwork.audio?.durationSeconds && <span className="cartel">Durée {formatDuration(artwork.audio.durationSeconds)}</span>}
+                {artwork.audio?.durationSeconds && <span className="cartel">{audio.duration(formatDuration(artwork.audio.durationSeconds))}</span>}
               </div>
               <ArtworkWaveform track={track} />
               {artwork.transcript && (
                 <details className="mt-4 text-sm text-ink-muted">
-                  <summary className="cursor-pointer text-ink">Description du son (accessibilité)</summary>
+                  <summary className="cursor-pointer text-ink">{t.soundDescription}</summary>
                   <p className="mt-3 whitespace-pre-line">{artwork.transcript}</p>
                 </details>
               )}
@@ -91,7 +93,7 @@ export default async function ArtworkPage({ params }: Props) {
               {artwork.gallery.map((image, index) => (
                 <li key={image.url} className="relative aspect-square overflow-hidden rounded-2xl border border-line">
                   <a href={image.url} target="_blank" rel="noopener noreferrer">
-                    <MediaImage image={{ ...image, alt: `${artwork.title} — image ${index + 1}` }} sizes="(min-width: 1024px) 20vw, 50vw" />
+                    <MediaImage image={{ ...image, alt: t.image(artwork.title, index + 1) }} sizes="(min-width: 1024px) 20vw, 50vw" />
                   </a>
                 </li>
               ))}
@@ -105,9 +107,9 @@ export default async function ArtworkPage({ params }: Props) {
           {artwork.summary && <p className="mt-5 text-lg text-ink/85">{artwork.summary}</p>}
 
           <dl className="mt-10 divide-y divide-line border-y border-line text-sm">
-            {artwork.room && <div className="flex justify-between gap-6 py-3"><dt className="text-ink-muted">Univers</dt><dd>{artwork.room.name}</dd></div>}
-            {artwork.track && <div className="flex justify-between gap-6 py-3"><dt className="text-ink-muted">Filière</dt><dd>{artwork.track.name}</dd></div>}
-            {artwork.cohort && <div className="flex justify-between gap-6 py-3"><dt className="text-ink-muted">Promotion</dt><dd>{artwork.cohort}</dd></div>}
+            {artwork.room && <div className="flex justify-between gap-6 py-3"><dt className="text-ink-muted">{t.universe}</dt><dd>{artwork.room.name}</dd></div>}
+            {artwork.track && <div className="flex justify-between gap-6 py-3"><dt className="text-ink-muted">{t.track}</dt><dd>{artwork.track.name}</dd></div>}
+            {artwork.cohort && <div className="flex justify-between gap-6 py-3"><dt className="text-ink-muted">{t.cohort}</dt><dd>{artwork.cohort}</dd></div>}
             {artwork.credits?.map((credit) => (
               <div key={credit.name + credit.role} className="flex justify-between gap-6 py-3"><dt className="text-ink-muted">{credit.role}</dt><dd className="text-right">{credit.name}</dd></div>
             ))}
@@ -115,7 +117,7 @@ export default async function ArtworkPage({ params }: Props) {
 
           {artwork.equipment.length > 0 && (
             <div className="mt-8">
-              <h2 className="cartel mb-3">Matériel utilisé</h2>
+              <h2 className="cartel mb-3">{t.equipment}</h2>
               <ul className="flex flex-wrap gap-2">
                 {artwork.equipment.map((item) => <li key={item} className="rounded-full border border-line px-3 py-1 text-sm">{item}</li>)}
               </ul>
@@ -124,8 +126,8 @@ export default async function ArtworkPage({ params }: Props) {
 
           {artwork.creationStory && (
             <div className="mt-10">
-              <h2 className="display mb-4 text-2xl">Récit de création</h2>
-              <RichText html={artwork.creationStory} />
+              <h2 className="display mb-4 text-2xl">{t.story}</h2>
+              <RichText html={artwork.creationStory} locale={locale} />
             </div>
           )}
 
@@ -134,8 +136,8 @@ export default async function ArtworkPage({ params }: Props) {
           {artwork.track && (
             <LocaleLink href={learnHref} className="mt-12 flex items-center justify-between gap-4 rounded-3xl border border-line bg-night-2 p-6 transition hover:border-[var(--accent)]">
               <span>
-                <span className="cartel block">Apprendre à faire ça</span>
-                <span className="display mt-1 block text-xl">Filière {artwork.track.name}</span>
+                <span className="cartel block">{t.learn}</span>
+                <span className="display mt-1 block text-xl">{t.trackName(artwork.track.name)}</span>
               </span>
               <ArrowRight className="size-5 text-[var(--accent-ink)]" aria-hidden />
             </LocaleLink>

@@ -21,7 +21,7 @@ export default async function ProfessionalProgramPage({ params }: Props) {
   return (
     <div style={{ ["--accent" as string]: "var(--color-hmi)" }}>
       <CurrentCrumb title={program.title} />
-      <ProgramDetail program={program} applyHref={`/emsi/professionnels/candidater?formation=${program.slug}`} />
+      <ProgramDetail program={program} applyHref={`/emsi/professionnels/candidater?formation=${program.slug}`} locale={locale} />
     </div>
   );
 }
