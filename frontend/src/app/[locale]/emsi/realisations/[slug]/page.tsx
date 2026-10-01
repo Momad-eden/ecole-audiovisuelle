@@ -14,10 +14,12 @@ import { api } from "@/lib/api";
 import { getDictionary } from "@/lib/i18n";
 import type { Locale } from "@/lib/i18n/locales";
 import { formatDuration, siteUrl } from "@/lib/utils";
+import { localeAlternates } from "@/lib/i18n/alternates";
+import { asLocale } from "@/lib/i18n/locales";
 
 type Props = { params: Promise<{ locale: Locale; slug: string }> };
 
-export async function generateMetadata({ params }: Props): Promise<Metadata> {
+async function baseMetadata({ params }: Props): Promise<Metadata> {
   const { locale, slug } = await params;
   const artwork = await api.artwork(slug, locale);
   if (!artwork) return {};
@@ -26,6 +28,11 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
     description: artwork.summary ?? undefined,
     openGraph: { title: artwork.title, description: artwork.summary ?? undefined, images: artwork.cover ? [{ url: artwork.cover.url, alt: artwork.cover.alt }] : [DEFAULT_SHARE_IMAGE] },
   };
+}
+
+export async function generateMetadata(props: Props): Promise<Metadata> {
+  const p = await props.params;
+  return { ...(await baseMetadata(props)), alternates: localeAlternates(`/emsi/realisations/${p.slug}`, asLocale(p.locale)) };
 }
 
 export default async function ArtworkPage({ params }: Props) {

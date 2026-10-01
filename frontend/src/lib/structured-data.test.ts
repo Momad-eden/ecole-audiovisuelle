@@ -46,3 +46,10 @@ test("page générale : rien de plus que le JSON-LD du site", () => {
 test("le script échappe les balises", () => {
   expect(jsonLdScript({ name: "</script><b>" })).not.toContain("<");
 });
+
+test("la langue de la page est indiquée, et l'adresse anglaise est préfixée", () => {
+  const fr = pageStructuredData(page({ title: "EMSI", domain: "emsi" }), "/emsi", [], "https://site.test");
+  const en = pageStructuredData(page({ title: "EMSI", domain: "emsi" }), "/emsi", [], "https://site.test", "en");
+  expect(fr).toMatchObject({ inLanguage: "fr", url: "https://site.test/emsi" });
+  expect(en).toMatchObject({ inLanguage: "en", url: "https://site.test/en/emsi" });
+});

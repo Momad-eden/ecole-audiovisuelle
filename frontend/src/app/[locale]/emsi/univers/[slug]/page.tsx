@@ -15,13 +15,20 @@ import { UniverseVisual } from "@/components/universe/UniverseVisual";
 import { api } from "@/lib/api";
 import { getDictionary } from "@/lib/i18n";
 import type { Locale } from "@/lib/i18n/locales";
+import { localeAlternates } from "@/lib/i18n/alternates";
+import { asLocale } from "@/lib/i18n/locales";
 
 type Props = { params: Promise<{ locale: Locale; slug: string }> };
 
-export async function generateMetadata({ params }: Props): Promise<Metadata> {
+async function baseMetadata({ params }: Props): Promise<Metadata> {
   const { locale, slug } = await params;
   const universe = await api.room(slug, locale);
   return universe ? { title: universe.name, description: universe.tagline ?? undefined } : {};
+}
+
+export async function generateMetadata(props: Props): Promise<Metadata> {
+  const p = await props.params;
+  return { ...(await baseMetadata(props)), alternates: localeAlternates(`/emsi/univers/${p.slug}`, asLocale(p.locale)) };
 }
 
 export default async function UniversePage({ params }: Props) {

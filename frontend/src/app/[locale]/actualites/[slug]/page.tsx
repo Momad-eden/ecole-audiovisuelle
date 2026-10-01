@@ -11,14 +11,21 @@ import { getDictionary } from "@/lib/i18n";
 import { formatDate } from "@/lib/i18n/format";
 import type { Locale } from "@/lib/i18n/locales";
 import { frenchSpacing } from "@/lib/utils";
+import { localeAlternates } from "@/lib/i18n/alternates";
+import { asLocale } from "@/lib/i18n/locales";
 
 type Props = { params: Promise<{ locale: Locale; slug: string }> };
 
-export async function generateMetadata({ params }: Props): Promise<Metadata> {
+async function baseMetadata({ params }: Props): Promise<Metadata> {
   const { locale, slug } = await params;
   const news = await api.newsItem(slug, locale);
   if (!news) return {};
   return { title: news.title, description: news.excerpt ?? undefined, openGraph: { type: "article", publishedTime: news.publishedAt ?? undefined, images: news.image ? [{ url: news.image.url }] : [DEFAULT_SHARE_IMAGE] } };
+}
+
+export async function generateMetadata(props: Props): Promise<Metadata> {
+  const p = await props.params;
+  return { ...(await baseMetadata(props)), alternates: localeAlternates(`/actualites/${p.slug}`, asLocale(p.locale)) };
 }
 
 export default async function NewsItemPage({ params }: Props) {

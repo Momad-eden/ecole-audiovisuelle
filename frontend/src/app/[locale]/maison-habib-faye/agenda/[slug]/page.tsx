@@ -14,13 +14,20 @@ import type { Locale } from "@/lib/i18n/locales";
 import { CurrentCrumb } from "@/components/layout/domain-crumb";
 import { DomainChrome } from "@/components/layout/DomainChrome";
 import { siteUrl } from "@/lib/utils";
+import { localeAlternates } from "@/lib/i18n/alternates";
+import { asLocale } from "@/lib/i18n/locales";
 
 type Props = { params: Promise<{ locale: Locale; slug: string }> };
 
-export async function generateMetadata({ params }: Props): Promise<Metadata> {
+async function baseMetadata({ params }: Props): Promise<Metadata> {
   const { locale, slug } = await params;
   const event = await api.agendaEvent(slug, locale);
   return event ? { title: event.title, description: event.summary ?? undefined } : {};
+}
+
+export async function generateMetadata(props: Props): Promise<Metadata> {
+  const p = await props.params;
+  return { ...(await baseMetadata(props)), alternates: localeAlternates(`/maison-habib-faye/agenda/${p.slug}`, asLocale(p.locale)) };
 }
 
 export default async function AgendaEventPage({ params }: Props) {

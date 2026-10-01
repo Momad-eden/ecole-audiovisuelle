@@ -8,11 +8,18 @@ import { api } from "@/lib/api";
 import { getDictionary } from "@/lib/i18n";
 import type { Locale } from "@/lib/i18n/locales";
 import { cn } from "@/lib/utils";
+import { localeAlternates } from "@/lib/i18n/alternates";
+import { asLocale } from "@/lib/i18n/locales";
 
 type Props = { params: Promise<{ locale: Locale }>; searchParams: Promise<{ univers?: string }> };
 
-export async function generateMetadata({ params }: Props): Promise<Metadata> {
+async function baseMetadata({ params }: Props): Promise<Metadata> {
   return getDictionary((await params).locale).meta.artworks;
+}
+
+export async function generateMetadata(props: Props): Promise<Metadata> {
+  const p = await props.params;
+  return { ...(await baseMetadata(props)), alternates: localeAlternates("/emsi/realisations", asLocale(p.locale)) };
 }
 
 export default async function RealisationsPage({ params, searchParams }: Props) {

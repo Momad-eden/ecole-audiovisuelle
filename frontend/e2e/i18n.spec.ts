@@ -131,3 +131,27 @@ test("les textes fixes d'une page anglaise (cartes, liens) sont en anglais", asy
   await expect(page.locator("main")).not.toContainText(/Voir la formation|Toutes les formations|Découvrir l'univers/);
   await expect(page.locator("html")).toHaveAttribute("lang", "en");
 });
+
+test.describe("référencement bilingue", () => {
+  test("une page anglaise annonce sa langue et ses équivalents", async ({ page }) => {
+    await page.goto("/en/emsi");
+    await expect(page.locator("html")).toHaveAttribute("lang", "en");
+    const hreflang = async (lang: string) => new URL((await page.locator(`link[rel="alternate"][hreflang="${lang}"]`).getAttribute("href")) ?? "", "http://x").pathname;
+    expect(await hreflang("fr")).toBe("/emsi");
+    expect(await hreflang("en")).toBe("/en/emsi");
+    expect(await hreflang("x-default")).toBe("/emsi");
+    expect(new URL((await page.locator('link[rel="canonical"]').getAttribute("href")) ?? "", "http://x").pathname).toBe("/en/emsi");
+  });
+
+  test("le plan du site contient les adresses anglaises", async ({ request }) => {
+    const xml = await (await request.get("/sitemap.xml")).text();
+    expect(xml).toContain("/en/emsi/dakar</loc>");
+    expect(xml).toContain('hreflang="en"');
+  });
+
+  test("les données structurées d'une page anglaise sont en anglais", async ({ page }) => {
+    await page.goto("/en/emsi/dakar");
+    const blocks = await page.locator('script[type="application/ld+json"]').allTextContents();
+    expect(blocks.some((text) => text.includes('"inLanguage":"en"') && text.includes("/en/emsi/dakar"))).toBe(true);
+  });
+});

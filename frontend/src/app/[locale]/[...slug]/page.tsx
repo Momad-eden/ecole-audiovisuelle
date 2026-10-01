@@ -8,16 +8,23 @@ import { localizedPath, type Locale } from "@/lib/i18n/locales";
 import { pageMetadata } from "@/lib/metadata";
 import { jsonLdScript, pageStructuredData } from "@/lib/structured-data";
 import { siteUrl } from "@/lib/utils";
+import { localeAlternates } from "@/lib/i18n/alternates";
+import { asLocale } from "@/lib/i18n/locales";
 
 type Props = { params: Promise<{ locale: Locale; slug: string[] }> };
 
-export async function generateMetadata({ params }: Props): Promise<Metadata> {
+async function baseMetadata({ params }: Props): Promise<Metadata> {
   const { locale, slug } = await params;
   const page = await api.page(slug.join("/"), locale);
   return page ? pageMetadata(page) : {};
 }
 
 /** Pages gérées dans l'administration (école, contact, pages libres…) et anciennes adresses redirigées. */
+export async function generateMetadata(props: Props): Promise<Metadata> {
+  const p = await props.params;
+  return { ...(await baseMetadata(props)), alternates: localeAlternates(`/${p.slug.join("/")}`, asLocale(p.locale)) };
+}
+
 export default async function CmsPage({ params }: Props) {
   const { locale, slug } = await params;
   const path = slug.join("/");
@@ -35,7 +42,7 @@ export default async function CmsPage({ params }: Props) {
   }
 
   const { menus, domains, places } = await api.site(locale);
-  const jsonLd = pageStructuredData(page, `/${path}`, places, siteUrl);
+  const jsonLd = pageStructuredData(page, `/${path}`, places, siteUrl, asLocale(locale));
   return (
     <DomainChrome domain={page.domain ?? "general"} site={{ menus, domains }} path={`/${path}`} title={page.title}>
       {jsonLd && <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: jsonLdScript(jsonLd) }} />}

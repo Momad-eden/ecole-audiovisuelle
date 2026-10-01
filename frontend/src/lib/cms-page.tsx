@@ -18,7 +18,7 @@ export async function CmsPageContent({ slug, locale }: { slug: string; locale: L
   const page = await api.page(slug, locale);
   if (!page) notFound();
   const { places } = await api.site(locale);
-  const jsonLd = pageStructuredData(page, `/${slug}`, places, siteUrl);
+  const jsonLd = pageStructuredData(page, `/${slug}`, places, siteUrl, locale);
   return (
     <>
       {jsonLd && <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: jsonLdScript(jsonLd) }} />}

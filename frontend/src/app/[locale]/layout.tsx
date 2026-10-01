@@ -12,6 +12,7 @@ import { api } from "@/lib/api";
 import { getDictionary } from "@/lib/i18n";
 import { isLocale, LOCALES } from "@/lib/i18n/locales";
 import { DEFAULT_SHARE_IMAGE } from "@/lib/metadata";
+import { localizedPath } from "@/lib/i18n/locales";
 import { siteUrl } from "@/lib/utils";
 import "../globals.css";
 
@@ -41,7 +42,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
     metadataBase: new URL(siteUrl),
     title: { default: title, template: `%s — EMSI` },
     description,
-    openGraph: { type: "website", locale: getDictionary(locale).meta.ogLocale, siteName: settings.schoolName, title, description, images: [DEFAULT_SHARE_IMAGE] },
+    openGraph: { type: "website", locale: getDictionary(locale).meta.ogLocale, siteName: settings.schoolName, title, description, images: [{ ...DEFAULT_SHARE_IMAGE, url: localizedPath(DEFAULT_SHARE_IMAGE.url, locale) }] },
     twitter: { card: "summary_large_image" },
   };
 }

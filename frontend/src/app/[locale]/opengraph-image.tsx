@@ -5,7 +5,14 @@ export const alt = "EMSI — École des Métiers du Son et de l'Image, Dakar et 
 export const size = { width: 1200, height: 630 };
 export const contentType = "image/png";
 
-export default function OpenGraphImage() {
+/** Textes de l'aperçu selon la langue de la page partagée. */
+const TEXT = {
+  fr: { school: "École des Métiers du Son et de l'Image", disciplines: "Son · Image · Lumière · Design · Scène" },
+  en: { school: "School of Sound and Image Professions", disciplines: "Sound · Image · Light · Design · Stage" },
+} as const;
+
+export default async function OpenGraphImage({ params }: { params: Promise<{ locale: string }> }) {
+  const t = TEXT[(await params).locale === "en" ? "en" : "fr"];
   const bars = [0.35, 0.6, 0.9, 0.7, 1, 0.85, 0.55, 0.75, 0.95, 0.6, 0.45, 0.8, 0.65, 0.9, 0.5, 0.7, 0.4, 0.6];
   return new ImageResponse(
     (
@@ -17,10 +24,10 @@ export default function OpenGraphImage() {
         </div>
         <div style={{ display: "flex", flexDirection: "column" }}>
           <div style={{ fontSize: 150, fontWeight: 800, letterSpacing: -6, lineHeight: 1 }}>EMSI</div>
-          <div style={{ fontSize: 40, marginTop: 18, maxWidth: 900 }}>École des Métiers du Son et de l&apos;Image</div>
+          <div style={{ fontSize: 40, marginTop: 18, maxWidth: 900 }}>{t.school}</div>
         </div>
         <div style={{ display: "flex", alignItems: "flex-end", justifyContent: "space-between" }}>
-          <div style={{ fontSize: 26, color: "#ff7a1a" }}>Son · Image · Lumière · Design · Scène</div>
+          <div style={{ fontSize: 26, color: "#ff7a1a" }}>{t.disciplines}</div>
           <div style={{ display: "flex", alignItems: "flex-end", gap: 6, height: 90 }}>
             {bars.map((h, i) => <div key={i} style={{ width: 10, height: 90 * h, borderRadius: 3, background: i % 3 === 0 ? "#8b6cff" : "#ff7a1a" }} />)}
           </div>
