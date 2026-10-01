@@ -10,7 +10,7 @@ export function jsonLdScript(data: JsonLd): string {
 
 /**
  * Données structurées d'une page à blocs selon son domaine.
- * Maison / Studio : Organization ; EMSI : EducationalOrganization ; page de campus (bloc
+ * Centre culturel / Studio : Organization ; EMSI : EducationalOrganization ; page de campus (bloc
  * « campus_programs ») : EducationalOrganization avec l'adresse du campus. Domaine général : rien
  * de plus que le JSON-LD du site (layout.tsx).
  */

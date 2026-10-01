@@ -34,7 +34,7 @@ export default async function NewsPage({ params, searchParams }: Props) {
       <Section className="pt-0 sm:pt-0">
         {news.data.length === 0 ? (
           <EmptyState title={t.emptyTitle} text={t.emptyText}>
-            <ButtonLink href="/maison-habib-faye/agenda">{t.seeAgenda}</ButtonLink>
+            <ButtonLink href="/centre-culturel/agenda">{t.seeAgenda}</ButtonLink>
             <ButtonLink href="/emsi" variant="secondary">{common.discoverUniverses}</ButtonLink>
           </EmptyState>
         ) : (

@@ -49,9 +49,10 @@ final class BlockTexts
         'services' => 'Services et tarifs', 'productions' => 'Productions du studio (écoute)',
         'agenda' => 'Agenda ou références', 'booking_form' => 'Formulaire de demande (devis, réservation)',
         'places' => 'Nos lieux (adresses)', 'campuses' => 'Nos campus (Dakar, Saint-Louis)',
-        'domains' => 'Nos trois maisons (triptyque)', 'campus_programs' => 'Formations de ce campus',
+        'domains' => 'Nos trois lieux (triptyque)', 'campus_programs' => 'Formations de ce campus',
         'downloads' => 'Documents à télécharger', 'support_form' => 'Nous soutenir (formulaire)',
         'showcase' => 'Vitrine photos et vidéos',
+        'statement' => 'Manifeste (phrase, chiffres, bandeau de photos)',
     ];
 
     /** Libellés d'un élément de répéteur (au singulier). */

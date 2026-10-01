@@ -55,7 +55,7 @@ class DomainsApiTest extends TestCase
     public function test_site_exposes_the_domains(): void
     {
         $this->getJson('/api/v1/public/site')->assertOk()
-            ->assertJsonPath('data.domains.maison', ['label' => 'Maison Habib Faye', 'color' => '#e0a84a'])
+            ->assertJsonPath('data.domains.maison', ['label' => 'Centre culturel Habib Faye', 'color' => '#e0a84a'])
             ->assertJsonPath('data.domains.emsi.color', '#ff7a1a')
             ->assertJsonPath('data.domains.studio.color', '#ff3b30')
             ->assertJsonStructure(['data' => ['domains' => ['general' => ['label', 'color']]]]);

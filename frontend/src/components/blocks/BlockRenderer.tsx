@@ -9,6 +9,7 @@ import { CampusesBlock } from "./CampusesBlock";
 import { CampusProgramsBlock } from "./CampusProgramsBlock";
 import { DomainsBlock } from "./DomainsBlock";
 import { ShowcaseBlock } from "./ShowcaseBlock";
+import { StatementBlock } from "./StatementBlock";
 import { DownloadsBlock } from "./DownloadsBlock";
 import { SupportFormBlock } from "./SupportFormBlock";
 import { AgendaBlock, BookingFormBlock, EcosystemBlock, EquipmentListBlock, PacksBlock, PlacesBlock, ProductionsBlock, ServicesBlock } from "./ImpactBlocks";
@@ -70,6 +71,7 @@ export function BlockRenderer({ blocks, path = "", title, locale, contentLocale 
           case "news": return <NewsBlock key={block.id} locale={locale} data={d as T.NewsData} />;
           case "partners": return <PartnersBlock key={block.id} locale={locale} data={d as T.PartnersData} />;
           case "professional_space": return <ProfessionalSpaceBlock key={block.id} locale={locale} data={d as T.ProfessionalSpaceData} />;
+          case "statement": return <StatementBlock key={block.id} data={d as T.StatementData} />;
           case "showcase": return <ShowcaseBlock key={block.id} data={d as T.ShowcaseData} />;
           case "contact": return <ContactBlock key={block.id} locale={locale} data={d as T.ContactData} />;
           default: return null;

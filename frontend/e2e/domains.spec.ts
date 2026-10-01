@@ -12,18 +12,18 @@ test("les anciennes adresses arrivent sur la nouvelle en une seule redirection",
     ["/professionnels/candidater", "/emsi/professionnels/candidater"],
     ["/expositions", "/emsi/realisations"],
     ["/expositions/une-expo", "/emsi/realisations"],
-    ["/studio", "/maison-habib-faye/studio"],
+    ["/studio", "/centre-culturel/studio"],
     ["/ecole", "/emsi"],
-    ["/espace-habib-faye", "/maison-habib-faye"],
-    ["/agenda", "/maison-habib-faye/agenda"],
-    ["/agenda/un-concert", "/maison-habib-faye/agenda/un-concert"],
-    ["/events", "/maison-habib-faye"],
-    ["/events/materiel/une-enceinte", "/maison-habib-faye"],
+    ["/espace-habib-faye", "/centre-culturel"],
+    ["/agenda", "/centre-culturel/agenda"],
+    ["/agenda/un-concert", "/centre-culturel/agenda/un-concert"],
+    ["/events", "/centre-culturel"],
+    ["/events/materiel/une-enceinte", "/centre-culturel"],
     ["/musee", "/emsi/realisations"],
     ["/musee/oeuvres/une-oeuvre", "/emsi/realisations/une-oeuvre"],
     ["/musee/salle-du-son", "/emsi/univers/son"],
     ["/musee/design", "/emsi/univers/design"],
-    ["/demande", "/maison-habib-faye/studio#reserver"],
+    ["/demande", "/centre-culturel/studio#reserver"],
   ];
   for (const [from, to] of redirections) {
     const response = await request.get(from, { maxRedirects: 0 });
@@ -67,7 +67,7 @@ test("la rubrique où l'on se trouve est marquée dans le menu", async ({ page, 
   await page.goto("/emsi/dakar");
   const nav = page.getByRole("navigation", { name: "Navigation principale" });
   await expect(nav.getByRole("button", { name: "EMSI" })).toHaveClass(/nav-pill-active/);
-  await expect(nav.getByRole("button", { name: "Maison Habib Faye" })).not.toHaveClass(/nav-pill-active/);
+  await expect(nav.getByRole("button", { name: "Centre culturel Habib Faye" })).not.toHaveClass(/nav-pill-active/);
   await nav.getByRole("button", { name: "EMSI" }).click();
   await expect(nav.getByRole("link", { name: "Campus de Dakar" })).toHaveAttribute("aria-current", "page");
 });
@@ -98,12 +98,12 @@ test("une page de campus affiche le fil d'Ariane et la sous-navigation EMSI, pag
 // Pages d'essai créées par `php artisan emsi:domains-showcase` (showcase.setup.ts).
 test.describe("nouveaux blocs", () => {
   const MAISONS = [
-    ["Maison Habib Faye", "/maison-habib-faye"],
+    ["Centre culturel Habib Faye", "/centre-culturel"],
     ["EMSI", "/emsi"],
-    ["Impact Live Studio", "/maison-habib-faye/studio"],
+    ["Impact Live Studio", "/centre-culturel/studio"],
   ] as const;
 
-  test("le triptyque « Nos trois maisons » : trois panneaux cliquables, côte à côte sur ordinateur", async ({ page, isMobile }) => {
+  test("le triptyque « Nos trois lieux » : trois panneaux cliquables, côte à côte sur ordinateur", async ({ page, isMobile }) => {
     test.skip(isMobile, "Disposition ordinateur.");
     await page.setViewportSize({ width: 1440, height: 900 });
     await page.goto("/essai-domaines-accueil");
@@ -231,7 +231,7 @@ test.describe("nouveaux blocs", () => {
   });
 });
 
-test("les pages de campus et de la Maison exposent leurs données structurées", async ({ page }) => {
+test("les pages de campus et du Centre culturel exposent leurs données structurées", async ({ page }) => {
   const jsonLd = async (path: string) => {
     await page.goto(path);
     const scripts = await page.locator('script[type="application/ld+json"]').allTextContents();
@@ -239,7 +239,7 @@ test("les pages de campus et de la Maison exposent leurs données structurées",
   };
   const campus = await jsonLd("/emsi/saint-louis");
   expect(campus).toContainEqual(expect.objectContaining({ "@type": "EducationalOrganization", address: expect.objectContaining({ "@type": "PostalAddress", addressCountry: "SN" }) }));
-  const maison = await jsonLd("/maison-habib-faye");
+  const maison = await jsonLd("/centre-culturel");
   expect(maison).toContainEqual(expect.objectContaining({ "@type": "Organization" }));
 });
 
@@ -247,9 +247,17 @@ test("le méga-menu présente la rubrique (photo, accroche) à côté de ses lie
   test.skip(isMobile, "Menu de bureau.");
   await page.goto("/");
   const nav = page.getByRole("navigation", { name: "Navigation principale" });
-  await nav.getByRole("button", { name: "Maison Habib Faye" }).click();
-  const feature = nav.getByRole("link", { name: /^Maison Habib Faye/ });
+  await nav.getByRole("button", { name: "Centre culturel Habib Faye" }).click();
+  const feature = nav.getByRole("link", { name: /^Centre culturel Habib Faye/ });
   await expect(feature).toBeVisible();
-  await expect(feature).toHaveAttribute("href", "/maison-habib-faye");
+  await expect(feature).toHaveAttribute("href", "/centre-culturel");
   await expect(feature).toContainText("centre culturel");
+});
+
+test("les anciennes adresses de la « Maison » mènent au Centre culturel, en français comme en anglais", async ({ request }) => {
+  for (const [from, to] of [["/maison-habib-faye", "/centre-culturel"], ["/maison-habib-faye/studio", "/centre-culturel/studio"], ["/en/maison-habib-faye/agenda", "/en/centre-culturel/agenda"]]) {
+    const response = await request.get(from, { maxRedirects: 0 });
+    expect(response.status(), from).toBe(308);
+    expect(new URL(response.headers()["location"], "http://x").pathname, from).toBe(to);
+  }
 });

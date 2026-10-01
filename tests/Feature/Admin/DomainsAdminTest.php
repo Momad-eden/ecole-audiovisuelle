@@ -53,7 +53,7 @@ class DomainsAdminTest extends TestCase
         $page = Page::create(['title' => 'Essai', 'slug' => 'essai', 'type' => 'free']);
         $this->get(PageResource::getUrl('edit', ['record' => $page]))->assertOk()
             ->assertSee('Domaine')->assertSee('Donne sa couleur et son menu à la page')
-            ->assertSeeInOrder(['Général', 'Maison Habib Faye', 'EMSI', 'Impact Live Studio'])->assertSee('Maison Habib Faye')->assertSee('EMSI')->assertSee('Impact Live Studio')->assertSee('Général');
+            ->assertSeeInOrder(['Général', 'Centre culturel Habib Faye', 'EMSI', 'Impact Live Studio'])->assertSee('Centre culturel Habib Faye')->assertSee('EMSI')->assertSee('Impact Live Studio')->assertSee('Général');
     }
 
     public function test_menu_item_form_offers_a_parent_for_main_menu(): void
@@ -135,7 +135,7 @@ class DomainsAdminTest extends TestCase
         $this->assertFalse($blocks->has('packs'));
 
         $type = collect($blocks['booking_form']->getDefaultChildComponents())->first(fn ($c) => $c->getName() === 'booking_type');
-        $this->assertSame(['studio_session' => 'Session studio', 'space_rental' => 'Location de l\'Espace Habib Faye'], $type->getOptions());
+        $this->assertSame(['studio_session' => 'Session studio', 'space_rental' => 'Location d\'un espace du Centre culturel'], $type->getOptions());
     }
 
     public function test_menu_parent_options_on_edit_exclude_self_and_buttons(): void
@@ -218,18 +218,18 @@ class DomainsAdminTest extends TestCase
     {
         $page = Livewire::test(CreatePage::class);
         foreach ([
-            'maison-habib-faye/studio/tarifs' => 'studio', 'maison-habib-faye/studio' => 'studio', 'maison-habib-faye/residences' => 'maison',
-            'emsi/campus-thies' => 'emsi', 'emsi' => 'emsi', 'maison-habib-faye' => 'maison',
+            'centre-culturel/studio/tarifs' => 'studio', 'centre-culturel/studio' => 'studio', 'centre-culturel/residences' => 'maison',
+            'emsi/campus-thies' => 'emsi', 'emsi' => 'emsi', 'centre-culturel' => 'maison',
         ] as $slug => $domain) {
             $page->fillForm(['slug' => $slug])->assertFormSet(['domain' => SiteDomain::from($domain)]);
         }
         // Autre adresse : le domaine choisi n'est pas changé ; l'équipe peut toujours le modifier.
         $page->fillForm(['domain' => 'maison'])->fillForm(['slug' => 'presse-2026'])->assertFormSet(['domain' => SiteDomain::MAISON]);
-        $page->fillForm(['title' => 'Résidences', 'slug' => 'maison-habib-faye/residences'])->fillForm(['domain' => 'general'])
+        $page->fillForm(['title' => 'Résidences', 'slug' => 'centre-culturel/residences'])->fillForm(['domain' => 'general'])
             ->call('create')->assertHasNoFormErrors();
 
-        $this->assertSame(SiteDomain::GENERAL, Page::where('slug', 'maison-habib-faye/residences')->firstOrFail()->domain);
+        $this->assertSame(SiteDomain::GENERAL, Page::where('slug', 'centre-culturel/residences')->firstOrFail()->domain);
         $this->assertNull(SiteDomain::forPath('emsiplus'));
-        $this->assertSame(SiteDomain::STUDIO, SiteDomain::forPath('/maison-habib-faye/studio'));
+        $this->assertSame(SiteDomain::STUDIO, SiteDomain::forPath('/centre-culturel/studio'));
     }
 }

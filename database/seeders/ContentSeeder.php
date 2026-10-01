@@ -65,7 +65,7 @@ class ContentSeeder extends Seeder
     public const SITE_V4 = 4;
 
     /**
-     * Site v4 : un site, trois domaines (Maison Habib Faye, EMSI, Impact Live Studio). Sans perte :
+     * Site v4 : un site, trois domaines (Centre culturel Habib Faye, EMSI, Impact Live Studio). Sans perte :
      * les pages sont déplacées (pas recréées), une page déjà présente n'est jamais réécrite, l'accueil n'est
      * remplacé qu'avec $home. Le premier passage est noté dans les paramètres (site_version) : les suivants
      * ne font plus que les réécritures de liens et les compléments de la page EMSI, sans recréer les pages,
@@ -115,10 +115,10 @@ class ContentSeeder extends Seeder
     /** Base mise à niveau par une version de la commande antérieure au repère : pages EMSI et Studio à leur nouvelle adresse. */
     private function siteV4AlreadyApplied(): bool
     {
-        return Page::where('slug', 'emsi')->exists() && Page::where('slug', 'maison-habib-faye/studio')->exists();
+        return Page::where('slug', 'emsi')->exists() && Page::where('slug', 'centre-culturel/studio')->exists();
     }
 
-    /** Ajoute Impact Live (studio, événementiel, Espace Habib Faye) et le campus de Saint-Louis à un site existant. */
+    /** Ajoute Impact Live (studio, événementiel, Centre culturel Habib Faye) et le campus de Saint-Louis à un site existant. */
     public function refreshImpactLive(): void
     {
         $this->impactLive();
@@ -447,7 +447,7 @@ class ContentSeeder extends Seeder
 
     /**
      * Impact Live : lieux, services (sans prix inventés : « Sur devis »), catégories de matériel,
-     * référence Festival de Saint-Louis, pages Studio, Events et Espace Habib Faye, et blocs
+     * référence Festival de Saint-Louis, pages Studio, Events et Centre culturel Habib Faye, et blocs
      * ajoutés à l'accueil (écosystème) et aux pages L'École et Contact (adresses). Idempotent.
      */
     private function impactLive(): void
@@ -456,7 +456,7 @@ class ContentSeeder extends Seeder
             ['EMSI Dakar', 'emsi-dakar', PlaceKind::CAMPUS, 'Dakar', 'Grand Théâtre National Doudou Ndiaye Coumba Rose'],
             ['EMSI Saint-Louis', 'emsi-saint-louis', PlaceKind::CAMPUS, 'Saint-Louis', null],
             ['Impact Live Studio', 'impact-live-studio', PlaceKind::STUDIO, 'Saint-Louis', null],
-            ['Espace Habib Faye', 'espace-habib-faye', PlaceKind::CULTURAL_CENTER, 'Saint-Louis', null],
+            ['Centre culturel Habib Faye', 'espace-habib-faye', PlaceKind::CULTURAL_CENTER, 'Saint-Louis', null],
         ];
         foreach ($places as $position => [$name, $slug, $kind, $city, $address]) {
             $place = Place::firstOrNew(['slug' => $slug]);
@@ -478,7 +478,7 @@ class ContentSeeder extends Seeder
                 ['Podiums et structures de scène', 'Scènes et podiums de spectacle, montés en toute sécurité.', 'stage'],
             ],
             'space' => [
-                ['Location de la salle', 'Concerts, spectacles, résidences, conférences : accueillez votre public à l\'Espace Habib Faye.', 'building'],
+                ['Location de la salle', 'Concerts, spectacles, résidences, conférences : accueillez votre public à l\'Centre culturel Habib Faye.', 'building'],
             ],
         ];
         foreach ($services as $activity => $list) {
@@ -499,7 +499,7 @@ class ContentSeeder extends Seeder
             'status' => PublicationStatus::PUBLISHED, 'published_at' => now(),
         ]);
 
-        $dream = 'Impact Live Studio, l\'EMSI et l\'Espace Habib Faye sont la preuve qu\'un rêve peut devenir réalité, même en Afrique.';
+        $dream = 'Impact Live Studio, l\'EMSI et l\'Centre culturel Habib Faye sont la preuve qu\'un rêve peut devenir réalité, même en Afrique.';
 
         $this->page('studio', 'Impact Live Studio', 'system', true, [
             ['hero', ['eyebrow' => 'Saint-Louis · Studio d\'enregistrement', 'title' => 'Ici, votre son', 'words' => ['prend vie', 'se raconte', 'se mixe', 'traverse les frontières'],
@@ -524,13 +524,13 @@ class ContentSeeder extends Seeder
             ['booking_form', ['title' => 'Parlez-nous de votre événement', 'text' => 'Date, lieu, public attendu : nous vous répondons avec une proposition sur mesure.', 'booking_type' => 'event_service']],
         ]);
 
-        $this->page('espace-habib-faye', 'Espace Habib Faye', 'system', true, [
-            ['hero', ['eyebrow' => 'Centre culturel · Saint-Louis', 'title' => 'Espace Habib Faye', 'subtitle' => 'Un centre culturel privé à Saint-Louis, dédié à la musique et aux arts vivants.', 'layout' => 'full',
+        $this->page('espace-habib-faye', 'Centre culturel Habib Faye', 'system', true, [
+            ['hero', ['eyebrow' => 'Centre culturel · Saint-Louis', 'title' => 'Centre culturel Habib Faye', 'subtitle' => 'Un centre culturel privé à Saint-Louis, dédié à la musique et aux arts vivants.', 'layout' => 'full',
                 'buttons' => [['label' => 'Voir la programmation', 'url' => '#programmation', 'style' => 'primary'], ['label' => 'Louer la salle', 'url' => '#louer', 'style' => 'secondary']]]],
             ['text', ['title' => 'Un lieu pour la création', 'body' => '<p>'.$dream.'</p><p>Présentation détaillée du lieu à compléter par l\'équipe.</p>']],
             ['agenda', ['title' => 'Programmation', 'scope' => 'upcoming', 'activity' => 'space', 'limit' => 12]],
             ['services', ['title' => 'Accueillir votre événement', 'activity' => 'space']],
-            ['booking_form', ['title' => 'Louer l\'Espace Habib Faye', 'booking_type' => 'space_rental']],
+            ['booking_form', ['title' => 'Louer l\'Centre culturel Habib Faye', 'booking_type' => 'space_rental']],
             ['places', ['title' => 'Nous trouver', 'kind' => 'cultural_center']],
         ]);
 
@@ -542,7 +542,7 @@ class ContentSeeder extends Seeder
                 ['name' => 'EMSI', 'activity' => 'school', 'text' => 'Former aux métiers du son, de l\'image et de la scène, à Dakar et à Saint-Louis.', 'url' => '/formations'],
                 ['name' => 'Impact Live Studio', 'activity' => 'studio', 'text' => 'Enregistrer, mixer et masteriser dans un studio pensé pour les artistes.', 'url' => '/studio'],
                 ['name' => 'Impact Live Events', 'activity' => 'events', 'text' => 'Sonorisation, lumières et podiums pour les artistes et les festivals.', 'url' => '/events'],
-                ['name' => 'Espace Habib Faye', 'activity' => 'space', 'text' => 'Un centre culturel privé à Saint-Louis.', 'url' => '/espace-habib-faye'],
+                ['name' => 'Centre culturel Habib Faye', 'activity' => 'space', 'text' => 'Un centre culturel privé à Saint-Louis.', 'url' => '/espace-habib-faye'],
             ],
         ]], after: 'venue');
         $this->insertBlock('ecole', ['places', ['title' => 'Deux campus, les mêmes formations', 'kind' => 'campus']], after: 'venue');
@@ -558,7 +558,7 @@ class ContentSeeder extends Seeder
                 'Les univers Son, Image, Infographie & design et Scène',
                 'Le programme professionnel EMSI × Grand Théâtre',
             ]],
-            'emsi-saint-louis' => ['À Saint-Louis, aux côtés d\'Impact Live Studio et de l\'Espace Habib Faye', [
+            'emsi-saint-louis' => ['À Saint-Louis, aux côtés d\'Impact Live Studio et de l\'Centre culturel Habib Faye', [
                 'Les mêmes formations qu\'à Dakar',
                 'Un studio d\'enregistrement et un centre culturel à proximité',
                 'Au contact des artistes et des événements de Saint-Louis',
@@ -588,7 +588,7 @@ class ContentSeeder extends Seeder
                     ['value' => '2', 'label' => 'campus', 'detail' => 'Dakar et Saint-Louis'],
                     ['value' => '5', 'label' => 'filières techniques', 'detail' => 'Son, lumière, régie, infographie, cadrage'],
                 ]]],
-                ['text', ['title' => 'Notre histoire', 'body' => '<p>Créée en 2016, l\'EMSI est une école de formations technico-artistiques. Elle a développé des Certificats de Spécialité (CS) et des BTS dans les métiers du spectacle vivant, et met à la disposition de ses apprenants un parc matériel professionnel, dont un studio de 154 m² et une scène live.</p><p>Fondée par Boubacar Tall, ingénieur du son sénégalais basé à Saint-Louis, l\'EMSI grandit aux côtés d\'Impact Live Studio, d\'Impact Live Events et de l\'Espace Habib Faye.</p>']],
+                ['text', ['title' => 'Notre histoire', 'body' => '<p>Créée en 2016, l\'EMSI est une école de formations technico-artistiques. Elle a développé des Certificats de Spécialité (CS) et des BTS dans les métiers du spectacle vivant, et met à la disposition de ses apprenants un parc matériel professionnel, dont un studio de 154 m² et une scène live.</p><p>Fondée par Boubacar Tall, ingénieur du son sénégalais basé à Saint-Louis, l\'EMSI grandit aux côtés d\'Impact Live Studio, d\'Impact Live Events et de l\'Centre culturel Habib Faye.</p>']],
                 ['cards', ['title' => 'Notre pédagogie', 'items' => [
                     ['icon' => 'sparkles', 'title' => 'La pratique d\'abord', 'text' => 'Les apprenants sont placés en situation réelle, sur du matériel professionnel.'],
                     ['icon' => 'users', 'title' => 'Un suivi individualisé', 'text' => 'Chaque parcours est accompagné par l\'équipe pédagogique de l\'EMSI.'],
@@ -652,7 +652,7 @@ class ContentSeeder extends Seeder
         $items = [
             'main' => [['Univers', '/univers', false], ['Formations', '/formations', false], ['Studio', '/studio', false], ['Events', '/events', false],
                 ['L\'École', '/ecole', false], ['Espace Pro', '/professionnels', false], ['Candidater', '/candidater', true]],
-            'footer' => [['Réalisations', '/realisations', false], ['Agenda', '/agenda', false], ['Espace Habib Faye', '/espace-habib-faye', false],
+            'footer' => [['Réalisations', '/realisations', false], ['Agenda', '/agenda', false], ['Centre culturel Habib Faye', '/espace-habib-faye', false],
                 ['Actualités', '/actualites', false], ['Contact', '/contact', false]],
             'legal' => [['Mentions légales', '/mentions-legales', false], ['Protection des données', '/confidentialite', false]],
         ];
@@ -799,9 +799,9 @@ class ContentSeeder extends Seeder
     private function movePages(): void
     {
         $moves = [
-            ['studio', 'maison-habib-faye/studio', SiteDomain::STUDIO],
+            ['studio', 'centre-culturel/studio', SiteDomain::STUDIO],
             ['ecole', 'emsi', SiteDomain::EMSI],
-            ['espace-habib-faye', 'maison-habib-faye', SiteDomain::MAISON],
+            ['espace-habib-faye', 'centre-culturel', SiteDomain::MAISON],
             ['professionnels', 'emsi/professionnels', SiteDomain::EMSI],
         ];
         foreach ($moves as [$from, $to, $domain]) {
@@ -829,9 +829,9 @@ class ContentSeeder extends Seeder
         $text = fn (string $title, string $body) => ['text', ['title' => $title, 'body' => "<p>{$body}</p>"]];
 
         // Seulement si aucune page n'a pu y être déplacée (nouvelle installation).
-        $this->createPage('maison-habib-faye', 'Maison Habib Faye', SiteDomain::MAISON, [
-            $hero('Centre culturel · Saint-Louis', 'Maison Habib Faye', $todo('présentez ici la Maison, Habib Faye et Boubacar Tall.')),
-            $text('Notre mission', $todo('la mission de la Maison.')),
+        $this->createPage('centre-culturel', 'Centre culturel Habib Faye', SiteDomain::MAISON, [
+            $hero('Centre culturel · Saint-Louis', 'Centre culturel Habib Faye', $todo('présentez ici le Centre culturel, Habib Faye et Boubacar Tall.')),
+            $text('Notre mission', $todo('la mission du Centre culturel.')),
             ['agenda', ['title' => 'Programmation', 'scope' => 'upcoming', 'limit' => 6]],
             ['places', ['title' => 'Nous trouver', 'kind' => 'cultural_center']],
         ]);
@@ -842,12 +842,12 @@ class ContentSeeder extends Seeder
             ['programs', ['title' => 'Nos formations', 'audience' => 'school', 'limit' => 6]],
         ]);
 
-        $this->createPage('maison-habib-faye/agenda', 'Programmation', SiteDomain::MAISON, [
-            $hero('Maison Habib Faye', 'Programmation', $todo('présentez ici la programmation de la Maison (concerts, résidences, rencontres).')),
+        $this->createPage('centre-culturel/agenda', 'Programmation', SiteDomain::MAISON, [
+            $hero('Centre culturel Habib Faye', 'Programmation', $todo('présentez ici la programmation du Centre culturel (concerts, résidences, rencontres).')),
             ['agenda', ['title' => 'Prochains rendez-vous', 'scope' => 'upcoming', 'limit' => 24]],
         ]);
-        $this->createPage('maison-habib-faye/espaces', 'Les espaces', SiteDomain::MAISON, [
-            $hero('Maison Habib Faye · Saint-Louis', 'Les espaces', $todo('présentez ici les salles et espaces à louer (capacité, équipement).')),
+        $this->createPage('centre-culturel/espaces', 'Les espaces', SiteDomain::MAISON, [
+            $hero('Centre culturel Habib Faye · Saint-Louis', 'Les espaces', $todo('présentez ici les salles et espaces à louer (capacité, équipement).')),
             ['places', ['title' => 'Nos espaces', 'kind' => 'cultural_center']],
             ['booking_form', ['title' => 'Louer un espace', 'text' => 'Date, type d\'événement, public attendu : nous vous répondons avec une proposition.', 'booking_type' => 'space_rental']],
         ]);
@@ -881,7 +881,7 @@ class ContentSeeder extends Seeder
         }
 
         $this->createPage('mission', 'Mission et impact', SiteDomain::GENERAL, [
-            $hero('Maison Habib Faye · EMSI · Impact Live Studio', 'Mission et impact', $todo('résumez ici la mission commune des trois maisons.')),
+            $hero('Centre culturel Habib Faye · EMSI · Impact Live Studio', 'Mission et impact', $todo('résumez ici la mission commune des trois lieux.')),
             $text('Notre mission', $todo('la mission, les publics touchés, les résultats (chiffres fournis par l\'équipe).')),
         ]);
         $this->createPage('partenaires', 'Partenaires et soutiens', SiteDomain::GENERAL, [
@@ -889,7 +889,7 @@ class ContentSeeder extends Seeder
             ['partners', ['title' => 'Nos partenaires']],
         ]);
         $this->createPage('soutenir', 'Nous soutenir', SiteDomain::GENERAL, [
-            $hero('Partenariat, mécénat, don', 'Nous soutenir', $todo('expliquez ici comment soutenir la Maison, l\'école et le studio.')),
+            $hero('Partenariat, mécénat, don', 'Nous soutenir', $todo('expliquez ici comment soutenir le Centre culturel, l\'école et le studio.')),
             ['support_form', ['title' => 'Nous écrire', 'text' => 'Partenaires, mécènes et donateurs : écrivez-nous, nous vous répondrons rapidement.']],
         ]);
         $this->createPage('presse', 'Presse', SiteDomain::GENERAL, [
@@ -932,14 +932,14 @@ class ContentSeeder extends Seeder
         }
 
         $images = [
-            'maison' => $this->heroImage(['maison-habib-faye', 'espace-habib-faye']),
+            'maison' => $this->heroImage(['centre-culturel', 'espace-habib-faye']),
             'emsi' => $this->heroImage([$home->slug, 'emsi', 'ecole']),
-            'studio' => $this->heroImage(['maison-habib-faye/studio', 'studio']),
+            'studio' => $this->heroImage(['centre-culturel/studio', 'studio']),
         ];
         $domains = [
-            'maison' => ['Centre culturel · Saint-Louis', 'Maison Habib Faye', 'Concerts, résidences et transmission, dans la maison de Habib Faye.', '/maison-habib-faye', 'Découvrir la Maison'],
+            'maison' => ['Centre culturel · Saint-Louis', 'Centre culturel Habib Faye', 'Concerts, résidences et transmission, à Saint-Louis.', '/centre-culturel', 'Découvrir le Centre culturel'],
             'emsi' => ['École · Dakar · Saint-Louis', 'EMSI', 'Les métiers du son, de l\'image et de la scène, sur du matériel professionnel.', '/emsi', 'Se former'],
-            'studio' => ['Studio d\'enregistrement · Saint-Louis', 'Impact Live Studio', 'Enregistrement, mixage et mastering, dans un studio pensé pour les artistes.', '/maison-habib-faye/studio', 'Réserver une séance'],
+            'studio' => ['Studio d\'enregistrement · Saint-Louis', 'Impact Live Studio', 'Enregistrement, mixage et mastering, dans un studio pensé pour les artistes.', '/centre-culturel/studio', 'Réserver une séance'],
         ];
 
         $panels = [];
@@ -972,7 +972,7 @@ class ContentSeeder extends Seeder
         }
         $home->update(['draft_blocks' => $blocks]);
         $home->publish();
-        $this->report[] = 'Accueil republié avec '.($missing === [] ? 'le héros Cinéma et ' : '').'le triptyque des trois maisons ; l\'ancienne version reste dans l\'historique.';
+        $this->report[] = 'Accueil republié avec '.($missing === [] ? 'le héros Cinéma et ' : '').'le triptyque des trois lieux ; l\'ancienne version reste dans l\'historique.';
     }
 
     /**
@@ -1068,20 +1068,20 @@ class ContentSeeder extends Seeder
     }
 
     /**
-     * Menu principal (Maison et EMSI avec leurs sous-menus) et pied de page, construits une seule fois :
+     * Menu principal (Centre culturel et EMSI avec leurs sous-menus) et pied de page, construits une seule fois :
      * s'ils existent déjà, l'équipe a pu les retoucher et on n'y touche plus. Les entrées existantes à la
      * même adresse et au même libellé (Contact, Candidater…) sont réutilisées, les autres sont masquées (jamais supprimées).
      */
     private function menusV4(): void
     {
-        if (MenuItem::where('location', 'main')->whereNull('parent_id')->where('url', '/maison-habib-faye')->whereHas('children')->exists()) {
+        if (MenuItem::where('location', 'main')->whereNull('parent_id')->where('url', '/centre-culturel')->whereHas('children')->exists()) {
             $this->report[] = 'Menu principal : déjà en place, non modifié.';
         } else {
             $claimed = [];
             $tree = [
                 ['Accueil', '/', false, []],
-                ['Maison Habib Faye', '/maison-habib-faye', false, [['La Maison', '/maison-habib-faye'], ['Programmation', '/maison-habib-faye/agenda'],
-                    ['Impact Live Studio', '/maison-habib-faye/studio'], ['Les espaces', '/maison-habib-faye/espaces']]],
+                ['Centre culturel Habib Faye', '/centre-culturel', false, [['Le Centre culturel', '/centre-culturel'], ['Programmation', '/centre-culturel/agenda'],
+                    ['Impact Live Studio', '/centre-culturel/studio'], ['Les espaces', '/centre-culturel/espaces']]],
                 ['EMSI', '/emsi', false, [['L\'école', '/emsi'], ['Campus de Dakar', '/emsi/dakar'], ['Campus de Saint-Louis', '/emsi/saint-louis'],
                     ['Formations', '/emsi/formations'], ['VAE et professionnels', '/emsi/professionnels'], ['Réalisations', '/emsi/realisations']]],
                 [MenuDefaults::ABOUT_LABEL, MenuDefaults::ABOUT_LINKS[0][1], false, MenuDefaults::ABOUT_LINKS],
@@ -1096,7 +1096,7 @@ class ContentSeeder extends Seeder
             MenuItem::where('location', 'main')->whereNotIn('id', $claimed)->update(['is_visible' => false]);
             MenuDefaults::fillDescriptions();
             MenuDefaults::fillParents();
-            $this->report[] = 'Menu principal reconstruit (Accueil, Maison Habib Faye, EMSI, À propos, Candidater) ; les anciennes entrées sont masquées.';
+            $this->report[] = 'Menu principal reconstruit (Accueil, Centre culturel Habib Faye, EMSI, À propos, Candidater) ; les anciennes entrées sont masquées.';
         }
 
         if (MenuItem::where('location', 'footer')->where('url', '/mission')->exists()) {

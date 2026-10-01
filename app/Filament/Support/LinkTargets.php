@@ -11,25 +11,25 @@ use Filament\Forms\Components\Select;
 use Illuminate\Support\Str;
 
 /**
- * Destinations des boutons et des liens, présentées par leur nom (« Maison Habib Faye › Impact Live Studio › Réserver une séance »)
+ * Destinations des boutons et des liens, présentées par leur nom (« Centre culturel Habib Faye › Impact Live Studio › Réserver une séance »)
  * plutôt que par une adresse à taper. Une adresse libre reste possible (WhatsApp, YouTube…).
  */
 final class LinkTargets
 {
     /** Sections repérables dans les pages (identifiants posés par les blocs du site). */
     private const SECTIONS = [
-        '/maison-habib-faye/studio#reserver' => 'Maison Habib Faye › Impact Live Studio › Réserver une séance',
-        '/maison-habib-faye/studio#productions' => 'Maison Habib Faye › Impact Live Studio › Écouter les productions',
-        '/maison-habib-faye#programmation' => 'Maison Habib Faye › La Maison › Programmation',
-        '/maison-habib-faye/espaces#louer' => 'Maison Habib Faye › Les espaces › Louer un espace',
+        '/centre-culturel/studio#reserver' => 'Centre culturel Habib Faye › Impact Live Studio › Réserver une séance',
+        '/centre-culturel/studio#productions' => 'Centre culturel Habib Faye › Impact Live Studio › Écouter les productions',
+        '/centre-culturel#programmation' => 'Centre culturel Habib Faye › Le Centre culturel › Programmation',
+        '/centre-culturel/espaces#louer' => 'Centre culturel Habib Faye › Les espaces › Louer un espace',
     ];
 
     private const PAGES = [
         '/' => 'Accueil',
-        '/maison-habib-faye' => 'Maison Habib Faye › La Maison',
-        '/maison-habib-faye/agenda' => 'Maison Habib Faye › Programmation',
-        '/maison-habib-faye/studio' => 'Maison Habib Faye › Impact Live Studio',
-        '/maison-habib-faye/espaces' => 'Maison Habib Faye › Les espaces',
+        '/centre-culturel' => 'Centre culturel Habib Faye › Le Centre culturel',
+        '/centre-culturel/agenda' => 'Centre culturel Habib Faye › Programmation',
+        '/centre-culturel/studio' => 'Centre culturel Habib Faye › Impact Live Studio',
+        '/centre-culturel/espaces' => 'Centre culturel Habib Faye › Les espaces',
         '/emsi' => 'EMSI › L\'école',
         '/emsi/dakar' => 'EMSI › Campus de Dakar',
         '/emsi/saint-louis' => 'EMSI › Campus de Saint-Louis',
@@ -60,8 +60,8 @@ final class LinkTargets
                 ->mapWithKeys(fn (Program $p) => $p->audience?->value === 'professional'
                     ? ["/emsi/professionnels/{$p->slug}" => "EMSI › VAE et professionnels › {$p->title}"]
                     : ["/emsi/formations/{$p->slug}" => "EMSI › Formations › {$p->title}"])->all(),
-            'Programmation de la Maison' => AgendaEvent::published()->where('is_reference', false)->latest('starts_at')->limit(30)->get()
-                ->mapWithKeys(fn (AgendaEvent $e) => ["/maison-habib-faye/agenda/{$e->slug}" => "Maison Habib Faye › Programmation › {$e->title}"])->all(),
+            'Programmation du Centre culturel' => AgendaEvent::published()->where('is_reference', false)->latest('starts_at')->limit(30)->get()
+                ->mapWithKeys(fn (AgendaEvent $e) => ["/centre-culturel/agenda/{$e->slug}" => "Centre culturel Habib Faye › Programmation › {$e->title}"])->all(),
             'Autres pages' => Page::where('type', 'free')->orderBy('title')->get()
                 ->mapWithKeys(fn (Page $p) => ["/{$p->slug}" => $p->title])->all(),
         ];

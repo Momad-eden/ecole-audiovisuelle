@@ -406,6 +406,25 @@ body::after {
 
 /* Film (ouverture de l'accueil) : lent zoom des photos, phrase dévoilée mot à mot, puis le reste qui monte. */
 .film-zoom { animation: film-zoom 9s ease-out both; }
+
+/* Manifeste : bandeau de photos qui glisse en continu (la piste contient deux fois les photos). */
+.statement-ribbon {
+  overflow: hidden;
+  mask-image: linear-gradient(90deg, transparent, #000 6%, #000 94%, transparent);
+}
+.statement-track {
+  display: flex;
+  width: max-content;
+  gap: 1rem;
+  padding-block: 0 1.5rem;
+  animation: statement-slide 70s linear infinite;
+}
+.statement-ribbon:hover .statement-track { animation-play-state: paused; }
+@keyframes statement-slide { to { transform: translateX(calc(-50% - 0.5rem)); } }
+@media (prefers-reduced-motion: reduce) {
+  .statement-ribbon { overflow-x: auto; }
+  .statement-track { animation: none; }
+}
 .film-grain {
   background:
     radial-gradient(120% 90% at 50% 40%, transparent 55%, rgb(0 0 0 / 0.55) 100%),
@@ -579,7 +598,7 @@ body[data-player] .floating-action { bottom: 7rem; }
 }
 
 /*
- * Triptyque « Nos trois maisons » : à la souris (pas au doigt), le panneau survolé s'élargit ;
+ * Triptyque « Nos trois lieux » : à la souris (pas au doigt), le panneau survolé s'élargit ;
  * sans transition si l'internaute limite les animations.
  */
 @media (min-width: 1024px) and (hover: hover) and (pointer: fine) {

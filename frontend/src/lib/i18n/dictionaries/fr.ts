@@ -159,7 +159,7 @@ export const fr = {
   },
 
   domains: {
-    label: "Nos trois maisons",
+    label: "Nos trois lieux",
   },
 
   downloads: {
@@ -361,7 +361,7 @@ export const fr = {
   },
 
   booking: {
-    types: { studio_session: "Session au studio", space_rental: "Location de l'Espace Habib Faye" },
+    types: { studio_session: "Session au studio", space_rental: "Location d'un espace du Centre culturel" },
     request: "Votre demande",
     organization: "Artiste, structure ou entreprise",
     phone: "Téléphone (WhatsApp de préférence)",
@@ -408,7 +408,7 @@ export const fr = {
   news: {
     eyebrow: "Journal",
     title: "Actualités",
-    text: "La vie de l'EMSI à Dakar et à Saint-Louis, d'Impact Live et de l'Espace Habib Faye.",
+    text: "La vie de l'EMSI à Dakar et à Saint-Louis, d'Impact Live et du Centre culturel Habib Faye.",
     emptyTitle: "Les premières actualités arrivent.",
     emptyText: "Rentrées, portes ouvertes, concerts, réalisations d'étudiants : suivez-nous en attendant sur l'agenda.",
     seeAgenda: "Voir l'agenda",

@@ -42,7 +42,7 @@ final class PageBlocks
             self::partners(), self::professionalSpace(), self::contact(),
             self::ecosystem(), self::services(), self::productions(),
             self::agenda(), self::bookingForm(), self::places(), self::campuses(),
-            self::domains(), self::campusPrograms(), self::downloads(), self::supportForm(), self::showcase(),
+            self::domains(), self::campusPrograms(), self::downloads(), self::supportForm(), self::showcase(), self::statement(),
         ];
     }
 
@@ -55,7 +55,7 @@ final class PageBlocks
             Repeater::make('items')->label('Activités')->minItems(1)->maxItems(6)->addActionLabel('Ajouter une activité')
                 ->schema([
                     TextInput::make('name')->label('Nom')->required()->maxLength(60),
-                    Select::make('activity')->label('Couleur / animation')->options(['school' => 'EMSI (école)', ...['studio' => 'Impact Live Studio', 'events' => 'Impact Live Events', 'space' => 'Espace Habib Faye']])->required(),
+                    Select::make('activity')->label('Couleur / animation')->options(['school' => 'EMSI (école)', ...['studio' => 'Impact Live Studio', 'events' => 'Impact Live Events', 'space' => 'Centre culturel Habib Faye']])->required(),
                     Textarea::make('text')->label('Présentation courte')->rows(2)->maxLength(200),
                     LinkTargets::field('url', 'Lien'),
                     ...self::image('image', 'Photo (facultatif)'),
@@ -68,7 +68,7 @@ final class PageBlocks
         return Block::make('services')->label('Services et tarifs')->icon('heroicon-o-wrench-screwdriver')->schema([
             TextInput::make('title')->label('Titre')->maxLength(80)->default('Nos services')->helperText(self::EMPHASIS_HELP),
             Textarea::make('text')->label('Texte')->rows(2)->maxLength(300),
-            Select::make('activity')->label('Services de')->options(['studio' => 'Impact Live Studio', 'events' => 'Impact Live Events', 'space' => 'Espace Habib Faye'])->required()->default('studio')
+            Select::make('activity')->label('Services de')->options(['studio' => 'Impact Live Studio', 'events' => 'Impact Live Events', 'space' => 'Centre culturel Habib Faye'])->required()->default('studio')
                 ->helperText('Les services se gèrent dans Impact Live › Services.'),
         ]);
     }
@@ -87,7 +87,7 @@ final class PageBlocks
         return Block::make('agenda')->label('Agenda ou références')->icon('heroicon-o-calendar-days')->schema([
             TextInput::make('title')->label('Titre')->maxLength(80)->helperText(self::EMPHASIS_HELP),
             Radio::make('scope')->label('Afficher')->options(['upcoming' => 'Les prochains événements', 'references' => 'Nos références (prestations réalisées)'])->default('upcoming')->inline(),
-            Select::make('activity')->label('Activité (facultatif)')->options(['school' => 'EMSI', ...['studio' => 'Impact Live Studio', 'events' => 'Impact Live Events', 'space' => 'Espace Habib Faye']]),
+            Select::make('activity')->label('Activité (facultatif)')->options(['school' => 'EMSI', ...['studio' => 'Impact Live Studio', 'events' => 'Impact Live Events', 'space' => 'Centre culturel Habib Faye']]),
             TextInput::make('limit')->label('Nombre')->numeric()->minValue(1)->maxValue(24)->default(6),
         ]);
     }
@@ -125,7 +125,7 @@ final class PageBlocks
 
     private static function domains(): Block
     {
-        return Block::make('domains')->label('Nos trois maisons (triptyque)')->icon('heroicon-o-view-columns')->schema([
+        return Block::make('domains')->label('Nos trois lieux (triptyque)')->icon('heroicon-o-view-columns')->schema([
             Repeater::make('panels')->label('Panneaux')->minItems(3)->maxItems(3)->defaultItems(3)
                 ->addActionLabel('Ajouter un panneau')->reorderable()
                 ->helperText('Trois grands panneaux côte à côte (empilés sur téléphone), un par domaine. Tout le panneau est cliquable.')
@@ -548,6 +548,24 @@ final class PageBlocks
                     TextInput::make('caption')->label('Légende')->maxLength(120),
                     LinkTargets::field('url', 'Lien (facultatif)'),
                 ]),
+            TextInput::make('button_label')->label('Texte du bouton (facultatif)')->maxLength(40),
+            LinkTargets::field('button_url', 'Lien du bouton')->required(fn ($get) => filled($get('button_label'))),
+        ]);
+    }
+
+    private static function statement(): Block
+    {
+        return Block::make('statement')->label('Manifeste (phrase, chiffres, bandeau de photos)')->icon('heroicon-o-megaphone')->schema([
+            TextInput::make('eyebrow')->label('Surtitre')->maxLength(60),
+            Textarea::make('text')->label('Grande phrase')->required()->rows(3)->maxLength(240)->helperText(self::EMPHASIS_HELP),
+            Repeater::make('facts')->label('Chiffres clés')->maxItems(4)->defaultItems(0)->columns(2)->addActionLabel('Ajouter un chiffre')
+                ->schema([
+                    TextInput::make('value')->label('Valeur (ex. 2016, +300, 5)')->required()->maxLength(12),
+                    TextInput::make('label')->label('Libellé (ex. année de création)')->required()->maxLength(40),
+                ]),
+            FileUpload::make('images')->label('Bandeau de photos (facultatif)')->image()->multiple()->reorderable()->maxFiles(12)
+                ->disk('public')->directory('pages')->maxSize(8192)
+                ->helperText('De 4 à 12 photos qui glissent lentement en continu (immobiles si le visiteur limite les animations).'),
             TextInput::make('button_label')->label('Texte du bouton (facultatif)')->maxLength(40),
             LinkTargets::field('button_url', 'Lien du bouton')->required(fn ($get) => filled($get('button_label'))),
         ]);

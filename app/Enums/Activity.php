@@ -18,7 +18,7 @@ enum Activity: string implements HasLabel
             self::SCHOOL => 'EMSI',
             self::STUDIO => 'Impact Live Studio',
             self::EVENTS => 'Impact Live Events',
-            self::SPACE => 'Espace Habib Faye',
+            self::SPACE => 'Centre culturel Habib Faye',
         };
     }
 
@@ -33,7 +33,7 @@ enum Activity: string implements HasLabel
             self::SCHOOL => 'EMSI',
             self::STUDIO => 'Impact Live Studio',
             self::EVENTS => 'Impact Live Events',
-            self::SPACE => 'Espace Habib Faye',
+            self::SPACE => 'Habib Faye Cultural Centre',
         };
     }
 }

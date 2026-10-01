@@ -14,7 +14,7 @@ const menus: Site["menus"]["main"] = [
     ],
   },
   { label: "Studio", url: "/studio", isButton: false, children: [{ label: "Le studio", url: "/studio" }] },
-  { label: "Maison", url: "/maison-habib-faye", isButton: false, children: [{ label: "Agenda", url: "/maison-habib-faye/agenda" }] },
+  { label: "Maison", url: "/centre-culturel", isButton: false, children: [{ label: "Agenda", url: "/centre-culturel/agenda" }] },
   { label: "Contact", url: "/contact", isButton: true, children: [] },
 ];
 

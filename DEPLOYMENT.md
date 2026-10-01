@@ -142,7 +142,7 @@ server {
 ```bash
 php artisan migrate --force
 php artisan db:seed --force              # contenu de référence (univers, filières, programmes, pages…)
-php artisan emsi:site-v4 --home         # site des trois domaines (Maison Habib Faye, EMSI, pages générales) sur le contenu de référence
+php artisan emsi:site-v4 --home         # site des trois domaines (Centre culturel Habib Faye, EMSI, pages générales) sur le contenu de référence
 php artisan storage:link
 php artisan emsi:create-admin            # premier directeur (mot de passe saisi de façon masquée)
 php artisan filament:assets
@@ -165,9 +165,9 @@ tar xzf /tmp/emsi-medias.tgz -C /var/www/emsi/storage/app
 php artisan migrate --force && php artisan storage:link
 ```
 
-La base locale est déjà au niveau du site des trois domaines : après ce transfert, `emsi:site-v4` n'est pas nécessaire. Sur une installation faite avec `db:seed`, lancez `php artisan migrate --force` puis `php artisan emsi:site-v4 --home` (`--home` remplace l'accueil par les trois maisons ; l'ancien reste dans l'historique).
+La base locale est déjà au niveau du site des trois domaines : après ce transfert, `emsi:site-v4` n'est pas nécessaire. Sur une installation faite avec `db:seed`, lancez `php artisan migrate --force` puis `php artisan emsi:site-v4 --home` (`--home` remplace l'accueil par les trois lieux ; l'ancien reste dans l'historique).
 
-Le premier passage de `emsi:site-v4` est noté dans les paramètres du site (repère de version). **Relancée ensuite**, la commande ne fait plus que réécrire les liens vers les anciennes adresses et compléter la page EMSI (univers, réalisations) : elle ne recrée ni les pages que l'équipe a renommées ou supprimées, ni les menus, ni les campus décochés sur une formation. `--force` reprend toute la mise à niveau (pages, menus et campus manquants) : ne l'utilisez pas une fois que l'équipe a retouché le site. Une base mise à niveau avant l'ajout du repère est reconnue (pages `/emsi` et `/maison-habib-faye/studio` présentes) et reçoit le repère.
+Le premier passage de `emsi:site-v4` est noté dans les paramètres du site (repère de version). **Relancée ensuite**, la commande ne fait plus que réécrire les liens vers les anciennes adresses et compléter la page EMSI (univers, réalisations) : elle ne recrée ni les pages que l'équipe a renommées ou supprimées, ni les menus, ni les campus décochés sur une formation. `--force` reprend toute la mise à niveau (pages, menus et campus manquants) : ne l'utilisez pas une fois que l'équipe a retouché le site. Une base mise à niveau avant l'ajout du repère est reconnue (pages `/emsi` et `/centre-culturel/studio` présentes) et reçoit le repère.
 
 Supprimer ensuite les comptes de test et vérifier ceux de l'équipe (Administration › Comptes).
 Aucun compte n'est créé par défaut. Les documents des candidats sont stockés dans `storage/app/private` (jamais publics).

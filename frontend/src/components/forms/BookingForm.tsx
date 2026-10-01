@@ -33,7 +33,7 @@ const bookingSchema = ({ validation: v }: Dictionary) =>
 
 type Values = z.infer<ReturnType<typeof bookingSchema>>;
 
-/** Demande de réservation : séance au studio ou location de l'Espace Habib Faye. */
+/** Demande de réservation : séance au studio ou location d'un espace du Centre culturel. */
 export function BookingForm({ type }: { type?: BookingType }) {
   const locale = useLocale();
   const t = useT();

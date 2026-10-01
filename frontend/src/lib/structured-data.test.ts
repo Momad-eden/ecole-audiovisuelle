@@ -2,7 +2,7 @@ import { expect, test } from "@playwright/test";
 import { pageStructuredData, jsonLdScript } from "./structured-data";
 import type { Block, Page, Place } from "./types";
 
-const page = (over: Partial<Page> = {}): Page => ({ title: "Maison Habib Faye", slug: "maison-habib-faye", type: "free", domain: "maison", seo: null, blocks: [], updatedAt: null, ...over });
+const page = (over: Partial<Page> = {}): Page => ({ title: "Centre culturel Habib Faye", slug: "centre-culturel", type: "free", domain: "maison", seo: null, blocks: [], updatedAt: null, ...over });
 const place = (over: Partial<Place> = {}): Place => ({
   id: 3, name: "EMSI Saint-Louis", slug: "saint-louis", kind: "campus", city: "Saint-Louis", address: "Sor, route de l'Université", phone: "+221 33 000 00 00",
   whatsapp: null, email: null, mapUrl: null, openingHours: null, tagline: null, description: null, highlights: [], image: null, ...over,
@@ -11,8 +11,8 @@ const campusBlock = (campus: unknown): Block => ({ id: "b1", type: "campus_progr
 
 test("Maison et Studio : Organization sans parentOrganization", () => {
   for (const domain of ["maison", "studio"] as const) {
-    const data = pageStructuredData(page({ domain }), "/maison-habib-faye", [], "https://site.test");
-    expect(data).toMatchObject({ "@context": "https://schema.org", "@type": "Organization", name: "Maison Habib Faye", url: "https://site.test/maison-habib-faye" });
+    const data = pageStructuredData(page({ domain }), "/centre-culturel", [], "https://site.test");
+    expect(data).toMatchObject({ "@context": "https://schema.org", "@type": "Organization", name: "Centre culturel Habib Faye", url: "https://site.test/centre-culturel" });
     expect(data).not.toHaveProperty("parentOrganization");
   }
 });

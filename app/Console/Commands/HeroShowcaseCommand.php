@@ -76,18 +76,22 @@ class HeroShowcaseCommand extends Command
             'subtitle' => 'Un centre culturel, une école et un studio.',
             'images' => [$images['grande_salle'], $images['studio_son']],
             'film_url' => 'https://www.youtube.com/watch?v=dQw4w9WgXcQ',
-            'buttons' => [['label' => 'Découvrir la Maison', 'url' => '/maison-habib-faye', 'style' => 'primary']],
+            'buttons' => [['label' => 'Découvrir le Centre culturel', 'url' => '/centre-culturel', 'style' => 'primary']],
         ], [
             ['type' => 'showcase', 'data' => [
                 'eyebrow' => 'Le centre en images', 'title' => 'Sur scène et en coulisses',
                 'items' => [
-                    ['image' => $images['grande_salle'], 'image_alt' => 'La grande salle', 'caption' => 'Sur scène', 'url' => '/maison-habib-faye/agenda'],
+                    ['image' => $images['grande_salle'], 'image_alt' => 'La grande salle', 'caption' => 'Sur scène', 'url' => '/centre-culturel/agenda'],
                     ['image' => $images['studio_son'], 'image_alt' => 'Le studio', 'caption' => 'Au studio', 'url' => null],
                     ['image' => $images['regie_broadcast'], 'image_alt' => 'La régie', 'caption' => 'En régie', 'url' => null],
                 ],
-                'button_label' => 'Voir la programmation', 'button_url' => '/maison-habib-faye/agenda',
+                'button_label' => 'Voir la programmation', 'button_url' => '/centre-culturel/agenda',
             ]],
             ['type' => 'stats', 'data' => ['title' => 'Repères', 'items' => [['value' => '2016', 'label' => 'création'], ['value' => '+300', 'label' => 'diplômés']]]],
+            ['type' => 'statement', 'data' => [
+                'eyebrow' => 'Saint-Louis · Dakar', 'text' => 'Un *centre culturel*, une école et un studio',
+                'facts' => [['value' => '3', 'label' => 'lieux']], 'images' => [$images['grande_salle'], $images['studio_son']],
+            ]],
             ['type' => 'text', 'data' => ['title' => 'Bas de page', 'body' => str_repeat('<p>Texte pour pouvoir défiler.</p>', 40)]],
         ]);
 

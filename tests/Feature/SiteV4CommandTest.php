@@ -25,14 +25,14 @@ class SiteV4CommandTest extends TestCase
     protected function setUp(): void
     {
         parent::setUp();
-        // Une base comme celle de l'école : accueil, école, studio, events, Espace Habib Faye, professionnels…
+        // Une base comme celle de l'école : accueil, école, studio, events, Centre culturel Habib Faye, professionnels…
         $this->seed(ContentSeeder::class);
     }
 
     public function test_pages_are_moved_with_their_blocks_and_history(): void
     {
-        $moves = ['studio' => ['maison-habib-faye/studio', SiteDomain::STUDIO], 'ecole' => ['emsi', SiteDomain::EMSI],
-            'espace-habib-faye' => ['maison-habib-faye', SiteDomain::MAISON], 'professionnels' => ['emsi/professionnels', SiteDomain::EMSI]];
+        $moves = ['studio' => ['centre-culturel/studio', SiteDomain::STUDIO], 'ecole' => ['emsi', SiteDomain::EMSI],
+            'espace-habib-faye' => ['centre-culturel', SiteDomain::MAISON], 'professionnels' => ['emsi/professionnels', SiteDomain::EMSI]];
         $before = collect($moves)->map(fn ($target, $slug) => Page::where('slug', $slug)->firstOrFail());
         $revisionIds = $before->map(fn (Page $page) => $page->revisions()->pluck('id')->sort()->values()->all());
 
@@ -50,11 +50,11 @@ class SiteV4CommandTest extends TestCase
             $this->assertSame($types($old->blocks), $types($page->blocks), $slug);
             $this->assertEmpty(array_diff($revisionIds[$slug], $page->revisions()->pluck('id')->all()), $slug);
         }
-        $this->getJson('/api/v1/public/pages/maison-habib-faye/studio')->assertOk()->assertJsonPath('data.domain', 'studio');
+        $this->getJson('/api/v1/public/pages/centre-culturel/studio')->assertOk()->assertJsonPath('data.domain', 'studio');
         $this->getJson('/api/v1/public/pages/emsi/professionnels')->assertOk()->assertJsonPath('data.domain', 'emsi');
 
         // Pages créées, publiées, avec leurs blocs de départ.
-        $created = ['maison-habib-faye/agenda' => 'maison', 'maison-habib-faye/espaces' => 'maison', 'emsi/dakar' => 'emsi', 'emsi/saint-louis' => 'emsi',
+        $created = ['centre-culturel/agenda' => 'maison', 'centre-culturel/espaces' => 'maison', 'emsi/dakar' => 'emsi', 'emsi/saint-louis' => 'emsi',
             'mission' => 'general', 'partenaires' => 'general', 'soutenir' => 'general', 'presse' => 'general'];
         foreach ($created as $slug => $domain) {
             $page = Page::where('slug', $slug)->firstOrFail();
@@ -68,9 +68,9 @@ class SiteV4CommandTest extends TestCase
         $this->assertContains('partners', array_column($dakar, 'type'));
         $this->assertSame(Place::where('slug', 'emsi-saint-louis')->value('id'),
             collect(Page::where('slug', 'emsi/saint-louis')->firstOrFail()->blocks)->firstWhere('type', 'campus_programs')['data']['campus_id']);
-        $this->assertContains('places', $types('maison-habib-faye/espaces'));
-        $this->assertSame('space_rental', collect(Page::where('slug', 'maison-habib-faye/espaces')->first()->blocks)->firstWhere('type', 'booking_form')['data']['booking_type']);
-        $this->assertContains('agenda', $types('maison-habib-faye/agenda'));
+        $this->assertContains('places', $types('centre-culturel/espaces'));
+        $this->assertSame('space_rental', collect(Page::where('slug', 'centre-culturel/espaces')->first()->blocks)->firstWhere('type', 'booking_form')['data']['booking_type']);
+        $this->assertContains('agenda', $types('centre-culturel/agenda'));
         $this->assertContains('support_form', $types('soutenir'));
         // Pas de bloc « Documents » vide : l'admin exige un document, la page ne pourrait plus être enregistrée.
         $this->assertNotContains('downloads', $types('presse'));
@@ -103,12 +103,12 @@ class SiteV4CommandTest extends TestCase
 
     public function test_a_page_already_at_the_target_address_is_not_overwritten(): void
     {
-        $maison = Page::create(['title' => 'La Maison', 'slug' => 'maison-habib-faye', 'type' => 'free', 'domain' => 'maison',
+        $maison = Page::create(['title' => 'Le Centre culturel', 'slug' => 'centre-culturel', 'type' => 'free', 'domain' => 'maison',
             'draft_blocks' => [['type' => 'text', 'data' => ['title' => 'Écrit par l\'équipe', 'body' => '<p>Notre maison.</p>']]]]);
         $maison->publish();
         $blocks = $maison->fresh()->blocks;
 
-        $this->artisan('emsi:site-v4')->expectsOutputToContain('« /maison-habib-faye » est déjà prise')->assertSuccessful();
+        $this->artisan('emsi:site-v4')->expectsOutputToContain('« /centre-culturel » est déjà prise')->assertSuccessful();
 
         $this->assertSame($blocks, $maison->fresh()->blocks);
         $this->assertSame(1, $maison->revisions()->count());
@@ -125,7 +125,7 @@ class SiteV4CommandTest extends TestCase
 
         $this->artisan('emsi:site-v4')->expectsOutputToContain('pages, menus et campus des formations ne sont plus modifiés')->assertSuccessful();
 
-        $this->assertTrue(MenuItem::where('location', 'main')->where('label', 'Agenda')->where('url', '/maison-habib-faye/agenda')->exists());
+        $this->assertTrue(MenuItem::where('location', 'main')->where('label', 'Agenda')->where('url', '/centre-culturel/agenda')->exists());
         $this->assertFalse(MenuItem::where('location', 'main')->where('label', 'Programmation')->exists());
         $this->assertFalse(MenuItem::where('location', 'footer')->where('label', 'Presse')->value('is_visible'));
         $this->assertSame('<p>Texte définitif.</p>', $mission->fresh()->blocks[0]['data']['body']);
@@ -148,8 +148,8 @@ class SiteV4CommandTest extends TestCase
 
         // Photos existantes réutilisées pour les trois diapositives.
         $this->setHeroImage('accueil', 'pages/accueil.jpg');
-        $this->setHeroImage('maison-habib-faye', 'pages/maison.jpg');
-        $this->setHeroImage('maison-habib-faye/studio', 'pages/studio.jpg');
+        $this->setHeroImage('centre-culturel', 'pages/maison.jpg');
+        $this->setHeroImage('centre-culturel/studio', 'pages/studio.jpg');
         $previous = $home->fresh()->blocks;
 
         $this->artisan('emsi:site-v4', ['--home' => true])->assertSuccessful();
@@ -158,11 +158,11 @@ class SiteV4CommandTest extends TestCase
         $this->assertSame(['hero', 'domains', 'stats', 'agenda', 'news', 'partners'], array_column($home->blocks, 'type'));
         $hero = $home->blocks[0]['data'];
         $this->assertSame('cinema', $hero['layout']);
-        $this->assertSame(['/maison-habib-faye', '/emsi', '/maison-habib-faye/studio'], array_column($hero['slides'], 'link_url'));
+        $this->assertSame(['/centre-culturel', '/emsi', '/centre-culturel/studio'], array_column($hero['slides'], 'link_url'));
         $this->assertSame(['pages/maison.jpg', 'pages/accueil.jpg', 'pages/studio.jpg'], array_column($hero['slides'], 'image'));
         $panels = $home->blocks[1]['data']['panels'];
         $this->assertSame(['maison', 'emsi', 'studio'], array_column($panels, 'domain'));
-        $this->assertSame(['/maison-habib-faye', '/emsi', '/maison-habib-faye/studio'], array_column($panels, 'url'));
+        $this->assertSame(['/centre-culturel', '/emsi', '/centre-culturel/studio'], array_column($panels, 'url'));
         $this->assertSame($home->blocks, $home->draft_blocks);
         $this->assertTrue($home->revisions()->get()->contains(fn (PageRevision $revision) => $revision->blocks === $previous));
         $this->getJson('/api/v1/public/pages/accueil')->assertOk()->assertJsonPath('data.blocks.1.type', 'domains');
@@ -224,11 +224,11 @@ class SiteV4CommandTest extends TestCase
         $visible = fn (string $location, ?int $parent = null) => MenuItem::where('location', $location)->where('is_visible', true)
             ->where('parent_id', $parent)->orderBy('position')->get();
         $main = $visible('main');
-        $this->assertSame(['Accueil', 'Maison Habib Faye', 'EMSI', 'À propos', 'Candidater'], $main->pluck('label')->all());
-        $this->assertSame(['/', '/maison-habib-faye', '/emsi', '/mission', '/candidater'], $main->pluck('url')->all());
+        $this->assertSame(['Accueil', 'Centre culturel Habib Faye', 'EMSI', 'À propos', 'Candidater'], $main->pluck('label')->all());
+        $this->assertSame(['/', '/centre-culturel', '/emsi', '/mission', '/candidater'], $main->pluck('url')->all());
         $this->assertTrue($main->last()->is_button);
-        $this->assertSame(['La Maison', 'Programmation', 'Impact Live Studio', 'Les espaces'], $visible('main', $main[1]->id)->pluck('label')->all());
-        $this->assertSame(['/maison-habib-faye', '/maison-habib-faye/agenda', '/maison-habib-faye/studio', '/maison-habib-faye/espaces'], $visible('main', $main[1]->id)->pluck('url')->all());
+        $this->assertSame(['Le Centre culturel', 'Programmation', 'Impact Live Studio', 'Les espaces'], $visible('main', $main[1]->id)->pluck('label')->all());
+        $this->assertSame(['/centre-culturel', '/centre-culturel/agenda', '/centre-culturel/studio', '/centre-culturel/espaces'], $visible('main', $main[1]->id)->pluck('url')->all());
         $this->assertSame(['L\'école', 'Campus de Dakar', 'Campus de Saint-Louis', 'Formations', 'VAE et professionnels', 'Réalisations'], $visible('main', $main[2]->id)->pluck('label')->all());
         $this->assertSame(['/emsi', '/emsi/dakar', '/emsi/saint-louis', '/emsi/formations', '/emsi/professionnels', '/emsi/realisations'], $visible('main', $main[2]->id)->pluck('url')->all());
         $this->assertSame(['Mission et impact', 'Partenaires et soutiens', 'Nous soutenir', 'Actualités', 'Presse', 'Contact'], $visible('main', $main[3]->id)->pluck('label')->all());
@@ -261,14 +261,14 @@ class SiteV4CommandTest extends TestCase
 
         $page->refresh();
         $this->assertSame('Tarifs · Dakar · Saint-Louis', $page->blocks[0]['data']['eyebrow']);
-        $this->assertSame(['/maison-habib-faye', '/maison-habib-faye/studio#reserver'], array_column($page->blocks[0]['data']['buttons'], 'url'));
+        $this->assertSame(['/centre-culturel', '/centre-culturel/studio#reserver'], array_column($page->blocks[0]['data']['buttons'], 'url'));
         $this->assertSame('/emsi/formations/technicien-lumiere', $page->blocks[1]['data']['items'][0]['url']);
         $this->assertSame('Grand Théâtre National', $page->blocks[2]['data']['title']);
-        $this->assertSame('<p>Voir <a href="/maison-habib-faye">nos prestations</a>.</p>', $page->blocks[2]['data']['body']);
+        $this->assertSame('<p>Voir <a href="/centre-culturel">nos prestations</a>.</p>', $page->blocks[2]['data']['body']);
         $this->assertCount(3, $page->blocks);
         $this->assertCount(4, $page->draft_blocks);
-        $this->assertSame('/maison-habib-faye/agenda', $page->draft_blocks[3]['data']['buttons'][0]['url']);
-        $this->assertSame('/maison-habib-faye', MenuItem::where('label', 'Location de sono')->value('url'));
+        $this->assertSame('/centre-culturel/agenda', $page->draft_blocks[3]['data']['buttons'][0]['url']);
+        $this->assertSame('/centre-culturel', MenuItem::where('label', 'Location de sono')->value('url'));
 
         // Plus aucun lien vers Impact Live Events ni vers une ancienne adresse sur les pages en ligne.
         $live = json_encode(Page::published()->pluck('blocks'), JSON_UNESCAPED_SLASHES);
@@ -286,9 +286,9 @@ class SiteV4CommandTest extends TestCase
         // L'équipe renomme des pages, change le menu et le pied de page, décoche une formation de tous les campus.
         Page::where('slug', 'presse')->update(['slug' => 'espace-presse']);
         Page::where('slug', 'emsi/dakar')->update(['slug' => 'emsi/campus-dakar']);
-        $maison = MenuItem::where('location', 'main')->whereNull('parent_id')->where('url', '/maison-habib-faye')->firstOrFail();
-        $maison->update(['label' => 'La Maison', 'url' => '/la-maison']);
-        $added = MenuItem::create(['location' => 'main', 'parent_id' => $maison->id, 'label' => 'Résidences', 'url' => '/maison-habib-faye/residences', 'position' => 9]);
+        $maison = MenuItem::where('location', 'main')->whereNull('parent_id')->where('url', '/centre-culturel')->firstOrFail();
+        $maison->update(['label' => 'Le Centre culturel', 'url' => '/la-maison']);
+        $added = MenuItem::create(['location' => 'main', 'parent_id' => $maison->id, 'label' => 'Résidences', 'url' => '/centre-culturel/residences', 'position' => 9]);
         MenuItem::where('location', 'footer')->where('url', '/mission')->delete();
         $program = Program::orderBy('id')->firstOrFail();
         $program->campuses()->detach();
@@ -330,7 +330,7 @@ class SiteV4CommandTest extends TestCase
         $emsi->revisions()->delete();
         $emsi->revisions()->create(['title' => $emsi->title, 'blocks' => $old]);
         Page::where('slug', 'presse')->update(['slug' => 'espace-presse']);
-        MenuItem::where('location', 'main')->whereNull('parent_id')->where('url', '/maison-habib-faye')->update(['url' => '/la-maison']);
+        MenuItem::where('location', 'main')->whereNull('parent_id')->where('url', '/centre-culturel')->update(['url' => '/la-maison']);
         $menus = MenuItem::orderBy('id')->get(['id', 'parent_id', 'label', 'url', 'position', 'is_visible'])->toArray();
         // Les univers de l'ancien accueil, retouchés par l'équipe, sont repris tels quels.
         $home = Page::where('slug', 'accueil')->firstOrFail();

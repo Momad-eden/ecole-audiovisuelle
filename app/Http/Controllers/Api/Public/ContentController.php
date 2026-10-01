@@ -311,7 +311,7 @@ class ContentController extends Controller
             ->merge(Program::published()->get(['slug', 'audience', 'updated_at'])->map(fn (Program $p) => $entry(
                 ($p->audience?->value === 'professional' ? '/emsi/professionnels/' : '/emsi/formations/').$p->slug, $p->updated_at)))
             ->merge(News::published()->get(['slug', 'updated_at'])->map(fn (News $n) => $entry('/actualites/'.$n->slug, $n->updated_at)))
-            ->merge(AgendaEvent::published()->get(['slug', 'updated_at'])->map(fn (AgendaEvent $e) => $entry('/maison-habib-faye/agenda/'.$e->slug, $e->updated_at)))
+            ->merge(AgendaEvent::published()->get(['slug', 'updated_at'])->map(fn (AgendaEvent $e) => $entry('/centre-culturel/agenda/'.$e->slug, $e->updated_at)))
             ->values()]);
     }
 }

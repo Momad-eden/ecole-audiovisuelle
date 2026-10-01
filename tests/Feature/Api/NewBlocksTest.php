@@ -12,7 +12,7 @@ use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Storage;
 use Tests\TestCase;
 
-/** Blocs « Nos trois maisons », « Formations de ce campus », « Documents à télécharger » et « Nous soutenir ». */
+/** Blocs « Nos trois lieux », « Formations de ce campus », « Documents à télécharger » et « Nous soutenir ». */
 class NewBlocksTest extends TestCase
 {
     use RefreshDatabase;
@@ -34,7 +34,7 @@ class NewBlocksTest extends TestCase
             'image' => "pages/{$domain}.jpg", 'image_alt' => "Photo {$title}", 'url' => "/{$domain}", 'label' => 'Découvrir',
         ];
         $this->page([['type' => 'domains', 'data' => ['intro' => 'La culture comme héritage', 'panels' => [
-            $panel('maison', 'Maison Habib Faye'), $panel('emsi', 'EMSI'), $panel('studio', 'Impact Live Studio'),
+            $panel('maison', 'Centre culturel Habib Faye'), $panel('emsi', 'EMSI'), $panel('studio', 'Impact Live Studio'),
         ]]]]);
 
         $this->getJson('/api/v1/public/pages/essai')->assertOk()
@@ -48,7 +48,7 @@ class NewBlocksTest extends TestCase
             ->assertJsonPath('data.blocks.0.data.panels.2.url', '/studio')
             ->assertJsonPath('data.blocks.0.data.panels.2.label', 'Découvrir')
             ->assertJsonPath('data.blocks.0.data.panels.0.image.url', url('/storage/pages/maison.jpg'))
-            ->assertJsonPath('data.blocks.0.data.panels.0.image.alt', 'Photo Maison Habib Faye');
+            ->assertJsonPath('data.blocks.0.data.panels.0.image.alt', 'Photo Centre culturel Habib Faye');
     }
 
     public function test_campus_programs_lists_only_programs_available_at_that_campus(): void

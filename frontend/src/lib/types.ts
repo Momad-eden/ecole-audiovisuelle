@@ -8,7 +8,7 @@ export type MenuChild = { label: string; url: string; description?: string | nul
 /** Entrée du menu ; `children` : sous-menu d'un niveau (vide pour les liens simples). */
 export type MenuLink = { label: string; url: string; isButton: boolean; description?: string | null; image?: Image | null; children?: MenuChild[] };
 
-/** Les trois domaines de la Maison, plus le domaine général (accueil, contact…). */
+/** Les trois domaines du Centre culturel, plus le domaine général (accueil, contact…). */
 export type DomainKey = "general" | "maison" | "emsi" | "studio";
 export type Domains = Record<DomainKey, { label: string; color: string }>;
 
@@ -190,7 +190,7 @@ export type Paginated<T> = {
   meta: { current_page: number; last_page: number; total: number; per_page: number };
 };
 
-// ——— Impact Live : studio, événementiel, Espace Habib Faye, lieux ———
+// ——— Impact Live : studio, événementiel, Centre culturel Habib Faye, lieux ———
 
 export type Activity = "school" | "studio" | "events" | "space";
 

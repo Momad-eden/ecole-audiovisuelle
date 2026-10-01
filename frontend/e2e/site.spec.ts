@@ -4,9 +4,9 @@ test("l'accueil présente les trois domaines et un appel à candidater", async (
   await page.goto("/");
   await expect(page.getByRole("heading", { level: 1 })).toContainText("La culture comme héritage");
   const triptyque = page.getByTestId("domains-block");
-  await expect(triptyque.locator('a[href="/maison-habib-faye"]').first()).toBeAttached();
+  await expect(triptyque.locator('a[href="/centre-culturel"]').first()).toBeAttached();
   await expect(triptyque.locator('a[href="/emsi"]')).toBeAttached();
-  await expect(triptyque.locator('a[href="/maison-habib-faye/studio"]')).toBeAttached();
+  await expect(triptyque.locator('a[href="/centre-culturel/studio"]')).toBeAttached();
   // Sur téléphone, le lien « Candidater » vit dans le menu replié : il est présent dans la page.
   await expect(page.locator('a[href^="/candidater"]').first()).toBeAttached();
 });
@@ -90,7 +90,7 @@ test("le changeur de thème passe en clair et s'en souvient", async ({ page, isM
 });
 
 test("le studio présente ses services, ses productions et la réservation d'une session", async ({ page }) => {
-  await page.goto("/maison-habib-faye/studio");
+  await page.goto("/centre-culturel/studio");
   await expect(page.getByRole("heading", { level: 1 })).toContainText("Ici, votre son");
   await expect(page.getByRole("heading", { name: "Du premier enregistrement au master" })).toBeVisible();
   await expect(page.getByRole("heading", { name: "Mixage" })).toBeVisible();
@@ -98,11 +98,11 @@ test("le studio présente ses services, ses productions et la réservation d'une
   await expect(page.getByLabel("Votre demande")).toHaveValue("studio_session", { timeout: 15000 });
 });
 
-test("la Maison Habib Faye et sa programmation sont accessibles depuis le pied de page", async ({ page }) => {
+test("le Centre culturel Habib Faye et sa programmation sont accessibles depuis le pied de page", async ({ page }) => {
   await page.goto("/");
-  await page.locator('footer a[href="/maison-habib-faye"]').click();
-  await expect(page.getByRole("heading", { level: 1, name: "Espace Habib Faye" })).toBeVisible({ timeout: 15000 });
-  await page.goto("/maison-habib-faye/agenda");
+  await page.locator('footer a[href="/centre-culturel"]').click();
+  await expect(page.getByRole("heading", { level: 1, name: "Centre culturel Habib Faye" })).toBeVisible({ timeout: 15000 });
+  await page.goto("/centre-culturel/agenda");
   await expect(page.getByRole("heading", { level: 1, name: "Programmation" })).toBeVisible();
 });
 
@@ -126,7 +126,7 @@ test("la page EMSI présente les univers ; /univers y mène", async ({ page }) =
 });
 
 test("les liens partagés affichent l'aperçu de l'EMSI", async ({ page, request }) => {
-  await page.goto("/maison-habib-faye/studio");
+  await page.goto("/centre-culturel/studio");
   const image = await page.locator('meta[property="og:image"]').first().getAttribute("content");
   expect(image).toContain("/opengraph-image");
   const response = await request.get("/opengraph-image");

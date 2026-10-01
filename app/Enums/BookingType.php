@@ -17,7 +17,7 @@ enum BookingType: string implements HasLabel
             self::STUDIO_SESSION => 'Session studio',
             self::EQUIPMENT_RENTAL => 'Location de matériel',
             self::EVENT_SERVICE => 'Prestation événementielle',
-            self::SPACE_RENTAL => 'Location de l\'Espace Habib Faye',
+            self::SPACE_RENTAL => 'Location d\'un espace du Centre culturel',
         };
     }
 }

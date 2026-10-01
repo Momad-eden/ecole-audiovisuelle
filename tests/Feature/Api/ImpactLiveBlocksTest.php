@@ -14,7 +14,7 @@ use App\Models\Service;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
 
-/** Les blocs des pages Studio, Events et Espace Habib Faye incluent leurs données. */
+/** Les blocs des pages Studio, Events et Centre culturel Habib Faye incluent leurs données. */
 class ImpactLiveBlocksTest extends TestCase
 {
     use RefreshDatabase;

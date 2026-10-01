@@ -9,7 +9,7 @@ import type { Locale } from "@/lib/i18n/locales";
 import type { DomainPanel, DomainsData } from "./types";
 
 /**
- * « Nos trois maisons » : trois grands panneaux côte à côte (empilés sous 1024 px), un par domaine,
+ * « Nos trois lieux » : trois grands panneaux côte à côte (empilés sous 1024 px), un par domaine,
  * chacun dans sa couleur ; à la souris, le panneau survolé s'élargit (CSS, voir .domains-panel).
  * Chaque panneau est un seul lien, dont le nom accessible est son titre.
  * La phrase d'intention est lue en premier (h1 si le bloc ouvre la page) mais affichée sous les panneaux.

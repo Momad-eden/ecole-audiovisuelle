@@ -70,6 +70,7 @@ class BlockResolver
             'gallery' => [...$data, 'images' => collect($data['images'] ?? [])->map(fn ($item) => [
                 ...$this->withImages($item),
             ])->values()->all()],
+            'statement' => [...$data, 'images' => collect($data['images'] ?? [])->map(fn ($path) => Media::image($path, ''))->filter()->values()->all()],
             'showcase' => [...$data, 'items' => collect($data['items'] ?? [])->map(fn ($item) => [
                 ...$this->withImages($item), 'video' => Media::url($item['video'] ?? null),
             ])->filter(fn ($item) => $item['image'])->values()->all()],

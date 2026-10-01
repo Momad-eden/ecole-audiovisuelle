@@ -16,13 +16,13 @@ enum SiteDomain: string implements HasLabel
     {
         return match ($this) {
             self::GENERAL => 'Général',
-            self::MAISON => 'Maison Habib Faye',
+            self::MAISON => 'Centre culturel Habib Faye',
             self::EMSI => 'EMSI',
             self::STUDIO => 'Impact Live Studio',
         };
     }
 
-    /** Libellé dans la langue demandée (API publique) ; noms propres identiques dans les deux langues. */
+    /** Libellé dans la langue demandée (API publique) ; noms propres identiques dans les deux langues, sauf le Centre culturel. */
     public function labelFor(string $locale): string
     {
         if ($locale !== 'en') {
@@ -31,21 +31,21 @@ enum SiteDomain: string implements HasLabel
 
         return match ($this) {
             self::GENERAL => 'General',
-            self::MAISON => 'Maison Habib Faye',
+            self::MAISON => 'Habib Faye Cultural Centre',
             self::EMSI => 'EMSI',
             self::STUDIO => 'Impact Live Studio',
         };
     }
 
-    /** Domaine déduit de l'adresse d'une page (maison-habib-faye/studio…, maison-habib-faye…, emsi…), sinon null. */
+    /** Domaine déduit de l'adresse d'une page (centre-culturel/studio…, centre-culturel…, emsi…), sinon null. */
     public static function forPath(?string $path): ?self
     {
         $path = trim((string) $path, '/');
         $under = fn (string $prefix) => $path === $prefix || str_starts_with($path, $prefix.'/');
 
         return match (true) {
-            $under('maison-habib-faye/studio') => self::STUDIO,
-            $under('maison-habib-faye') => self::MAISON,
+            $under('centre-culturel/studio') => self::STUDIO,
+            $under('centre-culturel') => self::MAISON,
             $under('emsi') => self::EMSI,
             default => null,
         };

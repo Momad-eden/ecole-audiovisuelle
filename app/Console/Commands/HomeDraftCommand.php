@@ -7,9 +7,9 @@ use Illuminate\Console\Command;
 use Illuminate\Support\Facades\Storage;
 
 /**
- * Nouvelle page d'accueil, préparée en BROUILLON : film d'ouverture, les trois maisons, l'agenda, la vitrine
- * photos et vidéos du centre, les chiffres clés, les actualités, l'appel au soutien et les partenaires.
- * Les blocs existants (trois maisons, chiffres, actualités, partenaires, agenda) sont repris tels quels ;
+ * Nouvelle page d'accueil, préparée en BROUILLON : film d'ouverture, manifeste (phrase, chiffres, bandeau de photos), les trois lieux, l'agenda, la vitrine
+ * photos et vidéos du centre, les actualités, l'appel au soutien et les partenaires.
+ * Les blocs existants (trois lieux, actualités, partenaires, agenda) sont repris tels quels, les chiffres clés passent dans le manifeste ;
  * la version en ligne n'est jamais modifiée : l'équipe relit l'aperçu puis publie depuis l'admin.
  * Un brouillon en cours (différent de la version en ligne) n'est remplacé qu'avec --force.
  */
@@ -26,8 +26,8 @@ class HomeDraftCommand extends Command
     ];
 
     private const SHOWCASE = [
-        ['pages/01M3R5AKQTX1B0PBT018R88CEN.jpg', 'Concert sur scène, lumières rouges', 'Sur scène', '/maison-habib-faye/agenda'],
-        ['pages/01M3PS2NY4YN4R4GEEDZTM5WC3.jpg', 'Un ingénieur du son à la console du studio', 'Au studio', '/maison-habib-faye/studio'],
+        ['pages/01M3R5AKQTX1B0PBT018R88CEN.jpg', 'Concert sur scène, lumières rouges', 'Sur scène', '/centre-culturel/agenda'],
+        ['pages/01M3PS2NY4YN4R4GEEDZTM5WC3.jpg', 'Un ingénieur du son à la console du studio', 'Au studio', '/centre-culturel/studio'],
         ['gallery/noCgZAuj3m9nL5FlIggH578X9H9KsyBuEKgkbGPd.webp', 'Une caméra en tournage', 'En tournage', '/emsi/formations'],
         ['pages/01M3JAVXS0NXQ1AHV5KACB01GB.jpg', 'Console de mixage éclairée dans la pénombre', 'En régie', '/emsi/formations'],
         ['pages/01M3GNZZ4KEHA28Z0NA1XX9Q9X.jpg', 'Façade d\'un bâtiment aux couleurs du Sénégal', 'Nos lieux', null],
@@ -58,28 +58,35 @@ class HomeDraftCommand extends Command
                 'layout' => 'film',
                 'eyebrow' => 'Saint-Louis · Dakar — Sénégal',
                 'title' => $title,
-                'subtitle' => 'Un centre culturel, une école et un studio, réunis dans l\'héritage de Habib Faye.',
+                'subtitle' => 'Un centre culturel, une école et un studio, réunis.',
                 'images' => $this->existing(self::FILM_IMAGES),
                 'video_loop' => null,
                 'film_url' => null,
                 'buttons' => [
-                    ['label' => 'Découvrir la Maison', 'url' => '/maison-habib-faye', 'style' => 'primary'],
+                    ['label' => 'Découvrir le Centre culturel', 'url' => '/centre-culturel', 'style' => 'primary'],
                     ['label' => 'Candidater à l\'EMSI', 'url' => '/candidater', 'style' => 'secondary'],
                 ],
+            ]],
+            ['type' => 'statement', 'data' => [
+                'eyebrow' => 'Saint-Louis · Dakar',
+                'text' => 'Un *centre culturel*, une *école* et un *studio* : trois lieux pour créer, apprendre et partager la culture, de Saint-Louis à Dakar.',
+                'facts' => [...collect($find('stats')['data']['items'] ?? [])->map(fn ($i) => ['value' => $i['value'], 'label' => $i['label']])->take(3)->all(), ['value' => '3', 'label' => 'lieux']],
+                'images' => $this->existing(self::FILM_IMAGES),
+                'button_label' => 'Notre mission',
+                'button_url' => '/mission',
             ]],
             $domains ? ['type' => 'domains', 'data' => [...$domains['data'], 'intro' => null]] : null,
             ['type' => 'agenda', 'data' => [...($find('agenda')['data'] ?? ['scope' => 'upcoming', 'activity' => null]), 'title' => 'À l\'affiche', 'limit' => 4]],
             ['type' => 'showcase', 'data' => [
                 'eyebrow' => 'Le centre en images',
                 'title' => 'Sur scène, au studio, en tournage',
-                'text' => 'Concerts, résidences, enregistrements et tournages : la vie de la Maison et de l\'école.',
+                'text' => 'Concerts, résidences, enregistrements et tournages : la vie du Centre culturel et de l\'école.',
                 'items' => array_values(array_filter(array_map(fn (array $item) => Storage::disk('public')->exists($item[0]) ? [
                     'image' => $item[0], 'image_alt' => $item[1], 'video' => null, 'caption' => $item[2], 'url' => $item[3],
                 ] : null, self::SHOWCASE))),
                 'button_label' => 'Voir la programmation',
-                'button_url' => '/maison-habib-faye/agenda',
+                'button_url' => '/centre-culturel/agenda',
             ]],
-            $find('stats'),
             $find('news'),
             ['type' => 'cta', 'data' => [
                 'title' => 'Soutenir la création, de Saint-Louis au monde',

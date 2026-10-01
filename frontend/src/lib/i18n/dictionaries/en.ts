@@ -359,7 +359,7 @@ export const en: Dictionary = {
   },
 
   booking: {
-    types: { studio_session: "Studio session", space_rental: "Hiring the Espace Habib Faye" },
+    types: { studio_session: "Studio session", space_rental: "Hiring a space at the Habib Faye Cultural Centre" },
     request: "Your request",
     organization: "Artist, organisation or company",
     phone: "Phone (WhatsApp preferred)",
@@ -406,7 +406,7 @@ export const en: Dictionary = {
   news: {
     eyebrow: "Journal",
     title: "News",
-    text: "Life at EMSI in Dakar and Saint-Louis, at Impact Live and at the Espace Habib Faye.",
+    text: "Life at EMSI in Dakar and Saint-Louis, at Impact Live and at the Habib Faye Cultural Centre.",
     emptyTitle: "Our first news is on its way.",
     emptyText: "Start of term, open days, concerts, student work: in the meantime, follow us on the events calendar.",
     seeAgenda: "See what's on",

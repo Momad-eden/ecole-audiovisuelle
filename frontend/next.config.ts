@@ -34,7 +34,7 @@ const nextConfig: NextConfig = {
     const rooms: Record<string, string> = { "salle-du-son": "son", "salle-de-la-lumiere": "scene", "salle-de-limage": "image", "salle-du-visuel": "design" };
     const permanent = (source: string, destination: string) => ({ source, destination, permanent: true });
     const french = [
-      // Les trois domaines : école (/emsi), Maison Habib Faye et Impact Live Studio (/maison-habib-faye).
+      // Les trois domaines : école (/emsi), Centre culturel Habib Faye et Impact Live Studio (/centre-culturel).
       // /univers mène au bloc des univers de la page EMSI (id="univers").
       permanent("/univers", "/emsi#univers"),
       permanent("/univers/:slug", "/emsi/univers/:slug"),
@@ -43,15 +43,18 @@ const nextConfig: NextConfig = {
       permanent("/professionnels/:path*", "/emsi/professionnels/:path*"),
       permanent("/expositions", "/emsi/realisations"),
       permanent("/expositions/:path*", "/emsi/realisations"),
-      permanent("/studio", "/maison-habib-faye/studio"),
+      // La « Maison Habib Faye » est devenue le « Centre culturel Habib Faye » (mêmes pages, nouvelle adresse).
+      permanent("/maison-habib-faye", "/centre-culturel"),
+      permanent("/maison-habib-faye/:path*", "/centre-culturel/:path*"),
+      permanent("/studio", "/centre-culturel/studio"),
       permanent("/ecole", "/emsi"),
-      permanent("/espace-habib-faye", "/maison-habib-faye"),
-      permanent("/agenda", "/maison-habib-faye/agenda"),
-      permanent("/agenda/:slug", "/maison-habib-faye/agenda/:slug"),
-      permanent("/events", "/maison-habib-faye"),
-      permanent("/events/:path*", "/maison-habib-faye"),
+      permanent("/espace-habib-faye", "/centre-culturel"),
+      permanent("/agenda", "/centre-culturel/agenda"),
+      permanent("/agenda/:slug", "/centre-culturel/agenda/:slug"),
+      permanent("/events", "/centre-culturel"),
+      permanent("/events/:path*", "/centre-culturel"),
       // Ancienne demande de devis d'Impact Live Events (retiré) : vers la réservation du studio.
-      permanent("/demande", "/maison-habib-faye/studio#reserver"),
+      permanent("/demande", "/centre-culturel/studio#reserver"),
       // Le « musée » est devenu les univers (disciplines) et les réalisations des étudiants : cibles directes, sans chaîne.
       permanent("/musee", "/emsi/realisations"),
       permanent("/musee/oeuvres/:slug", "/emsi/realisations/:slug"),

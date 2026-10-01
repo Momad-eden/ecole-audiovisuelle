@@ -21,10 +21,10 @@ import type { DomainKey } from "@/lib/types";
 
 /** Icône d'un lien de sous-menu, d'après son adresse (repli : flèche). */
 const ICONS: Record<string, LucideIcon> = {
-  "/maison-habib-faye": House,
-  "/maison-habib-faye/agenda": CalendarDays,
-  "/maison-habib-faye/studio": Mic,
-  "/maison-habib-faye/espaces": LayoutGrid,
+  "/centre-culturel": House,
+  "/centre-culturel/agenda": CalendarDays,
+  "/centre-culturel/studio": Mic,
+  "/centre-culturel/espaces": LayoutGrid,
   "/emsi": School,
   "/emsi/dakar": MapPin,
   "/emsi/saint-louis": MapPin,
@@ -44,10 +44,10 @@ export function MenuIcon({ url, className }: { url: string; className?: string }
   return <Icon className={className} aria-hidden />;
 }
 
-/** Domaine d'une adresse du menu, pour sa couleur (le studio a la sienne au sein de la Maison). */
+/** Domaine d'une adresse du menu, pour sa couleur (le studio a la sienne au sein du Centre culturel). */
 export function menuDomain(url: string): DomainKey {
-  if (url.startsWith("/maison-habib-faye/studio")) return "studio";
-  if (url === "/maison-habib-faye" || url.startsWith("/maison-habib-faye/")) return "maison";
+  if (url.startsWith("/centre-culturel/studio")) return "studio";
+  if (url === "/centre-culturel" || url.startsWith("/centre-culturel/")) return "maison";
   if (url === "/emsi" || url.startsWith("/emsi/")) return "emsi";
   return "general";
 }

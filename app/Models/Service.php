@@ -11,7 +11,7 @@ use App\Models\Concerns\RevalidatesFrontend;
 use App\Support\Price;
 use Illuminate\Database\Eloquent\Model;
 
-/** Service proposé par le studio, l'événementiel ou l'Espace Habib Faye. */
+/** Service proposé par le studio, l'événementiel ou le Centre culturel Habib Faye. */
 class Service extends Model
 {
     use HasPublication, HasTranslations, HasUniqueSlug, RevalidatesFrontend;

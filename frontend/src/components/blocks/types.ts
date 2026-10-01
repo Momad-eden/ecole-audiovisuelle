@@ -41,3 +41,4 @@ export type DownloadsData = { title?: string | null; files?: DownloadFile[] };
 export type SupportFormData = { title?: string | null; text?: string | null };
 export type ShowcaseItem = { image: Image; video?: string | null; caption?: string | null; url?: string | null };
 export type ShowcaseData = { eyebrow?: string | null; title: string; text?: string | null; items?: ShowcaseItem[]; buttonLabel?: string | null; buttonUrl?: string | null };
+export type StatementData = { eyebrow?: string | null; text: string; facts?: { value: string; label: string }[]; images?: Image[]; buttonLabel?: string | null; buttonUrl?: string | null };

@@ -156,7 +156,7 @@ test("Vitrine : une case s'agrandit, on passe à la suivante au clavier, Échap 
   await showcase.getByRole("button", { name: "Agrandir : Sur scène" }).click();
   const viewer = page.getByRole("dialog", { name: "Sur scène et en coulisses" });
   await expect(viewer.getByText("1 sur 3")).toBeVisible();
-  await expect(viewer.getByRole("link", { name: /Sur scène/ })).toHaveAttribute("href", "/maison-habib-faye/agenda");
+  await expect(viewer.getByRole("link", { name: /Sur scène/ })).toHaveAttribute("href", "/centre-culturel/agenda");
   await page.keyboard.press("ArrowRight");
   await expect(viewer.getByText("2 sur 3")).toBeVisible();
   await page.keyboard.press("Escape");
@@ -181,4 +181,12 @@ test("En-tête : devient une capsule au défilement, se cache en descendant et r
   await expect.poll(async () => (await header.boundingBox())!.y).toBeLessThan(-40);
   await page.mouse.wheel(0, -300);
   await expect.poll(async () => (await header.boundingBox())!.y).toBe(0);
+});
+
+test("Manifeste : grande phrase avec mot mis en valeur, chiffre et bandeau de photos décoratif", async ({ page }) => {
+  await page.goto("/essai-heros-film");
+  const statement = page.getByTestId("statement");
+  await expect(statement.locator("em.title-accent")).toHaveText("centre culturel");
+  await expect(statement.locator("dd .sr-only")).toHaveText("3");
+  await expect(statement.locator(".statement-ribbon")).toHaveAttribute("aria-hidden", "true");
 });

@@ -40,7 +40,7 @@ class Setting extends Model
     public const DEFAULT_GLOSSARY = [
         ['fr' => 'EMSI', 'en' => 'EMSI'],
         ['fr' => 'Impact Live Studio', 'en' => 'Impact Live Studio'],
-        ['fr' => 'Maison de la culture Habib Faye', 'en' => 'Maison de la culture Habib Faye'],
+        ['fr' => 'Centre culturel Habib Faye', 'en' => 'Habib Faye Cultural Centre'],
         ['fr' => 'Grand Théâtre National Doudou Ndiaye Coumba Rose', 'en' => 'Grand Théâtre National Doudou Ndiaye Coumba Rose'],
         ['fr' => 'Habib Faye', 'en' => 'Habib Faye'],
         ['fr' => 'Boubacar Tall', 'en' => 'Boubacar Tall'],

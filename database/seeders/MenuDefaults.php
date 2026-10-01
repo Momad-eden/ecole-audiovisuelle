@@ -22,10 +22,10 @@ final class MenuDefaults
 
     /** Phrase affichée sous chaque lien des sous-menus, par adresse. */
     public const DESCRIPTIONS = [
-        '/maison-habib-faye' => 'Le lieu, son histoire et l\'héritage de Habib Faye',
-        '/maison-habib-faye/agenda' => 'Concerts, résidences et rendez-vous à venir',
-        '/maison-habib-faye/studio' => 'Enregistrer, mixer et produire dans un studio équipé',
-        '/maison-habib-faye/espaces' => 'Les salles et lieux de la Maison',
+        '/centre-culturel' => 'Le lieu, son projet et ses activités',
+        '/centre-culturel/agenda' => 'Concerts, résidences et rendez-vous à venir',
+        '/centre-culturel/studio' => 'Enregistrer, mixer et produire dans un studio équipé',
+        '/centre-culturel/espaces' => 'Les salles et lieux du Centre culturel',
         '/emsi' => 'L\'école des métiers du son et de l\'image',
         '/emsi/dakar' => 'Formations et vie du campus de Dakar',
         '/emsi/saint-louis' => 'Formations et vie du campus de Saint-Louis',
@@ -35,14 +35,14 @@ final class MenuDefaults
         '/mission' => 'Pourquoi nous existons et ce que nous changeons',
         '/partenaires' => 'Les institutions et entreprises à nos côtés',
         '/soutenir' => 'Mécénat, dons et partenariats',
-        '/actualites' => 'Les dernières nouvelles de la Maison et de l\'EMSI',
+        '/actualites' => 'Les dernières nouvelles du Centre culturel et de l\'EMSI',
         '/presse' => 'Communiqués, dossier de presse et contacts médias',
         '/contact' => 'Nous écrire, nous appeler, nous trouver',
     ];
 
     /** Phrase d'accroche d'une rubrique du menu principal (panneau du méga-menu), par adresse. */
     public const PARENT_DESCRIPTIONS = [
-        '/maison-habib-faye' => 'Un centre culturel à Saint-Louis : concerts, résidences et transmission, dans la maison de Habib Faye.',
+        '/centre-culturel' => 'Un centre culturel à Saint-Louis : concerts, résidences, ateliers et transmission.',
         '/emsi' => 'L\'école des métiers du son, de l\'image et de la scène, à Dakar et à Saint-Louis.',
         '/mission' => 'Notre mission, celles et ceux qui nous accompagnent, et comment nous rejoindre.',
     ];
