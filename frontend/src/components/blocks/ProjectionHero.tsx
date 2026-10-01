@@ -1,5 +1,6 @@
 "use client";
 
+import { plainTitle } from "@/lib/emphasis";
 import { useRef } from "react";
 import { Volume2, VolumeX } from "lucide-react";
 import { useT } from "@/components/i18n/LocaleProvider";
@@ -26,7 +27,7 @@ export function ProjectionHero({ data, first }: { data: HeroData; first: boolean
   const { listening, loading, toggle, steer } = useArtSound(data.sound);
   const Heading = first ? "h1" : "h2";
   const t = useT().hero;
-  const title = frenchSpacing(data.title);
+  const title = frenchSpacing(plainTitle(data.title));
   const parts = splitHighlight(title, data.highlight);
 
   function follow(event: React.PointerEvent<HTMLElement>) {

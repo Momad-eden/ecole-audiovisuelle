@@ -23,19 +23,18 @@ export function DomainsBlock({ data, first, pageTitle, locale }: { data: Domains
   const dictionary = getDictionary(locale).domains;
 
   if (!first) {
+    // Après le film d'ouverture : trois cartes encadrées, avec marges, dans une section qui suit le thème
+    // (claire ou sombre) ; seules les cartes restent « de nuit » pour que le texte reste lisible sur la photo.
     return (
-      <section data-testid="domains-block" aria-label={intro ? undefined : dictionary.label} className="scene-dark relative isolate bg-night pt-20 sm:pt-28">
-        {intro && (
-          <div className="mx-auto mb-10 flex max-w-7xl flex-wrap items-end justify-between gap-6 px-4 sm:mb-14 sm:px-6 lg:px-8">
-            <div className="max-w-3xl">
-              <p className="cartel mb-4 flex items-center gap-3 text-[var(--accent-ink)]"><span className="h-px w-10 bg-[var(--accent-ink)]" aria-hidden />{dictionary.label}</p>
-              <h2 className="display text-balance text-[clamp(2.2rem,4.4vw,3.6rem)]"><Emphasis text={intro} /></h2>
-            </div>
-          </div>
-        )}
-        <div className="grid border-t border-line lg:flex lg:h-[78svh] lg:min-h-[36rem]">
-          {panels.map((panel, index) => <Panel key={`${panel.domain}-${index}`} panel={panel} index={index} priority={false} />)}
+      <section data-testid="domains-block" className="relative isolate py-20 sm:py-28">
+        <div className="mx-auto mb-10 max-w-7xl px-4 sm:mb-14 sm:px-6 lg:px-8">
+          <p className="cartel mb-4 flex items-center gap-3 text-[var(--accent-ink)]"><span className="h-px w-10 bg-[var(--accent-ink)]" aria-hidden />{dictionary.label}</p>
+          {intro && <h2 className="display max-w-3xl text-balance text-[clamp(2.2rem,4.4vw,3.6rem)]"><Emphasis text={intro} /></h2>}
+          {!intro && <h2 className="sr-only">{dictionary.label}</h2>}
         </div>
+        <ul className="mx-auto grid max-w-7xl gap-4 px-4 sm:px-6 lg:grid-cols-3 lg:gap-5 lg:px-8">
+          {panels.map((panel, index) => <li key={`${panel.domain}-${index}`}><DomainCard panel={panel} index={index} /></li>)}
+        </ul>
       </section>
     );
   }
@@ -45,7 +44,6 @@ export function DomainsBlock({ data, first, pageTitle, locale }: { data: Domains
       data-testid="domains-block"
       data-first={first || undefined}
       aria-label={intro ? undefined : getDictionary(locale).domains.label}
-      // Ouverture de page : plein écran ; après un film d'ouverture, un peu moins haut pour inviter à poursuivre.
       className="scene-dark relative isolate flex flex-col overflow-hidden bg-night lg:h-[100svh] lg:min-h-[40rem]"
     >
       {intro ? (
@@ -105,6 +103,57 @@ function Panel({ panel, index, priority }: { panel: DomainPanel; index: number; 
         {panel.text && <p className="mt-5 max-w-sm text-base text-ink/85 sm:text-lg">{frenchSpacing(panel.text)}</p>}
         {panel.label && (
           <span className="mt-7 inline-flex items-center gap-2 text-sm font-semibold text-[var(--accent-ink)]" aria-hidden>
+            {panel.label}
+            <ArrowRight className="size-4 motion-safe:transition-transform motion-safe:duration-300 group-hover:translate-x-1" />
+          </span>
+        )}
+      </div>
+    </article>
+  );
+}
+
+/** Carte d'un domaine (section après le film) : photo pleine carte, teinte du domaine, filet lumineux au survol. */
+function DomainCard({ panel, index }: { panel: DomainPanel; index: number }) {
+  const external = isExternal(panel.url);
+  const linkClass = "after:absolute after:inset-0 after:z-10 after:content-[''] focus-visible:outline-none";
+  const title = frenchSpacing(panel.title);
+
+  return (
+    <article
+      data-testid="domain-panel"
+      className={cn(
+        "scene-dark group relative isolate flex h-[25rem] flex-col justify-end overflow-hidden rounded-[2rem] border border-line bg-night shadow-[0_24px_60px_-30px_rgb(0_0_0/0.6)]",
+        "motion-safe:transition motion-safe:duration-500 hover:-translate-y-1 hover:shadow-[0_32px_70px_-28px_color-mix(in_oklab,var(--accent)_45%,transparent)] sm:h-[30rem] lg:h-[36rem]",
+        "has-[a:focus-visible]:outline has-[a:focus-visible]:outline-2 has-[a:focus-visible]:outline-offset-2 has-[a:focus-visible]:outline-[var(--accent)]",
+      )}
+      style={accentVars(panel.color)}
+    >
+      <div className="absolute inset-0 -z-20 brightness-[0.78] motion-safe:transition-transform motion-safe:duration-700 group-hover:scale-[1.06]" aria-hidden>
+        {panel.image && <MediaImage image={{ ...panel.image, alt: "" }} sizes="(min-width: 1024px) 33vw, 100vw" />}
+      </div>
+      <div
+        className="absolute inset-0 -z-10"
+        style={{ background: "linear-gradient(0deg, rgb(7 7 10 / 0.95) 10%, color-mix(in oklab, var(--accent) 22%, rgb(7 7 10 / 0.55)) 55%, rgb(7 7 10 / 0.15))" }}
+        aria-hidden
+      />
+      <span className="absolute left-6 right-6 top-6 flex items-center justify-between sm:left-8 sm:right-8 sm:top-8" aria-hidden>
+        <span className="cartel tabular-nums text-white/80">{String(index + 1).padStart(2, "0")}</span>
+        <span className="grid size-11 place-items-center rounded-full border border-white/25 bg-black/20 text-white backdrop-blur transition group-hover:border-[var(--accent)] group-hover:bg-[var(--accent)] group-hover:text-on-accent">
+          <ArrowRight className="size-4 -rotate-45 transition-transform group-hover:rotate-0" />
+        </span>
+      </span>
+      <div className="relative p-6 sm:p-8">
+        {panel.eyebrow && <p className="cartel mb-3" style={{ color: "var(--accent-ink)" }}>{panel.eyebrow}</p>}
+        <h3 className="display text-[clamp(2rem,3vw,2.8rem)] uppercase text-balance text-ink">
+          {external ? (
+            <a href={panel.url} target="_blank" rel="noopener noreferrer" className={linkClass}>{title}</a>
+          ) : (
+            <LocaleLink href={panel.url} className={linkClass}>{title}</LocaleLink>
+          )}
+        </h3>
+        {panel.text && <p className="mt-3 max-w-sm text-ink/85">{frenchSpacing(panel.text)}</p>}
+        {panel.label && (
+          <span className="mt-5 inline-flex items-center gap-2 text-sm font-semibold text-[var(--accent-ink)]" aria-hidden>
             {panel.label}
             <ArrowRight className="size-4 motion-safe:transition-transform motion-safe:duration-300 group-hover:translate-x-1" />
           </span>

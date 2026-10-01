@@ -97,7 +97,7 @@ html:has([data-domain-row]) {
   padding-inline: 0.75rem 0.5rem;
   border-radius: 9999px;
   border-color: var(--color-line);
-  background-color: color-mix(in oklab, var(--color-night) 74%, transparent);
+  background-color: color-mix(in oklab, var(--color-night) 90%, transparent);
   backdrop-filter: blur(18px) saturate(1.4);
   box-shadow: 0 14px 40px -18px rgb(0 0 0 / 0.6);
 }
@@ -114,8 +114,9 @@ html:has([data-domain-row]) {
   padding-inline: 1rem 0.375rem;
   border-radius: 9999px;
   border-color: var(--color-line);
-  background-color: color-mix(in oklab, var(--color-night) 74%, transparent);
+  background-color: color-mix(in oklab, var(--color-night) 92%, transparent);
   backdrop-filter: blur(18px) saturate(1.4);
+  box-shadow: 0 10px 30px -18px rgb(0 0 0 / 0.5);
 }
 html[data-header-hidden] .domain-row {
   transform: translateY(-4.375rem);
@@ -416,7 +417,7 @@ body::after {
   display: flex;
   width: max-content;
   gap: 1rem;
-  padding-block: 0 1.5rem;
+  padding-block: 0 2.5rem;
   animation: statement-slide 70s linear infinite;
 }
 .statement-ribbon:hover .statement-track { animation-play-state: paused; }

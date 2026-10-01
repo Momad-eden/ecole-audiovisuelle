@@ -70,13 +70,12 @@ class HomepageV5Test extends TestCase
         $page->refresh();
         $this->assertSame($published, $page->blocks, 'La version en ligne ne change pas.');
         $types = array_column($page->draft_blocks, 'type');
-        $this->assertSame(['hero', 'statement', 'partners', 'domains', 'institution', 'agenda', 'showcase', 'cta', 'partners'], $types);
+        $this->assertSame(['hero', 'statement', 'domains', 'institution', 'rooms', 'agenda', 'showcase', 'campuses', 'cta', 'partners'], $types);
         $this->assertSame('film', $page->draft_blocks[0]['data']['layout']);
         $this->assertSame('La culture comme héritage', $page->draft_blocks[0]['data']['title']);
         $this->assertSame(['pages/01M3R5AKQTX1B0PBT018R88CEN.jpg'], $page->draft_blocks[0]['data']['images']);
         $this->assertSame([['value' => '3', 'label' => 'lieux']], $page->draft_blocks[1]['data']['facts'], 'Chiffres du bloc « chiffres clés » repris (aucun ici), plus les trois lieux.');
-        $this->assertSame('strip', $page->draft_blocks[2]['data']['layout']);
-        $this->assertSame('Trois lieux, *un même élan*', $page->draft_blocks[3]['data']['intro']);
+        $this->assertSame('Trois lieux, *un même élan*', $page->draft_blocks[2]['data']['intro']);
         $this->assertCount(1, $page->draft_blocks[6]['data']['items'], 'Seules les photos présentes sur le disque sont proposées.');
     }
 

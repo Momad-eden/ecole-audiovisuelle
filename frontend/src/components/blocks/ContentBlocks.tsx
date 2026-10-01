@@ -18,7 +18,7 @@ const ICONS = { "audio-lines": AudioLines, lightbulb: Lightbulb, video: Video, p
 export function TextBlock({ data, locale }: BlockProps<TextData>) {
   return (
     <Section>
-      <Reveal className="mx-auto grid max-w-6xl gap-10 lg:grid-cols-[1fr_2fr]">
+      <Reveal className="grid gap-10 lg:grid-cols-[1fr_2fr]">
         {data.title ? <h2 className="display text-[clamp(1.9rem,3.6vw,3rem)] text-balance"><Emphasis text={data.title} /></h2> : <span />}
         <RichText html={data.body} locale={locale} className="text-lg" />
       </Reveal>

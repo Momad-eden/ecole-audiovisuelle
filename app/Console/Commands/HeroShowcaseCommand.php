@@ -88,6 +88,11 @@ class HeroShowcaseCommand extends Command
                 'button_label' => 'Voir la programmation', 'button_url' => '/centre-culturel/agenda',
             ]],
             ['type' => 'stats', 'data' => ['title' => 'Repères', 'items' => [['value' => '2016', 'label' => 'création'], ['value' => '+300', 'label' => 'diplômés']]]],
+            ['type' => 'domains', 'data' => ['intro' => 'Trois lieux, *un même élan*', 'panels' => [
+                ['domain' => 'maison', 'color' => '#e0a84a', 'eyebrow' => 'Saint-Louis', 'title' => 'Centre culturel Habib Faye', 'text' => 'Concerts.', 'image' => $images['grande_salle'], 'image_alt' => '', 'url' => '/centre-culturel', 'label' => 'Découvrir'],
+                ['domain' => 'emsi', 'color' => '#ff7a1a', 'eyebrow' => 'Dakar', 'title' => 'EMSI', 'text' => 'Se former.', 'image' => $images['regie_broadcast'], 'image_alt' => '', 'url' => '/emsi', 'label' => 'Se former'],
+                ['domain' => 'studio', 'color' => '#ef4444', 'eyebrow' => 'Saint-Louis', 'title' => 'Impact Live Studio', 'text' => 'Enregistrer.', 'image' => $images['studio_son'], 'image_alt' => '', 'url' => '/centre-culturel/studio', 'label' => 'Réserver'],
+            ]]],
             ['type' => 'institution', 'data' => [
                 'eyebrow' => 'Notre engagement', 'title' => 'Former, créer, *transmettre*',
                 'pillars' => [['title' => 'Notre mission', 'text' => 'Former.'], ['title' => 'Notre vision', 'text' => 'Rayonner.'], ['title' => 'Nos valeurs', 'text' => 'Transmettre.']],

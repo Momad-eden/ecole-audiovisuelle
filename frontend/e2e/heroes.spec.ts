@@ -200,3 +200,15 @@ test("Présentation institutionnelle : piliers numérotés et mot du fondateur",
   await expect(institution.locator("blockquote")).toContainText("Un rêve peut devenir réalité.");
   await expect(institution.locator("figcaption")).toContainText("Boubacar Tall");
 });
+
+test("Trois lieux après le film : trois cartes encadrées, avec une marge autour", async ({ page }) => {
+  await page.goto("/essai-heros-film");
+  const section = page.getByTestId("domains-block");
+  await expect(section.getByRole("heading", { level: 2 })).toHaveText("Trois lieux, un même élan");
+  const cards = section.getByTestId("domain-panel");
+  await expect(cards).toHaveCount(3);
+  await expect(section.getByRole("link", { name: "EMSI", exact: true })).toHaveAttribute("href", "/emsi");
+  const box = (await cards.first().boundingBox())!;
+  expect(box.x).toBeGreaterThanOrEqual(16);
+  await expect(cards.first()).not.toHaveCSS("border-top-left-radius", "0px");
+});

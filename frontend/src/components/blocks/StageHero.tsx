@@ -1,5 +1,6 @@
 "use client";
 
+import { plainTitle } from "@/lib/emphasis";
 import { useEffect, useRef, useState } from "react";
 import { useT } from "@/components/i18n/LocaleProvider";
 import { ButtonLink } from "@/components/ui/ButtonLink";
@@ -96,9 +97,9 @@ export function StageHero({ data, first, variant = "stage" }: { data: HeroData; 
         <Heading className="display text-[clamp(2.6rem,9vw,8.5rem)] text-balance">
           {words.length > 0 ? (
             <>
-              <span className="sr-only">{`${data.title} ${words.join(", ")}`}</span>
+              <span className="sr-only">{`${plainTitle(data.title)} ${words.join(", ")}`}</span>
               <span aria-hidden>
-                <span className="block">{data.title}</span>
+                <span className="block">{plainTitle(data.title)}</span>
                 <span key={word} className="word-in block" style={{ color: WORD_COLORS[variant][index % WORD_COLORS[variant].length], textShadow: "0 0 60px currentColor" }}>
                   {word}
                   <span className="text-ink">.</span>

@@ -1,5 +1,6 @@
 "use client";
 
+import { plainTitle } from "@/lib/emphasis";
 import { useRef } from "react";
 import { ButtonLink } from "@/components/ui/ButtonLink";
 import { MediaImage } from "@/components/ui/MediaImage";
@@ -23,7 +24,7 @@ export function StudioHero({ data, first }: { data: HeroData; first: boolean }) 
   const timecodeRef = useRef<HTMLSpanElement>(null);
   useRecTimecode(sectionRef, timecodeRef);
   const Heading = first ? "h1" : "h2";
-  const title = frenchSpacing(data.title);
+  const title = frenchSpacing(plainTitle(data.title));
   const parts = splitHighlight(title, data.highlight);
   const points = data.image ? (data.hotspots ?? []) : [];
   const tracks = data.tracks ?? [];

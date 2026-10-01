@@ -60,7 +60,8 @@ export function DomainRow({ section, path }: { section: DomainSection; path: str
         </nav>
         {siblings.length > 0 && (
           <nav aria-label={t.sections(section.parent.label)} className="min-w-0 max-sm:w-full">
-            <ul className="flex items-center gap-1 overflow-x-auto">
+            {/* Sur téléphone, la liste défile : un fondu à droite l'indique. */}
+            <ul className="flex items-center gap-1 overflow-x-auto [scrollbar-width:none] max-sm:pr-6 max-sm:[mask-image:linear-gradient(90deg,#000_85%,transparent)]">
               {siblings.map((item) => {
                 const here = item.url === section.current?.url;
                 return (

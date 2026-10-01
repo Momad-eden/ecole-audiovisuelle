@@ -2,6 +2,7 @@ import { LocaleLink } from "@/components/i18n/LocaleLink";
 import { ArrowRight } from "lucide-react";
 import { ButtonLink } from "@/components/ui/ButtonLink";
 import { cn } from "@/lib/utils";
+import { Emphasis } from "@/components/ui/Emphasis";
 import { MediaImage } from "@/components/ui/MediaImage";
 import { Container, Section, SectionTitle } from "@/components/ui/Section";
 import { InView } from "@/components/motion/InView";
@@ -93,7 +94,7 @@ export function PartnersBlock({ data, locale }: BlockProps<PartnersData>) {
     return (
       <section data-testid="partners-strip" className="border-y border-line py-8">
         <Container className="flex flex-col gap-5 lg:flex-row lg:items-center lg:gap-10">
-          <p className="cartel shrink-0 text-ink-muted">{data.title || dictionary.institution.supportedBy}</p>
+          <p className="cartel shrink-0 text-ink-muted">{data.title ? <Emphasis text={data.title} /> : dictionary.institution.supportedBy}</p>
           <ul className="grid gap-x-8 gap-y-2.5 sm:grid-cols-2 lg:flex lg:flex-wrap lg:items-center lg:gap-y-3">
             {items.map((partner) => (
               <li key={partner.name} className="flex items-center gap-8 lg:[&+li]:before:size-1 lg:[&+li]:before:rounded-full lg:[&+li]:before:bg-ink/25 lg:[&+li]:before:content-['']">
@@ -166,7 +167,7 @@ export function ProfessionalSpaceBlock({ data, locale }: BlockProps<Professional
       <Reveal className="relative grid overflow-hidden rounded-[2rem] border border-line bg-night-2 lg:grid-cols-[1.2fr_1fr]" >
         <div className="relative z-10 p-8 sm:p-12" style={{ ["--accent" as string]: "var(--color-hmi)" }}>
           <p className="cartel flex items-center gap-3 text-[var(--accent-ink)]"><span className="h-px w-10 bg-[var(--accent-ink)]" aria-hidden />{t.professionalSpace}</p>
-          <h2 className="display mt-5 text-[clamp(2rem,4vw,3.4rem)] text-balance">{data.title}</h2>
+          <h2 className="display mt-5 text-[clamp(2rem,4vw,3.4rem)] text-balance"><Emphasis text={data.title} /></h2>
           {data.text && <p className="mt-5 max-w-xl text-lg text-ink/80">{data.text}</p>}
           <div className="mt-9"><ButtonLink href="/emsi/professionnels">{data.buttonLabel || t.discoverProgram}</ButtonLink></div>
         </div>

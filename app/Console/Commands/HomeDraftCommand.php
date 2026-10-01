@@ -7,7 +7,7 @@ use Illuminate\Console\Command;
 use Illuminate\Support\Facades\Storage;
 
 /**
- * Nouvelle page d'accueil, préparée en BROUILLON : film d'ouverture, manifeste, bandeau « Avec le soutien de », les trois lieux, présentation institutionnelle, l'agenda, la vitrine
+ * Nouvelle page d'accueil, préparée en BROUILLON : film d'ouverture, manifeste, les trois lieux, présentation institutionnelle, univers, l'agenda, la vitrine, campus
  * photos et vidéos du centre, les actualités, l'appel au soutien et les partenaires.
  * Les blocs existants (trois lieux, actualités, partenaires, agenda) sont repris tels quels, les chiffres clés passent dans le manifeste ;
  * la version en ligne n'est jamais modifiée : l'équipe relit l'aperçu puis publie depuis l'admin.
@@ -75,7 +75,6 @@ class HomeDraftCommand extends Command
                 'button_label' => 'Notre mission',
                 'button_url' => '/mission',
             ]],
-            ['type' => 'partners', 'data' => ['title' => null, 'layout' => 'strip', 'categories' => ['co_organizer', 'institutional']]],
             $domains ? ['type' => 'domains', 'data' => [...$domains['data'], 'intro' => 'Trois lieux, *un même élan*']] : null,
             ['type' => 'institution', 'data' => [
                 'eyebrow' => 'Notre engagement',
@@ -92,6 +91,11 @@ class HomeDraftCommand extends Command
                 'button_label' => 'Mission et impact',
                 'button_url' => '/mission',
             ]],
+            ['type' => 'rooms', 'data' => [
+                'eyebrow' => 'L\'EMSI',
+                'title' => 'Cinq univers *à explorer*',
+                'text' => 'Son, image, design, scène, et bientôt le cinéma : chaque univers forme à des métiers précis, sur du matériel professionnel.',
+            ]],
             ['type' => 'agenda', 'data' => [...($find('agenda')['data'] ?? ['scope' => 'upcoming', 'activity' => null]), 'title' => 'À l\'affiche', 'limit' => 4]],
             ['type' => 'showcase', 'data' => [
                 'eyebrow' => 'Le centre en images',
@@ -102,6 +106,11 @@ class HomeDraftCommand extends Command
                 ] : null, self::SHOWCASE))),
                 'button_label' => 'Voir la programmation',
                 'button_url' => '/centre-culturel/agenda',
+            ]],
+            ['type' => 'campuses', 'data' => [
+                'eyebrow' => 'Se former',
+                'title' => 'Étudier à *Dakar* ou à *Saint-Louis*',
+                'text' => 'Les mêmes formations, la même exigence, le même matériel professionnel, dans deux villes.',
             ]],
             $find('news'),
             ['type' => 'cta', 'data' => [

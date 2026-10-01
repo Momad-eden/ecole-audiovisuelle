@@ -1,5 +1,6 @@
 "use client";
 
+import { Emphasis } from "@/components/ui/Emphasis";
 import { LocaleLink } from "@/components/i18n/LocaleLink";
 import { useT } from "@/components/i18n/LocaleProvider";
 import { useEffect, useRef } from "react";
@@ -7,7 +8,7 @@ import { ArrowRight } from "lucide-react";
 import type { ScrollTrigger } from "gsap/ScrollTrigger";
 import { InView } from "@/components/motion/InView";
 import type { RoomSummary } from "@/lib/types";
-import { frenchSpacing } from "@/lib/utils";
+
 import { UniverseVisual } from "./UniverseVisual";
 
 const DESKTOP_MOTION =
@@ -134,7 +135,7 @@ export function UniversesShowcase({ universes, eyebrow, title, text }: Props) {
                                 )}
                                 {title && (
                                     <h2 className="display text-[clamp(2.2rem,4.6vw,4rem)] text-balance">
-                                        {frenchSpacing(title)}
+                                        <Emphasis text={title} />
                                     </h2>
                                 )}
                                 {text && (
