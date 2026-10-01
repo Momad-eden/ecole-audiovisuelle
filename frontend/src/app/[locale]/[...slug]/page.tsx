@@ -16,7 +16,7 @@ type Props = { params: Promise<{ locale: Locale; slug: string[] }> };
 async function baseMetadata({ params }: Props): Promise<Metadata> {
   const { locale, slug } = await params;
   const page = await api.page(slug.join("/"), locale);
-  return page ? pageMetadata(page) : {};
+  return page ? pageMetadata(page, asLocale(locale)) : {};
 }
 
 /** Pages gérées dans l'administration (école, contact, pages libres…) et anciennes adresses redirigées. */

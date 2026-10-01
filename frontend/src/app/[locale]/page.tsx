@@ -13,7 +13,7 @@ async function baseMetadata({ params }: Props): Promise<Metadata> {
   const { locale } = await params;
   const [page, site] = await Promise.all([api.page("accueil", locale), api.site(locale)]);
   const { settings } = site;
-  return page ? { ...pageMetadata(page, settings.seoDescription || settings.description), title: { absolute: page.seo?.title || settings.seoTitle || settings.schoolName } } : {};
+  return page ? { ...pageMetadata(page, locale, settings.seoDescription || settings.description), title: { absolute: page.seo?.title || settings.seoTitle || settings.schoolName } } : {};
 }
 
 export async function generateMetadata(props: Props): Promise<Metadata> {

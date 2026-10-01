@@ -12,8 +12,9 @@ type Props = { params: Promise<{ locale: Locale }> };
 const professionalPage = async (locale: Locale) => (await api.page("emsi/professionnels", locale)) ?? (await api.page("professionnels", locale));
 
 async function baseMetadata({ params }: Props): Promise<Metadata> {
-  const page = await professionalPage((await params).locale);
-  return page ? pageMetadata(page) : {};
+  const { locale } = await params;
+  const page = await professionalPage(locale);
+  return page ? pageMetadata(page, locale) : {};
 }
 
 export async function generateMetadata(props: Props): Promise<Metadata> {

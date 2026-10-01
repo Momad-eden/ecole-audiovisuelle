@@ -44,10 +44,21 @@ class LocalizedApiTest extends TestCase
 
     private function translate(object $model, string $field, mixed $value): void
     {
+        // Champ structuré : état par texte, comme l'écrivent la tâche de traduction et l'admin.
+        $leaves = null;
+        if ($model->hasStructuredTranslation($field) && is_array($value)) {
+            $french = $model->frenchLeaves($field);
+            $leaves = [];
+            foreach (array_keys($value) as $key) {
+                if (isset($french[(string) $key])) {
+                    $leaves[(string) $key] = ['h' => $model::leafHash($french[(string) $key]), 's' => TranslationStatus::AUTO->value];
+                }
+            }
+        }
         $model->translations()->create([
             'field' => $field, 'locale' => 'en', 'status' => TranslationStatus::AUTO,
             'value' => is_array($value) ? json_encode($value, JSON_UNESCAPED_UNICODE) : $value,
-            'source_hash' => $model->sourceHash($field),
+            'source_hash' => $model->sourceHash($field), 'leaves' => $leaves,
         ]);
     }
 

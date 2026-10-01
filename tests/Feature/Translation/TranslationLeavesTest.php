@@ -10,6 +10,7 @@ use App\Filament\Support\TranslationTab;
 use App\Jobs\TranslateRecord;
 use App\Models\Page;
 use App\Models\Program;
+use App\Models\Setting;
 use App\Models\Translation;
 use App\Models\User;
 use App\Services\Translation\Translator;
@@ -308,5 +309,59 @@ class TranslationLeavesTest extends TestCase
             ->call('save')->assertHasNoFormErrors();
 
         $this->assertSame('EN: Bienvenue', json_decode($this->row($page, 'blocks')->value, true)['hero#0:title']);
+    }
+
+    public function test_inserting_a_block_of_the_same_type_never_shows_english_under_the_wrong_block(): void
+    {
+        $page = $this->publishedPage();
+        Setting::current()->update(['auto_translate' => false]);
+
+        // Un nouveau bloc « text » est inséré au-dessus de l'ancien : les rangs se décalent, la tâche n'a pas encore tourné.
+        $page = $this->republish($page, [
+            ['type' => 'hero', 'data' => ['title' => 'Bienvenue', 'subtitle' => 'Le son et l\'image']],
+            ['type' => 'text', 'data' => ['body' => '<p>Nouveau paragraphe</p>']],
+            ['type' => 'text', 'data' => ['body' => '<p>Une école</p>']],
+        ]);
+
+        $blocks = $this->getJson('/api/v1/public/pages/accueil?locale=en')->assertOk()->json('data.blocks');
+        $this->assertSame('<p>Nouveau paragraphe</p>', $blocks[1]['data']['body']);
+        $this->assertSame('EN: <p>Une école</p>', $blocks[2]['data']['body']);
+    }
+
+    public function test_a_moved_text_keeps_its_reviewed_english_and_is_not_sent_again(): void
+    {
+        $page = $this->publishedPage();
+        $row = $this->row($page, 'blocks');
+        $leaves = $row->leaves;
+        $leaves['text#0:body']['s'] = TranslationStatus::REVIEWED->value;
+        $value = json_decode($row->value, true);
+        $value['text#0:body'] = '<p>A school</p>';
+        $row->update(['leaves' => $leaves, 'value' => json_encode($value)]);
+        $this->translator->calls = [];
+
+        $page = $this->republish($page, [
+            ['type' => 'hero', 'data' => ['title' => 'Bienvenue', 'subtitle' => 'Le son et l\'image']],
+            ['type' => 'text', 'data' => ['body' => '<p>Nouveau paragraphe</p>']],
+            ['type' => 'text', 'data' => ['body' => '<p>Une école</p>']],
+        ]);
+
+        $sent = array_merge(...array_map(fn ($call) => array_values($call['texts']), $this->translator->calls));
+        $this->assertSame(['<p>Nouveau paragraphe</p>'], $sent);
+        $row = $this->row($page, 'blocks');
+        $this->assertSame('<p>A school</p>', json_decode($row->value, true)['text#1:body']);
+        $this->assertSame(TranslationStatus::REVIEWED->value, $row->leaves['text#1:body']['s']);
+        $blocks = $this->getJson('/api/v1/public/pages/accueil?locale=en')->json('data.blocks');
+        $this->assertSame('<p>A school</p>', $blocks[2]['data']['body']);
+    }
+
+    public function test_stale_english_is_not_served_when_the_french_changed(): void
+    {
+        $page = $this->publishedPage();
+        Setting::current()->update(['auto_translate' => false]);
+        $this->republish($page, $this->blocks('Bonjour'));
+
+        $blocks = $this->getJson('/api/v1/public/pages/accueil?locale=en')->json('data.blocks');
+        $this->assertSame('Bonjour', $blocks[0]['data']['title']);
+        $this->assertSame('EN: Le son et l\'image', $blocks[0]['data']['subtitle']);
     }
 }

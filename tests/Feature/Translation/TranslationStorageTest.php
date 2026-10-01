@@ -83,12 +83,14 @@ class TranslationStorageTest extends TestCase
         $page = Page::create(['title' => 'Accueil', 'slug' => 'accueil', 'type' => 'standard',
             'blocks' => [['type' => 'text', 'data' => ['text' => 'Bonjour']]],
             'draft_blocks' => [['type' => 'text', 'data' => ['text' => 'Brouillon']]]]);
-        $this->store($page, 'blocks', json_encode([['type' => 'text', 'data' => ['text' => 'Hello']]]));
+        // Anglais des blocs : carte « clé stable → texte », avec l'état par texte.
+        $this->store($page, 'blocks', json_encode(['text#0:text' => 'Hello']));
+        $page->translation('blocks')->update(['leaves' => ['text#0:text' => ['h' => Page::leafHash('Bonjour'), 's' => 'auto']]]);
 
         $program = Program::create(['title' => 'Son', 'slug' => 'son', 'audience' => 'school', 'kind' => 'certificate', 'skills' => ['Mixage']]);
         $this->store($program, 'skills', json_encode(['Mixing']));
 
-        $this->assertSame([['type' => 'text', 'data' => ['text' => 'Hello']]], $page->fresh()->translated('blocks', 'en'));
+        $this->assertSame(['text#0:text' => 'Hello'], $page->fresh()->translated('blocks', 'en'));
         $this->assertSame(['Mixing'], $program->fresh()->translated('skills', 'en'));
         $this->assertSame(['Mixage'], $program->fresh()->translated('skills', 'fr'));
     }

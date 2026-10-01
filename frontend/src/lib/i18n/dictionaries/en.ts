@@ -4,6 +4,7 @@ import type { Dictionary } from "./fr";
 export const en: Dictionary = {
   meta: {
     ogLocale: "en_GB",
+    shareImageAlt: "EMSI — School of Sound and Image Professions",
     notFound: "Page not found",
     preview: "Preview",
     news: { title: "News", description: "News from EMSI: school life, events and the Professionals' Area." },

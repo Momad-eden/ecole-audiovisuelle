@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { usePathname } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import { useLocale, useT } from "@/components/i18n/LocaleProvider";
 import { delocalizedPath, LOCALES, localizedPath, type Locale } from "@/lib/i18n/locales";
 import { cn } from "@/lib/utils";
@@ -23,7 +23,18 @@ function remember(locale: Locale) {
 export function LanguageSwitcher({ className }: { className?: string }) {
   const current = useLocale();
   const t = useT();
+  const router = useRouter();
   const path = delocalizedPath(usePathname() || "/");
+
+  // Les paramètres de l'adresse (référence d'un dossier, campus choisi…) suivent le changement de langue.
+  // Lus au clic plutôt qu'avec useSearchParams, qui imposerait un Suspense autour de l'en-tête.
+  function onClick(event: React.MouseEvent<HTMLAnchorElement>, locale: Locale) {
+    remember(locale);
+    const { search, hash } = window.location;
+    if (!(search || hash) || event.button !== 0 || event.metaKey || event.ctrlKey || event.shiftKey || event.altKey) return;
+    event.preventDefault();
+    router.push(localizedPath(path, locale) + search + hash);
+  }
 
   return (
     <nav aria-label={t.header.language} className={className}>
@@ -39,7 +50,7 @@ export function LanguageSwitcher({ className }: { className?: string }) {
                 aria-label={NAMES[locale]}
                 aria-current={active ? "true" : undefined}
                 prefetch={false}
-                onClick={() => remember(locale)}
+                onClick={(event) => onClick(event, locale)}
                 className={cn("grid min-h-9 min-w-10 place-items-center rounded-full px-2 transition", active ? "bg-ink text-night" : "text-ink/75 hover:text-ink")}
               >
                 {locale.toUpperCase()}

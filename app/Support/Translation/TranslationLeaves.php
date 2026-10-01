@@ -79,17 +79,70 @@ final class TranslationLeaves
     }
 
     /** @return array<int, string> clés dont le français n'a pas de traduction à jour */
-    public static function pending(Model $record, string $field, array $states): array
+    public static function pending(Model $record, string $field, array $states, array $english = []): array
     {
+        $known = self::byHash($english, $states);
         $pending = [];
         foreach ($record->frenchLeaves($field) as $key => $text) {
             $state = $states[$key] ?? null;
-            if (! $state || $state['h'] !== $record::leafHash($text) || $state['s'] === TranslationStatus::FAILED->value) {
+            $hash = $record::leafHash($text);
+            if (($state['h'] ?? null) !== $hash && isset($known[$hash])) {
+                continue; // texte déplacé (même français, autre clé) : sa traduction est reprise, rien à envoyer
+            }
+            if (! $state || $state['h'] !== $hash || $state['s'] === TranslationStatus::FAILED->value) {
                 $pending[] = $key;
             }
         }
 
         return $pending;
+    }
+
+    /**
+     * Anglais existant indexé par l'empreinte du français traduit : retrouve un texte déplacé (bloc inséré ou
+     * réordonné, élément de liste déplacé). Une version relue l'emporte sur une version automatique.
+     *
+     * @param  array<string, string>  $english
+     * @param  array<string, array{h: ?string, s: string}>  $states
+     * @return array<string, array{text: string, s: string}>
+     */
+    public static function byHash(array $english, array $states): array
+    {
+        $out = [];
+        foreach ($states as $key => $state) {
+            if ($state['h'] === null || $state['s'] === TranslationStatus::FAILED->value || ! isset($english[$key])) {
+                continue;
+            }
+            if (! isset($out[$state['h']]) || $state['s'] === TranslationStatus::REVIEWED->value) {
+                $out[$state['h']] = ['text' => $english[$key], 's' => $state['s']];
+            }
+        }
+
+        return $out;
+    }
+
+    /**
+     * Anglais à montrer, par clé : seulement quand il traduit le français actuel à cet endroit (empreinte égale),
+     * ou quand le même français a déjà une traduction sous une autre clé (texte déplacé). Jamais d'anglais
+     * périmé ni sous le mauvais bloc : les autres textes restent en français.
+     *
+     * @return array<string, string>
+     */
+    public static function current(Model $record, string $field, ?Translation $row): array
+    {
+        $states = self::states($record, $field, $row);
+        $english = self::english($record, $field, $row);
+        $known = self::byHash($english, $states);
+        $out = [];
+        foreach ($record->frenchLeaves($field) as $key => $text) {
+            $hash = $record::leafHash($text);
+            if (($states[$key]['h'] ?? null) === $hash && ($states[$key]['s'] ?? null) !== TranslationStatus::FAILED->value && isset($english[$key])) {
+                $out[$key] = $english[$key];
+            } elseif (isset($known[$hash])) {
+                $out[$key] = $known[$hash]['text'];
+            }
+        }
+
+        return $out;
     }
 
     /** Clés à relire (sans traduction relue sur le français actuel). @return array{0: int, 1: int} [à relire, total] */

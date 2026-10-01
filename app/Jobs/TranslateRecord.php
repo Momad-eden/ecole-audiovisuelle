@@ -137,8 +137,10 @@ class TranslateRecord implements ShouldBeUniqueUntilProcessing, ShouldQueue
             if ($record->hasStructuredTranslation($field)) {
                 // Champ structuré : seuls les textes sans traduction à jour partent (spec R2 §3.3).
                 $french = $record->frenchLeaves($field);
-                $states = TranslationLeaves::states($record, $field, $record->translation($field, 'en'));
-                $toSend = array_intersect_key($french, array_flip(TranslationLeaves::pending($record, $field, $states)));
+                $row = $record->translation($field, 'en');
+                $states = TranslationLeaves::states($record, $field, $row);
+                $english = TranslationLeaves::english($record, $field, $row);
+                $toSend = array_intersect_key($french, array_flip(TranslationLeaves::pending($record, $field, $states, $english)));
                 $prepared[$field]['leaves'] = array_map(fn (string $text) => $record::leafHash($text), $toSend);
             } else {
                 $toSend = ['' => (string) $record->frenchValue($field)];
@@ -260,6 +262,20 @@ class TranslateRecord implements ShouldBeUniqueUntilProcessing, ShouldQueue
             $states = TranslationLeaves::states($record, $field, $row);
             $english = TranslationLeaves::english($record, $field, $row);
             $previous = TranslationLeaves::previous($row);
+
+            // Textes déplacés : la traduction du même français est reprise sous la nouvelle clé, avec son statut.
+            $known = TranslationLeaves::byHash($english, $states);
+            foreach ($record->frenchLeaves($field) as $key => $french) {
+                $leaf = $record::leafHash($french);
+                if (($states[$key]['h'] ?? null) === $leaf || ! isset($known[$leaf]) || isset($translated[$key])) {
+                    continue;
+                }
+                if (($states[$key]['s'] ?? null) === TranslationStatus::REVIEWED->value && isset($english[$key])) {
+                    $previous[$key] = $english[$key];
+                }
+                $english[$key] = $known[$leaf]['text'];
+                $states[$key] = ['h' => $leaf, 's' => $known[$leaf]['s']];
+            }
 
             foreach ($translated as $key => $text) {
                 $key = (string) $key;

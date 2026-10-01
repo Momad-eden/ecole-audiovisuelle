@@ -6,6 +6,7 @@
 export const fr = {
   meta: {
     ogLocale: "fr_SN",
+    shareImageAlt: "EMSI — École des Métiers du Son et de l'Image",
     notFound: "Page introuvable",
     preview: "Aperçu",
     news: { title: "Actualités", description: "Les actualités de l'EMSI : vie de l'école, événements, Espace Professionnels." },

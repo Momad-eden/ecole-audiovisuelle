@@ -1,5 +1,5 @@
 import { CurrentCrumb } from "@/components/layout/domain-crumb";
-import { DEFAULT_SHARE_IMAGE } from "@/lib/metadata";
+import { openGraphBase } from "@/lib/metadata";
 import type { Metadata } from "next";
 import { LocaleLink } from "@/components/i18n/LocaleLink";
 import { notFound } from "next/navigation";
@@ -26,7 +26,7 @@ async function baseMetadata({ params }: Props): Promise<Metadata> {
   return {
     title: artwork.title,
     description: artwork.summary ?? undefined,
-    openGraph: { title: artwork.title, description: artwork.summary ?? undefined, images: artwork.cover ? [{ url: artwork.cover.url, alt: artwork.cover.alt }] : [DEFAULT_SHARE_IMAGE] },
+    openGraph: { ...openGraphBase(asLocale(locale)), title: artwork.title, description: artwork.summary ?? undefined, ...(artwork.cover ? { images: [{ url: artwork.cover.url, alt: artwork.cover.alt }] } : {}) },
   };
 }
 

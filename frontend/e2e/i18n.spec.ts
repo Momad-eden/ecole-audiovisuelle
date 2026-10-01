@@ -143,6 +143,12 @@ test.describe("référencement bilingue", () => {
     expect(new URL((await page.locator('link[rel="canonical"]').getAttribute("href")) ?? "", "http://x").pathname).toBe("/en/emsi");
   });
 
+  test("une page anglaise se partage avec l'aperçu anglais", async ({ page }) => {
+    await page.goto("/en/emsi");
+    await expect(page.locator('meta[property="og:locale"]')).toHaveAttribute("content", "en_GB");
+    expect(new URL((await page.locator('meta[property="og:image"]').getAttribute("content")) ?? "", "http://x").pathname).toBe("/en/opengraph-image");
+  });
+
   test("le plan du site contient les adresses anglaises", async ({ request }) => {
     const xml = await (await request.get("/sitemap.xml")).text();
     expect(xml).toContain("/en/emsi/dakar</loc>");
@@ -154,4 +160,11 @@ test.describe("référencement bilingue", () => {
     const blocks = await page.locator('script[type="application/ld+json"]').allTextContents();
     expect(blocks.some((text) => text.includes('"inLanguage":"en"') && text.includes("/en/emsi/dakar"))).toBe(true);
   });
+});
+
+test("changer de langue garde les paramètres de l'adresse (campus, référence de dossier)", async ({ page, isMobile }) => {
+  test.skip(isMobile, "Sélecteur dans le menu mobile : couvert par le parcours du sélecteur.");
+  await page.goto("/candidater?campus=emsi-dakar");
+  await page.locator("header").getByRole("link", { name: "English" }).click();
+  await expect(page).toHaveURL(/\/en\/candidater\?campus=emsi-dakar$/);
 });

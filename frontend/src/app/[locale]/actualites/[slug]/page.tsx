@@ -1,4 +1,4 @@
-import { DEFAULT_SHARE_IMAGE } from "@/lib/metadata";
+import { openGraphBase } from "@/lib/metadata";
 import type { Metadata } from "next";
 import { LocaleLink } from "@/components/i18n/LocaleLink";
 import { notFound } from "next/navigation";
@@ -20,7 +20,7 @@ async function baseMetadata({ params }: Props): Promise<Metadata> {
   const { locale, slug } = await params;
   const news = await api.newsItem(slug, locale);
   if (!news) return {};
-  return { title: news.title, description: news.excerpt ?? undefined, openGraph: { type: "article", publishedTime: news.publishedAt ?? undefined, images: news.image ? [{ url: news.image.url }] : [DEFAULT_SHARE_IMAGE] } };
+  return { title: news.title, description: news.excerpt ?? undefined, openGraph: { ...openGraphBase(asLocale(locale)), type: "article", publishedTime: news.publishedAt ?? undefined, ...(news.image ? { images: [{ url: news.image.url }] } : {}) } };
 }
 
 export async function generateMetadata(props: Props): Promise<Metadata> {

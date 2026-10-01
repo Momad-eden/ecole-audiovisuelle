@@ -8,6 +8,7 @@ use App\Models\Setting;
 use App\Models\Translation;
 use App\Services\Translation\Translator;
 use App\Support\Translation\BlockTexts;
+use App\Support\Translation\TranslationLeaves;
 use Illuminate\Database\Eloquent\Relations\MorphMany;
 use Illuminate\Support\Facades\DB;
 
@@ -144,6 +145,29 @@ trait HasTranslations
 
         if (! $this->isStructuredField($field)) {
             return $row->value;
+        }
+
+        // Champ structuré : seulement l'anglais qui traduit le français actuel, texte par texte (repli français ailleurs).
+        if (is_array($french) || $french === null) {
+            try {
+                json_decode($row->value, true, 512, JSON_THROW_ON_ERROR);
+            } catch (\JsonException) {
+                return $french;
+            }
+            $current = TranslationLeaves::current($this, $field, $row);
+            if ($field === 'blocks') {
+                return $current;
+            }
+            if (! is_array($french)) {
+                return $french;
+            }
+            foreach ($current as $key => $text) {
+                if (array_key_exists($key, $french)) {
+                    $french[$key] = $text;
+                }
+            }
+
+            return $french;
         }
 
         // JSON invalide ou qui n'est pas un tableau : repli sur le français.
