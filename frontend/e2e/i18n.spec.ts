@@ -168,3 +168,14 @@ test("changer de langue garde les paramètres de l'adresse (campus, référence 
   await page.locator("header").getByRole("link", { name: "English" }).click();
   await expect(page).toHaveURL(/\/en\/candidater\?campus=emsi-dakar$/);
 });
+
+test("changer de langue ne produit aucune erreur dans la console", async ({ page, isMobile }) => {
+  test.skip(isMobile, "Sélecteur dans le menu mobile : couvert par le parcours du sélecteur.");
+  const errors: string[] = [];
+  page.on("console", (message) => message.type() === "error" && errors.push(message.text()));
+  await page.goto("/");
+  await page.locator("header").getByRole("link", { name: "English" }).click();
+  await expect(page).toHaveURL(/\/en$/);
+  await expect(page.locator("html")).toHaveAttribute("lang", "en");
+  expect(errors).toEqual([]);
+});
