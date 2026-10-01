@@ -1084,6 +1084,7 @@ class ContentSeeder extends Seeder
                     ['Impact Live Studio', '/maison-habib-faye/studio'], ['Les espaces', '/maison-habib-faye/espaces']]],
                 ['EMSI', '/emsi', false, [['L\'école', '/emsi'], ['Campus de Dakar', '/emsi/dakar'], ['Campus de Saint-Louis', '/emsi/saint-louis'],
                     ['Formations', '/emsi/formations'], ['VAE et professionnels', '/emsi/professionnels'], ['Réalisations', '/emsi/realisations']]],
+                [MenuDefaults::ABOUT_LABEL, MenuDefaults::ABOUT_LINKS[0][1], false, MenuDefaults::ABOUT_LINKS],
                 ['Candidater', '/candidater', true, []],
             ];
             foreach ($tree as $position => [$label, $url, $button, $children]) {
@@ -1093,7 +1094,8 @@ class ContentSeeder extends Seeder
                 }
             }
             MenuItem::where('location', 'main')->whereNotIn('id', $claimed)->update(['is_visible' => false]);
-            $this->report[] = 'Menu principal reconstruit (Accueil, Maison Habib Faye, EMSI, Candidater) ; les anciennes entrées sont masquées.';
+            MenuDefaults::fillDescriptions();
+            $this->report[] = 'Menu principal reconstruit (Accueil, Maison Habib Faye, EMSI, À propos, Candidater) ; les anciennes entrées sont masquées.';
         }
 
         if (MenuItem::where('location', 'footer')->where('url', '/mission')->exists()) {

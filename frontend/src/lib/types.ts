@@ -3,7 +3,7 @@ import type { Locale } from "./i18n/locales";
 
 export type Image = { url: string; alt: string };
 
-export type MenuChild = { label: string; url: string };
+export type MenuChild = { label: string; url: string; description?: string | null };
 
 /** Entrée du menu ; `children` : sous-menu d'un niveau (vide pour les liens simples). */
 export type MenuLink = { label: string; url: string; isButton: boolean; children?: MenuChild[] };

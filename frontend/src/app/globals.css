@@ -198,6 +198,59 @@ body::after {
     radial-gradient(40% 30% at 85% 15%, color-mix(in oklab, var(--accent) 12%, transparent) 0%, transparent 70%);
 }
 
+/* Navigation principale : entrées en pilule, panneau de sous-menu en verre, icône teintée du domaine. */
+@layer components {
+  .nav-pill {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+    min-height: 2.5rem;
+    border-radius: 9999px;
+    padding: 0 1rem;
+    font-size: 0.875rem;
+    color: color-mix(in oklab, var(--color-ink) 78%, transparent);
+    transition: background-color 0.2s, color 0.2s;
+  }
+  .nav-pill:hover,
+  .nav-pill:focus-visible {
+    background: color-mix(in oklab, var(--color-ink) 7%, transparent);
+    color: var(--color-ink);
+  }
+  .nav-pill-active {
+    background: color-mix(in oklab, var(--color-ink) 10%, transparent);
+    color: var(--color-ink);
+    font-weight: 600;
+  }
+  .nav-panel {
+    max-width: calc(100vw - 2rem);
+    overflow: hidden;
+    border-radius: 1.5rem;
+    border: 1px solid var(--color-line);
+    background:
+      linear-gradient(90deg, transparent, var(--accent) 50%, transparent) top / 100% 1px no-repeat,
+      radial-gradient(80% 60% at 50% 0%, color-mix(in oklab, var(--accent) 10%, transparent), transparent 70%),
+      color-mix(in oklab, var(--color-night-2) 94%, transparent);
+    box-shadow: 0 24px 64px -16px rgb(0 0 0 / 0.55);
+    backdrop-filter: blur(20px);
+  }
+  .nav-icon {
+    display: grid;
+    flex-shrink: 0;
+    place-items: center;
+    width: 2.5rem;
+    height: 2.5rem;
+    border-radius: 0.85rem;
+    border: 1px solid color-mix(in oklab, var(--accent) 28%, transparent);
+    background: color-mix(in oklab, var(--accent) 14%, transparent);
+    color: var(--accent-ink);
+    transition: transform 0.2s, background-color 0.2s;
+  }
+  .group:hover .nav-icon {
+    transform: scale(1.06);
+    background: color-mix(in oklab, var(--accent) 22%, transparent);
+  }
+}
+
 /* Cartel technique : capitales espacées en police mono. */
 .cartel {
   font-family: var(--font-mono);

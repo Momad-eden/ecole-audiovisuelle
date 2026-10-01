@@ -18,9 +18,9 @@ class MenuItem extends Model
         'legal' => 'Liens légaux',
     ];
 
-    protected array $translatable = ['label'];
+    protected array $translatable = ['label', 'description'];
 
-    protected $fillable = ['location', 'parent_id', 'label', 'url', 'is_button', 'position', 'is_visible'];
+    protected $fillable = ['location', 'parent_id', 'label', 'description', 'url', 'is_button', 'position', 'is_visible'];
 
     protected $casts = [
         'is_button' => 'boolean',

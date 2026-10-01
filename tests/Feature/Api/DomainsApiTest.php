@@ -31,7 +31,7 @@ class DomainsApiTest extends TestCase
         $response->assertJsonCount(1, 'data.menus.main')
             ->assertJsonPath('data.menus.main.0.label', 'EMSI')
             ->assertJsonCount(1, 'data.menus.main.0.children')
-            ->assertJsonPath('data.menus.main.0.children.0', ['label' => 'Formations', 'url' => '/formations'])
+            ->assertJsonPath('data.menus.main.0.children.0', ['label' => 'Formations', 'url' => '/formations', 'description' => null])
             ->assertJsonPath('data.menus.footer.0.children', []);
     }
 

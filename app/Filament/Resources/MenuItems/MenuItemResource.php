@@ -63,6 +63,9 @@ class MenuItemResource extends Resource
                             ->visible(fn (Get $get) => $get('location') === 'main')->live(),
                         TextInput::make('label')->label('Texte du lien')->required()->maxLength(40),
                         LinkTargets::field('url', 'Destination')->required(),
+                        TextInput::make('description')->label('Description')->maxLength(90)->columnSpanFull()
+                            ->helperText('Phrase courte affichée sous le lien dans le sous-menu (ex. « Concerts, résidences et rendez-vous à venir »).')
+                            ->visible(fn (Get $get) => $get('location') === 'main' && filled($get('parent_id'))),
                         Toggle::make('is_button')->label('Afficher comme bouton')->helperText('Ex. « Candidater »')->inline(false),
                         Toggle::make('is_visible')->label('Visible')->default(true)->inline(false),
                     ]),

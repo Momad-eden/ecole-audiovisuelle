@@ -47,6 +47,31 @@ test("le menu EMSI s'ouvre au clavier et se referme avec Échap", async ({ page,
   await expect(bouton).toBeFocused();
 });
 
+test("le menu « À propos » regroupe mission, partenaires, soutien, actualités, presse et contact, avec leur description", async ({ page, isMobile }) => {
+  test.skip(isMobile, "Menu de bureau : sur téléphone, voir l'accordéon.");
+  await page.goto("/");
+  const nav = page.getByRole("navigation", { name: "Navigation principale" });
+  await nav.getByRole("button", { name: "À propos" }).click();
+  // Le nom accessible d'un lien comprend sa description : on vise le début du nom.
+  const link = (name: string) => nav.getByRole("link", { name: new RegExp(`^${name}`) });
+  for (const name of ["Mission et impact", "Partenaires et soutiens", "Nous soutenir", "Actualités", "Presse", "Contact"]) {
+    await expect(link(name)).toBeVisible();
+  }
+  await expect(link("Presse")).toContainText("Communiqués");
+  await link("Contact").click();
+  await expect(page).toHaveURL(/\/contact$/);
+});
+
+test("la rubrique où l'on se trouve est marquée dans le menu", async ({ page, isMobile }) => {
+  test.skip(isMobile, "Menu de bureau.");
+  await page.goto("/emsi/dakar");
+  const nav = page.getByRole("navigation", { name: "Navigation principale" });
+  await expect(nav.getByRole("button", { name: "EMSI" })).toHaveClass(/nav-pill-active/);
+  await expect(nav.getByRole("button", { name: "Maison Habib Faye" })).not.toHaveClass(/nav-pill-active/);
+  await nav.getByRole("button", { name: "EMSI" }).click();
+  await expect(nav.getByRole("link", { name: "Campus de Dakar" })).toHaveAttribute("aria-current", "page");
+});
+
 test("sur téléphone, le menu EMSI s'ouvre en accordéon", async ({ page }) => {
   await page.setViewportSize({ width: 390, height: 800 });
   await page.goto("/");

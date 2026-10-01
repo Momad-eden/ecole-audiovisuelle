@@ -6,8 +6,8 @@ import type { Locale } from "@/lib/i18n/locales";
 import type { Site } from "@/lib/types";
 import { HeaderShell } from "./HeaderShell";
 import { LanguageSwitcher } from "./LanguageSwitcher";
+import { MainNav } from "./MainNav";
 import { MobileMenu } from "./MobileMenu";
-import { NavDropdown } from "./NavDropdown";
 import { ThemeToggle } from "./ThemeToggle";
 
 export function SiteHeader({ site, locale }: { site: Site; locale: Locale }) {
@@ -30,21 +30,7 @@ export function SiteHeader({ site, locale }: { site: Site; locale: Locale }) {
           <span className="cartel hidden leading-tight xl:block" aria-hidden>{t.taglineTop}<br />{t.taglineBottom}</span>
         </LocaleLink>
 
-        <nav aria-label={t.mainNav} className="hidden lg:block">
-          <ul className="flex items-center gap-1">
-            {navLinks.map((link) =>
-              link.children?.length ? (
-                <NavDropdown key={link.url + link.label} link={link} />
-              ) : (
-                <li key={link.url + link.label}>
-                  <LocaleLink href={link.url} className="inline-flex items-center rounded-full px-4 py-2 text-sm text-ink/80 transition hover:bg-ink/5 hover:text-ink">
-                    {link.label}
-                  </LocaleLink>
-                </li>
-              ),
-            )}
-          </ul>
-        </nav>
+        <MainNav links={navLinks} domains={site.domains} label={t.mainNav} />
 
         <div className="flex items-center gap-2">
           <LanguageSwitcher className="hidden sm:block" />
@@ -55,7 +41,7 @@ export function SiteHeader({ site, locale }: { site: Site; locale: Locale }) {
               <ArrowRight className="size-4 transition-transform group-hover:translate-x-0.5" aria-hidden />
             </LocaleLink>
           )}
-          <MobileMenu links={links} />
+          <MobileMenu links={links} domains={site.domains} />
         </div>
       </div>
     </HeaderShell>

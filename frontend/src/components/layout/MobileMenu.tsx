@@ -2,20 +2,30 @@
 
 import { LocaleLink } from "@/components/i18n/LocaleLink";
 import { useEffect, useRef, useState } from "react";
+import { usePathname } from "next/navigation";
 import { ArrowRight, Menu, X } from "lucide-react";
 import { ChevronDown } from "lucide-react";
 import { useT } from "@/components/i18n/LocaleProvider";
-import type { MenuLink } from "@/lib/types";
+import { accentVars } from "@/lib/contrast";
+import { domainSection } from "@/lib/domains";
+import { delocalizedPath } from "@/lib/i18n/locales";
+import type { Domains, MenuLink } from "@/lib/types";
+import { cn } from "@/lib/utils";
+import { menuColor } from "./MainNav";
+import { MenuIcon, menuDomain } from "./menu-icons";
 import { LanguageSwitcher } from "./LanguageSwitcher";
 import { ThemeToggle } from "./ThemeToggle";
 
-export function MobileMenu({ links }: { links: MenuLink[] }) {
+export function MobileMenu({ links, domains }: { links: MenuLink[]; domains?: Domains }) {
     const t = useT().header;
     const [open, setOpen] = useState(false);
     const [expanded, setExpanded] = useState<string | null>(null);
     const dialogRef = useRef<HTMLDialogElement>(null);
     const navLinks = links.filter((link) => !link.isButton);
     const cta = links.find((link) => link.isButton);
+    const path = delocalizedPath(usePathname() || "/");
+    const clean = path.length > 1 ? path.replace(/\/+$/, "") : path;
+    const section = domainSection(navLinks, clean);
 
     useEffect(() => {
         const dialog = dialogRef.current;
@@ -25,12 +35,16 @@ export function MobileMenu({ links }: { links: MenuLink[] }) {
     }, [open]);
 
     const close = () => setOpen(false);
+    const openMenu = () => {
+        setExpanded(section?.parent.children?.length ? section.parent.url + section.parent.label : null);
+        setOpen(true);
+    };
 
     return (
         <>
             <button
                 type="button"
-                onClick={() => setOpen(true)}
+                onClick={openMenu}
                 className="grid size-11 place-items-center rounded-full border border-line bg-night/60 lg:hidden"
                 aria-label={t.openMenu}
             >
@@ -65,13 +79,15 @@ export function MobileMenu({ links }: { links: MenuLink[] }) {
                                 const key = link.url + link.label;
                                 const children = link.children ?? [];
                                 const isOpen = expanded === key;
+                                const active = section?.parent === link || clean === link.url;
+                                const color = menuColor(link.url, domains);
                                 const number = (
                                     <span className="cartel tabular-nums">
                                         {String(index + 1).padStart(2, "0")}
                                     </span>
                                 );
                                 return (
-                                    <li key={key} className="border-b border-line">
+                                    <li key={key} className="border-b border-line" style={accentVars(color)}>
                                         {children.length > 0 ? (
                                             <>
                                                 <button
@@ -81,25 +97,40 @@ export function MobileMenu({ links }: { links: MenuLink[] }) {
                                                     onClick={() => setExpanded(isOpen ? null : key)}
                                                     className="flex w-full items-baseline justify-between py-4 text-left"
                                                 >
-                                                    <span className="display text-3xl">{link.label}</span>
+                                                    <span className={cn("display text-3xl", active && "text-[var(--accent-ink)]")}>{link.label}</span>
                                                     <span className="flex items-center gap-3">
                                                         {number}
                                                         <ChevronDown className={"size-4 self-center transition motion-reduce:transition-none " + (isOpen ? "rotate-180" : "")} aria-hidden />
                                                     </span>
                                                 </button>
-                                                <ul id={`mobile-sub-${index}`} hidden={!isOpen} className="pb-3">
-                                                    {children.map((child) => (
-                                                        <li key={child.url}>
-                                                            <LocaleLink href={child.url} onClick={close} className="flex min-h-11 items-center pl-3 text-lg text-ink/85">
-                                                                {child.label}
-                                                            </LocaleLink>
-                                                        </li>
-                                                    ))}
+                                                <ul id={`mobile-sub-${index}`} hidden={!isOpen} className="grid gap-1 pb-4">
+                                                    {children.map((child) => {
+                                                        const here = section?.current?.url === child.url && section.parent === link;
+                                                        const studio = menuDomain(child.url) === "studio" ? domains?.studio?.color : undefined;
+                                                        return (
+                                                            <li key={child.url + child.label} style={accentVars(studio)}>
+                                                                <LocaleLink
+                                                                    href={child.url}
+                                                                    onClick={close}
+                                                                    aria-current={here ? "page" : undefined}
+                                                                    className={cn("flex items-center gap-3 rounded-2xl p-2.5 transition active:bg-ink/[0.08]", here && "bg-ink/[0.06]")}
+                                                                >
+                                                                    <span className="nav-icon">
+                                                                        <MenuIcon url={child.url} className="size-[1.15rem]" />
+                                                                    </span>
+                                                                    <span className="min-w-0">
+                                                                        <span className="block font-semibold text-ink">{child.label}</span>
+                                                                        {child.description && <span className="block text-sm leading-snug text-ink-muted">{child.description}</span>}
+                                                                    </span>
+                                                                </LocaleLink>
+                                                            </li>
+                                                        );
+                                                    })}
                                                 </ul>
                                             </>
                                         ) : (
-                                            <LocaleLink href={link.url} onClick={close} className="flex items-baseline justify-between py-4">
-                                                <span className="display text-3xl">{link.label}</span>
+                                            <LocaleLink href={link.url} onClick={close} aria-current={active ? "page" : undefined} className="flex items-baseline justify-between py-4">
+                                                <span className={cn("display text-3xl", active && "text-[var(--accent-ink)]")}>{link.label}</span>
                                                 {number}
                                             </LocaleLink>
                                         )}

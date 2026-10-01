@@ -224,13 +224,15 @@ class SiteV4CommandTest extends TestCase
         $visible = fn (string $location, ?int $parent = null) => MenuItem::where('location', $location)->where('is_visible', true)
             ->where('parent_id', $parent)->orderBy('position')->get();
         $main = $visible('main');
-        $this->assertSame(['Accueil', 'Maison Habib Faye', 'EMSI', 'Candidater'], $main->pluck('label')->all());
-        $this->assertSame(['/', '/maison-habib-faye', '/emsi', '/candidater'], $main->pluck('url')->all());
+        $this->assertSame(['Accueil', 'Maison Habib Faye', 'EMSI', 'À propos', 'Candidater'], $main->pluck('label')->all());
+        $this->assertSame(['/', '/maison-habib-faye', '/emsi', '/mission', '/candidater'], $main->pluck('url')->all());
         $this->assertTrue($main->last()->is_button);
         $this->assertSame(['La Maison', 'Programmation', 'Impact Live Studio', 'Les espaces'], $visible('main', $main[1]->id)->pluck('label')->all());
         $this->assertSame(['/maison-habib-faye', '/maison-habib-faye/agenda', '/maison-habib-faye/studio', '/maison-habib-faye/espaces'], $visible('main', $main[1]->id)->pluck('url')->all());
         $this->assertSame(['L\'école', 'Campus de Dakar', 'Campus de Saint-Louis', 'Formations', 'VAE et professionnels', 'Réalisations'], $visible('main', $main[2]->id)->pluck('label')->all());
         $this->assertSame(['/emsi', '/emsi/dakar', '/emsi/saint-louis', '/emsi/formations', '/emsi/professionnels', '/emsi/realisations'], $visible('main', $main[2]->id)->pluck('url')->all());
+        $this->assertSame(['Mission et impact', 'Partenaires et soutiens', 'Nous soutenir', 'Actualités', 'Presse', 'Contact'], $visible('main', $main[3]->id)->pluck('label')->all());
+        $this->assertSame('Toutes les formations, campus par campus', $visible('main', $main[2]->id)[3]->description);
         $this->assertSame(['Mission et impact', 'Partenaires et soutiens', 'Nous soutenir', 'Actualités', 'Presse', 'Contact'], $visible('footer')->pluck('label')->all());
         $this->assertSame(['Mentions légales', 'Protection des données'], $visible('legal')->pluck('label')->all());
 
