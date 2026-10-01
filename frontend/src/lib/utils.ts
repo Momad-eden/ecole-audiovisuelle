@@ -4,16 +4,6 @@ export function cn(...inputs: ClassValue[]) {
   return clsx(inputs);
 }
 
-/** 1250000 → « 1 250 000 FCFA » */
-export function fcfa(amount: number): string {
-  return `${new Intl.NumberFormat("fr-FR", { maximumFractionDigits: 0 }).format(amount).replace(/ /g, " ")} FCFA`;
-}
-
-export function formatDate(iso: string | null | undefined, options: Intl.DateTimeFormatOptions = { day: "numeric", month: "long", year: "numeric" }): string {
-  if (!iso) return "";
-  return new Intl.DateTimeFormat("fr-FR", { timeZone: "Africa/Dakar", ...options }).format(new Date(iso));
-}
-
 export function formatDuration(seconds: number | null | undefined): string {
   if (!seconds) return "";
   const m = Math.floor(seconds / 60);

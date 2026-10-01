@@ -9,7 +9,8 @@ const slugify = (value: string) => value.normalize("NFD").replace(/[̀-ͯ]/g, ""
 const findCampus = (campuses: Place[], slug?: string) =>
   slug ? campuses.find((c) => c.slug === slug) ?? campuses.find((c) => c.city && slugify(c.city) === slug) : undefined;
 
-const notOffered = (campus: Place) => `Cette formation n'est pas proposée à ${campusLabel(campus)}. Choisissez-en une autre ou changez de campus.`;
+/** Message « formation non proposée dans ce campus », dans la langue de la page (dictionnaire application.notOffered). */
+type NotOffered = (campus: string) => string;
 
 /** Formations proposées dans un campus (aucun campus choisi : aucune). */
 export function offeringsForCampus(offerings: Offering[], campusId: string | undefined | null): Offering[] {
@@ -23,7 +24,7 @@ export function offeringsForCampus(offerings: Offering[], campusId: string | und
  * Sans campus dans l'adresse (fiche formation), une formation ouverte dans un seul campus fixe ce campus ;
  * ouverte dans plusieurs, rien n'est imposé : le formulaire la resélectionne quand le candidat choisit son campus.
  */
-export function resolvePreselection({ offerings, campuses, campusSlug, programOfferingIds }: { offerings: Offering[]; campuses: Place[]; campusSlug?: string; programOfferingIds: number[] }) {
+export function resolvePreselection({ offerings, campuses, campusSlug, programOfferingIds, notOffered }: { offerings: Offering[]; campuses: Place[]; campusSlug?: string; programOfferingIds: number[]; notOffered: NotOffered }) {
   const single = campuses.length === 1;
   const candidates = offerings.filter((o) => programOfferingIds.includes(o.id));
   const offeringCampuses = campuses.filter((c) => candidates.some((o) => o.campusIds.includes(c.id)));
@@ -31,7 +32,7 @@ export function resolvePreselection({ offerings, campuses, campusSlug, programOf
   // Un seul campus : la liste n'est pas filtrée, la présélection non plus.
   const available = single ? candidates : campus ? candidates.filter((o) => o.campusIds.includes(campus.id)) : [];
   const offering = available[0];
-  const notice = campus && !single && candidates.length > 0 && !offering ? notOffered(campus) : undefined;
+  const notice = campus && !single && candidates.length > 0 && !offering ? notOffered(campusLabel(campus)) : undefined;
   return {
     campusId: campus && !single ? String(campus.id) : undefined,
     offeringId: offering ? String(offering.id) : undefined,
@@ -40,9 +41,9 @@ export function resolvePreselection({ offerings, campuses, campusSlug, programOf
 }
 
 /** Formation voulue (fiche formation) dans le campus que le candidat vient de choisir : son offre, sinon un message. */
-export function wantedOffering({ offerings, campuses, campusId, wantedIds }: { offerings: Offering[]; campuses: Place[]; campusId?: string; wantedIds: number[] }) {
+export function wantedOffering({ offerings, campuses, campusId, wantedIds, notOffered }: { offerings: Offering[]; campuses: Place[]; campusId?: string; wantedIds: number[]; notOffered: NotOffered }) {
   const campus = campuses.find((c) => String(c.id) === campusId);
   if (!campus || wantedIds.length === 0) return { offeringId: undefined, notice: undefined };
   const offering = offeringsForCampus(offerings, campusId).find((o) => wantedIds.includes(o.id));
-  return { offeringId: offering ? String(offering.id) : undefined, notice: offering ? undefined : notOffered(campus) };
+  return { offeringId: offering ? String(offering.id) : undefined, notice: offering ? undefined : notOffered(campusLabel(campus)) };
 }

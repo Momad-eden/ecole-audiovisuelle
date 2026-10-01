@@ -1,14 +1,11 @@
 import type { BookingType } from "./types";
 
-/** Demandes possibles depuis le site : Impact Live Events (matériel, prestations) est retiré. */
-export const BOOKING_TYPES = {
-  studio_session: "Session au studio",
-  space_rental: "Location de l'Espace Habib Faye",
-} as const satisfies Partial<Record<BookingType, string>>;
+/** Demandes possibles depuis le site : Impact Live Events (matériel, prestations) est retiré. Libellés : dictionnaire booking.types. */
+export const BOOKING_TYPES = ["studio_session", "space_rental"] as const satisfies readonly BookingType[];
 
-export type PublicBookingType = keyof typeof BOOKING_TYPES;
+export type PublicBookingType = (typeof BOOKING_TYPES)[number];
 
 /** Type du formulaire : celui fixé par le bloc s'il est encore proposé, sinon une séance au studio. */
 export function publicBookingType(type: BookingType | null | undefined): PublicBookingType {
-  return type && type in BOOKING_TYPES ? (type as PublicBookingType) : "studio_session";
+  return type && (BOOKING_TYPES as readonly string[]).includes(type) ? (type as PublicBookingType) : "studio_session";
 }

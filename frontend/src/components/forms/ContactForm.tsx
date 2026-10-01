@@ -1,30 +1,36 @@
 "use client";
 
-import { useState } from "react";
-import { useLocale } from "@/components/i18n/LocaleProvider";
+import { useMemo, useState } from "react";
+import { useLocale, useT } from "@/components/i18n/LocaleProvider";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
+import type { Dictionary } from "@/lib/i18n";
 import { Field, Honeypot, inputClass } from "./Field";
 
-const SUBJECTS = { information: "Demande d'information", partnership: "Partenariat", press: "Presse", visit: "Visite de l'école", other: "Autre" };
+const SUBJECTS = ["information", "partnership", "press", "visit", "other"] as const;
 
-const schema = z
-  .object({
-    subject: z.enum(Object.keys(SUBJECTS) as [keyof typeof SUBJECTS, ...(keyof typeof SUBJECTS)[]]),
-    name: z.string().trim().min(2, "Indiquez votre nom.").max(150),
-    email: z.string().trim().email("Adresse e-mail invalide.").or(z.literal("")),
-    phone: z.string().trim().max(30).optional(),
-    message: z.string().trim().min(10, "Votre message est trop court.").max(3000),
-    consent: z.literal(true, { message: "Votre accord est nécessaire pour que nous puissions vous répondre." }),
-    website: z.string().optional(),
-  })
-  .refine((v) => v.email || v.phone, { message: "Indiquez un e-mail ou un téléphone.", path: ["email"] });
+/** Validation côté navigateur, messages dans la langue de la page (Laravel revalide et fait foi). */
+const contactSchema = ({ validation: v }: Dictionary) =>
+  z
+    .object({
+      subject: z.enum(SUBJECTS),
+      name: z.string().trim().min(2, v.name).max(150),
+      email: z.string().trim().email(v.email).or(z.literal("")),
+      phone: z.string().trim().max(30).optional(),
+      message: z.string().trim().min(10, v.messageShort).max(3000),
+      consent: z.literal(true, { message: v.consent }),
+      website: z.string().optional(),
+    })
+    .refine((values) => values.email || values.phone, { message: v.emailOrPhone, path: ["email"] });
 
-type Values = z.infer<typeof schema>;
+type Values = z.infer<ReturnType<typeof contactSchema>>;
 
 export function ContactForm() {
   const locale = useLocale();
+  const t = useT();
+  const { forms: f, contactForm: c } = t;
+  const schema = useMemo(() => contactSchema(t), [t]);
   const [status, setStatus] = useState<"idle" | "sent" | "error">("idle");
   const { register, handleSubmit, formState: { errors, isSubmitting } } = useForm<Values>({ resolver: zodResolver(schema), defaultValues: { subject: "information", email: "", phone: "" } });
 
@@ -39,40 +45,40 @@ export function ContactForm() {
   };
 
   if (status === "sent") {
-    return <div role="status" className="rounded-3xl border border-line bg-night-2 p-10 text-center"><p className="display text-3xl">Merci !</p><p className="mt-3 text-ink-muted">Votre message a bien été envoyé. Nous vous répondrons rapidement.</p></div>;
+    return <div role="status" className="rounded-3xl border border-line bg-night-2 p-10 text-center"><p className="display text-3xl">{f.thanks}</p><p className="mt-3 text-ink-muted">{f.sent}</p></div>;
   }
 
   return (
     <form onSubmit={handleSubmit(onSubmit)} noValidate className="relative space-y-6 rounded-3xl border border-line bg-night-2 p-6 sm:p-10">
-      <Honeypot register={register("website")} />
-      <Field id="subject" label="Objet" required>
+      <Honeypot register={register("website")} label={f.honeypot} />
+      <Field id="subject" label={c.subject} required>
         <select id="subject" className={inputClass} {...register("subject")}>
-          {Object.entries(SUBJECTS).map(([value, label]) => <option key={value} value={value}>{label}</option>)}
+          {SUBJECTS.map((value) => <option key={value} value={value}>{c.subjects[value]}</option>)}
         </select>
       </Field>
-      <Field id="name" label="Nom" required error={errors.name?.message}>
+      <Field id="name" label={f.name} required error={errors.name?.message}>
         <input id="name" autoComplete="name" className={inputClass} aria-invalid={!!errors.name} {...register("name")} />
       </Field>
       <div className="grid gap-6 sm:grid-cols-2">
-        <Field id="email" label="E-mail" error={errors.email?.message}>
+        <Field id="email" label={f.email} error={errors.email?.message}>
           <input id="email" type="email" autoComplete="email" className={inputClass} aria-invalid={!!errors.email} {...register("email")} />
         </Field>
-        <Field id="phone" label="Téléphone">
-          <input id="phone" type="tel" autoComplete="tel" placeholder="+221 77 000 00 00" className={inputClass} {...register("phone")} />
+        <Field id="phone" label={f.phone}>
+          <input id="phone" type="tel" autoComplete="tel" placeholder={f.phonePlaceholder} className={inputClass} {...register("phone")} />
         </Field>
       </div>
-      <Field id="message" label="Message" required error={errors.message?.message}>
+      <Field id="message" label={f.message} required error={errors.message?.message}>
         <textarea id="message" rows={6} className={inputClass} aria-invalid={!!errors.message} {...register("message")} />
       </Field>
       <Field id="consent" label="" error={errors.consent?.message}>
         <label className="flex items-start gap-3 text-sm text-ink-muted">
           <input id="consent" type="checkbox" className="mt-1 size-4 accent-brand" {...register("consent")} />
-          J&apos;accepte que l&apos;EMSI utilise ces informations pour répondre à ma demande.
+          {c.consent}
         </label>
       </Field>
-      {status === "error" && <p role="alert" className="text-sm text-rec">L&apos;envoi a échoué. Réessayez dans quelques minutes.</p>}
+      {status === "error" && <p role="alert" className="text-sm text-rec">{f.failed}</p>}
       <button type="submit" disabled={isSubmitting} className="inline-flex min-h-12 items-center rounded-full bg-brand px-8 font-semibold text-on-accent disabled:opacity-60">
-        {isSubmitting ? "Envoi…" : "Envoyer"}
+        {isSubmitting ? f.sending : f.send}
       </button>
     </form>
   );
