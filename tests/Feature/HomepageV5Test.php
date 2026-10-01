@@ -76,7 +76,7 @@ class HomepageV5Test extends TestCase
         $this->assertSame(['pages/01M3R5AKQTX1B0PBT018R88CEN.jpg'], $page->draft_blocks[0]['data']['images']);
         $this->assertSame([['value' => '3', 'label' => 'lieux']], $page->draft_blocks[1]['data']['facts'], 'Chiffres du bloc « chiffres clés » repris (aucun ici), plus les trois lieux.');
         $this->assertSame('strip', $page->draft_blocks[2]['data']['layout']);
-        $this->assertNull($page->draft_blocks[3]['data']['intro']);
+        $this->assertSame('Trois lieux, *un même élan*', $page->draft_blocks[3]['data']['intro']);
         $this->assertCount(1, $page->draft_blocks[6]['data']['items'], 'Seules les photos présentes sur le disque sont proposées.');
     }
 

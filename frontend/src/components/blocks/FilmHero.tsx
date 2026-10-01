@@ -81,6 +81,8 @@ export function FilmHero({ data, first }: { data: HeroData; first: boolean }) {
       </div>
       {/* Voile : la photo reste vivante en haut, le texte se pose sur un fond presque noir. */}
       <div className="absolute inset-0 -z-10 bg-[linear-gradient(180deg,rgb(7_7_10/0.55)_0%,rgb(7_7_10/0.15)_35%,rgb(7_7_10/0.55)_65%,var(--color-night)_100%)]" aria-hidden />
+      {/* Voile horizontal : la phrase reste lisible même sur une photo très claire. */}
+      <div className="absolute inset-0 -z-10 bg-[linear-gradient(90deg,rgb(7_7_10/0.82)_0%,rgb(7_7_10/0.55)_45%,rgb(7_7_10/0.1)_80%)] max-sm:bg-[linear-gradient(90deg,rgb(7_7_10/0.7),rgb(7_7_10/0.45))]" aria-hidden />
       <div className="absolute inset-0 -z-10 bg-[radial-gradient(70%_60%_at_15%_85%,color-mix(in_oklab,var(--accent)_22%,transparent),transparent_70%)]" aria-hidden />
       {/* Grain de pellicule et vignettage : ambiance cinéma, et des photos de petite taille moins visiblement floues. */}
       <div className="film-grain absolute inset-0 -z-10" aria-hidden />
@@ -127,7 +129,8 @@ export function FilmHero({ data, first }: { data: HeroData; first: boolean }) {
           )}
         </div>
 
-        <div className="mt-14 flex items-center justify-between gap-4 border-t border-ink/15 pt-5">
+        {/* Sous 1024 px, la marge droite laisse la place au bouton WhatsApp flottant. */}
+        <div className="mt-12 flex items-center justify-between gap-4 border-t border-ink/15 pt-5 max-lg:pr-16 sm:mt-14">
           <a href="#apres-film" className="group inline-flex items-center gap-3 text-sm text-ink/75 transition hover:text-ink">
             <span className="grid size-9 place-items-center rounded-full border border-ink/25 transition group-hover:border-ink/60">
               <ArrowDown className="size-4 motion-safe:animate-bounce" aria-hidden />

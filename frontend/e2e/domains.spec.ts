@@ -261,3 +261,20 @@ test("les anciennes adresses de la « Maison » mènent au Centre culturel, en f
     expect(new URL(response.headers()["location"], "http://x").pathname, from).toBe(to);
   }
 });
+
+test("à 1024 px, chaque méga-menu reste entièrement dans l'écran", async ({ page, isMobile }) => {
+  test.skip(isMobile, "Menu de bureau.");
+  await page.setViewportSize({ width: 1024, height: 768 });
+  await page.goto("/");
+  const nav = page.getByRole("navigation", { name: "Navigation principale" });
+  for (const name of ["Centre culturel Habib Faye", "EMSI", "À propos"]) {
+    const button = nav.getByRole("button", { name });
+    await button.click();
+    const panel = page.locator(`#${await button.getAttribute("aria-controls")}`.replace(/:/g, "\\:"));
+    await expect(panel).toBeVisible();
+    await expect.poll(async () => (await panel.boundingBox())!.x).toBeGreaterThanOrEqual(0);
+    const box = (await panel.boundingBox())!;
+    expect(box.x + box.width).toBeLessThanOrEqual(1024);
+    await page.keyboard.press("Escape");
+  }
+});

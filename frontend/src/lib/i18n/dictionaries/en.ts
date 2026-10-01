@@ -162,7 +162,7 @@ export const en: Dictionary = {
   },
 
   domains: {
-    label: "Our three houses",
+    label: "Our three venues",
   },
 
   downloads: {

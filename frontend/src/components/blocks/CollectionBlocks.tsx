@@ -94,9 +94,9 @@ export function PartnersBlock({ data, locale }: BlockProps<PartnersData>) {
       <section data-testid="partners-strip" className="border-y border-line py-8">
         <Container className="flex flex-col gap-5 lg:flex-row lg:items-center lg:gap-10">
           <p className="cartel shrink-0 text-ink-muted">{data.title || dictionary.institution.supportedBy}</p>
-          <ul className="flex flex-wrap items-center gap-x-8 gap-y-3">
+          <ul className="grid gap-x-8 gap-y-2.5 sm:grid-cols-2 lg:flex lg:flex-wrap lg:items-center lg:gap-y-3">
             {items.map((partner) => (
-              <li key={partner.name} className="flex items-center gap-8 [&+li]:before:size-1 [&+li]:before:rounded-full [&+li]:before:bg-ink/25 [&+li]:before:content-['']">
+              <li key={partner.name} className="flex items-center gap-8 lg:[&+li]:before:size-1 lg:[&+li]:before:rounded-full lg:[&+li]:before:bg-ink/25 lg:[&+li]:before:content-['']">
                 {partner.logo ? (
                   <span className="relative block h-10 w-28 opacity-75 grayscale transition hover:opacity-100 hover:grayscale-0"><MediaImage image={partner.logo} sizes="112px" fit="contain" /></span>
                 ) : (

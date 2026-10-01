@@ -26,7 +26,8 @@ export function MainNav({ links, domains, label }: { links: MenuLink[]; domains?
 
   return (
     <nav aria-label={label} className="hidden lg:block">
-      <ul className="main-nav-pill flex items-center gap-0.5 rounded-full border border-line bg-night/40 p-1 shadow-[0_8px_32px_-12px_rgb(0_0_0/0.45)] backdrop-blur-md">
+      {/* Pas de backdrop-filter ici : il ferait de la pilule le repère des méga-menus (centrés alors sous elle, hors écran). */}
+      <ul className="main-nav-pill flex items-center gap-0.5 rounded-full border border-line bg-night/60 p-1 shadow-[0_8px_32px_-12px_rgb(0_0_0/0.45)]">
         {links.map((link) => {
           const color = menuColor(link.url, domains);
           if (link.children?.length) {

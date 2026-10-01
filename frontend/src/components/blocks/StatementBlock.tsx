@@ -22,15 +22,15 @@ export function StatementBlock({ data }: { data: StatementData }) {
         <Reveal className="grid gap-12 lg:grid-cols-[1.9fr_1fr] lg:items-end">
           <div>
             {data.eyebrow && <p className="cartel mb-6 flex items-center gap-3 text-[var(--accent-ink)]"><span className="h-px w-10 bg-[var(--accent-ink)]" aria-hidden />{data.eyebrow}</p>}
-            <p className="display text-balance text-[clamp(1.9rem,3.5vw,3.2rem)] leading-[1.04]"><Emphasis text={data.text} /></p>
+            <p className="display text-balance text-[clamp(1.9rem,3.5vw,3.2rem)] leading-[1.1]"><Emphasis text={data.text} /></p>
             {data.buttonLabel && data.buttonUrl && <div className="mt-10"><ButtonLink href={data.buttonUrl} variant="secondary">{data.buttonLabel}</ButtonLink></div>}
           </div>
           {facts.length > 0 && (
-            <dl className={cn("grid gap-x-8 gap-y-8 border-t border-line pt-8 lg:border-l lg:border-t-0 lg:pl-10 lg:pt-0", facts.length > 1 && "grid-cols-2")}>
+            <dl className={cn("grid gap-x-10 gap-y-8 border-t border-line pt-8 lg:border-l lg:border-t-0 lg:pl-10 lg:pt-0", facts.length > 1 && "grid-cols-2")}>
               {facts.map((fact) => (
                 <div key={fact.value + fact.label} className="flex flex-col">
                   <dt className="cartel order-2 mt-3 text-ink-muted">{fact.label}</dt>
-                  <dd className="display order-1 text-[clamp(2.6rem,4.6vw,4rem)] leading-none text-[var(--accent-ink)]"><CountUp value={fact.value} /></dd>
+                  <dd className="display order-1 text-[clamp(2.3rem,3.3vw,3.6rem)] leading-none text-[var(--accent-ink)]"><CountUp value={fact.value} /></dd>
                 </div>
               ))}
             </dl>

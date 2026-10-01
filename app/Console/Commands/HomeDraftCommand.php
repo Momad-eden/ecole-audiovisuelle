@@ -76,7 +76,7 @@ class HomeDraftCommand extends Command
                 'button_url' => '/mission',
             ]],
             ['type' => 'partners', 'data' => ['title' => null, 'layout' => 'strip', 'categories' => ['co_organizer', 'institutional']]],
-            $domains ? ['type' => 'domains', 'data' => [...$domains['data'], 'intro' => null]] : null,
+            $domains ? ['type' => 'domains', 'data' => [...$domains['data'], 'intro' => 'Trois lieux, *un même élan*']] : null,
             ['type' => 'institution', 'data' => [
                 'eyebrow' => 'Notre engagement',
                 'title' => 'Former, créer, *transmettre*',

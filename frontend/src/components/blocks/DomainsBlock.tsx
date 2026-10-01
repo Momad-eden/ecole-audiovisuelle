@@ -12,13 +12,33 @@ import type { DomainPanel, DomainsData } from "./types";
  * « Nos trois lieux » : trois grands panneaux côte à côte (empilés sous 1024 px), un par domaine,
  * chacun dans sa couleur ; à la souris, le panneau survolé s'élargit (CSS, voir .domains-panel).
  * Chaque panneau est un seul lien, dont le nom accessible est son titre.
- * La phrase d'intention est lue en premier (h1 si le bloc ouvre la page) mais affichée sous les panneaux.
+ * Bloc d'ouverture : la phrase d'intention est le h1, lue en premier mais affichée sous les panneaux.
+ * Après un autre bloc (film d'ouverture) : elle devient le titre de la section, au-dessus des panneaux.
  */
 export function DomainsBlock({ data, first, pageTitle, locale }: { data: DomainsData; first: boolean; pageTitle?: string; locale: Locale }) {
   const panels = (data.panels ?? []).slice(0, 3);
   if (panels.length === 0) return null;
   const intro = data.intro?.trim();
   const IntroTag = first ? "h1" : "p";
+  const dictionary = getDictionary(locale).domains;
+
+  if (!first) {
+    return (
+      <section data-testid="domains-block" aria-label={intro ? undefined : dictionary.label} className="scene-dark relative isolate bg-night pt-20 sm:pt-28">
+        {intro && (
+          <div className="mx-auto mb-10 flex max-w-7xl flex-wrap items-end justify-between gap-6 px-4 sm:mb-14 sm:px-6 lg:px-8">
+            <div className="max-w-3xl">
+              <p className="cartel mb-4 flex items-center gap-3 text-[var(--accent-ink)]"><span className="h-px w-10 bg-[var(--accent-ink)]" aria-hidden />{dictionary.label}</p>
+              <h2 className="display text-balance text-[clamp(2.2rem,4.4vw,3.6rem)]"><Emphasis text={intro} /></h2>
+            </div>
+          </div>
+        )}
+        <div className="grid border-t border-line lg:flex lg:h-[78svh] lg:min-h-[36rem]">
+          {panels.map((panel, index) => <Panel key={`${panel.domain}-${index}`} panel={panel} index={index} priority={false} />)}
+        </div>
+      </section>
+    );
+  }
 
   return (
     <section
@@ -26,7 +46,7 @@ export function DomainsBlock({ data, first, pageTitle, locale }: { data: Domains
       data-first={first || undefined}
       aria-label={intro ? undefined : getDictionary(locale).domains.label}
       // Ouverture de page : plein écran ; après un film d'ouverture, un peu moins haut pour inviter à poursuivre.
-      className={cn("scene-dark relative isolate flex flex-col overflow-hidden bg-night lg:min-h-[40rem]", first ? "lg:h-[100svh]" : "lg:h-[82svh]")}
+      className="scene-dark relative isolate flex flex-col overflow-hidden bg-night lg:h-[100svh] lg:min-h-[40rem]"
     >
       {intro ? (
         <div className="order-last border-t border-line bg-night px-6 py-8 sm:px-10 lg:py-10">
@@ -51,26 +71,30 @@ function Panel({ panel, index, priority }: { panel: DomainPanel; index: number; 
     <article
       data-testid="domain-panel"
       className={cn(
-        "domains-panel group relative isolate flex min-h-[26rem] flex-col justify-end overflow-hidden sm:min-h-[32rem] lg:min-h-0 lg:flex-1 lg:basis-0",
+        "domains-panel group relative isolate flex min-h-[23rem] flex-col justify-end overflow-hidden sm:min-h-[28rem] lg:min-h-0 lg:flex-1 lg:basis-0",
         "has-[a:focus-visible]:outline has-[a:focus-visible]:outline-2 has-[a:focus-visible]:-outline-offset-4 has-[a:focus-visible]:outline-[var(--accent)]",
         index > 0 && "border-t border-line lg:border-l lg:border-t-0",
       )}
       style={accentVars(panel.color)}
     >
-      <div className="absolute inset-0 -z-20 brightness-[0.62] saturate-[0.85] motion-safe:transition-transform motion-safe:duration-700 group-hover:scale-[1.04]" aria-hidden>
+      <div className="absolute inset-0 -z-20 brightness-[0.72] saturate-[0.9] motion-safe:transition-transform motion-safe:duration-700 group-hover:scale-[1.04]" aria-hidden>
         {panel.image && <MediaImage image={{ ...panel.image, alt: "" }} sizes="(min-width: 1024px) 40vw, 100vw" priority={priority} />}
       </div>
       {/* Teinte du domaine sur la photo, fond presque noir sous le texte : le blanc reste lisible. */}
       <div
         className="absolute inset-0 -z-10"
-        style={{ background: "linear-gradient(0deg, var(--color-night) 14%, color-mix(in oklab, var(--accent) 30%, rgb(7 7 10 / 0.72)) 62%, rgb(7 7 10 / 0.6))" }}
+        style={{ background: "linear-gradient(0deg, var(--color-night) 8%, color-mix(in oklab, var(--accent) 26%, rgb(7 7 10 / 0.62)) 55%, rgb(7 7 10 / 0.25))" }}
         aria-hidden
       />
       {/* Filet de lumière du domaine : il s'allume au survol. */}
       <span className="absolute inset-x-0 bottom-0 h-1 origin-left scale-x-[0.18] bg-[var(--accent)] shadow-[0_0_24px_var(--accent)] motion-safe:transition-transform motion-safe:duration-500 group-hover:scale-x-100" aria-hidden />
 
-      <div className="relative px-6 pb-10 pt-32 sm:px-10 lg:px-9 lg:pb-14 xl:px-12">
-        {panel.eyebrow && <p className="cartel mb-4" style={{ color: "var(--accent-ink)" }}>{panel.eyebrow}</p>}
+      <div className="relative px-6 pb-10 pt-24 sm:px-10 lg:px-9 lg:pb-14 xl:px-12">
+        <p className="cartel mb-4 flex items-center gap-3" style={{ color: "var(--accent-ink)" }}>
+          <span className="tabular-nums text-ink/70">{String(index + 1).padStart(2, "0")}</span>
+          <span className="h-px w-6 bg-[var(--accent-ink)]" aria-hidden />
+          {panel.eyebrow}
+        </p>
         <h2 className="display text-[clamp(2.4rem,3.6vw,4.4rem)] uppercase text-balance text-ink">
           {external ? (
             <a href={panel.url} target="_blank" rel="noopener noreferrer" className={linkClass}>{title}</a>
