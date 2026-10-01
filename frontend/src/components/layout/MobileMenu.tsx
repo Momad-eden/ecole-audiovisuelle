@@ -56,7 +56,7 @@ export function MobileMenu({ links, domains }: { links: MenuLink[]; domains?: Do
                 className="m-0 h-dvh max-h-none w-full max-w-none bg-night p-0 text-ink backdrop:bg-night/80"
                 aria-label={t.menu}
             >
-                <div className="beam flex min-h-full flex-col px-5 py-4">
+                <div className="beam flex min-h-full flex-col px-5 pb-[max(1.5rem,env(safe-area-inset-bottom))] pt-4">
                     <div className="flex items-center justify-between">
                         <span className="display text-2xl">EMSI</span>
                         <span className="flex items-center gap-2">

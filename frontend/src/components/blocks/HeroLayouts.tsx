@@ -56,7 +56,7 @@ export function SpotlightHero({ data, first }: Props) {
         <div className="absolute bottom-[8%] left-1/2 h-24 w-[70vmin] -translate-x-1/2 rounded-[50%] bg-[radial-gradient(closest-side,color-mix(in_oklab,var(--accent)_45%,transparent),transparent)] blur-md" />
         <div className="absolute inset-x-0 bottom-0 h-1/3 bg-gradient-to-t from-night to-transparent" />
       </div>
-      <div className="mx-auto w-full max-w-5xl px-4 sm:px-6">
+      <div className="mx-auto w-full max-w-5xl px-5 sm:px-6">
         <Eyebrow text={data.eyebrow} className="justify-center" />
         <Heading className={cn("display text-balance", heroTitleSize(data.title))}><Emphasis text={data.title} /></Heading>
         {data.subtitle && <p className="mx-auto mt-7 max-w-2xl text-lg text-ink/80 sm:text-xl">{data.subtitle}</p>}
@@ -72,7 +72,7 @@ export function EditorialHero({ data, first }: Props) {
   return (
     <section className="relative isolate overflow-hidden pb-16 pt-32 sm:pt-40" style={accentStyle(data)}>
       <div className="beam absolute inset-0 -z-10" aria-hidden />
-      <div className="mx-auto grid max-w-7xl items-end gap-12 px-4 sm:px-6 lg:grid-cols-[1.25fr_1fr] lg:px-8">
+      <div className="mx-auto grid max-w-7xl items-end gap-12 px-5 sm:px-6 lg:grid-cols-[1.25fr_1fr] lg:px-8">
         <div className="pb-4">
           <Eyebrow text={data.eyebrow} />
           <Heading className={cn("display text-balance", heroTitleSize(data.title))}><Emphasis text={data.title} /></Heading>
@@ -100,7 +100,7 @@ export function PosterHero({ data, first, locale }: Props & { locale: Locale }) 
           <MediaImage image={data.image} sizes="100vw" priority={first} />
         </div>
       )}
-      <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+      <div className="mx-auto max-w-7xl px-5 sm:px-6 lg:px-8">
         <div className="flex flex-wrap items-center justify-between gap-4 border-b border-current/25 pb-5 font-mono text-xs uppercase tracking-[0.2em]">
           <span>{data.eyebrow ?? "EMSI"}</span>
           <span aria-hidden>{getDictionary(locale).hero.posterTagline}</span>
@@ -131,7 +131,7 @@ export function MosaicHero({ data, first }: Props) {
   return (
     <section className="relative isolate overflow-hidden pb-16 pt-32 sm:pt-40" style={accentStyle(data)}>
       <div className="beam absolute inset-0 -z-10" aria-hidden />
-      <div className="mx-auto grid max-w-7xl items-center gap-12 px-4 sm:px-6 lg:grid-cols-2 lg:px-8">
+      <div className="mx-auto grid max-w-7xl items-center gap-12 px-5 sm:px-6 lg:grid-cols-2 lg:px-8">
         <div>
           <Eyebrow text={data.eyebrow} />
           <Heading className={cn("display text-balance", heroTitleSize(data.title))}><Emphasis text={data.title} /></Heading>
@@ -163,7 +163,7 @@ export function CompactHero({ data, first }: Props) {
   return (
     <section className="relative isolate overflow-hidden pb-10 pt-32 sm:pt-36" style={accentStyle(data)}>
       <div className="beam absolute inset-0 -z-10 opacity-60" aria-hidden />
-      <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+      <div className="mx-auto max-w-7xl px-5 sm:px-6 lg:px-8">
         <Eyebrow text={data.eyebrow} />
         <Heading className="display text-[clamp(2.1rem,4.6vw,3.8rem)] text-balance"><Emphasis text={data.title} /></Heading>
         {data.subtitle && <p className="mt-5 max-w-2xl text-lg text-ink/80">{data.subtitle}</p>}

@@ -47,7 +47,7 @@ export function LanguageSwitcher({ className }: { className?: string }) {
                 aria-label={NAMES[locale]}
                 aria-current={active ? "true" : undefined}
                 onClick={(event) => onClick(event, locale)}
-                className={cn("grid min-h-9 min-w-10 place-items-center rounded-full px-2 transition", active ? "bg-ink text-night" : "text-ink/75 hover:text-ink")}
+                className={cn("grid min-h-9 min-w-10 place-items-center rounded-full px-2 transition pointer-coarse:min-h-11 pointer-coarse:min-w-11", active ? "bg-ink text-night" : "text-ink/75 hover:text-ink")}
               >
                 {locale.toUpperCase()}
               </a>

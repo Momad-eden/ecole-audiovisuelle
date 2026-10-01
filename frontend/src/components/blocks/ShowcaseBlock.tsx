@@ -46,7 +46,7 @@ export function ShowcaseBlock({ data }: { data: ShowcaseData }) {
 
   return (
     <section data-testid="showcase" className="relative py-20 sm:py-28">
-      <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+      <div className="mx-auto max-w-7xl px-5 sm:px-6 lg:px-8">
         <div className="mb-10 flex flex-wrap items-end justify-between gap-6 sm:mb-14">
           <div className="max-w-3xl">
             {data.eyebrow && <p className="cartel mb-4 flex items-center gap-3 text-[var(--accent-ink)]"><span className="h-px w-10 bg-[var(--accent-ink)]" aria-hidden />{data.eyebrow}</p>}

@@ -34,7 +34,7 @@ export function ProgramDetail({ program, applyHref, locale }: { program: Program
           <MediaImage image={program.cover} sizes="100vw" priority className="opacity-25" />
           <div className="absolute inset-0 bg-gradient-to-b from-night/30 to-night" />
         </div>
-        <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+        <div className="mx-auto max-w-7xl px-5 sm:px-6 lg:px-8">
           <p className="cartel">{[program.kindLabel, program.durationLabel].filter(Boolean).join(" · ")}</p>
           <h1 className="display mt-5 max-w-5xl text-[clamp(2.2rem,5vw,4.4rem)] text-balance">{program.title}</h1>
           {program.levelLabel && <p className="mt-4 text-lg text-[var(--accent-ink)]">{program.levelLabel}</p>}

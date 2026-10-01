@@ -87,9 +87,10 @@ export function FilmHero({ data, first }: { data: HeroData; first: boolean }) {
       {/* Grain de pellicule et vignettage : ambiance cinéma, et des photos de petite taille moins visiblement floues. */}
       <div className="film-grain absolute inset-0 -z-10" aria-hidden />
 
-      <div className="mx-auto w-full max-w-7xl px-4 pb-14 pt-40 sm:px-6 sm:pb-20 lg:px-8">
+      {/* Espacements sur une échelle de 8 px ; plus d'air sur téléphone (ui-ux-pro-max : spacing-scale, touch-density). */}
+      <div className="mx-auto w-full max-w-7xl px-5 pb-10 pt-40 sm:px-6 sm:pb-20 lg:px-8">
         {data.eyebrow && (
-          <p className="film-rise cartel mb-6 flex items-center gap-3 text-ink/85" style={{ animationDelay: "100ms" }}>
+          <p className="film-rise cartel mb-8 flex items-center gap-3 text-ink/85 sm:mb-6" style={{ animationDelay: "100ms" }}>
             <span className="relative flex size-2" aria-hidden>
               <span className="absolute inline-flex size-full rounded-full bg-[var(--accent)] opacity-60 motion-safe:animate-ping" />
               <span className="relative inline-flex size-2 rounded-full bg-[var(--accent)]" />
@@ -97,7 +98,7 @@ export function FilmHero({ data, first }: { data: HeroData; first: boolean }) {
             {data.eyebrow}
           </p>
         )}
-        <Heading className="display max-w-6xl text-balance text-[clamp(2.8rem,7vw,7.2rem)] leading-[0.95]">
+        <Heading className="display max-w-6xl text-balance text-[clamp(2.5rem,7vw,7.2rem)] leading-[1.02] sm:leading-[0.95]">
           {words.map((word, i) => (
             <span key={i}>
               <span className="inline-block overflow-hidden pb-[0.06em] align-bottom">
@@ -110,14 +111,15 @@ export function FilmHero({ data, first }: { data: HeroData; first: boolean }) {
           ))}
         </Heading>
         {data.subtitle && (
-          <p className="film-rise mt-7 max-w-2xl text-lg text-ink/85 sm:text-xl" style={{ animationDelay: `${300 + words.length * 70}ms` }}>
+          <p className="film-rise mt-6 max-w-[34ch] text-lg leading-relaxed text-ink/85 sm:mt-7 sm:max-w-2xl sm:text-xl" style={{ animationDelay: `${300 + words.length * 70}ms` }}>
             {frenchSpacing(data.subtitle)}
           </p>
         )}
 
-        <div className="film-rise mt-10 flex flex-wrap items-center gap-3" style={{ animationDelay: `${420 + words.length * 70}ms` }}>
+        {/* Téléphone : boutons pleine largeur, empilés à 12 px d'écart ; à partir de 640 px, côte à côte. */}
+        <div className="film-rise mt-10 flex flex-col gap-3 sm:flex-row sm:flex-wrap sm:items-center" style={{ animationDelay: `${420 + words.length * 70}ms` }}>
           {(data.buttons ?? []).map((button) => (
-            <ButtonLink key={button.url + button.label} href={button.url} size="lg" variant={button.style === "secondary" ? "secondary" : "primary"}>{button.label}</ButtonLink>
+            <ButtonLink key={button.url + button.label} href={button.url} size="lg" variant={button.style === "secondary" ? "secondary" : "primary"} className="justify-center max-sm:w-full">{button.label}</ButtonLink>
           ))}
           {film && (
             <button type="button" onClick={() => setFilmOpen(true)} className="group inline-flex min-h-12 items-center gap-3 rounded-full py-1.5 pl-1.5 pr-5 text-sm font-semibold text-ink transition hover:bg-ink/10">
@@ -130,7 +132,7 @@ export function FilmHero({ data, first }: { data: HeroData; first: boolean }) {
         </div>
 
         {/* Sous 1024 px, la marge droite laisse la place au bouton WhatsApp flottant. */}
-        <div className="mt-12 flex items-center justify-between gap-4 border-t border-ink/15 pt-5 max-lg:pr-16 sm:mt-14">
+        <div className="mt-12 flex items-center justify-between gap-4 border-t border-ink/15 pt-6 max-lg:pr-16 sm:mt-14 sm:pt-5">
           <a href="#apres-film" className="group inline-flex items-center gap-3 text-sm text-ink/75 transition hover:text-ink">
             <span className="grid size-9 place-items-center rounded-full border border-ink/25 transition group-hover:border-ink/60">
               <ArrowDown className="size-4 motion-safe:animate-bounce" aria-hidden />

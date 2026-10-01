@@ -86,7 +86,7 @@ export function StageHero({ data, first, variant = "stage" }: { data: HeroData; 
         <div className="absolute inset-x-0 bottom-[22%] h-px bg-gradient-to-r from-transparent via-ink/20 to-transparent" />
       </div>
 
-      <div className="mx-auto w-full max-w-7xl px-4 sm:px-6 lg:px-8">
+      <div className="mx-auto w-full max-w-7xl px-5 sm:px-6 lg:px-8">
         {data.eyebrow && (
           <p className="cartel mb-6 flex items-center gap-3 text-ink/80">
             <span className="h-px w-10 bg-brand" aria-hidden />

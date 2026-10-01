@@ -19,7 +19,7 @@ export function InstitutionBlock({ data, locale }: { data: InstitutionData; loca
 
   return (
     <section data-testid="institution" className="relative isolate border-y border-line bg-night-2 py-24 sm:py-32">
-      <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+      <div className="mx-auto max-w-7xl px-5 sm:px-6 lg:px-8">
         <Reveal className="grid gap-10 lg:grid-cols-[1.4fr_1fr] lg:items-end">
           <div>
             {data.eyebrow && <p className="cartel mb-5 flex items-center gap-3 text-[var(--accent-ink)]"><span className="h-px w-10 bg-[var(--accent-ink)]" aria-hidden />{data.eyebrow}</p>}

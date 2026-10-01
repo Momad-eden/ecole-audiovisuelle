@@ -18,7 +18,7 @@ export function StatementBlock({ data }: { data: StatementData }) {
   return (
     <section data-testid="statement" className="relative isolate overflow-hidden py-24 sm:py-32">
       <div className="absolute inset-x-0 top-0 -z-10 h-[70%] bg-[radial-gradient(60%_80%_at_20%_0%,color-mix(in_oklab,var(--accent)_14%,transparent),transparent_70%)]" aria-hidden />
-      <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+      <div className="mx-auto max-w-7xl px-5 sm:px-6 lg:px-8">
         <Reveal className="grid gap-8 lg:grid-cols-[1fr_auto] lg:items-end">
           <div className="max-w-5xl">
             {data.eyebrow && <p className="cartel mb-6 flex items-center gap-3 text-[var(--accent-ink)]"><span className="h-px w-10 bg-[var(--accent-ink)]" aria-hidden />{data.eyebrow}</p>}

@@ -32,7 +32,7 @@ export function DomainsBlock({ data, first, pageTitle, locale }: { data: Domains
           {intro && <h2 className="display max-w-3xl text-balance text-[clamp(2.2rem,4.4vw,3.6rem)]"><Emphasis text={intro} /></h2>}
           {!intro && <h2 className="sr-only">{dictionary.label}</h2>}
         </div>
-        <ul className="mx-auto grid max-w-7xl gap-4 px-4 sm:px-6 lg:grid-cols-3 lg:gap-5 lg:px-8">
+        <ul className="mx-auto grid max-w-7xl gap-4 px-5 sm:px-6 lg:grid-cols-3 lg:gap-5 lg:px-8">
           {panels.map((panel, index) => <li key={`${panel.domain}-${index}`}><DomainCard panel={panel} index={index} /></li>)}
         </ul>
       </section>

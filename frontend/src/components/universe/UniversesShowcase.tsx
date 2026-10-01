@@ -121,7 +121,7 @@ export function UniversesShowcase({ universes, eyebrow, title, text }: Props) {
                 className="relative overflow-hidden"
             >
                 <div className="flex min-h-svh flex-col justify-center py-20 lg:pb-8 lg:pt-24">
-                    <header className="mx-auto w-full max-w-7xl px-4 sm:px-6 lg:px-8">
+                    <header className="mx-auto w-full max-w-7xl px-5 sm:px-6 lg:px-8">
                         <div className="flex flex-wrap items-end justify-between gap-6">
                             <div className="max-w-4xl">
                                 {eyebrow && (
@@ -161,7 +161,7 @@ export function UniversesShowcase({ universes, eyebrow, title, text }: Props) {
 
                     <div
                         ref={trackRef}
-                        className="universe-track mt-10 grid gap-5 px-4 sm:px-6 lg:mt-8 lg:grid-cols-2 lg:px-8"
+                        className="universe-track mt-10 grid gap-5 px-5 sm:px-6 lg:mt-8 lg:grid-cols-2 lg:px-8"
                     >
                         {universes.map((universe, index) => (
                             <UniversePanel
