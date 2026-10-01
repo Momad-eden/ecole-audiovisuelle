@@ -27,7 +27,7 @@
 - Le **Grand Théâtre National Doudou Ndiaye Coumba Rose est un partenaire** qui accueille le campus de Dakar ; ce n'est pas un domaine.
 - Le projet EMSI × Grand Théâtre (Volet 1 + BTS par la VAE) s'adresse à des **professionnels** ; il vit dans sa rubrique `/emsi/professionnels` et ne domine ni l'accueil ni le menu.
 - Navigation principale : **Accueil · Maison Habib Faye ▾ · EMSI ▾ · Candidater** (sous-menus au clic et au clavier, accordéon sur téléphone, fil d'Ariane et sous-navigation de domaine). L'accueil commence par le triptyque « Nos trois maisons ».
-- **À venir (R2)** : site **bilingue français / anglais**, à faire avant le style des titres et le paiement mensuel.
+- **Site bilingue (R2)** : français à la racine, anglais sous `/en/…` aux mêmes chemins, sélecteur FR · EN, jamais de redirection automatique selon la langue du navigateur. L'anglais est proposé par **DeepL API Free** (aucun service payant, garde-fou à 95 % du quota mensuel) et **relu par l'équipe** dans l'onglet « Anglais » de chaque fiche ; sans clé DeepL, tout reste utilisable (saisie manuelle, repli français). Une traduction relue n'est jamais écrasée tant que son texte français n'a pas changé (suivi texte par texte pour les blocs, listes et référencement). L'admin reste en français.
 - Les anciennes adresses (`/formations`, `/studio`, `/ecole`, `/agenda`, `/events`, `/musee`, `/demande`…) sont redirigées en une fois vers les nouvelles.
 
 ### B. Tout est administrable par un non-informaticien
@@ -105,9 +105,10 @@ php artisan emsi:impact-live     # ajouter Impact Live et le campus de Saint-Lou
 php artisan emsi:site-v3         # page L'École à deux campus, chiffres clés et agenda sur l'accueil (relançable)
 php artisan emsi:site-v4 [--home] [--force]  # site des trois domaines : adresses, menus, pied de page, pages à compléter ; --home remplace l'accueil. Premier passage noté (settings.site_version = 4) : relancée, elle ne refait que les liens et la page EMSI ; --force reprend tout
 php artisan emsi:domains-showcase  # pages d'essai des nouveaux blocs pour Playwright (--remove pour les retirer ; créées et supprimées par les tests)
+php artisan emsi:translate [--model=] [--dry-run] [--force]  # traduction anglaise de lancement (DeepL gratuit) : décompte des caractères et du quota, puis mise en file ; ce qui dépasse le quota reprend tout seul au renouvellement
 ./vendor/bin/pint
 
-# Tout lancer en local (Laravel :8000, file d'attente, site :3000)
+# Tout lancer en local (Laravel :8000, file d'attente, site :3000 — ou :3001 si le port est pris ; FRONTEND_URL doit pointer dessus)
 composer dev
 
 # Frontend seul
@@ -115,11 +116,12 @@ cd frontend && npm install && npm run dev
 npm run lint && npm run build
 ```
 
-## 8. État du projet (au 30/09/2026)
+## 8. État du projet (au 01/10/2026)
 
 - **Code terminé** : PR #1 à #9 fusionnées dans `main` (site « Plein feux » avec thème clair, univers, Impact Live, deux campus et deux caisses, héros « Œuvre d'art » avec son, choix des liens dans l'admin, titres lisibles quelle que soit la couleur, guide de déploiement corrigé, PHP 8.4 minimum). Suites vertes : 104 tests Laravel (SQLite et MySQL), 6 tests unitaires (`npm test`), 26 parcours Playwright.
 - **Héros (branche `feat/heros-projection-studio-cinema`, 29/09/2026)** : nouvelles mises en page *Projection* (photo de fond, rubans, poursuite) et *Cinéma* (diaporama et chiffres clés) ; *Studio* refait (points posés sur le matériel dans l'admin via `HotspotPicker`, 1 à 3 morceaux à écouter). *Œuvre d'art* inchangée. Les héros sur photo gardent une palette de nuit en thème clair (`.scene-dark`). Pages d'essai e2e : `php artisan emsi:hero-showcase` (créées puis supprimées par Playwright, jamais par `db:seed`). Suites : 116 tests Laravel (SQLite et MySQL), 12 tests unitaires, 44 parcours Playwright (le serveur local de l'EMSI tourne sur le port 3001 : `E2E_BASE_URL=http://localhost:3001 npm run e2e`). Suite de la demande de Momar : 2. style des titres et textes dans l'admin, 4. passe visuelle, 3. paiement mensuel des étudiants.
 - **Trois domaines (R1, branche `feat/trois-domaines`, 30/09/2026)** : terminé et vérifié en local (`emsi:site-v4 --home` appliqué à la base locale). Suites : 231 tests Laravel (SQLite et MySQL), 40 tests unitaires (`npm test`), 88 parcours Playwright (bureau et téléphone ; 8 ignorés selon l'écran ou les données). Suite : **R2 site bilingue FR/EN**, puis 2. style des titres, 3. paiement mensuel. Restes connus : **photos de la Maison à fournir** (puis un héros Cinéma sur l'accueil), textes « À compléter » à remplacer dans l'admin (agenda, espaces, campus, mission, partenaires, soutenir, presse), relancer `php artisan migrate` puis `emsi:site-v4` sur la base locale pour poser le repère de version et compléter la page EMSI (univers, réalisations ; `/univers` → `/emsi#univers`).
+- **Site bilingue (R2, branche `feat/bilingue`, 01/10/2026)** : table `translations` (suivi par texte, statuts « Traduction automatique » / « Relue » / « Échec »), traduction DeepL gratuite en file d'attente à chaque publication, onglet « Anglais » et liste « Traductions à relire » dans l'admin, API `?locale=en`, site sous `[locale]` avec dictionnaires typés, sélecteur FR · EN et référencement bilingue (hreflang, plan du site, JSON-LD). Migrations R2 appliquées à la base locale. À faire par l'école : créer un compte **DeepL API Free**, mettre `DEEPL_API_KEY` dans `.env`, puis `php artisan emsi:translate` ; relire les traductions. Ensuite : 2. style des titres, 3. paiement mensuel.
 - **Prochaine étape — mise en ligne** : l'EMSI réserve `emsi.sn` (bureau d'enregistrement accrédité NIC Sénégal) et commande un OVHcloud VPS-2 (Ubuntu 24.04). Ensuite installation selon `DEPLOYMENT.md`, en **transférant la base et `storage/app` locales** (le contenu y est déjà saisi, déjà mis à niveau), pas en repartant d'un `db:seed` ; sur un `db:seed`, lancer `migrate` puis `emsi:site-v4 --home`.
 - **Attendu de l'école** : photos, tarifs du studio, matériel à louer, dates de rentrée, coordonnées des quatre lieux, mentions légales, comptes de l'équipe, boîtes mail.
 - **Documents** : présentation du site à Boubacar Tall et guide de mise en ligne (domaine, serveur, e-mails, budget), publiés comme pages privées claude.ai ; guide de l'équipe `docs/GUIDE-ADMIN.md`.

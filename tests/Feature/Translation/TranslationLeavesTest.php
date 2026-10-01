@@ -110,7 +110,8 @@ class TranslationLeavesTest extends TestCase
         $page = $this->publishedPage();
 
         $leaves = $this->row($page, 'blocks')->leaves;
-        $this->assertSame(['hero#0:title', 'hero#0:subtitle', 'text#0:body'], array_keys($leaves));
+        // MySQL réordonne les clés d'un JSON stocké : on compare l'ensemble des clés, pas leur ordre.
+        $this->assertEqualsCanonicalizing(['hero#0:title', 'hero#0:subtitle', 'text#0:body'], array_keys($leaves));
         $this->assertSame(['h' => hash('sha256', 'Bienvenue'), 's' => 'auto'], $leaves['hero#0:title']);
     }
 

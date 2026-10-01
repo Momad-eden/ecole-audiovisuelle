@@ -77,6 +77,8 @@ DB_USERNAME=emsi
 DB_PASSWORD=********
 
 QUEUE_CONNECTION=database
+# Traduction anglaise automatique (DeepL API Free, gratuite) ; vide = traduction à la main dans l'admin
+DEEPL_API_KEY=
 SESSION_SECURE_COOKIE=true
 LOG_LEVEL=warning
 
@@ -205,7 +207,7 @@ WantedBy=multi-user.target
 
 ## 8. File d'attente et tâches planifiées
 
-`/etc/systemd/system/emsi-queue.service` (formes d'onde, e-mails) :
+`/etc/systemd/system/emsi-queue.service` (formes d'onde, e-mails, **traductions anglaises** — sans ce service, rien n'est traduit) :
 
 ```ini
 [Unit]
@@ -226,6 +228,13 @@ Crontab de `www-data` : `* * * * * cd /var/www/emsi && php artisan schedule:run 
 
 ```bash
 sudo systemctl daemon-reload && sudo systemctl enable --now emsi-web emsi-queue
+```
+
+Traduction anglaise de lancement (une fois, après avoir mis `DEEPL_API_KEY`) :
+
+```bash
+php artisan emsi:translate --dry-run   # décompte des caractères et du quota gratuit, rien n'est envoyé
+php artisan emsi:translate             # met en file ; ce qui dépasse le quota du mois reprend tout seul au renouvellement
 ```
 
 ## 9. E-mails : enregistrements DNS

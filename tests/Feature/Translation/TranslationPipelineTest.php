@@ -107,7 +107,7 @@ class TranslationPipelineTest extends TestCase
         ], $map);
 
         $seo = json_decode($this->row($page, 'seo')->value, true);
-        $this->assertSame(['title' => 'EN: Titre Google', 'description' => 'EN: Description Google', 'image' => 'seo.jpg'], $seo);
+        $this->assertEquals(['title' => 'EN: Titre Google', 'description' => 'EN: Description Google', 'image' => 'seo.jpg'], $seo); // ordre des clés libre (MySQL)
 
         // Le HTML part en mode HTML, le reste en texte.
         $htmlTexts = [];
@@ -121,7 +121,7 @@ class TranslationPipelineTest extends TestCase
 
         $this->assertSame([], $page->fresh()->outdatedFields('en'));
         // Le français ne bouge pas.
-        $this->assertSame($this->blocks(), $page->fresh()->blocks);
+        $this->assertEquals($this->blocks(), $page->fresh()->blocks); // ordre des clés libre (MySQL)
     }
 
     public function test_publishing_dispatches_one_job(): void
@@ -520,9 +520,9 @@ class TranslationPipelineTest extends TestCase
         $row = DB::table('settings')->first();
         $this->assertEquals(1, $row->auto_translate);
         $glossary = json_decode($row->translation_glossary, true);
-        $this->assertContains(['fr' => 'EMSI', 'en' => 'EMSI'], $glossary);
-        $this->assertContains(['fr' => 'Grand Théâtre National Doudou Ndiaye Coumba Rose', 'en' => 'Grand Théâtre National Doudou Ndiaye Coumba Rose'], $glossary);
-        $this->assertContains(['fr' => 'VAE', 'en' => 'Recognition of Prior Learning (VAE)'], $glossary);
+        $this->assertContainsEquals(['fr' => 'EMSI', 'en' => 'EMSI'], $glossary);
+        $this->assertContainsEquals(['fr' => 'Grand Théâtre National Doudou Ndiaye Coumba Rose', 'en' => 'Grand Théâtre National Doudou Ndiaye Coumba Rose'], $glossary);
+        $this->assertContainsEquals(['fr' => 'VAE', 'en' => 'Recognition of Prior Learning (VAE)'], $glossary);
         $this->assertCount(9, $glossary);
     }
 
@@ -548,7 +548,7 @@ class TranslationPipelineTest extends TestCase
 
         $setting = Setting::current()->fresh();
         $this->assertSame('gl-new', $setting->deepl_glossary_id);
-        $this->assertSame([['fr' => 'EMSI', 'en' => 'EMSI'], ['fr' => 'filière', 'en' => 'programme track']], $setting->translation_glossary);
+        $this->assertEquals([['fr' => 'EMSI', 'en' => 'EMSI'], ['fr' => 'filière', 'en' => 'programme track']], $setting->translation_glossary);
         Http::assertSent(fn (Request $r) => str_ends_with($r->url(), '/v2/glossaries')
             && $r['entries'] === "EMSI\tEMSI\nfilière\tprogramme track");
     }
@@ -577,7 +577,7 @@ class TranslationPipelineTest extends TestCase
         $setting = Setting::current()->fresh();
         $this->assertSame('+221 33 111 11 11', $setting->phone);
         $this->assertFalse($setting->auto_translate);
-        $this->assertSame([['fr' => 'filière', 'en' => 'track']], $setting->translation_glossary);
+        $this->assertEquals([['fr' => 'filière', 'en' => 'track']], $setting->translation_glossary);
     }
 
     public function test_settings_page_without_translator_explains_manual_translation(): void

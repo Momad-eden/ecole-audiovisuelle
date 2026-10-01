@@ -201,6 +201,19 @@ Sélectionnez le texte, puis choisissez. Les polices, tailles et couleurs sont v
 - **Ancienne adresse d'une page** : Site › Redirections (ex. `/ancienne-page` → `/nouvelle-page`).
 - **Créer un compte pour un collègue** (directeur) : Administration › Comptes utilisateurs › Nouveau compte. Un compte qui part se **désactive** (il n'est pas supprimé).
 
+## Le site en anglais
+
+Le site existe en français (adresses habituelles) et en anglais (mêmes adresses précédées de `/en`). Les visiteurs changent de langue avec **FR · EN** en haut de page.
+
+- **D'où vient l'anglais** : à chaque publication, le texte français est envoyé à DeepL (service de traduction gratuit) et l'anglais apparaît sur le site quelques instants plus tard, marqué « Traduction automatique ».
+- **Relire** : *Site › Traductions à relire* liste ce qui n'a pas encore été relu. Ouvrez une fiche, onglet **Anglais** : le français à gauche, l'anglais à droite. Corrigez puis enregistrez (le texte passe « Relue »), ou cliquez **Marquer comme relue** s'il convient. **Retraduire** redemande une traduction.
+- **Une traduction relue n'est jamais remplacée** tant que le texte français correspondant ne change pas. Si vous modifiez ce français, une nouvelle traduction est proposée et l'ancienne version relue reste visible (« Ancienne version relue »).
+- **Vider un texte anglais** : le site affiche alors le français à cet endroit.
+- **Lexique** (*Paramètres du site › Traduction anglaise*) : les noms à ne jamais traduire (EMSI, Impact Live Studio, Maison de la culture Habib Faye…) et les traductions imposées (« VAE » → « Recognition of Prior Learning (VAE) »). Ajoutez-y vos termes.
+- **Quota gratuit** : 500 000 caractères par mois, affichés dans les paramètres et sur le tableau de bord. S'il est atteint, les traductions reprennent toutes seules quand il se renouvelle.
+- **Sans compte DeepL** : tout fonctionne, mais l'anglais se saisit à la main dans l'onglet **Anglais** ; tant qu'un texte n'est pas traduit, le site anglais montre le français.
+- **Créer le compte DeepL (une fois)** : sur deepl.com, offre « DeepL API Free » (une carte bancaire peut être demandée pour vérifier l'identité, rien n'est prélevé dans l'offre gratuite) ; copiez la clé d'authentification et donnez-la au référent technique, qui l'ajoute au serveur (`DEEPL_API_KEY`).
+
 ## En cas de problème
 
 - Un message rouge s'affiche en haut à droite : lisez-le, il explique ce qui manque (ex. « Cette catégorie ne correspond pas à un encaissement »).
