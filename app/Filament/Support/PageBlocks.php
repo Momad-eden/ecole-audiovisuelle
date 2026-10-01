@@ -39,7 +39,7 @@ final class PageBlocks
             self::partners(), self::professionalSpace(), self::contact(),
             self::ecosystem(), self::services(), self::productions(),
             self::agenda(), self::bookingForm(), self::places(), self::campuses(),
-            self::domains(), self::campusPrograms(), self::downloads(), self::supportForm(),
+            self::domains(), self::campusPrograms(), self::downloads(), self::supportForm(), self::showcase(),
         ];
     }
 
@@ -218,6 +218,7 @@ final class PageBlocks
                 ->acceptedFileTypes(['video/mp4', 'video/webm'])->maxSize(20480)
                 ->helperText('MP4 court et léger (moins de 20 Mo). Remplacé par l\'image si l\'internaute limite les animations.'),
             Radio::make('layout')->label('Mise en page')->options([
+                'film' => 'Film (vidéo plein écran, grande phrase, idéal pour l\'accueil)',
                 'masterpiece' => 'Œuvre d\'art (rubans de lumière interactifs, titre-image, cartel)',
                 'projection' => 'Projection (photo de fond, rubans de lumière, cartel)',
                 'cinema' => 'Cinéma (diaporama plein écran et chiffres clés)',
@@ -232,6 +233,10 @@ final class PageBlocks
                 'full' => 'Plein écran',
                 'split' => 'Texte et image côte à côte',
             ])->default('stage')->inline()->live(),
+            TextInput::make('film_url')->label('Film complet (lien YouTube ou Vimeo, facultatif)')->url()
+                ->regex('#^https?://(www\.)?(youtube\.com|youtu\.be|vimeo\.com)/#i')
+                ->helperText('Ajoute un bouton « Voir le film » qui ouvre la vidéo avec le son. La boucle muette ci-dessus tourne en fond.')
+                ->visible(fn ($get) => $get('layout') === 'film'),
             TagsInput::make('words')->label('Mots qui défilent à la fin du titre')->placeholder('Ex. le son')
                 ->helperText('Scène animée uniquement : le titre se termine par ces mots, l\'un après l\'autre. Laissez vide pour un titre fixe.')
                 ->visible(fn ($get) => in_array($get('layout'), ['stage', 'events'], true)),
@@ -241,9 +246,11 @@ final class PageBlocks
             self::audioUpload('sound', 'Son de l\'œuvre (facultatif)')
                 ->helperText('Joué en boucle quand le visiteur clique « Écouter l\'œuvre » ; sa main le déplace entre les enceintes et le rend plus ou moins brillant. Idéal : une nappe ou un extrait de 20 à 60 secondes, qui boucle sans coupure (MP3, 20 Mo maximum). Sans fichier, un son synthétique suit la main.')
                 ->visible(fn ($get) => in_array($get('layout'), ['masterpiece', 'projection'], true)),
-            FileUpload::make('images')->label('Photos de la mosaïque (3 ou 4)')->image()->multiple()->reorderable()->maxFiles(4)
+            FileUpload::make('images')->label(fn ($get) => $get('layout') === 'film' ? 'Photos qui défilent (sans vidéo, 2 à 4)' : 'Photos de la mosaïque (3 ou 4)')
+                ->image()->multiple()->reorderable()->maxFiles(4)
                 ->disk('public')->directory('pages')->maxSize(8192)
-                ->visible(fn ($get) => $get('layout') === 'mosaic'),
+                ->helperText(fn ($get) => $get('layout') === 'film' ? 'Utilisées tant qu\'aucune boucle vidéo n\'est déposée : elles se succèdent en fondu, avec un lent zoom. Grandes photos de préférence (au moins 1920 px de large).' : null)
+                ->visible(fn ($get) => in_array($get('layout'), ['mosaic', 'film'], true)),
             TextInput::make('caption')->label('Légende de la photo')->maxLength(120)
                 ->visible(fn ($get) => in_array($get('layout'), ['masterpiece', 'projection', 'editorial', 'mosaic', 'poster'], true))
                 ->helperText('Œuvre d\'art et Projection : le titre du cartel de musée. Éditorial, mosaïque, affiche : la légende de la photo.'),
@@ -519,5 +526,27 @@ final class PageBlocks
             'clapperboard' => 'Régie / spectacle', 'graduation-cap' => 'Diplôme', 'users' => 'Équipe', 'award' => 'Certification',
             'calendar' => 'Calendrier', 'map-pin' => 'Lieu', 'briefcase' => 'Métier', 'sparkles' => 'Excellence',
         ];
+    }
+
+    private static function showcase(): Block
+    {
+        return Block::make('showcase')->label('Vitrine photos et vidéos')->icon('heroicon-o-play-circle')->schema([
+            TextInput::make('eyebrow')->label('Surtitre')->maxLength(60),
+            TextInput::make('title')->label('Titre')->required()->maxLength(80),
+            Textarea::make('text')->label('Texte')->rows(2)->maxLength(300),
+            Repeater::make('items')->label('Photos et vidéos')->minItems(1)->maxItems(12)->defaultItems(0)->grid(2)
+                ->addActionLabel('Ajouter une photo ou une vidéo')
+                ->helperText('La première occupe la grande case. Une vidéo joue en boucle, sans le son, quand elle apparaît à l\'écran ; le visiteur l\'agrandit pour l\'écouter.')
+                ->schema([
+                    ...self::image('image', 'Photo (ou image d\'aperçu de la vidéo)', true),
+                    FileUpload::make('video')->label('Vidéo (facultatif)')->disk('public')->directory('pages/video')
+                        ->acceptedFileTypes(['video/mp4', 'video/webm'])->maxSize(51200)
+                        ->helperText('MP4 de moins de 50 Mo ; quelques dizaines de secondes suffisent.'),
+                    TextInput::make('caption')->label('Légende')->maxLength(120),
+                    LinkTargets::field('url', 'Lien (facultatif)'),
+                ]),
+            TextInput::make('button_label')->label('Texte du bouton (facultatif)')->maxLength(40),
+            LinkTargets::field('button_url', 'Lien du bouton')->required(fn ($get) => filled($get('button_label'))),
+        ]);
     }
 }

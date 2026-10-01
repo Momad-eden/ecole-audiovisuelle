@@ -5,6 +5,7 @@ import { MediaImage } from "@/components/ui/MediaImage";
 import { RichText } from "@/components/ui/RichText";
 import { Section, SectionTitle } from "@/components/ui/Section";
 import { VideoEmbed } from "@/components/ui/VideoEmbed";
+import { CountUp } from "@/components/motion/CountUp";
 import { Reveal } from "@/components/motion/Reveal";
 import { getDictionary } from "@/lib/i18n";
 import type { Locale } from "@/lib/i18n/locales";
@@ -86,12 +87,14 @@ export function StatsBlock({ data }: BlockProps<StatsData>) {
   return (
     <Section>
       <SectionTitle title={data.title} />
-      <dl className={cn("grid gap-px overflow-hidden rounded-3xl border border-line bg-line sm:grid-cols-2", (data.items ?? []).length === 3 && "lg:grid-cols-3", (data.items ?? []).length >= 4 && "lg:grid-cols-4")}>
+      <dl className={cn("grid border-y border-line sm:grid-cols-2", (data.items ?? []).length === 3 && "lg:grid-cols-3", (data.items ?? []).length >= 4 && "lg:grid-cols-4")}>
         {(data.items ?? []).map((item, i) => (
-          <Reveal key={item.label} delay={i * 100} className="bg-night p-8 sm:p-10">
-            <dt className="cartel">{item.label}</dt>
-            <dd className="display mt-4 text-[clamp(3rem,6vw,4.8rem)] text-[var(--accent-ink)]">{item.value}</dd>
-            {item.detail && <dd className="mt-3 text-sm text-ink-muted">{item.detail}</dd>}
+          <Reveal key={item.label} delay={i * 100} className={cn("relative flex flex-col py-10 sm:px-8 sm:py-12", i > 0 && "border-t border-line sm:border-t-0 sm:border-l")}>
+            <dt className="cartel order-2 mt-5 text-ink">{item.label}</dt>
+            <dd className="display order-1 text-[clamp(3.6rem,8vw,7rem)] leading-none text-[var(--accent-ink)]">
+              <CountUp value={item.value} />
+            </dd>
+            {item.detail && <dd className="order-3 mt-2 max-w-xs text-sm text-ink-muted">{item.detail}</dd>}
           </Reveal>
         ))}
       </dl>

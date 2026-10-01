@@ -24,7 +24,8 @@ export function DomainsBlock({ data, first, pageTitle, locale }: { data: Domains
       data-testid="domains-block"
       data-first={first || undefined}
       aria-label={intro ? undefined : getDictionary(locale).domains.label}
-      className="scene-dark relative isolate flex flex-col overflow-hidden bg-night lg:h-[100svh] lg:min-h-[40rem]"
+      // Ouverture de page : plein écran ; après un film d'ouverture, un peu moins haut pour inviter à poursuivre.
+      className={cn("scene-dark relative isolate flex flex-col overflow-hidden bg-night lg:min-h-[40rem]", first ? "lg:h-[100svh]" : "lg:h-[82svh]")}
     >
       {intro ? (
         <div className="order-last border-t border-line bg-night px-6 py-8 sm:px-10 lg:py-10">

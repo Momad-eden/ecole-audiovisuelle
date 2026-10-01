@@ -70,6 +70,9 @@ class BlockResolver
             'gallery' => [...$data, 'images' => collect($data['images'] ?? [])->map(fn ($item) => [
                 ...$this->withImages($item),
             ])->values()->all()],
+            'showcase' => [...$data, 'items' => collect($data['items'] ?? [])->map(fn ($item) => [
+                ...$this->withImages($item), 'video' => Media::url($item['video'] ?? null),
+            ])->filter(fn ($item) => $item['image'])->values()->all()],
             'audio' => [...$data, 'tracks' => $this->tracks($data['tracks'] ?? [])],
             'faq' => [...$data, 'items' => Faq::where('group', $data['group'] ?? 'general')->where('is_visible', true)
                 ->with(Localized::eager())->orderBy('position')->get()

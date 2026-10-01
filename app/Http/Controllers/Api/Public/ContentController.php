@@ -89,6 +89,8 @@ class ContentController extends Controller
                 'label' => Localized::value($i, 'label'),
                 'url' => $i->url,
                 'isButton' => $i->is_button,
+                'description' => Localized::value($i, 'description') ?: null,
+                'image' => Media::image($i->image, Localized::value($i, 'label')),
                 'children' => ($children[$i->id] ?? collect())->map(fn (MenuItem $c) => [
                     'label' => Localized::value($c, 'label'),
                     'url' => $c->url,

@@ -6,7 +6,7 @@ export type Image = { url: string; alt: string };
 export type MenuChild = { label: string; url: string; description?: string | null };
 
 /** Entrée du menu ; `children` : sous-menu d'un niveau (vide pour les liens simples). */
-export type MenuLink = { label: string; url: string; isButton: boolean; children?: MenuChild[] };
+export type MenuLink = { label: string; url: string; isButton: boolean; description?: string | null; image?: Image | null; children?: MenuChild[] };
 
 /** Les trois domaines de la Maison, plus le domaine général (accueil, contact…). */
 export type DomainKey = "general" | "maison" | "emsi" | "studio";

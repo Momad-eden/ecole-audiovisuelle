@@ -10,7 +10,7 @@ export type Hotspot = { x: number; y: number; label: string };
 export type HeroTrack = { title: string; credits?: string | null; url: string | null };
 export type CinemaSlide = { eyebrow?: string | null; title: string; image: Image; link?: { label: string; url: string } | null };
 
-export type HeroData = { eyebrow?: string; title: string; subtitle?: string; image?: Image | null; videoLoop?: string | null; layout?: "masterpiece" | "projection" | "cinema" | "stage" | "studio" | "events" | "spotlight" | "editorial" | "poster" | "mosaic" | "compact" | "full" | "split"; words?: string[]; images?: Image[]; caption?: string; sound?: string | null; accent?: string | null; buttons?: ButtonData[]; highlight?: string | null; hotspots?: Hotspot[]; tracks?: HeroTrack[]; slides?: CinemaSlide[]; facts?: { value: string; label: string }[] };
+export type HeroData = { eyebrow?: string; title: string; subtitle?: string; image?: Image | null; videoLoop?: string | null; filmUrl?: string | null; layout?: "film" | "masterpiece" | "projection" | "cinema" | "stage" | "studio" | "events" | "spotlight" | "editorial" | "poster" | "mosaic" | "compact" | "full" | "split"; words?: string[]; images?: Image[]; caption?: string; sound?: string | null; accent?: string | null; buttons?: ButtonData[]; highlight?: string | null; hotspots?: Hotspot[]; tracks?: HeroTrack[]; slides?: CinemaSlide[]; facts?: { value: string; label: string }[] };
 export type MarqueeData = { words?: string[] };
 export type VenueData = { eyebrow?: string; title: string; text?: string; image?: Image | null; facts?: { value: string; label: string }[]; buttons?: ButtonData[] };
 export type EquipmentData = { title?: string; text?: string; groups?: { category: string; items?: string[]; image?: Image | null }[] };
@@ -39,3 +39,5 @@ export type CampusProgramsData = { title?: string | null; campus: { id: number; 
 export type DownloadFile = { title: string; description?: string | null; url: string; size: number; extension: string };
 export type DownloadsData = { title?: string | null; files?: DownloadFile[] };
 export type SupportFormData = { title?: string | null; text?: string | null };
+export type ShowcaseItem = { image: Image; video?: string | null; caption?: string | null; url?: string | null };
+export type ShowcaseData = { eyebrow?: string | null; title: string; text?: string | null; items?: ShowcaseItem[]; buttonLabel?: string | null; buttonUrl?: string | null };

@@ -1,6 +1,7 @@
 import { LocaleLink } from "@/components/i18n/LocaleLink";
 import { ArrowRight } from "lucide-react";
 import { ButtonLink } from "@/components/ui/ButtonLink";
+import { cn } from "@/lib/utils";
 import { MediaImage } from "@/components/ui/MediaImage";
 import { Section, SectionTitle } from "@/components/ui/Section";
 import { InView } from "@/components/motion/InView";
@@ -83,24 +84,37 @@ export function PartnersBlock({ data, locale }: BlockProps<PartnersData>) {
   return (
     <Section>
       <SectionTitle title={data.title} />
-      <ul className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+      {/* Mur de partenaires : grille à filets fins ; logo en gris qui prend ses couleurs au survol, sinon le nom. */}
+      <ul className={cn("grid grid-cols-2 gap-px overflow-hidden rounded-3xl border border-line bg-line sm:grid-cols-3", items.length % 3 === 0 ? "" : "lg:grid-cols-4")}>
         {items.map((partner) => {
-          const content = (
-            <>
-              {partner.logo && <span className="relative block h-14 w-full"><MediaImage image={partner.logo} sizes="200px" fit="contain" className="object-left" /></span>}
-              <span className="block font-medium leading-snug">{partner.name}</span>
-            </>
+          const content = partner.logo ? (
+            <span className="relative block h-16 w-full grayscale transition duration-300 group-hover:grayscale-0 group-focus-visible:grayscale-0 opacity-80 group-hover:opacity-100">
+              <MediaImage image={partner.logo} sizes="240px" fit="contain" />
+            </span>
+          ) : (
+            <span className="block text-balance text-center text-[0.95rem] font-semibold leading-snug text-ink/80 transition group-hover:text-ink sm:text-base">{partner.name}</span>
           );
+          const cell = "group flex w-full min-h-36 items-center justify-center bg-night p-6 transition hover:bg-night-2 sm:p-8";
           return (
-            <li key={partner.name} className="rounded-3xl border border-line bg-night-2 p-7 transition hover:border-ink/30">
+            <li key={partner.name} className="flex">
               {partner.website ? (
-                <a href={partner.website} target="_blank" rel="noopener noreferrer" className="flex h-full flex-col gap-4 transition hover:text-brand">{content}<span className="sr-only">{t.newTab}</span></a>
+                <a href={partner.website} target="_blank" rel="noopener noreferrer" className={cell} aria-label={partner.logo ? partner.name : undefined}>
+                  {content}<span className="sr-only">{t.newTab}</span>
+                </a>
               ) : (
-                <div className="flex h-full flex-col gap-4">{content}</div>
+                <div className={cell} title={partner.name}>{content}{partner.logo && <span className="sr-only">{partner.name}</span>}</div>
               )}
             </li>
           );
         })}
+        {/* Cases vides pour finir la dernière rangée (sinon le fond des filets apparaît). */}
+        {[
+          { cols: 2, className: "sm:hidden" },
+          { cols: 3, className: cn("max-sm:hidden", items.length % 3 !== 0 && "lg:hidden") },
+          ...(items.length % 3 === 0 ? [] : [{ cols: 4, className: "max-lg:hidden" }]),
+        ].flatMap(({ cols, className }) =>
+          Array.from({ length: (cols - (items.length % cols)) % cols }, (_, i) => <li key={`vide-${cols}-${i}`} className={cn("bg-night", className)} aria-hidden />),
+        )}
       </ul>
     </Section>
   );

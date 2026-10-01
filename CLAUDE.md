@@ -105,6 +105,7 @@ php artisan emsi:impact-live     # ajouter Impact Live et le campus de Saint-Lou
 php artisan emsi:site-v3         # page L'École à deux campus, chiffres clés et agenda sur l'accueil (relançable)
 php artisan emsi:site-v4 [--home] [--force]  # site des trois domaines : adresses, menus, pied de page, pages à compléter ; --home remplace l'accueil. Premier passage noté (settings.site_version = 4) : relancée, elle ne refait que les liens et la page EMSI ; --force reprend tout
 php artisan emsi:domains-showcase  # pages d'essai des nouveaux blocs pour Playwright (--remove pour les retirer ; créées et supprimées par les tests)
+php artisan emsi:accueil-brouillon [--force]  # nouvelle page d'accueil (film, vitrine, soutien…) écrite en BROUILLON seulement ; refuse d'écraser un brouillon en cours sans --force
 php artisan emsi:translate [--model=] [--dry-run] [--force]  # traduction anglaise de lancement (DeepL gratuit) : décompte des caractères et du quota, puis mise en file ; ce qui dépasse le quota reprend tout seul au renouvellement
 ./vendor/bin/pint
 

@@ -20,7 +20,7 @@ class MenuItem extends Model
 
     protected array $translatable = ['label', 'description'];
 
-    protected $fillable = ['location', 'parent_id', 'label', 'description', 'url', 'is_button', 'position', 'is_visible'];
+    protected $fillable = ['location', 'parent_id', 'label', 'description', 'image', 'url', 'is_button', 'position', 'is_visible'];
 
     protected $casts = [
         'is_button' => 'boolean',

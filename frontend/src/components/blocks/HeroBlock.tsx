@@ -8,6 +8,7 @@ import { ArtHero } from "./ArtHero";
 import { ProjectionHero } from "./ProjectionHero";
 import { StudioHero } from "./StudioHero";
 import { CinemaHero } from "./CinemaHero";
+import { FilmHero } from "./FilmHero";
 import { CompactHero, EditorialHero, MosaicHero, PosterHero, SpotlightHero, heroTitleSize } from "./HeroLayouts";
 import type { Locale } from "@/lib/i18n/locales";
 import type { HeroData } from "./types";
@@ -21,6 +22,7 @@ export function HeroBlock({ data, first, locale }: { data: HeroData; first: bool
     case "projection": return <ProjectionHero data={data} first={first} />;
     case "studio": return <StudioHero data={data} first={first} />;
     case "cinema": return <CinemaHero data={data} first={first} />;
+    case "film": return <FilmHero data={data} first={first} />;
     case "spotlight": return <SpotlightHero data={data} first={first} />;
     case "editorial": return <EditorialHero data={data} first={first} />;
     case "poster": return <PosterHero data={data} first={first} locale={locale} />;

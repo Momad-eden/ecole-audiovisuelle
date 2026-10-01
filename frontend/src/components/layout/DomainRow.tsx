@@ -43,8 +43,8 @@ export function DomainRow({ section, path }: { section: DomainSection; path: str
   const siblings = section.parent.children ?? [];
 
   return (
-    <div data-domain-row className={cn("site-header fixed inset-x-0 top-18 z-40 transition-colors duration-500", scrolled ? "border-b border-line bg-night/85 backdrop-blur-md" : "border-b border-transparent")}>
-      <div className="mx-auto flex h-11 max-w-7xl items-center justify-between gap-4 px-4 sm:px-6 lg:px-8">
+    <div data-domain-row data-scrolled={scrolled ? "" : undefined} className="domain-row fixed inset-x-0 top-18 z-40 transition-transform duration-500 ease-out motion-reduce:transition-none">
+      <div className="domain-row-bar mx-auto flex h-11 max-w-7xl items-center justify-between gap-4 px-4 sm:px-6 lg:px-8">
         <nav aria-label={t.label} className="hidden min-w-0 sm:block">
           <ol className="flex items-center gap-1.5 whitespace-nowrap text-xs text-ink-muted">
             {crumbs.map((crumb, index) => {

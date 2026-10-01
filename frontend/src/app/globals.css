@@ -81,9 +81,52 @@
 html:has([data-domain-row]) {
   --chrome-h: 7.25rem;
 }
+/*
+ * En-tête au défilement : la barre devient une capsule de verre détachée des bords (et la rangée de domaine
+ * une seconde capsule, plus fine) ; quand l'en-tête se cache (html[data-header-hidden]), la rangée remonte.
+ */
+.header-bar,
+.domain-row-bar {
+  border: 1px solid transparent;
+  transition: height 0.45s, margin 0.45s, max-width 0.45s, border-radius 0.45s, background-color 0.45s, border-color 0.45s, box-shadow 0.45s, padding 0.45s;
+}
+.site-header[data-scrolled] .header-bar {
+  height: 3.5rem;
+  margin-top: 0.625rem;
+  max-width: min(76rem, calc(100% - 1rem));
+  padding-inline: 0.75rem 0.5rem;
+  border-radius: 9999px;
+  border-color: var(--color-line);
+  background-color: color-mix(in oklab, var(--color-night) 74%, transparent);
+  backdrop-filter: blur(18px) saturate(1.4);
+  box-shadow: 0 14px 40px -18px rgb(0 0 0 / 0.6);
+}
+.site-header[data-scrolled] .main-nav-pill {
+  border-color: transparent;
+  background: transparent;
+  box-shadow: none;
+  backdrop-filter: none;
+}
+.domain-row[data-scrolled] .domain-row-bar {
+  height: 2.5rem;
+  margin-top: 0.375rem;
+  max-width: min(76rem, calc(100% - 1rem));
+  padding-inline: 1rem 0.375rem;
+  border-radius: 9999px;
+  border-color: var(--color-line);
+  background-color: color-mix(in oklab, var(--color-night) 74%, transparent);
+  backdrop-filter: blur(18px) saturate(1.4);
+}
+html[data-header-hidden] .domain-row {
+  transform: translateY(-4.375rem);
+}
+@media (prefers-reduced-motion: reduce) {
+  .header-bar, .domain-row-bar { transition: none; }
+}
+
 /* Une affiche en haut de page est un aplat de couleur : l'en-tête garde son fond pour que le menu reste lisible. */
-html:has(.poster-hero[data-first]) .site-header,
-html:has(.poster-hero[data-first]) [data-domain-row] {
+html:has(.poster-hero[data-first]) .site-header:not([data-scrolled]),
+html:has(.poster-hero[data-first]) [data-domain-row]:not([data-scrolled]) {
   border-bottom-color: var(--color-line);
   background: color-mix(in oklab, var(--color-night) 85%, transparent);
   backdrop-filter: blur(12px);
@@ -118,8 +161,8 @@ html:has(.poster-hero[data-first]) [data-domain-row] {
 :root[data-theme="light"] .scene-dark[style*="--accent-on"] {
   --color-on-accent: var(--accent-on);
 }
-:root[data-theme="light"]:has(.scene-dark[data-first]) .site-header,
-:root[data-theme="light"]:has(.scene-dark[data-first]) [data-domain-row] {
+:root[data-theme="light"]:has(.scene-dark[data-first]) .site-header:not([data-scrolled]),
+:root[data-theme="light"]:has(.scene-dark[data-first]) [data-domain-row]:not([data-scrolled]) {
   border-bottom-color: var(--color-line);
   background: color-mix(in oklab, var(--color-night) 85%, transparent);
   backdrop-filter: blur(12px);
@@ -346,6 +389,17 @@ body::after {
 .cinema-progress { width: 0; animation: cinema-progress linear forwards; }
 @keyframes cinema-progress { to { width: 100%; } }
 .cinema-caption { animation: art-rise 0.9s cubic-bezier(0.2, 0.7, 0.2, 1) both; }
+
+/* Film (ouverture de l'accueil) : lent zoom des photos, phrase dévoilée mot à mot, puis le reste qui monte. */
+.film-zoom { animation: film-zoom 9s ease-out both; }
+@keyframes film-zoom { from { transform: scale(1.04); } to { transform: scale(1.16) translate(-1.5%, -1%); } }
+.film-word { animation: film-word 0.9s cubic-bezier(0.2, 0.7, 0.2, 1) both; }
+@keyframes film-word { from { transform: translateY(105%); } to { transform: none; } }
+.film-rise { animation: film-rise 0.9s cubic-bezier(0.2, 0.7, 0.2, 1) both; }
+@keyframes film-rise { from { opacity: 0; transform: translateY(1.25rem); } to { opacity: 1; transform: none; } }
+@media (prefers-reduced-motion: reduce) {
+  .film-zoom, .film-word, .film-rise { animation: none; }
+}
 
 /* Studio : point posé sur le matériel, qui pulse doucement pour inviter à le survoler. */
 .hotspot-dot {

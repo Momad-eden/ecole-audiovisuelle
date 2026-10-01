@@ -11,7 +11,9 @@ use App\Filament\Support\TranslationTab;
 use App\Models\MenuItem;
 use BackedEnum;
 use Filament\Actions\EditAction;
+use Filament\Forms\Components\FileUpload;
 use Filament\Forms\Components\Select;
+use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Toggle;
 use Filament\Resources\Resource;
@@ -66,6 +68,13 @@ class MenuItemResource extends Resource
                         TextInput::make('description')->label('Description')->maxLength(90)->columnSpanFull()
                             ->helperText('Phrase courte affichée sous le lien dans le sous-menu (ex. « Concerts, résidences et rendez-vous à venir »).')
                             ->visible(fn (Get $get) => $get('location') === 'main' && filled($get('parent_id'))),
+                        Textarea::make('description')->label('Phrase d\'accroche du panneau')->rows(2)->maxLength(140)->columnSpanFull()
+                            ->helperText('Rubrique à sous-menus : affichée dans son grand panneau, avec la photo.')
+                            ->visible(fn (Get $get) => $get('location') === 'main' && blank($get('parent_id')) && ! $get('is_button')),
+                        FileUpload::make('image')->label('Photo du panneau')->image()->disk('public')->directory('menus')
+                            ->imageEditor()->maxSize(8192)->columnSpanFull()
+                            ->helperText('Rubrique à sous-menus : photo affichée à gauche de ses liens (format paysage).')
+                            ->visible(fn (Get $get) => $get('location') === 'main' && blank($get('parent_id')) && ! $get('is_button')),
                         Toggle::make('is_button')->label('Afficher comme bouton')->helperText('Ex. « Candidater »')->inline(false),
                         Toggle::make('is_visible')->label('Visible')->default(true)->inline(false),
                     ]),

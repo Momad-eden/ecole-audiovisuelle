@@ -51,6 +51,7 @@ final class BlockTexts
         'places' => 'Nos lieux (adresses)', 'campuses' => 'Nos campus (Dakar, Saint-Louis)',
         'domains' => 'Nos trois maisons (triptyque)', 'campus_programs' => 'Formations de ce campus',
         'downloads' => 'Documents à télécharger', 'support_form' => 'Nous soutenir (formulaire)',
+        'showcase' => 'Vitrine photos et vidéos',
     ];
 
     /** Libellés d'un élément de répéteur (au singulier). */

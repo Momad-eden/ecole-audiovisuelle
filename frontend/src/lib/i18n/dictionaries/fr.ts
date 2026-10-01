@@ -108,6 +108,24 @@ export const fr = {
     equipment: "Matériel du studio",
   },
 
+  film: {
+    watch: "Voir le film",
+    close: "Fermer le film",
+    pause: "Mettre la vidéo en pause",
+    play: "Relancer la vidéo",
+    scroll: "Découvrir",
+  },
+
+  showcase: {
+    open: (caption: string) => `Agrandir : ${caption}`,
+    item: (index: number) => `Image ${index}`,
+    video: "Vidéo",
+    close: "Fermer",
+    previous: "Précédent",
+    next: "Suivant",
+    counter: (index: number, count: number) => `${index} sur ${count}`,
+  },
+
   blocks: {
     enlargeImage: "Agrandir l'image (nouvel onglet)",
     video: "Vidéo",

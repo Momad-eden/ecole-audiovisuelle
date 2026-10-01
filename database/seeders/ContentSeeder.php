@@ -1095,6 +1095,7 @@ class ContentSeeder extends Seeder
             }
             MenuItem::where('location', 'main')->whereNotIn('id', $claimed)->update(['is_visible' => false]);
             MenuDefaults::fillDescriptions();
+            MenuDefaults::fillParents();
             $this->report[] = 'Menu principal reconstruit (Accueil, Maison Habib Faye, EMSI, À propos, Candidater) ; les anciennes entrées sont masquées.';
         }
 

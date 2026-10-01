@@ -3,6 +3,7 @@
 namespace Database\Seeders;
 
 use App\Models\MenuItem;
+use App\Models\Page;
 
 /** Contenu par défaut du menu principal, partagé par le ContentSeeder et la migration du groupe « À propos ». */
 final class MenuDefaults
@@ -38,6 +39,44 @@ final class MenuDefaults
         '/presse' => 'Communiqués, dossier de presse et contacts médias',
         '/contact' => 'Nous écrire, nous appeler, nous trouver',
     ];
+
+    /** Phrase d'accroche d'une rubrique du menu principal (panneau du méga-menu), par adresse. */
+    public const PARENT_DESCRIPTIONS = [
+        '/maison-habib-faye' => 'Un centre culturel à Saint-Louis : concerts, résidences et transmission, dans la maison de Habib Faye.',
+        '/emsi' => 'L\'école des métiers du son, de l\'image et de la scène, à Dakar et à Saint-Louis.',
+        '/mission' => 'Notre mission, celles et ceux qui nous accompagnent, et comment nous rejoindre.',
+    ];
+
+    /**
+     * Rubriques du menu principal : phrase d'accroche et photo, si elles sont vides. La photo vient du panneau
+     * du triptyque de l'accueil qui mène à la même adresse.
+     */
+    public static function fillParents(): void
+    {
+        $blocks = Page::where('slug', 'accueil')->value('blocks');
+        $blocks = is_string($blocks) ? json_decode($blocks, true) : $blocks;
+        $images = [];
+        foreach ((array) $blocks as $block) {
+            if (($block['type'] ?? null) === 'domains') {
+                foreach ($block['data']['panels'] ?? [] as $panel) {
+                    if (! empty($panel['image']) && ! empty($panel['url'])) {
+                        $images[$panel['url']] ??= $panel['image'];
+                    }
+                }
+            }
+        }
+
+        MenuItem::where('location', 'main')->whereNull('parent_id')->where('is_button', false)->has('children')->get()
+            ->each(function (MenuItem $item) use ($images) {
+                $item->fill([
+                    'description' => $item->description ?? (self::PARENT_DESCRIPTIONS[$item->url] ?? null),
+                    'image' => $item->image ?? ($images[$item->url] ?? null),
+                ]);
+                if ($item->isDirty()) {
+                    $item->save();
+                }
+            });
+    }
 
     /** Crée le groupe « À propos » du menu principal s'il n'existe pas (placé après les autres entrées). */
     public static function addAboutGroup(): void

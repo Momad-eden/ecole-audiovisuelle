@@ -18,7 +18,7 @@ export function SiteHeader({ site, locale }: { site: Site; locale: Locale }) {
 
   return (
     <HeaderShell>
-      <div className="mx-auto flex h-18 max-w-7xl items-center justify-between gap-6 px-4 sm:px-6 lg:px-8">
+      <div className="header-bar relative mx-auto flex h-18 max-w-7xl items-center justify-between gap-6 px-4 sm:px-6 lg:px-8">
         <LocaleLink href="/" className="flex items-center gap-3" aria-label={t.home(site.settings.schoolName)}>
           {site.settings.logo ? (
             <span className="relative block size-12">

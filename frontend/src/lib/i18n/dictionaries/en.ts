@@ -102,6 +102,24 @@ export const en: Dictionary = {
     pause: "Pause the slideshow",
   },
 
+  film: {
+    watch: "Watch the film",
+    close: "Close the film",
+    pause: "Pause the video",
+    play: "Play the video",
+    scroll: "Explore",
+  },
+
+  showcase: {
+    open: (caption: string) => `Enlarge: ${caption}`,
+    item: (index: number) => `Image ${index}`,
+    video: "Video",
+    close: "Close",
+    previous: "Previous",
+    next: "Next",
+    counter: (index: number, count: number) => `${index} of ${count}`,
+  },
+
   studio: {
     equipment: "Studio equipment",
   },

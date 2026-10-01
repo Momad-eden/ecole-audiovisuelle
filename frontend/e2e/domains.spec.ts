@@ -59,7 +59,7 @@ test("le menu « À propos » regroupe mission, partenaires, soutien, actualité
   }
   await expect(link("Presse")).toContainText("Communiqués");
   await link("Contact").click();
-  await expect(page).toHaveURL(/\/contact$/);
+  await expect(page).toHaveURL(/\/contact$/, { timeout: 15000 }); // première compilation de la page en dev
 });
 
 test("la rubrique où l'on se trouve est marquée dans le menu", async ({ page, isMobile }) => {
@@ -241,4 +241,15 @@ test("les pages de campus et de la Maison exposent leurs données structurées",
   expect(campus).toContainEqual(expect.objectContaining({ "@type": "EducationalOrganization", address: expect.objectContaining({ "@type": "PostalAddress", addressCountry: "SN" }) }));
   const maison = await jsonLd("/maison-habib-faye");
   expect(maison).toContainEqual(expect.objectContaining({ "@type": "Organization" }));
+});
+
+test("le méga-menu présente la rubrique (photo, accroche) à côté de ses liens", async ({ page, isMobile }) => {
+  test.skip(isMobile, "Menu de bureau.");
+  await page.goto("/");
+  const nav = page.getByRole("navigation", { name: "Navigation principale" });
+  await nav.getByRole("button", { name: "Maison Habib Faye" }).click();
+  const feature = nav.getByRole("link", { name: /^Maison Habib Faye/ });
+  await expect(feature).toBeVisible();
+  await expect(feature).toHaveAttribute("href", "/maison-habib-faye");
+  await expect(feature).toContainText("centre culturel");
 });
