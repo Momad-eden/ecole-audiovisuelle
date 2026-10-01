@@ -80,7 +80,8 @@ class TranslateRecord implements ShouldBeUniqueUntilProcessing, ShouldQueue
                     return;
                 }
                 $this->syncPendingGlossary();
-                $translated = $translator->translate($texts, $htmlKeys);
+                [$sent, $sentHtml, $emphasized] = self::protectEmphasis($texts, $htmlKeys);
+                $translated = self::restoreEmphasis($translator->translate($sent, $sentHtml), $emphasized);
             } catch (QuotaExceeded) {
                 $this->releaseUntilQuotaRenews();
 
@@ -214,6 +215,46 @@ class TranslateRecord implements ShouldBeUniqueUntilProcessing, ShouldQueue
         } catch (Throwable $e) {
             Log::warning('Envoi du lexique à DeepL impossible : '.$e->getMessage());
         }
+    }
+
+    /**
+     * Mots mis en valeur d'un titre (*mot*) : envoyés à DeepL comme balises <em>, qu'il garde autour du mot
+     * traduit (des astérisques seraient déplacés ou perdus), puis remis en astérisques au retour.
+     *
+     * @param  array<string, string>  $texts
+     * @param  array<int, string>  $htmlKeys
+     * @return array{0: array<string, string>, 1: array<int, string>, 2: array<int, string>}
+     */
+    private static function protectEmphasis(array $texts, array $htmlKeys): array
+    {
+        $emphasized = [];
+        foreach ($texts as $key => $text) {
+            if (in_array($key, $htmlKeys, true) || ! preg_match('/\*[^*\n]+\*/u', $text)) {
+                continue;
+            }
+            $texts[$key] = preg_replace('/\*([^*\n]+)\*/u', '<em>$1</em>', htmlspecialchars($text, ENT_NOQUOTES, 'UTF-8'));
+            $htmlKeys[] = $key;
+            $emphasized[] = $key;
+        }
+
+        return [$texts, $htmlKeys, $emphasized];
+    }
+
+    /**
+     * @param  array<string, string>  $translated
+     * @param  array<int, string>  $emphasized
+     * @return array<string, string>
+     */
+    private static function restoreEmphasis(array $translated, array $emphasized): array
+    {
+        foreach ($emphasized as $key) {
+            if (isset($translated[$key])) {
+                $text = preg_replace('#<em>(.*?)</em>#us', '*$1*', $translated[$key]);
+                $translated[$key] = html_entity_decode(strip_tags($text), ENT_QUOTES | ENT_HTML5, 'UTF-8');
+            }
+        }
+
+        return $translated;
     }
 
     private static function isHtml(string $field, string $key, string $text): bool

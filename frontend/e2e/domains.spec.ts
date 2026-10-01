@@ -126,7 +126,7 @@ test.describe("nouveaux blocs", () => {
     await expect.poll(async () => (await triptyque.getByTestId("domain-panel").first().boundingBox())!.width).toBeGreaterThan(boxes[0].width * 1.2);
 
     await triptyque.getByRole("link", { name: "EMSI", exact: true }).click();
-    await expect(page).toHaveURL(/\/emsi$/);
+    await expect(page).toHaveURL(/\/emsi$/, { timeout: 15000 }); // première compilation de la page en dev
   });
 
   test("le triptyque s'empile sur téléphone, sans défilement horizontal", async ({ page }) => {

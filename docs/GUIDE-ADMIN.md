@@ -79,6 +79,10 @@ Un bouton qui mène à une section vide est masqué automatiquement : « Écoute
 - **Grand titre (héros)**, mise en page « **Film** » (idéale pour l'accueil) : plein écran, grande phrase dévoilée mot à mot, deux boutons. En fond, la **boucle vidéo muette** (MP4 court, moins de 20 Mo) ; sans vidéo, les **photos qui défilent** (2 à 4, grandes de préférence) se succèdent en fondu avec un lent zoom. **Film complet** (facultatif) : un lien YouTube ou Vimeo ajoute un bouton « Voir le film » qui l'ouvre avec le son. Le visiteur peut mettre la boucle en pause.
 - **Vitrine photos et vidéos** : jusqu'à 12 photos ou vidéos dans une grille au rythme varié (la première occupe la grande case). Pour une vidéo, déposez le MP4 (moins de 50 Mo) **et** une photo d'aperçu : elle joue sans le son quand elle apparaît à l'écran, et le visiteur l'agrandit pour l'écouter. Chaque case peut avoir une légende et un lien ; un bouton facultatif termine le bloc (ex. « Voir la programmation »).
 
+### Mettre un mot en valeur dans un titre
+
+Dans le titre d'un bloc, entourez un ou plusieurs mots d'**astérisques** : `La culture comme *héritage*, l'art comme *métier*`. Sur le site, ils s'affichent en italique élégant, dans la couleur de la rubrique. Une ou deux mises en valeur par titre suffisent. La traduction anglaise garde la mise en valeur.
+
 ### Les univers
 
 Menu **Univers & réalisations › Univers** : nom, couleur de lumière, **animation** (son, image, design, scène, cinéma), accroche et texte. « Bientôt à l'EMSI » annonce un univers en préparation (ex. Cinéma). Les filières se rattachent à un univers depuis **Formations › Filières**.

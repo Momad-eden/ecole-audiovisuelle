@@ -1,5 +1,7 @@
 "use client";
 
+import { plainTitle } from "@/lib/emphasis";
+import { Emphasis } from "@/components/ui/Emphasis";
 import { useEffect, useRef, useState } from "react";
 import { ArrowRight, ChevronLeft, ChevronRight, Expand, Play, X } from "lucide-react";
 import { LocaleLink } from "@/components/i18n/LocaleLink";
@@ -48,7 +50,7 @@ export function ShowcaseBlock({ data }: { data: ShowcaseData }) {
         <div className="mb-10 flex flex-wrap items-end justify-between gap-6 sm:mb-14">
           <div className="max-w-3xl">
             {data.eyebrow && <p className="cartel mb-4 flex items-center gap-3 text-[var(--accent-ink)]"><span className="h-px w-10 bg-[var(--accent-ink)]" aria-hidden />{data.eyebrow}</p>}
-            <h2 className="display text-balance text-[clamp(2.2rem,5vw,4.2rem)]">{frenchSpacing(data.title)}</h2>
+            <h2 className="display text-balance text-[clamp(2.2rem,4.4vw,3.6rem)]"><Emphasis text={data.title} /></h2>
             {data.text && <p className="mt-5 max-w-2xl text-lg text-ink/80">{frenchSpacing(data.text)}</p>}
           </div>
           {data.buttonLabel && data.buttonUrl && <ButtonLink href={data.buttonUrl} variant="secondary">{data.buttonLabel}</ButtonLink>}
@@ -63,7 +65,7 @@ export function ShowcaseBlock({ data }: { data: ShowcaseData }) {
         </ul>
       </div>
 
-      <dialog ref={dialogRef} onClose={() => setOpen(null)} aria-label={data.title}
+      <dialog ref={dialogRef} onClose={() => setOpen(null)} aria-label={plainTitle(data.title)}
         onKeyDown={(event) => { if (event.key === "ArrowRight") go(1); if (event.key === "ArrowLeft") go(-1); }}
         className="m-0 h-dvh max-h-none w-full max-w-none bg-night/95 p-0 text-ink backdrop:bg-night/90 backdrop:backdrop-blur-sm">
         {current && open !== null && (

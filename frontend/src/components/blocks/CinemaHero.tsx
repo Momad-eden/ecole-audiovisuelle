@@ -1,5 +1,7 @@
 "use client";
 
+import { plainTitle } from "@/lib/emphasis";
+import { Emphasis } from "@/components/ui/Emphasis";
 import { useEffect, useRef, useState } from "react";
 import { LocaleLink } from "@/components/i18n/LocaleLink";
 import { useT } from "@/components/i18n/LocaleProvider";
@@ -71,7 +73,7 @@ export function CinemaHero({ data, first }: { data: HeroData; first: boolean }) 
       data-first={first ? "" : undefined}
       tabIndex={count > 1 ? 0 : undefined}
       aria-roledescription={count > 1 ? t.slideshow : undefined}
-      aria-label={data.title}
+      aria-label={plainTitle(data.title)}
       onKeyDown={onKeyDown}
       // Pause au focus seulement au clavier : un clic sur la photo ne doit pas figer le diaporama.
       onFocus={(event) => event.target.matches(":focus-visible") && setFocused(true)}
@@ -110,7 +112,7 @@ export function CinemaHero({ data, first }: { data: HeroData; first: boolean }) 
         <div className="flex flex-1 flex-col justify-end pb-10 sm:pb-14">
           <div className="self-start" {...hoverPause}>
           {count === 0 ? (
-            <Heading className="display max-w-4xl text-balance text-[clamp(2.6rem,7vw,6.5rem)]">{frenchSpacing(data.title)}</Heading>
+            <Heading className="display max-w-4xl text-balance text-[clamp(2.6rem,7vw,6.5rem)]"><Emphasis text={data.title} /></Heading>
           ) : (
             slides.map((slide, i) => {
               const SlideHeading = i === 0 ? Heading : "h2";

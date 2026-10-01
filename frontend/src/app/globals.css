@@ -221,6 +221,20 @@ body::after {
   letter-spacing: -0.035em;
   line-height: 0.92;
 }
+/*
+ * Mot mis en valeur dans un titre (*mot* dans l'admin) : italique de Fraunces, poids léger, couleur de la
+ * rubrique ; il garde la casse saisie même dans un titre en capitales.
+ */
+.title-accent {
+  font-family: var(--font-serif);
+  font-style: italic;
+  font-weight: 400;
+  font-variation-settings: normal;
+  letter-spacing: -0.02em;
+  text-transform: none;
+  color: var(--accent-ink);
+}
+
 .display-condensed {
   font-family: var(--font-display);
   font-variation-settings: "wdth" 75;
@@ -392,6 +406,13 @@ body::after {
 
 /* Film (ouverture de l'accueil) : lent zoom des photos, phrase dévoilée mot à mot, puis le reste qui monte. */
 .film-zoom { animation: film-zoom 9s ease-out both; }
+.film-grain {
+  background:
+    radial-gradient(120% 90% at 50% 40%, transparent 55%, rgb(0 0 0 / 0.55) 100%),
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.5'/%3E%3C/svg%3E");
+  opacity: 0.35;
+  mix-blend-mode: overlay;
+}
 @keyframes film-zoom { from { transform: scale(1.04); } to { transform: scale(1.16) translate(-1.5%, -1%); } }
 .film-word { animation: film-word 0.9s cubic-bezier(0.2, 0.7, 0.2, 1) both; }
 @keyframes film-word { from { transform: translateY(105%); } to { transform: none; } }

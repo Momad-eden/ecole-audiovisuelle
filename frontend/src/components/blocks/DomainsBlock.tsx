@@ -1,4 +1,5 @@
 import { LocaleLink } from "@/components/i18n/LocaleLink";
+import { Emphasis } from "@/components/ui/Emphasis";
 import { ArrowRight } from "lucide-react";
 import { MediaImage } from "@/components/ui/MediaImage";
 import { accentVars } from "@/lib/contrast";
@@ -29,7 +30,7 @@ export function DomainsBlock({ data, first, pageTitle, locale }: { data: Domains
     >
       {intro ? (
         <div className="order-last border-t border-line bg-night px-6 py-8 sm:px-10 lg:py-10">
-          <IntroTag className="display mx-auto max-w-7xl text-[clamp(1.6rem,3.4vw,3rem)] uppercase text-balance">{frenchSpacing(intro)}</IntroTag>
+          <IntroTag className="display mx-auto max-w-7xl text-[clamp(1.6rem,3.4vw,3rem)] uppercase text-balance"><Emphasis text={intro} /></IntroTag>
         </div>
       ) : (
         first && pageTitle && <h1 className="sr-only">{pageTitle}</h1>

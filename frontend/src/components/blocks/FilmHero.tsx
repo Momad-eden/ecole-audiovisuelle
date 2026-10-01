@@ -7,6 +7,7 @@ import { useReducedMotion } from "@/components/motion/useReducedMotion";
 import { ButtonLink } from "@/components/ui/ButtonLink";
 import { MediaImage } from "@/components/ui/MediaImage";
 import { accentVars } from "@/lib/contrast";
+import { plainTitle, titleWords } from "@/lib/emphasis";
 import { cn, frenchSpacing, videoEmbed } from "@/lib/utils";
 import type { HeroData } from "./types";
 
@@ -29,7 +30,8 @@ export function FilmHero({ data, first }: { data: HeroData; first: boolean }) {
   const [index, setIndex] = useState(0);
   const Heading = first ? "h1" : "h2";
 
-  const stills = data.images?.length ? data.images : data.image ? [data.image] : [];
+  // L'image de fond choisie passe en premier, puis les photos qui défilent (sans doublon).
+  const stills = [...(data.image ? [data.image] : []), ...(data.images ?? []).filter((image) => image.url !== data.image?.url)];
   const video = data.videoLoop && !reducedMotion ? data.videoLoop : null;
   const film = data.filmUrl ? videoEmbed(data.filmUrl) : null;
   const moving = !reducedMotion && !paused;
@@ -55,7 +57,7 @@ export function FilmHero({ data, first }: { data: HeroData; first: boolean }) {
     if (!filmOpen && dialog.open) dialog.close();
   }, [filmOpen]);
 
-  const words = frenchSpacing(data.title).split(" ");
+  const words = titleWords(frenchSpacing(data.title));
 
   return (
     <section
@@ -80,6 +82,8 @@ export function FilmHero({ data, first }: { data: HeroData; first: boolean }) {
       {/* Voile : la photo reste vivante en haut, le texte se pose sur un fond presque noir. */}
       <div className="absolute inset-0 -z-10 bg-[linear-gradient(180deg,rgb(7_7_10/0.55)_0%,rgb(7_7_10/0.15)_35%,rgb(7_7_10/0.55)_65%,var(--color-night)_100%)]" aria-hidden />
       <div className="absolute inset-0 -z-10 bg-[radial-gradient(70%_60%_at_15%_85%,color-mix(in_oklab,var(--accent)_22%,transparent),transparent_70%)]" aria-hidden />
+      {/* Grain de pellicule et vignettage : ambiance cinéma, et des photos de petite taille moins visiblement floues. */}
+      <div className="film-grain absolute inset-0 -z-10" aria-hidden />
 
       <div className="mx-auto w-full max-w-7xl px-4 pb-14 pt-40 sm:px-6 sm:pb-20 lg:px-8">
         {data.eyebrow && (
@@ -91,11 +95,13 @@ export function FilmHero({ data, first }: { data: HeroData; first: boolean }) {
             {data.eyebrow}
           </p>
         )}
-        <Heading className="display max-w-6xl text-balance text-[clamp(2.6rem,6.4vw,6.6rem)] uppercase leading-[0.95]">
+        <Heading className="display max-w-6xl text-balance text-[clamp(2.8rem,7vw,7.2rem)] leading-[0.95]">
           {words.map((word, i) => (
             <span key={i}>
               <span className="inline-block overflow-hidden pb-[0.06em] align-bottom">
-                <span className="film-word inline-block" style={{ animationDelay: `${180 + i * 70}ms` }}>{word}</span>
+                <span className="film-word inline-block" style={{ animationDelay: `${180 + i * 70}ms` }}>
+                  {word.map((part, j) => part.accent ? <em key={j} className="title-accent pr-[0.06em]">{part.text}</em> : <span key={j}>{part.text}</span>)}
+                </span>
               </span>
               {i < words.length - 1 && " "}
             </span>
@@ -148,7 +154,7 @@ export function FilmHero({ data, first }: { data: HeroData; first: boolean }) {
       <span id="apres-film" className="absolute bottom-0" aria-hidden />
 
       {film && (
-        <dialog ref={dialogRef} onClose={() => setFilmOpen(false)} aria-label={data.title}
+        <dialog ref={dialogRef} onClose={() => setFilmOpen(false)} aria-label={plainTitle(data.title)}
           className="m-auto w-[min(72rem,calc(100vw-2rem))] max-w-none overflow-visible bg-transparent p-0 backdrop:bg-night/90 backdrop:backdrop-blur-sm">
           <button type="button" onClick={() => setFilmOpen(false)} aria-label={t.close}
             className="absolute -top-14 right-0 grid size-11 place-items-center rounded-full border border-ink/30 text-ink hover:bg-ink/10">
@@ -156,7 +162,7 @@ export function FilmHero({ data, first }: { data: HeroData; first: boolean }) {
           </button>
           <div className="aspect-video overflow-hidden rounded-2xl bg-night-3 shadow-2xl">
             {filmOpen && (
-              <iframe src={film.embedUrl} title={data.title} allow="autoplay; encrypted-media; picture-in-picture; fullscreen" allowFullScreen className="h-full w-full" />
+              <iframe src={film.embedUrl} title={plainTitle(data.title)} allow="autoplay; encrypted-media; picture-in-picture; fullscreen" allowFullScreen className="h-full w-full" />
             )}
           </div>
         </dialog>
