@@ -188,7 +188,12 @@ test("Manifeste : grande phrase avec mot mis en valeur, chiffre et bandeau de ph
   const statement = page.getByTestId("statement");
   await expect(statement.locator("em.title-accent")).toHaveText("centre culturel");
   await expect(statement.locator("dd .sr-only")).toHaveText("3");
-  await expect(statement.locator(".statement-ribbon")).toHaveAttribute("aria-hidden", "true");
+  // Bandeau de photos décoratif, avec un bouton pause visible.
+  await expect(statement.locator(".statement-ribbon > [aria-hidden=true]")).toHaveCount(1);
+  const toggle = statement.getByRole("button", { name: "Mettre le bandeau de photos en pause" });
+  await toggle.click();
+  await expect(statement.getByRole("button", { name: "Relancer le bandeau de photos" })).toBeVisible();
+  await expect(statement.locator(".statement-track").first()).toHaveCSS("animation-play-state", "paused");
 });
 
 test("Présentation institutionnelle : piliers numérotés et mot du fondateur", async ({ page }) => {

@@ -301,7 +301,7 @@ class ContentSeeder extends Seeder
     private function partners(): void
     {
         $partners = [
-            ['Grand Théâtre National Doudou Ndiaye Coumba Rose', 'co_organizer', 'Co-porteur du programme : met à disposition ses salles, plateaux et équipements techniques.'],
+            ['Grand Théâtre National Doudou Ndiaye Coumba Rose', 'institutional', 'Partenaire du campus de Dakar : met à disposition ses salles, plateaux et équipements techniques.'],
             ['Direction des Concours du Sénégal', 'institutional', 'Partenaire institutionnel garant de la certification du Volet 1.'],
             ['Ministère de la Culture', 'institutional', 'Associé à la gouvernance stratégique du programme.'],
             ['Ministère de la Formation professionnelle', 'institutional', 'Associé à la gouvernance stratégique du programme.'],
@@ -403,7 +403,7 @@ class ContentSeeder extends Seeder
                 ['period' => 'Novembre 2027', 'title' => 'Certification de niveau BTS', 'tag' => 'Volet 2'],
             ]]],
             ['programs', ['title' => 'Les programmes', 'audience' => 'professional', 'limit' => 6]],
-            ['partners', ['title' => 'Porteurs et partenaires']],
+            ['partners', ['title' => 'Nos partenaires']],
             ['faq', ['title' => 'Questions fréquentes', 'group' => 'vae']],
             ['cta', ['title' => 'Être prévenu de l\'ouverture des candidatures', 'text' => 'Le recrutement du Volet 2 ouvre en janvier 2027.', 'buttons' => [['label' => 'Candidater', 'url' => '/professionnels/candidater', 'style' => 'primary']]]],
         ]);
@@ -863,7 +863,6 @@ class ContentSeeder extends Seeder
             ?? ['eyebrow' => 'Notre adresse', 'title' => 'Au cœur du Grand Théâtre National Doudou Ndiaye Coumba Rose',
                 'text' => 'À Dakar, nos apprenants se forment là où le spectacle se fabrique : sur les plateaux, dans les salles et en régie.'];
         $venue['buttons'] = [];
-        $theatre = Partner::where('name', 'like', '%Grand Théâtre%')->first();
 
         foreach ([['emsi/dakar', 'Dakar', $dakar], ['emsi/saint-louis', 'Saint-Louis', $saintLouis]] as [$slug, $city, $campus]) {
             $blocks = [$hero("EMSI · Campus de {$city}", "Campus de {$city}", $todo("présentez ici le campus de {$city} (lieu, équipe, équipements)."),
@@ -875,7 +874,7 @@ class ContentSeeder extends Seeder
             }
             if ($city === 'Dakar') {
                 $blocks[] = ['venue', $venue];
-                $blocks[] = ['partners', ['title' => 'Notre partenaire, le Grand Théâtre National', 'categories' => [$theatre->category ?? 'co_organizer']]];
+                $blocks[] = ['partners', ['title' => 'Nos partenaires', 'categories' => ['institutional']]];
             }
             $this->createPage($slug, "Campus de {$city}", SiteDomain::EMSI, $blocks);
         }

@@ -110,6 +110,11 @@ export const en: Dictionary = {
     scroll: "Explore",
   },
 
+  statement: {
+    pause: "Pause the photo strip",
+    play: "Play the photo strip",
+  },
+
   institution: {
     supportedBy: "With the support of",
     founderWord: "A word from the founder",

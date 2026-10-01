@@ -2,8 +2,8 @@ import { CountUp } from "@/components/motion/CountUp";
 import { Reveal } from "@/components/motion/Reveal";
 import { ButtonLink } from "@/components/ui/ButtonLink";
 import { Emphasis } from "@/components/ui/Emphasis";
-import { MediaImage } from "@/components/ui/MediaImage";
 import { cn } from "@/lib/utils";
+import { StatementRibbon } from "./StatementRibbon";
 import type { StatementData } from "./types";
 
 /**
@@ -39,17 +39,7 @@ export function StatementBlock({ data }: { data: StatementData }) {
         )}
       </div>
 
-      {images.length > 0 && (
-        <div className="statement-ribbon mt-14 sm:mt-20" aria-hidden>
-          <div className="statement-track">
-            {[...images, ...images].map((image, index) => (
-              <div key={image.url + index} className={cn("relative h-56 w-80 shrink-0 overflow-hidden rounded-3xl border border-line sm:h-72 sm:w-[26rem]", index % 2 === 1 && "sm:translate-y-8")}>
-                <MediaImage image={{ ...image, alt: "" }} sizes="416px" />
-              </div>
-            ))}
-          </div>
-        </div>
-      )}
+      {images.length > 0 && <StatementRibbon images={images} />}
     </section>
   );
 }

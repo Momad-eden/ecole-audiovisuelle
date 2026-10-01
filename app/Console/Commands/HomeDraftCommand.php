@@ -8,7 +8,7 @@ use Illuminate\Support\Facades\Storage;
 
 /**
  * Nouvelle page d'accueil, préparée en BROUILLON : film d'ouverture, manifeste, les trois lieux, présentation institutionnelle, univers, l'agenda, la vitrine, campus
- * photos et vidéos du centre, les actualités, l'appel au soutien et les partenaires.
+ * photos et vidéos du centre, les actualités et l'appel au soutien (les partenaires ont leur page).
  * Les blocs existants (trois lieux, actualités, partenaires, agenda) sont repris tels quels, les chiffres clés passent dans le manifeste ;
  * la version en ligne n'est jamais modifiée : l'équipe relit l'aperçu puis publie depuis l'admin.
  * Un brouillon en cours (différent de la version en ligne) n'est remplacé qu'avec --force.
@@ -121,7 +121,6 @@ class HomeDraftCommand extends Command
                     ['label' => 'Devenir partenaire', 'url' => '/partenaires', 'style' => 'secondary'],
                 ],
             ]],
-            $find('partners'),
         ]));
 
         $page->update(['draft_blocks' => $blocks]);

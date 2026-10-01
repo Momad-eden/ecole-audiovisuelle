@@ -116,6 +116,11 @@ export const fr = {
     scroll: "Découvrir",
   },
 
+  statement: {
+    pause: "Mettre le bandeau de photos en pause",
+    play: "Relancer le bandeau de photos",
+  },
+
   institution: {
     supportedBy: "Avec le soutien de",
     founderWord: "Le mot du fondateur",

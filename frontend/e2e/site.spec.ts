@@ -15,7 +15,7 @@ test("la page du campus de Dakar présente le Grand Théâtre comme partenaire e
   await page.goto("/emsi/dakar");
   await expect(page.getByRole("heading", { level: 1, name: "Campus de Dakar" })).toBeVisible();
   await expect(page.getByRole("heading", { name: "Les formations à Dakar" })).toBeVisible();
-  await expect(page.getByRole("heading", { name: "Notre partenaire, le Grand Théâtre National" })).toBeVisible();
+  await expect(page.getByRole("heading", { name: "Nos partenaires" })).toBeVisible();
 });
 
 test("on découvre un univers, ses filières et ses métiers", async ({ page }) => {
