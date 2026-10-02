@@ -1,5 +1,6 @@
 "use client";
 
+import { plainTitle } from "@/lib/emphasis";
 import { useRef } from "react";
 import { ButtonLink } from "@/components/ui/ButtonLink";
 import { MediaImage } from "@/components/ui/MediaImage";
@@ -23,7 +24,7 @@ export function StudioHero({ data, first }: { data: HeroData; first: boolean }) 
   const timecodeRef = useRef<HTMLSpanElement>(null);
   useRecTimecode(sectionRef, timecodeRef);
   const Heading = first ? "h1" : "h2";
-  const title = frenchSpacing(data.title);
+  const title = frenchSpacing(plainTitle(data.title));
   const parts = splitHighlight(title, data.highlight);
   const points = data.image ? (data.hotspots ?? []) : [];
   const tracks = data.tracks ?? [];
@@ -49,7 +50,7 @@ export function StudioHero({ data, first }: { data: HeroData; first: boolean }) 
 
       {points.length > 0 && <Hotspots points={points} />}
 
-      <div className="pointer-events-none relative z-20 mx-auto w-full max-w-7xl px-4 sm:px-6 lg:px-8">
+      <div className="pointer-events-none relative z-20 mx-auto w-full max-w-7xl px-5 sm:px-6 lg:px-8">
         <div className="pointer-events-auto max-w-xl">
           <p className="cartel mb-5 flex items-center gap-2 text-rec">
             <span className="rec-dot size-2 rounded-full bg-rec" aria-hidden />

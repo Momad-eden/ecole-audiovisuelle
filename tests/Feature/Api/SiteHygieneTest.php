@@ -36,7 +36,7 @@ class SiteHygieneTest extends TestCase
         EquipmentItem::create(['name' => 'Line array', 'equipment_category_id' => EquipmentCategory::create(['name' => 'Son'])->id, 'usage' => 'rental', 'status' => PublicationStatus::PUBLISHED]);
 
         $this->getJson('/api/v1/public/sitemap')->assertOk()
-            ->assertJsonFragment(['path' => '/maison-habib-faye/agenda/concert'])
+            ->assertJsonFragment(['path' => '/centre-culturel/agenda/concert'])
             ->assertJsonMissing(['path' => '/events/materiel/line-array']);
     }
 

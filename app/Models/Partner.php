@@ -31,4 +31,15 @@ class Partner extends Model
         'media' => 'Média',
         'venue' => 'Lieu',
     ];
+
+    /** Titre d'un groupe de partenaires sur le site (pluriel), par langue. */
+    public const GROUPS = [
+        'fr' => ['co_organizer' => 'Porteurs du programme', 'institutional' => 'Partenaires institutionnels', 'technical' => 'Partenaires techniques', 'media' => 'Médias', 'venue' => 'Lieux partenaires'],
+        'en' => ['co_organizer' => 'Programme leads', 'institutional' => 'Institutional partners', 'technical' => 'Technical partners', 'media' => 'Media', 'venue' => 'Partner venues'],
+    ];
+
+    public static function groupLabel(?string $category, string $locale): ?string
+    {
+        return $category === null ? null : (self::GROUPS[$locale][$category] ?? self::GROUPS['fr'][$category] ?? null);
+    }
 }

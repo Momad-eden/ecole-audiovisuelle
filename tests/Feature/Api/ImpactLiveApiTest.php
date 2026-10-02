@@ -109,7 +109,7 @@ class ImpactLiveApiTest extends TestCase
 
         $this->getJson('/api/v1/public/agenda')->assertOk()->assertJsonCount(1, 'data')->assertJsonPath('data.0.title', 'Concert à venir')->assertJsonPath('data.0.activity', 'space');
         $this->getJson('/api/v1/public/agenda?scope=references')->assertOk()->assertJsonCount(1, 'data')->assertJsonPath('data.0.title', 'Festival de Saint-Louis');
-        $this->getJson('/api/v1/public/agenda/concert-a-venir')->assertOk()->assertJsonPath('data.activityLabel', 'Espace Habib Faye');
+        $this->getJson('/api/v1/public/agenda/concert-a-venir')->assertOk()->assertJsonPath('data.activityLabel', 'Centre culturel Habib Faye');
 
         $this->getJson('/api/v1/public/places?kind=campus')->assertOk()->assertJsonCount(1, 'data')->assertJsonPath('data.0.city', 'Dakar');
         $this->getJson('/api/v1/public/site')->assertOk()->assertJsonCount(2, 'data.places');

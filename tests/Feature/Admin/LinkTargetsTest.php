@@ -24,11 +24,11 @@ class LinkTargetsTest extends TestCase
 
         $flat = LinkTargets::flat();
 
-        $this->assertSame('Maison Habib Faye › Impact Live Studio › Réserver une séance', $flat['/maison-habib-faye/studio#reserver']);
-        $this->assertSame('Maison Habib Faye › Impact Live Studio › Écouter les productions', $flat['/maison-habib-faye/studio#productions']);
+        $this->assertSame('Centre culturel Habib Faye › Impact Live Studio › Réserver une séance', $flat['/centre-culturel/studio#reserver']);
+        $this->assertSame('Centre culturel Habib Faye › Impact Live Studio › Écouter les productions', $flat['/centre-culturel/studio#productions']);
         $this->assertSame('EMSI › Campus de Dakar', $flat['/emsi/dakar']);
         $this->assertSame('EMSI › Campus de Saint-Louis', $flat['/emsi/saint-louis']);
-        $this->assertSame('Maison Habib Faye › Programmation', $flat['/maison-habib-faye/agenda']);
+        $this->assertSame('Centre culturel Habib Faye › Programmation', $flat['/centre-culturel/agenda']);
         $this->assertSame('Nous soutenir', $flat['/soutenir']);
         $this->assertSame('EMSI › Univers › Son', $flat['/emsi/univers/son']);
         $this->assertSame('EMSI › Candidater à Saint-Louis', $flat['/candidater?campus=emsi-saint-louis']);
@@ -44,11 +44,11 @@ class LinkTargetsTest extends TestCase
 
     public function test_searching_finds_a_destination_by_name_and_accepts_a_typed_address(): void
     {
-        $this->assertArrayHasKey('/maison-habib-faye/studio#reserver', LinkTargets::search('réserver'));
+        $this->assertArrayHasKey('/centre-culturel/studio#reserver', LinkTargets::search('réserver'));
         $this->assertArrayHasKey('/emsi/dakar', LinkTargets::search('campus de dakar'));
         $this->assertSame(['https://wa.me/221776807062' => 'Utiliser l\'adresse « https://wa.me/221776807062 »'], LinkTargets::search('https://wa.me/221776807062'));
         $this->assertSame([], LinkTargets::search('rien de tel'));
-        $this->assertSame('Maison Habib Faye › Impact Live Studio › Réserver une séance', LinkTargets::label('/maison-habib-faye/studio#reserver'));
+        $this->assertSame('Centre culturel Habib Faye › Impact Live Studio › Réserver une séance', LinkTargets::label('/centre-culturel/studio#reserver'));
         $this->assertSame('https://youtube.com/x', LinkTargets::label('https://youtube.com/x'));
     }
 }

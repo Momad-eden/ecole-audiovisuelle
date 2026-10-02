@@ -1,4 +1,5 @@
 import { LocaleLink } from "@/components/i18n/LocaleLink";
+import { Emphasis } from "@/components/ui/Emphasis";
 import { CalendarDays } from "lucide-react";
 import { ButtonLink } from "@/components/ui/ButtonLink";
 import { MediaImage } from "@/components/ui/MediaImage";
@@ -25,7 +26,7 @@ export function CampusProgramsBlock({ data, id, locale }: { data: CampusPrograms
             <span className="h-px w-10 bg-[var(--accent-ink)]" aria-hidden />
             {data.campus.name}
           </p>
-          <h2 id={headingId} className="display text-[clamp(2rem,4.6vw,3.8rem)] text-balance">{frenchSpacing(title)}</h2>
+          <h2 id={headingId} className="display text-[clamp(2rem,4.6vw,3.8rem)] text-balance"><Emphasis text={title} /></h2>
         </header>
 
         {items.length === 0 ? (

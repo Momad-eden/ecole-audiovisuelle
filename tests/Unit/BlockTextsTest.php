@@ -325,7 +325,7 @@ class BlockTextsTest extends TestCase
         $this->assertSame('Bloc 1 · Grand titre (héros) · Diapositive 2 · Titre', BlockTexts::describe('hero#0:slides.1.title', $blocks));
         $this->assertSame('Bloc 4 · Grand titre (héros) · Point sur la photo 1 · Texte', BlockTexts::describe('hero#1:hotspots.0.label', $blocks));
         $this->assertSame('Bloc 4 · Grand titre (héros) · Mot qui défile 2', BlockTexts::describe('hero#1:words.1', $blocks));
-        $this->assertSame('Bloc 2 · Nos trois maisons (triptyque) · Panneau 3 · Texte du lien', BlockTexts::describe('domains#0:panels.2.label', $blocks));
+        $this->assertSame('Bloc 2 · Nos trois lieux (triptyque) · Panneau 3 · Texte du lien', BlockTexts::describe('domains#0:panels.2.label', $blocks));
         $this->assertSame('Bloc 3 · Texte · Texte', BlockTexts::describe('text#0:body', $blocks));
         $this->assertSame('Bloc 1 · Grand titre (héros) · Description de l\'image', BlockTexts::describe('hero#0:image_alt', $blocks));
         $this->assertSame('Bloc supprimé · Chronologie / étapes · Étape 1 · Titre', BlockTexts::describe('timeline#0:steps.0.title', $blocks));

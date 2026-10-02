@@ -76,6 +76,18 @@ Un bouton qui mène à une section vide est masqué automatiquement : « Écoute
 - **Le matériel** : des catégories (ex. « Consoles son ») et leur liste de matériel ; une photo par catégorie dès que possible.
 - **Chronologie / étapes**, présentation « Étapes numérotées » : le parcours pour rejoindre l'école.
 
+- **Grand titre (héros)**, mise en page « **Film** » (idéale pour l'accueil) : plein écran, grande phrase dévoilée mot à mot, deux boutons. En fond, la **boucle vidéo muette** (MP4 court, moins de 20 Mo) ; sans vidéo, les **photos qui défilent** (2 à 4, grandes de préférence) se succèdent en fondu avec un lent zoom. **Film complet** (facultatif) : un lien YouTube ou Vimeo ajoute un bouton « Voir le film » qui l'ouvre avec le son. Le visiteur peut mettre la boucle en pause.
+- **Vitrine photos et vidéos** : jusqu'à 12 photos ou vidéos dans une grille au rythme varié (la première occupe la grande case). Pour une vidéo, déposez le MP4 (moins de 50 Mo) **et** une photo d'aperçu : elle joue sans le son quand elle apparaît à l'écran, et le visiteur l'agrandit pour l'écouter. Chaque case peut avoir une légende et un lien ; un bouton facultatif termine le bloc (ex. « Voir la programmation »).
+
+- **Manifeste (phrase, chiffres, bandeau de photos)** : à placer juste après le grand titre de l'accueil. Une grande phrase qui présente le Centre culturel, l'école et le studio (mots mis en valeur avec des astérisques), jusqu'à 4 chiffres clés qui défilent jusqu'à leur valeur, et un bandeau de 4 à 12 photos qui glisse lentement en continu. Bouton facultatif (ex. « Notre mission »).
+
+- **Présentation institutionnelle (mission, valeurs, mot du fondateur)** : titre, courte présentation, jusqu'à 4 **piliers** numérotés (ex. Notre mission, Notre vision, Nos valeurs) et, en option, **le mot du fondateur** (citation, nom, fonction, portrait ; sans portrait, ses initiales s'affichent). Bouton facultatif (ex. « Mission et impact »).
+- **Partenaires**, présentation **Bandeau discret** : une ligne « Avec le soutien de » à placer en haut de l'accueil (choisissez les catégories, ex. institutionnels). La présentation **Mur de logos** regroupe les partenaires par catégorie (Partenaires institutionnels, Porteurs du programme…). Ajoutez les **logos** dans le menu Partenaires : ils s'affichent en gris et prennent leurs couleurs au survol.
+
+### Mettre un mot en valeur dans un titre
+
+Dans le titre d'un bloc, entourez un ou plusieurs mots d'**astérisques** : `La culture comme *héritage*, l'art comme *métier*`. Sur le site, ils s'affichent en italique élégant, dans la couleur de la rubrique. Une ou deux mises en valeur par titre suffisent. La traduction anglaise garde la mise en valeur.
+
 ### Les univers
 
 Menu **Univers & réalisations › Univers** : nom, couleur de lumière, **animation** (son, image, design, scène, cinéma), accroche et texte. « Bientôt à l'EMSI » annonce un univers en préparation (ex. Cinéma). Les filières se rattachent à un univers depuis **Formations › Filières**.
@@ -126,17 +138,19 @@ On ne modifie jamais une opération enregistrée. Ouvrez-la › **Annuler cette 
 
 ### Les trois domaines du site
 
-Le site présente trois « maisons » : la **Maison de la culture Habib Faye** (avec Impact Live Studio), l'**EMSI** (campus de Dakar et de Saint-Louis) et des pages générales (mission, partenaires, soutenir, presse). Le Grand Théâtre est présenté comme partenaire qui accueille le campus de Dakar.
+Le site présente trois « maisons » : la **Centre culturel Habib Faye** (avec Impact Live Studio), l'**EMSI** (campus de Dakar et de Saint-Louis) et des pages générales (mission, partenaires, soutenir, presse). Le Grand Théâtre est présenté comme partenaire qui accueille le campus de Dakar.
 
-- **Domaine d'une page** : dans **Site › Pages du site**, chaque page a un champ **Domaine** (Général, Maison Habib Faye, EMSI ou Impact Live Studio). Il règle la couleur, le fil d'Ariane et la sous-navigation. Quand vous saisissez l'adresse, le domaine se choisit tout seul : `maison-habib-faye/studio/…` → Impact Live Studio, `maison-habib-faye/…` → Maison Habib Faye, `emsi/…` → EMSI ; pour une autre adresse, il reste sur Général (ou sur ce que vous aviez choisi). Vous pouvez toujours le changer ensuite.
-- **Sous-menus** : dans **Site › Menus du site**, un lien du **Menu principal** peut être placé dans un **Sous-menu de** : la liste propose les éléments de premier niveau (Accueil, Maison Habib Faye, EMSI…), sauf les boutons comme « Candidater ». Le lien apparaît alors dans le menu déroulant de ce parent. Un élément qui a déjà des sous-menus ne peut pas devenir lui-même un sous-menu. Un lien placé au **Pied de page** ou dans les **Liens légaux** quitte automatiquement son sous-menu. Le menu principal est : Accueil · Maison Habib Faye ▾ · EMSI ▾ · Candidater.
+- **Domaine d'une page** : dans **Site › Pages du site**, chaque page a un champ **Domaine** (Général, Centre culturel Habib Faye, EMSI ou Impact Live Studio). Il règle la couleur, le fil d'Ariane et la sous-navigation. Quand vous saisissez l'adresse, le domaine se choisit tout seul : `centre-culturel/studio/…` → Impact Live Studio, `centre-culturel/…` → Centre culturel Habib Faye, `emsi/…` → EMSI ; pour une autre adresse, il reste sur Général (ou sur ce que vous aviez choisi). Vous pouvez toujours le changer ensuite.
+- **Sous-menus** : dans **Site › Menus du site**, un lien du **Menu principal** peut être placé dans un **Sous-menu de** : la liste propose les éléments de premier niveau (Accueil, Centre culturel Habib Faye, EMSI…), sauf les boutons comme « Candidater ». Le lien apparaît alors dans le menu déroulant de ce parent. Un élément qui a déjà des sous-menus ne peut pas devenir lui-même un sous-menu. Un lien placé au **Pied de page** ou dans les **Liens légaux** quitte automatiquement son sous-menu. Le menu principal est : Accueil · Centre culturel Habib Faye ▾ · EMSI ▾ · À propos ▾ · Candidater. « À propos » regroupe Mission et impact, Partenaires et soutiens, Nous soutenir, Actualités, Presse et Contact (ces liens restent aussi au pied de page).
+- **Description d'un sous-menu** : chaque lien d'un sous-menu peut avoir une **Description**, une phrase courte affichée sous son nom dans le menu déroulant (ex. « Concerts, résidences et rendez-vous à venir »). Laissée vide, seul le nom s'affiche. Elle est traduite en anglais comme le reste (onglet Anglais). L'icône de chaque lien est choisie automatiquement d'après sa destination.
+- **Grand panneau d'une rubrique** : une rubrique à sous-menus (Centre culturel Habib Faye, EMSI, À propos) a une **Photo du panneau** et une **Phrase d'accroche**, affichées à gauche de ses liens quand le menu s'ouvre. Sans photo, le panneau prend la couleur de la rubrique.
 - **Campus des formations** : sur une formation, **Disponible à** permet de cocher Dakar, Saint-Louis ou les deux ; une nouvelle formation a tous les campus cochés par défaut (sans campus coché, personne ne peut y candidater). Sur une session, le champ **Campus** dit où elle a lieu. Le formulaire de candidature ne propose que les formations du campus choisi.
 
 ### Les nouveaux blocs
 
 Dans **Ajouter un bloc** d'une page :
 
-- **Nos trois maisons** : trois grands panneaux cliquables (Maison Habib Faye, EMSI, Impact Live Studio) avec photo, titre et texte. C'est le premier bloc de l'accueil.
+- **Nos trois lieux** : trois grands panneaux cliquables (Centre culturel Habib Faye, EMSI, Impact Live Studio) avec photo, titre et texte. C'est le premier bloc de l'accueil.
 - **Formations de ce campus** : la liste des formations proposées dans le campus choisi (à placer sur la page du campus).
 - **Documents à télécharger** : des fichiers PDF (dossier de présentation, dossier de presse…) à ajouter depuis la médiathèque, avec un titre.
 - **Nous soutenir** : formulaire pour les financeurs et partenaires. Les messages arrivent dans **Site › Messages reçus** avec le type **Soutien / partenariat** (et le type de soutien choisi : partenariat, mécénat, don) ; traitez-les comme les autres (Lire › Marquer comme traité).
@@ -144,19 +158,20 @@ Dans **Ajouter un bloc** d'une page :
 ### Compléter le site
 
 - **Textes « À compléter »** : plusieurs pages créées à la mise à niveau (Programmation, Espaces, Campus de Dakar, Campus de Saint-Louis, Mission, Partenaires, Nous soutenir, Presse) contiennent un texte commençant par « À compléter ». Ouvrez la page dans **Site › Pages du site**, remplacez-le par votre texte, puis **Publier**. Ne laissez pas ces textes en ligne.
-- **Photos de la Maison** : ajoutez-les dans la médiathèque, puis dans la page **Maison Habib Faye** (bloc Grand titre › Photo). Quand vous avez de belles photos, vous pouvez mettre sur l'accueil, avant « Nos trois maisons », un **Grand titre** en mise en page **Cinéma** (diaporama de 2 à 5 photos).
+- **Nouvelle page d'accueil** : une version préparée attend en **brouillon** (film d'ouverture, trois lieux, « À l'affiche », vitrine « Le centre en images », chiffres, actualités, appel au soutien, partenaires). Ouvrez **Pages du site › Accueil › Aperçu**, remplacez les photos provisoires par les vôtres (et ajoutez une **boucle vidéo** dans le Grand titre), vérifiez les légendes, puis **Publier**. « À l'affiche » n'apparaît que lorsqu'un événement à venir est publié (avec sa date et, si possible, une photo).
+- **Photos du Centre culturel** : ajoutez-les dans la médiathèque, puis dans la page **Centre culturel Habib Faye** (bloc Grand titre › Photo). Quand vous avez de belles photos, vous pouvez mettre sur l'accueil, avant « Nos trois lieux », un **Grand titre** en mise en page **Cinéma** (diaporama de 2 à 5 photos).
 - **Page EMSI** : elle présente l'école, ses univers (Son, Image…), les réalisations des étudiants et les deux campus ; chaque carte de campus mène à la page du campus (« Découvrir le campus ») et à la candidature. Le bloc « Le lieu » (Grand Théâtre) est sur la page **Campus de Dakar**.
-- **Agenda** : la page **Programmation** (Maison Habib Faye) affiche les événements publiés dans Impact Live › Agenda et références. L'ancienne page « Events » (location de sono) n'est plus sur le site.
+- **Agenda** : la page **Programmation** (Centre culturel Habib Faye) affiche les événements publiés dans Impact Live › Agenda et références. L'ancienne page « Events » (location de sono) n'est plus sur le site.
 
 ---
 
-## Impact Live : studio, agenda et Espace Habib Faye
+## Impact Live : studio, agenda et Centre culturel Habib Faye
 
 Menu **Impact Live** (rôles Directeur et Commercial ; la Communication peut aussi mettre à jour la vitrine).
 
 ### Traiter une demande de réservation
 
-Depuis le site, on ne peut demander qu'une **séance au studio** ou la **location d'un espace** de la Maison (la location de matériel et les prestations d'Impact Live Events ne sont plus proposées).
+Depuis le site, on ne peut demander qu'une **séance au studio** ou la **location d'un espace** du Centre culturel (la location de matériel et les prestations d'Impact Live Events ne sont plus proposées).
 
 1. **Impact Live › Demandes** : le chiffre à côté du menu indique les nouvelles demandes. Chaque demande a une référence (ex. `DEM-2026-00012`), ses dates, son lieu, le public attendu et le message du client.
 2. Rappelez le client (bouton WhatsApp ou téléphone sur la fiche). Consignez l'échange avec **⋮ › Ajouter une note**.
@@ -167,14 +182,14 @@ Depuis le site, on ne peut demander qu'une **séance au studio** ou la **locatio
 
 Menu **Impact Live › Productions du studio** › **Ajouter un titre à écouter** : titre, fichier son (MP3, WAV, M4A ou OGG, 50 Mo maximum), pochette et crédits. Choisissez « Publié » : le titre s'écoute aussitôt sur la page Studio, avec sa forme d'onde, dans le lecteur qui suit le visiteur de page en page.
 
-### Mettre à jour les pages de la Maison et du studio
+### Mettre à jour les pages du Centre culturel et du studio
 
-- **Services** : les services du studio (enregistrement, mixage, mastering…) et la location des espaces de la Maison, avec leur prix indicatif (laissez-le vide pour « Sur devis »).
-- **Agenda et références** : les prochains événements de la Maison (dates, lieu, billetterie), affichés sur la page **Programmation**, et, en cochant « Référence », les réalisations passées (ex. Festival de Saint-Louis) qui s'affichent dans « Ils nous ont fait confiance ».
+- **Services** : les services du studio (enregistrement, mixage, mastering…) et la location des espaces du Centre culturel, avec leur prix indicatif (laissez-le vide pour « Sur devis »).
+- **Agenda et références** : les prochains événements du Centre culturel (dates, lieu, billetterie), affichés sur la page **Programmation**, et, en cochant « Référence », les réalisations passées (ex. Festival de Saint-Louis) qui s'affichent dans « Ils nous ont fait confiance ».
 - **Productions du studio** : dans Univers & réalisations › Réalisations, choisissez « Réalisée par : Impact Live Studio » et ajoutez le fichier son ; elle s'écoute sur la page Impact Live Studio.
 - **Équipement du studio** : la fiche technique de la page Impact Live Studio. Le matériel à louer et les packs d'Impact Live Events ne sont plus affichés sur le site (leurs fiches restent en base, hors du menu).
-- **Pages de la Maison et du studio** : dans Site › Pages du site, les pages **Maison Habib Faye**, **Programmation**, **Impact Live Studio** et **Les espaces** se modifient comme la page d'accueil (titres, textes, ordre des blocs).
-- **Lieux** (Administration › Lieux) : adresses, téléphones, horaires et photos des campus de Dakar et de Saint-Louis, du studio et de la Maison Habib Faye.
+- **Pages du Centre culturel et du studio** : dans Site › Pages du site, les pages **Centre culturel Habib Faye**, **Programmation**, **Impact Live Studio** et **Les espaces** se modifient comme la page d'accueil (titres, textes, ordre des blocs).
+- **Lieux** (Administration › Lieux) : adresses, téléphones, horaires et photos des campus de Dakar et de Saint-Louis, du studio et de la Centre culturel Habib Faye.
 
 ---
 
@@ -209,7 +224,7 @@ Le site existe en français (adresses habituelles) et en anglais (mêmes adresse
 - **Relire** : *Site › Traductions à relire* liste ce qui n'a pas encore été relu. Ouvrez une fiche, onglet **Anglais** : le français à gauche, l'anglais à droite. Corrigez puis enregistrez (le texte passe « Relue »), ou cliquez **Marquer comme relue** s'il convient. **Retraduire** redemande une traduction.
 - **Une traduction relue n'est jamais remplacée** tant que le texte français correspondant ne change pas. Si vous modifiez ce français, une nouvelle traduction est proposée et l'ancienne version relue reste visible (« Ancienne version relue »).
 - **Vider un texte anglais** : le site affiche alors le français à cet endroit.
-- **Lexique** (*Paramètres du site › Traduction anglaise*) : les noms à ne jamais traduire (EMSI, Impact Live Studio, Maison de la culture Habib Faye…) et les traductions imposées (« VAE » → « Recognition of Prior Learning (VAE) »). Ajoutez-y vos termes.
+- **Lexique** (*Paramètres du site › Traduction anglaise*) : les noms à ne jamais traduire (EMSI, Impact Live Studio, Centre culturel Habib Faye…) et les traductions imposées (« VAE » → « Recognition of Prior Learning (VAE) »). Ajoutez-y vos termes.
 - **Quota gratuit** : 500 000 caractères par mois, affichés dans les paramètres et sur le tableau de bord. S'il est atteint, les traductions reprennent toutes seules quand il se renouvelle.
 - **Sans compte DeepL** : tout fonctionne, mais l'anglais se saisit à la main dans l'onglet **Anglais** ; tant qu'un texte n'est pas traduit, le site anglais montre le français.
 - **Créer le compte DeepL (une fois)** : sur deepl.com, offre « DeepL API Free » (une carte bancaire peut être demandée pour vérifier l'identité, rien n'est prélevé dans l'offre gratuite) ; copiez la clé d'authentification et donnez-la au référent technique, qui l'ajoute au serveur (`DEEPL_API_KEY`).

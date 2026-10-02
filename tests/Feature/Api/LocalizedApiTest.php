@@ -167,10 +167,11 @@ class LocalizedApiTest extends TestCase
         $this->translate($settings, 'seo_description', 'Training for careers');
 
         $parent = MenuItem::create(['label' => 'L\'école', 'url' => '/emsi', 'location' => 'main']);
-        $child = MenuItem::create(['label' => 'Formations', 'url' => '/emsi/formations', 'location' => 'main', 'parent_id' => $parent->id]);
+        $child = MenuItem::create(['label' => 'Formations', 'description' => 'Toutes les formations', 'url' => '/emsi/formations', 'location' => 'main', 'parent_id' => $parent->id]);
         MenuItem::create(['label' => 'Contact', 'url' => '/contact', 'location' => 'main']);
         $this->translate($parent, 'label', 'The school');
         $this->translate($child, 'label', 'Programmes');
+        $this->translate($child, 'description', 'All our programmes');
 
         $this->getJson('/api/v1/public/site?locale=en')
             ->assertOk()
@@ -181,6 +182,7 @@ class LocalizedApiTest extends TestCase
             ->assertJsonPath('data.menus.main.0.label', 'The school')
             ->assertJsonPath('data.menus.main.0.children.0.label', 'Programmes')
             ->assertJsonPath('data.menus.main.0.children.0.url', '/emsi/formations')
+            ->assertJsonPath('data.menus.main.0.children.0.description', 'All our programmes')
             ->assertJsonPath('data.menus.main.1.label', 'Contact')
             ->assertJsonPath('data.domains.general.label', 'General');
 

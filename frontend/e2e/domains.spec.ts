@@ -12,18 +12,18 @@ test("les anciennes adresses arrivent sur la nouvelle en une seule redirection",
     ["/professionnels/candidater", "/emsi/professionnels/candidater"],
     ["/expositions", "/emsi/realisations"],
     ["/expositions/une-expo", "/emsi/realisations"],
-    ["/studio", "/maison-habib-faye/studio"],
+    ["/studio", "/centre-culturel/studio"],
     ["/ecole", "/emsi"],
-    ["/espace-habib-faye", "/maison-habib-faye"],
-    ["/agenda", "/maison-habib-faye/agenda"],
-    ["/agenda/un-concert", "/maison-habib-faye/agenda/un-concert"],
-    ["/events", "/maison-habib-faye"],
-    ["/events/materiel/une-enceinte", "/maison-habib-faye"],
+    ["/espace-habib-faye", "/centre-culturel"],
+    ["/agenda", "/centre-culturel/agenda"],
+    ["/agenda/un-concert", "/centre-culturel/agenda/un-concert"],
+    ["/events", "/centre-culturel"],
+    ["/events/materiel/une-enceinte", "/centre-culturel"],
     ["/musee", "/emsi/realisations"],
     ["/musee/oeuvres/une-oeuvre", "/emsi/realisations/une-oeuvre"],
     ["/musee/salle-du-son", "/emsi/univers/son"],
     ["/musee/design", "/emsi/univers/design"],
-    ["/demande", "/maison-habib-faye/studio#reserver"],
+    ["/demande", "/centre-culturel/studio#reserver"],
   ];
   for (const [from, to] of redirections) {
     const response = await request.get(from, { maxRedirects: 0 });
@@ -45,6 +45,31 @@ test("le menu EMSI s'ouvre au clavier et se referme avec Échap", async ({ page,
   await page.keyboard.press("Escape");
   await expect(bouton).toHaveAttribute("aria-expanded", "false");
   await expect(bouton).toBeFocused();
+});
+
+test("le menu « À propos » regroupe mission, partenaires, soutien, actualités, presse et contact, avec leur description", async ({ page, isMobile }) => {
+  test.skip(isMobile, "Menu de bureau : sur téléphone, voir l'accordéon.");
+  await page.goto("/");
+  const nav = page.getByRole("navigation", { name: "Navigation principale" });
+  await nav.getByRole("button", { name: "À propos" }).click();
+  // Le nom accessible d'un lien comprend sa description : on vise le début du nom.
+  const link = (name: string) => nav.getByRole("link", { name: new RegExp(`^${name}`) });
+  for (const name of ["Mission et impact", "Partenaires et soutiens", "Nous soutenir", "Actualités", "Presse", "Contact"]) {
+    await expect(link(name)).toBeVisible();
+  }
+  await expect(link("Presse")).toContainText("Communiqués");
+  await link("Contact").click();
+  await expect(page).toHaveURL(/\/contact$/, { timeout: 15000 }); // première compilation de la page en dev
+});
+
+test("la rubrique où l'on se trouve est marquée dans le menu", async ({ page, isMobile }) => {
+  test.skip(isMobile, "Menu de bureau.");
+  await page.goto("/emsi/dakar");
+  const nav = page.getByRole("navigation", { name: "Navigation principale" });
+  await expect(nav.getByRole("button", { name: "EMSI" })).toHaveClass(/nav-pill-active/);
+  await expect(nav.getByRole("button", { name: "Centre culturel Habib Faye" })).not.toHaveClass(/nav-pill-active/);
+  await nav.getByRole("button", { name: "EMSI" }).click();
+  await expect(nav.getByRole("link", { name: "Campus de Dakar" })).toHaveAttribute("aria-current", "page");
 });
 
 test("sur téléphone, le menu EMSI s'ouvre en accordéon", async ({ page }) => {
@@ -73,12 +98,12 @@ test("une page de campus affiche le fil d'Ariane et la sous-navigation EMSI, pag
 // Pages d'essai créées par `php artisan emsi:domains-showcase` (showcase.setup.ts).
 test.describe("nouveaux blocs", () => {
   const MAISONS = [
-    ["Maison Habib Faye", "/maison-habib-faye"],
+    ["Centre culturel Habib Faye", "/centre-culturel"],
     ["EMSI", "/emsi"],
-    ["Impact Live Studio", "/maison-habib-faye/studio"],
+    ["Impact Live Studio", "/centre-culturel/studio"],
   ] as const;
 
-  test("le triptyque « Nos trois maisons » : trois panneaux cliquables, côte à côte sur ordinateur", async ({ page, isMobile }) => {
+  test("le triptyque « Nos trois lieux » : trois panneaux cliquables, côte à côte sur ordinateur", async ({ page, isMobile }) => {
     test.skip(isMobile, "Disposition ordinateur.");
     await page.setViewportSize({ width: 1440, height: 900 });
     await page.goto("/essai-domaines-accueil");
@@ -101,7 +126,7 @@ test.describe("nouveaux blocs", () => {
     await expect.poll(async () => (await triptyque.getByTestId("domain-panel").first().boundingBox())!.width).toBeGreaterThan(boxes[0].width * 1.2);
 
     await triptyque.getByRole("link", { name: "EMSI", exact: true }).click();
-    await expect(page).toHaveURL(/\/emsi$/);
+    await expect(page).toHaveURL(/\/emsi$/, { timeout: 15000 }); // première compilation de la page en dev
   });
 
   test("le triptyque s'empile sur téléphone, sans défilement horizontal", async ({ page }) => {
@@ -206,7 +231,7 @@ test.describe("nouveaux blocs", () => {
   });
 });
 
-test("les pages de campus et de la Maison exposent leurs données structurées", async ({ page }) => {
+test("les pages de campus et du Centre culturel exposent leurs données structurées", async ({ page }) => {
   const jsonLd = async (path: string) => {
     await page.goto(path);
     const scripts = await page.locator('script[type="application/ld+json"]').allTextContents();
@@ -214,6 +239,42 @@ test("les pages de campus et de la Maison exposent leurs données structurées",
   };
   const campus = await jsonLd("/emsi/saint-louis");
   expect(campus).toContainEqual(expect.objectContaining({ "@type": "EducationalOrganization", address: expect.objectContaining({ "@type": "PostalAddress", addressCountry: "SN" }) }));
-  const maison = await jsonLd("/maison-habib-faye");
+  const maison = await jsonLd("/centre-culturel");
   expect(maison).toContainEqual(expect.objectContaining({ "@type": "Organization" }));
+});
+
+test("le méga-menu présente la rubrique (photo, accroche) à côté de ses liens", async ({ page, isMobile }) => {
+  test.skip(isMobile, "Menu de bureau.");
+  await page.goto("/");
+  const nav = page.getByRole("navigation", { name: "Navigation principale" });
+  await nav.getByRole("button", { name: "Centre culturel Habib Faye" }).click();
+  const feature = nav.getByRole("link", { name: /^Centre culturel Habib Faye/ });
+  await expect(feature).toBeVisible();
+  await expect(feature).toHaveAttribute("href", "/centre-culturel");
+  await expect(feature).toContainText("centre culturel");
+});
+
+test("les anciennes adresses de la « Maison » mènent au Centre culturel, en français comme en anglais", async ({ request }) => {
+  for (const [from, to] of [["/maison-habib-faye", "/centre-culturel"], ["/maison-habib-faye/studio", "/centre-culturel/studio"], ["/en/maison-habib-faye/agenda", "/en/centre-culturel/agenda"]]) {
+    const response = await request.get(from, { maxRedirects: 0 });
+    expect(response.status(), from).toBe(308);
+    expect(new URL(response.headers()["location"], "http://x").pathname, from).toBe(to);
+  }
+});
+
+test("à 1024 px, chaque méga-menu reste entièrement dans l'écran", async ({ page, isMobile }) => {
+  test.skip(isMobile, "Menu de bureau.");
+  await page.setViewportSize({ width: 1024, height: 768 });
+  await page.goto("/");
+  const nav = page.getByRole("navigation", { name: "Navigation principale" });
+  for (const name of ["Centre culturel Habib Faye", "EMSI", "À propos"]) {
+    const button = nav.getByRole("button", { name });
+    await button.click();
+    const panel = page.locator(`#${await button.getAttribute("aria-controls")}`.replace(/:/g, "\\:"));
+    await expect(panel).toBeVisible();
+    await expect.poll(async () => (await panel.boundingBox())!.x).toBeGreaterThanOrEqual(0);
+    const box = (await panel.boundingBox())!;
+    expect(box.x + box.width).toBeLessThanOrEqual(1024);
+    await page.keyboard.press("Escape");
+  }
 });

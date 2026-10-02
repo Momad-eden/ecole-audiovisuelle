@@ -1,4 +1,5 @@
 import { Fragment } from "react";
+import { Emphasis } from "@/components/ui/Emphasis";
 import { cn } from "@/lib/utils";
 import { ButtonLink } from "@/components/ui/ButtonLink";
 import { MediaImage } from "@/components/ui/MediaImage";
@@ -47,7 +48,7 @@ export function VenueBlock({ data }: BlockProps<VenueData>) {
         <div className="grid items-center gap-14 lg:grid-cols-[1fr_1.1fr]">
           <Reveal>
             {data.eyebrow && <p className="cartel mb-5 flex items-center gap-3 text-[var(--accent-ink)]"><span className="h-px w-10 bg-[var(--accent-ink)]" aria-hidden />{data.eyebrow}</p>}
-            <h2 className="display text-[clamp(1.9rem,3.4vw,3rem)] text-balance">{data.title}</h2>
+            <h2 className="display text-[clamp(1.9rem,3.4vw,3rem)] text-balance"><Emphasis text={data.title} /></h2>
             {data.text && <p className="mt-6 max-w-xl text-lg text-ink/80">{data.text}</p>}
             {data.buttons && data.buttons.length > 0 && (
               <div className="mt-8 flex flex-wrap gap-3">

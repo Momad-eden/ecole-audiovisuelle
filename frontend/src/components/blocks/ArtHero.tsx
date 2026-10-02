@@ -1,11 +1,12 @@
 "use client";
 
+import { Emphasis } from "@/components/ui/Emphasis";
 import { useRef } from "react";
 import { Volume2, VolumeX } from "lucide-react";
 import { useT } from "@/components/i18n/LocaleProvider";
 import { ButtonLink } from "@/components/ui/ButtonLink";
 import { accentVars } from "@/lib/contrast";
-import { cn, frenchSpacing } from "@/lib/utils";
+import { cn } from "@/lib/utils";
 import { useArtSound } from "./art/useArtSound";
 import { useLightRibbons } from "./art/useLightRibbons";
 import type { HeroData } from "./types";
@@ -58,7 +59,7 @@ export function ArtHero({ data, first }: { data: HeroData; first: boolean }) {
           style={image ? { backgroundImage: `url("${image}")` } : undefined}
           data-image={image ? "true" : undefined}
         >
-          {frenchSpacing(data.title)}
+          <Emphasis text={data.title} />
         </Heading>
 
         <div className="mt-10 grid gap-10 lg:grid-cols-[minmax(0,1fr)_auto] lg:items-end">

@@ -148,7 +148,7 @@ class PublicContentApiTest extends TestCase
             ->assertJsonFragment(['path' => '/emsi/formations/son-live'])
             ->assertJsonFragment(['path' => '/emsi/professionnels/mixage-pro'])
             ->assertJsonFragment(['path' => '/emsi/realisations/une-oeuvre'])
-            ->assertJsonFragment(['path' => '/maison-habib-faye/agenda/un-concert']);
+            ->assertJsonFragment(['path' => '/centre-culturel/agenda/un-concert']);
 
         $paths = collect($response->json('data'))->pluck('path');
         foreach (['/univers/', '/formations/', '/realisations/', '/professionnels/', '/agenda/', '/events', '/expositions'] as $old) {

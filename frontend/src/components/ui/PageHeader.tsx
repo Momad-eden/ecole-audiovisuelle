@@ -8,7 +8,7 @@ export function PageHeader({ eyebrow, title, text, accent, children, aside, clas
   return (
     <section className={cn("relative isolate overflow-hidden pb-14 pt-36 sm:pt-44", className)} style={accent ? { ["--accent" as string]: accent } : undefined}>
       <div className="beam absolute inset-0 -z-10" aria-hidden />
-      <div className={cn("mx-auto grid max-w-7xl gap-12 px-4 sm:px-6 lg:px-8", aside && "lg:grid-cols-[1.2fr_1fr] lg:items-center")}>
+      <div className={cn("mx-auto grid max-w-7xl gap-12 px-5 sm:px-6 lg:px-8", aside && "lg:grid-cols-[1.2fr_1fr] lg:items-center")}>
         <div>
           {eyebrow && (
             <p className="cartel mb-5 flex items-center gap-3 text-[var(--accent-ink)]">

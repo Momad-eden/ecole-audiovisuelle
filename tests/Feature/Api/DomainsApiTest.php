@@ -31,7 +31,7 @@ class DomainsApiTest extends TestCase
         $response->assertJsonCount(1, 'data.menus.main')
             ->assertJsonPath('data.menus.main.0.label', 'EMSI')
             ->assertJsonCount(1, 'data.menus.main.0.children')
-            ->assertJsonPath('data.menus.main.0.children.0', ['label' => 'Formations', 'url' => '/formations'])
+            ->assertJsonPath('data.menus.main.0.children.0', ['label' => 'Formations', 'url' => '/formations', 'description' => null])
             ->assertJsonPath('data.menus.footer.0.children', []);
     }
 
@@ -55,7 +55,7 @@ class DomainsApiTest extends TestCase
     public function test_site_exposes_the_domains(): void
     {
         $this->getJson('/api/v1/public/site')->assertOk()
-            ->assertJsonPath('data.domains.maison', ['label' => 'Maison Habib Faye', 'color' => '#e0a84a'])
+            ->assertJsonPath('data.domains.maison', ['label' => 'Centre culturel Habib Faye', 'color' => '#e0a84a'])
             ->assertJsonPath('data.domains.emsi.color', '#ff7a1a')
             ->assertJsonPath('data.domains.studio.color', '#ff3b30')
             ->assertJsonStructure(['data' => ['domains' => ['general' => ['label', 'color']]]]);

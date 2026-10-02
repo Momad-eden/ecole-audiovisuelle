@@ -21,7 +21,7 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
 
 /**
- * Pages d'essai des blocs « Nos trois maisons », « Formations de ce campus », « Nous soutenir » et
+ * Pages d'essai des blocs « Nos trois lieux », « Formations de ce campus », « Nous soutenir » et
  * « Documents à télécharger », et une formation d'essai proposée seulement dans le premier campus,
  * pour les parcours Playwright. Lancée par la préparation des tests e2e et supprimée à la fin (--remove) :
  * rien de tout cela ne doit rester dans une base qui partira en production.
@@ -63,12 +63,12 @@ class DomainsShowcaseCommand extends Command
             'domain' => $domain, 'eyebrow' => $eyebrow, 'title' => $title, 'text' => $text,
             'image' => $images[$image], 'image_alt' => '', 'url' => $url, 'label' => $label,
         ];
-        $this->page('essai-domaines-accueil', 'Essai — Nos trois maisons', 'general', [['type' => 'domains', 'data' => [
+        $this->page('essai-domaines-accueil', 'Essai — Nos trois lieux', 'general', [['type' => 'domains', 'data' => [
             'intro' => 'La culture comme héritage, l\'art comme métier',
             'panels' => [
-                $panel('maison', 'Centre culturel · Saint-Louis', 'Maison Habib Faye', 'Concerts, résidences, transmission. Et Impact Live Studio.', 'facade_monumentale', '/maison-habib-faye', 'Découvrir la Maison'),
+                $panel('maison', 'Centre culturel · Saint-Louis', 'Centre culturel Habib Faye', 'Concerts, résidences, transmission. Et Impact Live Studio.', 'facade_monumentale', '/centre-culturel', 'Découvrir le Centre culturel'),
                 $panel('emsi', 'École · Dakar & Saint-Louis', 'EMSI', 'Les métiers du son, de l\'image et de la scène.', 'grande_salle', '/emsi', 'Se former'),
-                $panel('studio', '● REC · Studio', 'Impact Live Studio', 'Enregistrement, mixage, mastering.', 'studio_son', '/maison-habib-faye/studio', 'Réserver'),
+                $panel('studio', '● REC · Studio', 'Impact Live Studio', 'Enregistrement, mixage, mastering.', 'studio_son', '/centre-culturel/studio', 'Réserver'),
             ],
         ]]]);
 

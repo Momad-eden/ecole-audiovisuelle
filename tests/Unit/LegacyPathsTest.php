@@ -22,22 +22,25 @@ class LegacyPathsTest extends TestCase
             'professionnels' => ['/professionnels', '/emsi/professionnels'],
             'professionnels candidater' => ['/professionnels/candidater', '/emsi/professionnels/candidater'],
             'expositions' => ['/expositions/2025', '/emsi/realisations'],
-            'studio' => ['/studio', '/maison-habib-faye/studio'],
-            'studio anchor kept' => ['/studio#reserver', '/maison-habib-faye/studio#reserver'],
+            'studio' => ['/studio', '/centre-culturel/studio'],
+            'studio anchor kept' => ['/studio#reserver', '/centre-culturel/studio#reserver'],
             'ecole' => ['/ecole', '/emsi'],
-            'espace anchor kept' => ['/espace-habib-faye#programmation', '/maison-habib-faye#programmation'],
-            'agenda' => ['/agenda', '/maison-habib-faye/agenda'],
-            'agenda event' => ['/agenda/festival', '/maison-habib-faye/agenda/festival'],
-            'events' => ['/events', '/maison-habib-faye'],
-            'events anchor dropped' => ['/events#devis', '/maison-habib-faye'],
-            'events subpage' => ['/events/materiel', '/maison-habib-faye'],
+            'espace anchor kept' => ['/espace-habib-faye#programmation', '/centre-culturel#programmation'],
+            'agenda' => ['/agenda', '/centre-culturel/agenda'],
+            'agenda event' => ['/agenda/festival', '/centre-culturel/agenda/festival'],
+            'events' => ['/events', '/centre-culturel'],
+            'events anchor dropped' => ['/events#devis', '/centre-culturel'],
+            'events subpage' => ['/events/materiel', '/centre-culturel'],
             'musee' => ['/musee', '/emsi/realisations'],
             'musee oeuvre' => ['/musee/oeuvres/la-nuit', '/emsi/realisations/la-nuit'],
             'musee salle' => ['/musee/salle-du-son', '/emsi/univers/son'],
             'musee autre salle' => ['/musee/cinema', '/emsi/univers/cinema'],
-            'demande de devis' => ['/demande', '/maison-habib-faye/studio#reserver'],
-            'demande avec requête' => ['/demande?type=x', '/maison-habib-faye/studio#reserver'],
-            'trailing slash' => ['/studio/', '/maison-habib-faye/studio'],
+            'demande de devis' => ['/demande', '/centre-culturel/studio#reserver'],
+            'demande avec requête' => ['/demande?type=x', '/centre-culturel/studio#reserver'],
+            'trailing slash' => ['/studio/', '/centre-culturel/studio'],
+            'ancienne Maison' => ['/maison-habib-faye', '/centre-culturel'],
+            'ancienne Maison, sous-page et ancre' => ['/maison-habib-faye/studio#reserver', '/centre-culturel/studio#reserver'],
+            'ancienne Maison, événement' => ['/maison-habib-faye/agenda/festival', '/centre-culturel/agenda/festival'],
         ];
     }
 
@@ -51,7 +54,7 @@ class LegacyPathsTest extends TestCase
     {
         return [
             ['/'], ['/#univers'], ['/candidater'], ['/candidater?campus=emsi-dakar'], ['/contact'], ['/actualites/une-nouvelle'],
-            ['/emsi'], ['/emsi/formations/x'], ['/maison-habib-faye/studio#reserver'], ['/maison-habib-faye'],
+            ['/emsi'], ['/emsi/formations/x'], ['/centre-culturel/studio#reserver'], ['/centre-culturel'],
             ['/studios'], ['/eventsx'], ['/formationsx'], ['/demandes'], ['#reserver'], [''],
             ['https://emsi.sn/formations'], ['mailto:contact@emsi.sn'], ['tel:+221776807062'],
         ];
@@ -76,7 +79,7 @@ class LegacyPathsTest extends TestCase
         $html = '<p>Voir <a href="/formations/son">la formation</a>, <a href=\'/events\'>nos prestations</a> et <a href="https://x.sn/studio">ailleurs</a>.</p>';
 
         $this->assertSame(
-            '<p>Voir <a href="/emsi/formations/son">la formation</a>, <a href=\'/maison-habib-faye\'>nos prestations</a> et <a href="https://x.sn/studio">ailleurs</a>.</p>',
+            '<p>Voir <a href="/emsi/formations/son">la formation</a>, <a href=\'/centre-culturel\'>nos prestations</a> et <a href="https://x.sn/studio">ailleurs</a>.</p>',
             LegacyPaths::rewriteHtml($html),
         );
     }

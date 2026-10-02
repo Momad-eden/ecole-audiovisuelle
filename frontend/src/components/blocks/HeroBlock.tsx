@@ -1,13 +1,15 @@
 import { ButtonLink } from "@/components/ui/ButtonLink";
+import { Emphasis } from "@/components/ui/Emphasis";
 import { MediaImage } from "@/components/ui/MediaImage";
 import { accentVars } from "@/lib/contrast";
-import { cn, frenchSpacing } from "@/lib/utils";
+import { cn } from "@/lib/utils";
 import { HeroVideo } from "./HeroVideo";
 import { StageHero } from "./StageHero";
 import { ArtHero } from "./ArtHero";
 import { ProjectionHero } from "./ProjectionHero";
 import { StudioHero } from "./StudioHero";
 import { CinemaHero } from "./CinemaHero";
+import { FilmHero } from "./FilmHero";
 import { CompactHero, EditorialHero, MosaicHero, PosterHero, SpotlightHero, heroTitleSize } from "./HeroLayouts";
 import type { Locale } from "@/lib/i18n/locales";
 import type { HeroData } from "./types";
@@ -21,6 +23,7 @@ export function HeroBlock({ data, first, locale }: { data: HeroData; first: bool
     case "projection": return <ProjectionHero data={data} first={first} />;
     case "studio": return <StudioHero data={data} first={first} />;
     case "cinema": return <CinemaHero data={data} first={first} />;
+    case "film": return <FilmHero data={data} first={first} />;
     case "spotlight": return <SpotlightHero data={data} first={first} />;
     case "editorial": return <EditorialHero data={data} first={first} />;
     case "poster": return <PosterHero data={data} first={first} locale={locale} />;
@@ -44,10 +47,10 @@ export function HeroBlock({ data, first, locale }: { data: HeroData; first: bool
       )}
       <div className="beam absolute inset-0 -z-10" aria-hidden />
 
-      <div className={cn("mx-auto w-full max-w-7xl px-4 sm:px-6 lg:px-8", split && "grid items-center gap-12 lg:grid-cols-2")}>
+      <div className={cn("mx-auto w-full max-w-7xl px-5 sm:px-6 lg:px-8", split && "grid items-center gap-12 lg:grid-cols-2")}>
         <div className={cn(split ? "max-w-3xl" : "max-w-5xl")}>
           {data.eyebrow && <p className="cartel mb-5 flex items-center gap-3 text-[var(--accent-ink)]"><span className="h-px w-10 bg-[var(--accent-ink)]" aria-hidden />{data.eyebrow}</p>}
-          <Heading className={cn("display text-balance", heroTitleSize(data.title))}>{frenchSpacing(data.title)}</Heading>
+          <Heading className={cn("display text-balance", heroTitleSize(data.title))}><Emphasis text={data.title} /></Heading>
           {data.subtitle && <p className="mt-6 max-w-2xl text-lg text-ink/80 sm:text-xl">{data.subtitle}</p>}
           {data.buttons && data.buttons.length > 0 && (
             <div className="mt-10 flex flex-wrap gap-3">

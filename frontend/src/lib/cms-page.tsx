@@ -8,7 +8,7 @@ import { pageMetadata } from "@/lib/metadata";
 import { jsonLdScript, pageStructuredData } from "@/lib/structured-data";
 import { siteUrl } from "@/lib/utils";
 
-/** Page à blocs gérée dans l'admin, servie par une route dédiée à une adresse fixe (ex. /maison-habib-faye/studio). */
+/** Page à blocs gérée dans l'admin, servie par une route dédiée à une adresse fixe (ex. /centre-culturel/studio). */
 export async function cmsMetadata(slug: string, locale: Locale): Promise<Metadata> {
   const page = await api.page(slug, locale);
   return page ? pageMetadata(page, locale) : {};

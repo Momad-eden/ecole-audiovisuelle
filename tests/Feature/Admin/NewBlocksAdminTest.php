@@ -85,7 +85,7 @@ class NewBlocksAdminTest extends TestCase
         ]]);
 
         $this->get(PageResource::getUrl('edit', ['record' => $page]))->assertOk()
-            ->assertSee('Nos trois maisons (triptyque)')
+            ->assertSee('Nos trois lieux (triptyque)')
             ->assertSee('Formations de ce campus')
             ->assertSee('Documents à télécharger')
             ->assertSee('Nous soutenir (formulaire)');

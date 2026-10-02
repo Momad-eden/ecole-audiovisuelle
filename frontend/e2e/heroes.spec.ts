@@ -132,3 +132,88 @@ test.describe("sur tablette tactile", () => {
     await expect(point).toHaveAttribute("aria-expanded", "true");
   });
 });
+
+test("Film : grande phrase en h1, mots séparés, défilement des photos en pause au bouton", async ({ page }) => {
+  await page.goto("/essai-heros-film");
+  await expect(page.getByRole("heading", { level: 1 })).toHaveText("La culture comme héritage");
+  const pause = page.getByTestId("film-hero").getByRole("button", { name: "Mettre la vidéo en pause" });
+  await pause.click();
+  await expect(page.getByTestId("film-hero").getByRole("button", { name: "Relancer la vidéo" })).toBeVisible();
+});
+
+test("Film : « Voir le film » ouvre la vidéo complète et Échap la referme", async ({ page }) => {
+  await page.goto("/essai-heros-film");
+  await page.getByRole("button", { name: "Voir le film" }).click();
+  const dialog = page.getByRole("dialog", { name: "La culture comme héritage" });
+  await expect(dialog.locator("iframe")).toHaveAttribute("src", /youtube-nocookie\.com\/embed\/dQw4w9WgXcQ/);
+  await page.keyboard.press("Escape");
+  await expect(dialog).toBeHidden();
+});
+
+test("Vitrine : une case s'agrandit, on passe à la suivante au clavier, Échap referme", async ({ page }) => {
+  await page.goto("/essai-heros-film");
+  const showcase = page.getByTestId("showcase");
+  await showcase.getByRole("button", { name: "Agrandir : Sur scène" }).click();
+  const viewer = page.getByRole("dialog", { name: "Sur scène et en coulisses" });
+  await expect(viewer.getByText("1 sur 3")).toBeVisible();
+  await expect(viewer.getByRole("link", { name: /Sur scène/ })).toHaveAttribute("href", "/centre-culturel/agenda");
+  await page.keyboard.press("ArrowRight");
+  await expect(viewer.getByText("2 sur 3")).toBeVisible();
+  await page.keyboard.press("Escape");
+  await expect(viewer).toBeHidden();
+});
+
+test("Chiffres clés : la valeur finale est lisible par les lecteurs d'écran", async ({ page }) => {
+  await page.goto("/essai-heros-film");
+  await expect(page.locator("dd .sr-only").filter({ hasText: "+300" })).toHaveCount(1);
+  await page.getByText("diplômés").scrollIntoViewIfNeeded();
+  await expect(page.locator("dd [aria-hidden]").filter({ hasText: "+300" })).toBeVisible({ timeout: 5000 });
+});
+
+test("En-tête : devient une capsule au défilement, se cache en descendant et revient en remontant", async ({ page }) => {
+  await page.goto("/essai-heros-film");
+  const header = page.locator(".site-header");
+  await expect(header).not.toHaveAttribute("data-scrolled");
+  // Premier défilement court (page prête, capsule), puis on descend franchement : l'en-tête se cache.
+  await page.mouse.wheel(0, 200);
+  await expect(header).toHaveAttribute("data-scrolled", "");
+  await page.mouse.wheel(0, 1400);
+  await expect.poll(async () => (await header.boundingBox())!.y).toBeLessThan(-40);
+  await page.mouse.wheel(0, -300);
+  await expect.poll(async () => (await header.boundingBox())!.y).toBe(0);
+});
+
+test("Manifeste : grande phrase avec mot mis en valeur, chiffre et bandeau de photos décoratif", async ({ page }) => {
+  await page.goto("/essai-heros-film");
+  const statement = page.getByTestId("statement");
+  await expect(statement.locator("em.title-accent")).toHaveText("centre culturel");
+  await expect(statement.locator("dd .sr-only")).toHaveText("3");
+  // Bandeau de photos décoratif, avec un bouton pause visible.
+  await expect(statement.locator(".statement-ribbon > [aria-hidden=true]")).toHaveCount(1);
+  const toggle = statement.getByRole("button", { name: "Mettre le bandeau de photos en pause" });
+  await toggle.click();
+  await expect(statement.getByRole("button", { name: "Relancer le bandeau de photos" })).toBeVisible();
+  await expect(statement.locator(".statement-track").first()).toHaveCSS("animation-play-state", "paused");
+});
+
+test("Présentation institutionnelle : piliers numérotés et mot du fondateur", async ({ page }) => {
+  await page.goto("/essai-heros-film");
+  const institution = page.getByTestId("institution");
+  await expect(institution.getByRole("heading", { level: 2 })).toHaveText("Former, créer, transmettre");
+  await expect(institution.getByRole("listitem")).toHaveCount(3);
+  await expect(institution.getByRole("heading", { level: 3, name: "Notre vision" })).toBeVisible();
+  await expect(institution.locator("blockquote")).toContainText("Un rêve peut devenir réalité.");
+  await expect(institution.locator("figcaption")).toContainText("Boubacar Tall");
+});
+
+test("Trois lieux après le film : trois cartes encadrées, avec une marge autour", async ({ page }) => {
+  await page.goto("/essai-heros-film");
+  const section = page.getByTestId("domains-block");
+  await expect(section.getByRole("heading", { level: 2 })).toHaveText("Trois lieux, un même élan");
+  const cards = section.getByTestId("domain-panel");
+  await expect(cards).toHaveCount(3);
+  await expect(section.getByRole("link", { name: "EMSI", exact: true })).toHaveAttribute("href", "/emsi");
+  const box = (await cards.first().boundingBox())!;
+  expect(box.x).toBeGreaterThanOrEqual(16);
+  await expect(cards.first()).not.toHaveCSS("border-top-left-radius", "0px");
+});

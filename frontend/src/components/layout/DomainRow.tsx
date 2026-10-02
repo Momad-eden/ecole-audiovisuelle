@@ -43,8 +43,8 @@ export function DomainRow({ section, path }: { section: DomainSection; path: str
   const siblings = section.parent.children ?? [];
 
   return (
-    <div data-domain-row className={cn("site-header fixed inset-x-0 top-18 z-40 transition-colors duration-500", scrolled ? "border-b border-line bg-night/85 backdrop-blur-md" : "border-b border-transparent")}>
-      <div className="mx-auto flex h-11 max-w-7xl items-center justify-between gap-4 px-4 sm:px-6 lg:px-8">
+    <div data-domain-row data-scrolled={scrolled ? "" : undefined} className="domain-row fixed inset-x-0 top-18 z-40 transition-transform duration-500 ease-out motion-reduce:transition-none">
+      <div className="domain-row-bar mx-auto flex h-11 max-w-7xl items-center justify-between gap-4 px-5 sm:px-6 lg:px-8">
         <nav aria-label={t.label} className="hidden min-w-0 sm:block">
           <ol className="flex items-center gap-1.5 whitespace-nowrap text-xs text-ink-muted">
             {crumbs.map((crumb, index) => {
@@ -60,7 +60,8 @@ export function DomainRow({ section, path }: { section: DomainSection; path: str
         </nav>
         {siblings.length > 0 && (
           <nav aria-label={t.sections(section.parent.label)} className="min-w-0 max-sm:w-full">
-            <ul className="flex items-center gap-1 overflow-x-auto">
+            {/* Sur téléphone, la liste défile : un fondu à droite l'indique. */}
+            <ul className="flex items-center gap-1 overflow-x-auto pointer-coarse:gap-2 [scrollbar-width:none] max-sm:pr-6 max-sm:[mask-image:linear-gradient(90deg,#000_85%,transparent)]">
               {siblings.map((item) => {
                 const here = item.url === section.current?.url;
                 return (
@@ -68,7 +69,8 @@ export function DomainRow({ section, path }: { section: DomainSection; path: str
                     <LocaleLink
                       href={item.url}
                       aria-current={here ? (item.url === clean ? "page" : "location") : undefined}
-                      className={cn("inline-flex min-h-8 items-center rounded-full px-3 text-xs transition", here ? "bg-[var(--accent)] font-semibold text-on-accent" : "text-ink/80 hover:text-ink")}
+                      // Zone touchable de 44 px (ui-ux-pro-max : touch-target-size) pour une pastille visible de 32 px.
+                      className={cn("relative inline-flex min-h-8 items-center rounded-full px-3 text-xs transition after:absolute after:-inset-y-1.5 after:inset-x-0 after:content-[''] pointer-coarse:text-sm", here ? "bg-[var(--accent)] font-semibold text-on-accent" : "text-ink/80 hover:text-ink")}
                     >
                       {item.label}
                     </LocaleLink>

@@ -17,8 +17,8 @@ import "../globals.css";
 
 // Archivo variable : l'axe de largeur (wdth) donne les titres d'affiche étendus.
 const archivo = Archivo({ subsets: ["latin"], variable: "--font-archivo", display: "swap", axes: ["wdth"] });
-// Police « élégante » proposée dans l'éditeur : téléchargée seulement si un texte l'utilise.
-const fraunces = Fraunces({ subsets: ["latin"], variable: "--font-fraunces", display: "swap", preload: false });
+// Police « élégante » : mots mis en valeur dans les titres (*mot*) et éditeur ; téléchargée seulement si un texte l'utilise.
+const fraunces = Fraunces({ subsets: ["latin"], variable: "--font-fraunces", display: "swap", style: ["normal", "italic"], preload: false });
 const inter = Inter({ subsets: ["latin"], variable: "--font-inter", display: "swap" });
 // Police des petits cartels : non préchargée, pour laisser la bande passante aux titres.
 const jetbrains = JetBrains_Mono({ subsets: ["latin"], variable: "--font-jetbrains", display: "swap", preload: false });

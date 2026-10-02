@@ -49,15 +49,18 @@ final class BlockTexts
         'services' => 'Services et tarifs', 'productions' => 'Productions du studio (écoute)',
         'agenda' => 'Agenda ou références', 'booking_form' => 'Formulaire de demande (devis, réservation)',
         'places' => 'Nos lieux (adresses)', 'campuses' => 'Nos campus (Dakar, Saint-Louis)',
-        'domains' => 'Nos trois maisons (triptyque)', 'campus_programs' => 'Formations de ce campus',
+        'domains' => 'Nos trois lieux (triptyque)', 'campus_programs' => 'Formations de ce campus',
         'downloads' => 'Documents à télécharger', 'support_form' => 'Nous soutenir (formulaire)',
+        'showcase' => 'Vitrine photos et vidéos',
+        'statement' => 'Manifeste (phrase, chiffres, bandeau de photos)',
+        'institution' => 'Présentation institutionnelle (mission, valeurs, mot du fondateur)',
     ];
 
     /** Libellés d'un élément de répéteur (au singulier). */
     private const ITEM_LABELS = [
         'slides' => 'Diapositive', 'facts' => 'Chiffre clé', 'hotspots' => 'Point sur la photo', 'tracks' => 'Morceau',
         'buttons' => 'Bouton', 'panels' => 'Panneau', 'items' => 'Élément', 'steps' => 'Étape', 'images' => 'Image',
-        'files' => 'Document', 'groups' => 'Catégorie', 'words' => 'Mot qui défile',
+        'files' => 'Document', 'groups' => 'Catégorie', 'words' => 'Mot qui défile', 'pillars' => 'Pilier',
     ];
 
     /** Libellés des champs ; `repeteur.champ` prime sur `champ`. */

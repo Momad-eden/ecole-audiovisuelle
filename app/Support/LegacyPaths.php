@@ -8,8 +8,8 @@ namespace App\Support;
  * (blocs des pages, menus, redirections de l'admin) sans passer par une redirection.
  *
  * Seules les adresses internes (« /… ») sont concernées. La requête et l'ancre sont gardées quand la
- * page cible est la même page déplacée (/studio#reserver → /maison-habib-faye/studio#reserver) ;
- * elles sont abandonnées quand plusieurs anciennes pages mènent à une seule (/events#devis → /maison-habib-faye).
+ * page cible est la même page déplacée (/studio#reserver → /centre-culturel/studio#reserver) ;
+ * elles sont abandonnées quand plusieurs anciennes pages mènent à une seule (/events#devis → /centre-culturel).
  */
 final class LegacyPaths
 {
@@ -30,13 +30,14 @@ final class LegacyPaths
         $target = match ($segments[0] ?? null) {
             'univers' => $rest === '' ? ['/emsi#univers'] : '/emsi/univers'.$tail,   // bloc des univers de la page EMSI
             'formations', 'realisations', 'professionnels' => '/emsi/'.$segments[0].$tail,
-            'studio' => $rest === '' ? '/maison-habib-faye/studio' : null,
+            'studio' => $rest === '' ? '/centre-culturel/studio' : null,
             'ecole' => $rest === '' ? '/emsi' : null,
-            'espace-habib-faye' => $rest === '' ? '/maison-habib-faye' : null,
-            'agenda' => '/maison-habib-faye/agenda'.$tail,
-            'events' => ['/maison-habib-faye'],
+            'espace-habib-faye' => $rest === '' ? '/centre-culturel' : null,
+            'maison-habib-faye' => '/centre-culturel'.$tail,   // « Maison Habib Faye » renommée « Centre culturel Habib Faye »
+            'agenda' => '/centre-culturel/agenda'.$tail,
+            'events' => ['/centre-culturel'],
             'expositions' => ['/emsi/realisations'],
-            'demande' => ['/maison-habib-faye/studio#reserver'],   // ancienne demande de devis d'Impact Live Events
+            'demande' => ['/centre-culturel/studio#reserver'],   // ancienne demande de devis d'Impact Live Events
             'musee' => match (true) {
                 $rest === '' => ['/emsi/realisations'],
                 ($segments[1] ?? null) === 'oeuvres' && isset($segments[2]) => '/emsi/realisations/'.$segments[2],

@@ -1,7 +1,8 @@
-import { cn, frenchSpacing } from "@/lib/utils";
+import { cn } from "@/lib/utils";
+import { Emphasis } from "./Emphasis";
 
 export function Container({ children, className }: { children: React.ReactNode; className?: string }) {
-  return <div className={cn("mx-auto w-full max-w-7xl px-4 sm:px-6 lg:px-8", className)}>{children}</div>;
+  return <div className={cn("mx-auto w-full max-w-7xl px-5 sm:px-6 lg:px-8", className)}>{children}</div>;
 }
 
 export function Section({ children, className, id }: { children: React.ReactNode; className?: string; id?: string }) {
@@ -17,12 +18,12 @@ export function SectionTitle({ eyebrow, title, text, className }: { eyebrow?: st
   return (
     <header className={cn("mb-12 max-w-3xl", className)}>
       {eyebrow && (
-        <p className="cartel mb-4 flex items-center gap-3">
+        <p className="cartel mb-4 flex items-center gap-3 text-[var(--accent-ink)]">
           <span className="h-px w-10 bg-[var(--accent-ink)]" aria-hidden />
           {eyebrow}
         </p>
       )}
-      {title && <h2 className="display text-[clamp(2rem,4.6vw,3.8rem)] text-balance">{frenchSpacing(title)}</h2>}
+      {title && <h2 className="display text-[clamp(2.2rem,4.4vw,3.6rem)] text-balance"><Emphasis text={title} /></h2>}
       {text && <p className="mt-5 text-lg text-ink-muted">{text}</p>}
     </header>
   );

@@ -1,5 +1,6 @@
 "use client";
 
+import { plainTitle } from "@/lib/emphasis";
 import { useEffect, useRef, useState } from "react";
 import { useT } from "@/components/i18n/LocaleProvider";
 import { ButtonLink } from "@/components/ui/ButtonLink";
@@ -85,7 +86,7 @@ export function StageHero({ data, first, variant = "stage" }: { data: HeroData; 
         <div className="absolute inset-x-0 bottom-[22%] h-px bg-gradient-to-r from-transparent via-ink/20 to-transparent" />
       </div>
 
-      <div className="mx-auto w-full max-w-7xl px-4 sm:px-6 lg:px-8">
+      <div className="mx-auto w-full max-w-7xl px-5 sm:px-6 lg:px-8">
         {data.eyebrow && (
           <p className="cartel mb-6 flex items-center gap-3 text-ink/80">
             <span className="h-px w-10 bg-brand" aria-hidden />
@@ -96,9 +97,9 @@ export function StageHero({ data, first, variant = "stage" }: { data: HeroData; 
         <Heading className="display text-[clamp(2.6rem,9vw,8.5rem)] text-balance">
           {words.length > 0 ? (
             <>
-              <span className="sr-only">{`${data.title} ${words.join(", ")}`}</span>
+              <span className="sr-only">{`${plainTitle(data.title)} ${words.join(", ")}`}</span>
               <span aria-hidden>
-                <span className="block">{data.title}</span>
+                <span className="block">{plainTitle(data.title)}</span>
                 <span key={word} className="word-in block" style={{ color: WORD_COLORS[variant][index % WORD_COLORS[variant].length], textShadow: "0 0 60px currentColor" }}>
                   {word}
                   <span className="text-ink">.</span>

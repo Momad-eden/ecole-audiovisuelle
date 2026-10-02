@@ -70,6 +70,10 @@ class BlockResolver
             'gallery' => [...$data, 'images' => collect($data['images'] ?? [])->map(fn ($item) => [
                 ...$this->withImages($item),
             ])->values()->all()],
+            'statement' => [...$data, 'images' => collect($data['images'] ?? [])->map(fn ($path) => Media::image($path, ''))->filter()->values()->all()],
+            'showcase' => [...$data, 'items' => collect($data['items'] ?? [])->map(fn ($item) => [
+                ...$this->withImages($item), 'video' => Media::url($item['video'] ?? null),
+            ])->filter(fn ($item) => $item['image'])->values()->all()],
             'audio' => [...$data, 'tracks' => $this->tracks($data['tracks'] ?? [])],
             'faq' => [...$data, 'items' => Faq::where('group', $data['group'] ?? 'general')->where('is_visible', true)
                 ->with(Localized::eager())->orderBy('position')->get()
@@ -100,7 +104,8 @@ class BlockResolver
             'partners' => [...$data, 'items' => Partner::where('is_active', true)
                 ->when($data['categories'] ?? null, fn ($q, $categories) => $q->whereIn('category', $categories))
                 ->orderBy('position')->get()
-                ->map(fn (Partner $p) => ['name' => $p->name, 'category' => $p->category, 'website' => $p->website, 'logo' => Media::image($p->logo, $p->name)])
+                ->map(fn (Partner $p) => ['name' => $p->name, 'category' => $p->category, 'group' => Partner::groupLabel($p->category, app()->getLocale()),
+                    'website' => $p->website, 'logo' => Media::image($p->logo, $p->name)])
                 ->all()],
             'contact' => [...$data, 'settings' => $this->contactSettings()],
             'domains' => [...$data, 'panels' => $this->domainPanels($data['panels'] ?? [])],

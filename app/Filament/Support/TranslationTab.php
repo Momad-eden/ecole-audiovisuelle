@@ -88,7 +88,7 @@ final class TranslationTab
             'tagline' => ['Accroche', 'text'], 'description' => ['Présentation', 'textarea'], 'highlights' => ['Points forts', 'list'],
             'opening_hours' => ['Horaires', 'text'], 'image_alt' => ['Description de l\'image', 'text'],
         ],
-        'menu_item' => ['label' => ['Texte du lien', 'text']],
+        'menu_item' => ['label' => ['Texte du lien', 'text'], 'description' => ['Description (sous-menu)', 'text']],
         'setting' => [
             'description' => ['Présentation courte (pied de page)', 'textarea'], 'opening_hours' => ['Horaires d\'accueil', 'text'],
             'seo_title' => ['Titre du site dans Google', 'text'], 'seo_description' => ['Description dans Google', 'textarea'],

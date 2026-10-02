@@ -1,10 +1,11 @@
 import { LocaleLink } from "@/components/i18n/LocaleLink";
+import { Emphasis } from "@/components/ui/Emphasis";
 import { ButtonLink } from "@/components/ui/ButtonLink";
 import { MediaImage } from "@/components/ui/MediaImage";
 import { InView } from "@/components/motion/InView";
 import { UniverseVisual } from "@/components/universe/UniverseVisual";
 import { accentVars } from "@/lib/contrast";
-import { cn, frenchSpacing } from "@/lib/utils";
+import { cn } from "@/lib/utils";
 import { HeroVideo } from "./HeroVideo";
 import { getDictionary } from "@/lib/i18n";
 import type { Locale } from "@/lib/i18n/locales";
@@ -55,9 +56,9 @@ export function SpotlightHero({ data, first }: Props) {
         <div className="absolute bottom-[8%] left-1/2 h-24 w-[70vmin] -translate-x-1/2 rounded-[50%] bg-[radial-gradient(closest-side,color-mix(in_oklab,var(--accent)_45%,transparent),transparent)] blur-md" />
         <div className="absolute inset-x-0 bottom-0 h-1/3 bg-gradient-to-t from-night to-transparent" />
       </div>
-      <div className="mx-auto w-full max-w-5xl px-4 sm:px-6">
+      <div className="mx-auto w-full max-w-5xl px-5 sm:px-6">
         <Eyebrow text={data.eyebrow} className="justify-center" />
-        <Heading className={cn("display text-balance", heroTitleSize(data.title))}>{frenchSpacing(data.title)}</Heading>
+        <Heading className={cn("display text-balance", heroTitleSize(data.title))}><Emphasis text={data.title} /></Heading>
         {data.subtitle && <p className="mx-auto mt-7 max-w-2xl text-lg text-ink/80 sm:text-xl">{data.subtitle}</p>}
         <Buttons data={data} className="justify-center" />
       </div>
@@ -71,10 +72,10 @@ export function EditorialHero({ data, first }: Props) {
   return (
     <section className="relative isolate overflow-hidden pb-16 pt-32 sm:pt-40" style={accentStyle(data)}>
       <div className="beam absolute inset-0 -z-10" aria-hidden />
-      <div className="mx-auto grid max-w-7xl items-end gap-12 px-4 sm:px-6 lg:grid-cols-[1.25fr_1fr] lg:px-8">
+      <div className="mx-auto grid max-w-7xl items-end gap-12 px-5 sm:px-6 lg:grid-cols-[1.25fr_1fr] lg:px-8">
         <div className="pb-4">
           <Eyebrow text={data.eyebrow} />
-          <Heading className={cn("display text-balance", heroTitleSize(data.title))}>{frenchSpacing(data.title)}</Heading>
+          <Heading className={cn("display text-balance", heroTitleSize(data.title))}><Emphasis text={data.title} /></Heading>
           {data.subtitle && <p className="mt-7 max-w-xl text-lg text-ink/80 sm:text-xl">{data.subtitle}</p>}
           <Buttons data={data} />
         </div>
@@ -99,13 +100,13 @@ export function PosterHero({ data, first, locale }: Props & { locale: Locale }) 
           <MediaImage image={data.image} sizes="100vw" priority={first} />
         </div>
       )}
-      <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+      <div className="mx-auto max-w-7xl px-5 sm:px-6 lg:px-8">
         <div className="flex flex-wrap items-center justify-between gap-4 border-b border-current/25 pb-5 font-mono text-xs uppercase tracking-[0.2em]">
           <span>{data.eyebrow ?? "EMSI"}</span>
           <span aria-hidden>{getDictionary(locale).hero.posterTagline}</span>
         </div>
         <Heading className={cn("display-condensed mt-8 uppercase leading-[0.86] text-balance", data.title.length <= 30 ? "text-[clamp(3.4rem,13vw,12rem)]" : "text-[clamp(2.8rem,8.5vw,8rem)]")}>
-          {frenchSpacing(data.title)}
+          <Emphasis text={data.title} />
         </Heading>
         <div className="mt-10 grid gap-8 border-t border-current/25 pt-6 lg:grid-cols-[1fr_auto] lg:items-end">
           {data.subtitle && <p className="max-w-2xl text-lg font-medium sm:text-xl">{data.subtitle}</p>}
@@ -130,10 +131,10 @@ export function MosaicHero({ data, first }: Props) {
   return (
     <section className="relative isolate overflow-hidden pb-16 pt-32 sm:pt-40" style={accentStyle(data)}>
       <div className="beam absolute inset-0 -z-10" aria-hidden />
-      <div className="mx-auto grid max-w-7xl items-center gap-12 px-4 sm:px-6 lg:grid-cols-2 lg:px-8">
+      <div className="mx-auto grid max-w-7xl items-center gap-12 px-5 sm:px-6 lg:grid-cols-2 lg:px-8">
         <div>
           <Eyebrow text={data.eyebrow} />
-          <Heading className={cn("display text-balance", heroTitleSize(data.title))}>{frenchSpacing(data.title)}</Heading>
+          <Heading className={cn("display text-balance", heroTitleSize(data.title))}><Emphasis text={data.title} /></Heading>
           {data.subtitle && <p className="mt-7 max-w-xl text-lg text-ink/80 sm:text-xl">{data.subtitle}</p>}
           <Buttons data={data} />
         </div>
@@ -162,9 +163,9 @@ export function CompactHero({ data, first }: Props) {
   return (
     <section className="relative isolate overflow-hidden pb-10 pt-32 sm:pt-36" style={accentStyle(data)}>
       <div className="beam absolute inset-0 -z-10 opacity-60" aria-hidden />
-      <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+      <div className="mx-auto max-w-7xl px-5 sm:px-6 lg:px-8">
         <Eyebrow text={data.eyebrow} />
-        <Heading className="display text-[clamp(2.1rem,4.6vw,3.8rem)] text-balance">{frenchSpacing(data.title)}</Heading>
+        <Heading className="display text-[clamp(2.1rem,4.6vw,3.8rem)] text-balance"><Emphasis text={data.title} /></Heading>
         {data.subtitle && <p className="mt-5 max-w-2xl text-lg text-ink/80">{data.subtitle}</p>}
         <Buttons data={data} className="mt-8" />
       </div>

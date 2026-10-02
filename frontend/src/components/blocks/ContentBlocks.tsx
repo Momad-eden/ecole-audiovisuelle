@@ -1,14 +1,16 @@
 import { LocaleLink } from "@/components/i18n/LocaleLink";
+import { Emphasis } from "@/components/ui/Emphasis";
 import { ArrowRight, Award, AudioLines, Briefcase, Calendar, Clapperboard, GraduationCap, Lightbulb, MapPin, Palette, Plus, Sparkles, Users, Video } from "lucide-react";
 import { ButtonLink } from "@/components/ui/ButtonLink";
 import { MediaImage } from "@/components/ui/MediaImage";
 import { RichText } from "@/components/ui/RichText";
 import { Section, SectionTitle } from "@/components/ui/Section";
 import { VideoEmbed } from "@/components/ui/VideoEmbed";
+import { CountUp } from "@/components/motion/CountUp";
 import { Reveal } from "@/components/motion/Reveal";
 import { getDictionary } from "@/lib/i18n";
 import type { Locale } from "@/lib/i18n/locales";
-import { cn, frenchSpacing } from "@/lib/utils";
+import { cn } from "@/lib/utils";
 import type { BlockProps, CardsData, CtaData, FaqData, GalleryData, QuoteData, StatsData, TextData, TextImageData, TimelineData, VideoData } from "./types";
 
 const ICONS = { "audio-lines": AudioLines, lightbulb: Lightbulb, video: Video, palette: Palette, clapperboard: Clapperboard, "graduation-cap": GraduationCap, users: Users, award: Award, calendar: Calendar, "map-pin": MapPin, briefcase: Briefcase, sparkles: Sparkles } as const;
@@ -16,8 +18,8 @@ const ICONS = { "audio-lines": AudioLines, lightbulb: Lightbulb, video: Video, p
 export function TextBlock({ data, locale }: BlockProps<TextData>) {
   return (
     <Section>
-      <Reveal className="mx-auto grid max-w-6xl gap-10 lg:grid-cols-[1fr_2fr]">
-        {data.title ? <h2 className="display text-[clamp(1.9rem,3.6vw,3rem)] text-balance">{data.title}</h2> : <span />}
+      <Reveal className="grid gap-10 lg:grid-cols-[1fr_2fr]">
+        {data.title ? <h2 className="display text-[clamp(1.9rem,3.6vw,3rem)] text-balance"><Emphasis text={data.title} /></h2> : <span />}
         <RichText html={data.body} locale={locale} className="text-lg" />
       </Reveal>
     </Section>
@@ -86,12 +88,14 @@ export function StatsBlock({ data }: BlockProps<StatsData>) {
   return (
     <Section>
       <SectionTitle title={data.title} />
-      <dl className={cn("grid gap-px overflow-hidden rounded-3xl border border-line bg-line sm:grid-cols-2", (data.items ?? []).length === 3 && "lg:grid-cols-3", (data.items ?? []).length >= 4 && "lg:grid-cols-4")}>
+      <dl className={cn("grid border-y border-line sm:grid-cols-2", (data.items ?? []).length === 3 && "lg:grid-cols-3", (data.items ?? []).length >= 4 && "lg:grid-cols-4")}>
         {(data.items ?? []).map((item, i) => (
-          <Reveal key={item.label} delay={i * 100} className="bg-night p-8 sm:p-10">
-            <dt className="cartel">{item.label}</dt>
-            <dd className="display mt-4 text-[clamp(3rem,6vw,4.8rem)] text-[var(--accent-ink)]">{item.value}</dd>
-            {item.detail && <dd className="mt-3 text-sm text-ink-muted">{item.detail}</dd>}
+          <Reveal key={item.label} delay={i * 100} className={cn("relative flex flex-col py-10 sm:px-8 sm:py-12", i > 0 && "border-t border-line sm:border-t-0 sm:border-l")}>
+            <dt className="cartel order-2 mt-5 text-ink">{item.label}</dt>
+            <dd className="display order-1 text-[clamp(3.6rem,8vw,7rem)] leading-none text-[var(--accent-ink)]">
+              <CountUp value={item.value} />
+            </dd>
+            {item.detail && <dd className="order-3 mt-2 max-w-xs text-sm text-ink-muted">{item.detail}</dd>}
           </Reveal>
         ))}
       </dl>
@@ -134,7 +138,7 @@ export function CtaBlock({ data }: { data: CtaData; locale?: Locale }) {
         <div className="absolute inset-x-0 bottom-0 h-1/2 bg-gradient-to-t from-night to-transparent" />
       </div>
       <Reveal className="mx-auto max-w-5xl text-center">
-        <h2 className="display text-[clamp(2.6rem,8vw,6.5rem)] text-balance">{frenchSpacing(data.title)}</h2>
+        <h2 className="display text-[clamp(2.4rem,5.6vw,5rem)] text-balance"><Emphasis text={data.title} /></h2>
         {data.text && <p className="mx-auto mt-6 max-w-2xl text-lg text-ink/80 sm:text-xl">{data.text}</p>}
         <div className="mt-12 flex flex-wrap justify-center gap-3">
           {(data.buttons ?? []).map((button) => (

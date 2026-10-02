@@ -32,7 +32,7 @@ class DomainsMigrationTest extends TestCase
 
         $this->assertSame(SiteDomain::GENERAL, $page->domain);
         $this->assertSame('#ff7a1a', SiteDomain::EMSI->color());
-        $this->assertSame('Maison Habib Faye', SiteDomain::MAISON->label());
+        $this->assertSame('Centre culturel Habib Faye', SiteDomain::MAISON->label());
     }
 
     /** Classe sans données : sous MySQL une modification de structure validerait la transaction du test. */

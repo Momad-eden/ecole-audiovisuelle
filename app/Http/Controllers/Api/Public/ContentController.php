@@ -89,7 +89,13 @@ class ContentController extends Controller
                 'label' => Localized::value($i, 'label'),
                 'url' => $i->url,
                 'isButton' => $i->is_button,
-                'children' => ($children[$i->id] ?? collect())->map(fn (MenuItem $c) => ['label' => Localized::value($c, 'label'), 'url' => $c->url])->values()->all(),
+                'description' => Localized::value($i, 'description') ?: null,
+                'image' => Media::image($i->image, Localized::value($i, 'label')),
+                'children' => ($children[$i->id] ?? collect())->map(fn (MenuItem $c) => [
+                    'label' => Localized::value($c, 'label'),
+                    'url' => $c->url,
+                    'description' => Localized::value($c, 'description') ?: null,
+                ])->values()->all(),
             ])->values())
             ->all() + ['main' => [], 'footer' => [], 'legal' => []];
     }
@@ -305,7 +311,7 @@ class ContentController extends Controller
             ->merge(Program::published()->get(['slug', 'audience', 'updated_at'])->map(fn (Program $p) => $entry(
                 ($p->audience?->value === 'professional' ? '/emsi/professionnels/' : '/emsi/formations/').$p->slug, $p->updated_at)))
             ->merge(News::published()->get(['slug', 'updated_at'])->map(fn (News $n) => $entry('/actualites/'.$n->slug, $n->updated_at)))
-            ->merge(AgendaEvent::published()->get(['slug', 'updated_at'])->map(fn (AgendaEvent $e) => $entry('/maison-habib-faye/agenda/'.$e->slug, $e->updated_at)))
+            ->merge(AgendaEvent::published()->get(['slug', 'updated_at'])->map(fn (AgendaEvent $e) => $entry('/centre-culturel/agenda/'.$e->slug, $e->updated_at)))
             ->values()]);
     }
 }
