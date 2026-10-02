@@ -28,7 +28,7 @@ class GrandTheatrePartnerMigrationTest extends TestCase
         $this->assertSame('institutional', $theatre->category);
         $this->assertStringStartsWith('Partenaire du campus de Dakar', $theatre->description);
         $blocks = $page->fresh()->blocks;
-        $this->assertSame(['title' => 'Nos partenaires', 'categories' => ['institutional']], $blocks[0]['data']);
-        $this->assertSame(['title' => 'Titre de l\'équipe', 'categories' => ['media']], $blocks[1]['data'], 'Un bloc retouché par l\'équipe ne change pas.');
+        $this->assertEquals(['title' => 'Nos partenaires', 'categories' => ['institutional']], $blocks[0]['data']);
+        $this->assertEquals(['title' => 'Titre de l\'équipe', 'categories' => ['media']], $blocks[1]['data'], 'Un bloc retouché par l\'équipe ne change pas.');
     }
 }
