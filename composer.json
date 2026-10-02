@@ -55,7 +55,7 @@
         ],
         "dev": [
             "Composer\\Config::disableProcessTimeout",
-            "npx concurrently -c \"#93c5fd,#c4b5fd,#fdba74\" \"php artisan serve --port=8000\" \"php artisan queue:listen --tries=1 --timeout=300\" \"npm --prefix frontend run dev\" --names=laravel,file,site"
+            "npx concurrently -c \"#93c5fd,#c4b5fd,#fdba74\" \"php artisan serve --port=8000\" \"php artisan queue:listen --tries=1 --timeout=0\" \"npm --prefix frontend run dev\" --names=laravel,file,site"
         ],
         "test:mysql": [
             "Composer\\Config::disableProcessTimeout",
