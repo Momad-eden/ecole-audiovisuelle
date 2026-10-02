@@ -1,4 +1,5 @@
 import type { Page, Place } from "./types";
+import { localizedPath, type Locale } from "./i18n/locales";
 
 type JsonLd = Record<string, unknown>;
 
@@ -13,8 +14,9 @@ export function jsonLdScript(data: JsonLd): string {
  * « campus_programs ») : EducationalOrganization avec l'adresse du campus. Domaine général : rien
  * de plus que le JSON-LD du site (layout.tsx).
  */
-export function pageStructuredData(page: Pick<Page, "title" | "domain" | "blocks">, path: string, places: Place[], origin: string): JsonLd | null {
-  const url = `${origin}${path}`;
+export function pageStructuredData(page: Pick<Page, "title" | "domain" | "blocks">, path: string, places: Place[], origin: string, locale: Locale = "fr"): JsonLd | null {
+  const url = `${origin}${localizedPath(path, locale)}`;
+  const inLanguage = locale;
   const campusBlock = page.blocks.find((block) => block.type === "campus_programs");
   const campus = campusBlock?.data.campus as { id: number; name: string; city: string | null } | null | undefined;
 
@@ -25,9 +27,9 @@ export function pageStructuredData(page: Pick<Page, "title" | "domain" | "blocks
     if (place?.address) address.streetAddress = place.address;
     if (city) address.addressLocality = city;
     address.addressCountry = "SN";
-    return { "@context": "https://schema.org", "@type": "EducationalOrganization", name: campus.name, url, address, ...(place?.phone ? { telephone: place.phone } : {}) };
+    return { "@context": "https://schema.org", "@type": "EducationalOrganization", name: campus.name, url, inLanguage, address, ...(place?.phone ? { telephone: place.phone } : {}) };
   }
-  if (page.domain === "emsi") return { "@context": "https://schema.org", "@type": "EducationalOrganization", name: page.title, url };
-  if (page.domain === "maison" || page.domain === "studio") return { "@context": "https://schema.org", "@type": "Organization", name: page.title, url };
+  if (page.domain === "emsi") return { "@context": "https://schema.org", "@type": "EducationalOrganization", name: page.title, url, inLanguage };
+  if (page.domain === "maison" || page.domain === "studio") return { "@context": "https://schema.org", "@type": "Organization", name: page.title, url, inLanguage };
   return null;
 }

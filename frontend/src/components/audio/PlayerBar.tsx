@@ -1,7 +1,8 @@
 "use client";
 
 import { useEffect } from "react";
-import Link from "next/link";
+import { LocaleLink } from "@/components/i18n/LocaleLink";
+import { useT } from "@/components/i18n/LocaleProvider";
 import { Pause, Play, X } from "lucide-react";
 import { formatDuration } from "@/lib/utils";
 import { useAudio } from "./AudioProvider";
@@ -11,6 +12,7 @@ import { Waveform } from "./Waveform";
 /** Barre de lecture fixe en bas d'écran, visible dès qu'un son a été lancé. */
 export function PlayerBar() {
   const { track, playing, toggle, seek, close, currentTime, duration } = useAudio();
+  const t = useT().audio;
   const peaks = usePeaks(track?.src, track?.peaks, Boolean(track));
 
   useEffect(() => {
@@ -24,7 +26,7 @@ export function PlayerBar() {
   return (
     <div
       role="region"
-      aria-label="Lecteur audio"
+      aria-label={t.player}
       className="fixed inset-x-0 bottom-0 z-50 border-t border-line bg-night-2/95 backdrop-blur"
       style={{ ["--accent" as string]: track.accent ?? "var(--color-brand)" }}
     >
@@ -32,7 +34,7 @@ export function PlayerBar() {
         <button
           type="button"
           onClick={toggle}
-          aria-label={playing ? "Mettre en pause" : "Lire"}
+          aria-label={playing ? t.playerPause : t.playerPlay}
           className="grid size-11 shrink-0 place-items-center rounded-full bg-[var(--accent-ink)] text-on-accent"
         >
           {playing ? <Pause className="size-5" aria-hidden /> : <Play className="size-5 translate-x-px" aria-hidden />}
@@ -40,16 +42,16 @@ export function PlayerBar() {
         <div className="min-w-0 flex-1">
           <div className="flex items-baseline justify-between gap-3">
             <p className="truncate text-sm font-medium">
-              {track.href ? <Link href={track.href} className="hover:underline">{track.title}</Link> : track.title}
+              {track.href ? <LocaleLink href={track.href} className="hover:underline">{track.title}</LocaleLink> : track.title}
               {track.subtitle && <span className="ml-2 text-ink-muted">{track.subtitle}</span>}
             </p>
             <span className="cartel shrink-0">
               {formatDuration(currentTime)} / {formatDuration(duration)}
             </span>
           </div>
-          <Waveform peaks={peaks} progress={progress} onSeek={seek} label={`Position dans « ${track.title} »`} className="h-8" />
+          <Waveform peaks={peaks} progress={progress} onSeek={seek} label={t.position(track.title)} className="h-8" />
         </div>
-        <button type="button" onClick={close} aria-label="Fermer le lecteur" className="grid size-9 place-items-center rounded-full text-ink-muted hover:text-ink">
+        <button type="button" onClick={close} aria-label={t.close} className="grid size-9 place-items-center rounded-full text-ink-muted hover:text-ink">
           <X className="size-5" aria-hidden />
         </button>
       </div>

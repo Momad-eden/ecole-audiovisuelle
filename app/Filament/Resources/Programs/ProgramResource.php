@@ -12,6 +12,7 @@ use App\Filament\Resources\Programs\RelationManagers\CohortsRelationManager;
 use App\Filament\Support\Fields;
 use App\Filament\Support\FrenchLabels;
 use App\Filament\Support\RichText\TypographyPlugin;
+use App\Filament\Support\TranslationTab;
 use App\Models\Place;
 use App\Models\Program;
 use BackedEnum;
@@ -86,6 +87,7 @@ class ProgramResource extends Resource
                     Fields::publication(),
                     Fields::seo(),
                 ]),
+                TranslationTab::make(),
             ]),
         ]);
     }

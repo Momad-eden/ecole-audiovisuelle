@@ -1,13 +1,16 @@
 "use client";
 
-import Link from "next/link";
+import { LocaleLink } from "@/components/i18n/LocaleLink";
 import { useEffect, useRef, useState } from "react";
 import { ArrowRight, Menu, X } from "lucide-react";
 import { ChevronDown } from "lucide-react";
+import { useT } from "@/components/i18n/LocaleProvider";
 import type { MenuLink } from "@/lib/types";
+import { LanguageSwitcher } from "./LanguageSwitcher";
 import { ThemeToggle } from "./ThemeToggle";
 
 export function MobileMenu({ links }: { links: MenuLink[] }) {
+    const t = useT().header;
     const [open, setOpen] = useState(false);
     const [expanded, setExpanded] = useState<string | null>(null);
     const dialogRef = useRef<HTMLDialogElement>(null);
@@ -29,7 +32,7 @@ export function MobileMenu({ links }: { links: MenuLink[] }) {
                 type="button"
                 onClick={() => setOpen(true)}
                 className="grid size-11 place-items-center rounded-full border border-line bg-night/60 lg:hidden"
-                aria-label="Ouvrir le menu"
+                aria-label={t.openMenu}
             >
                 <Menu className="size-5" aria-hidden />
             </button>
@@ -37,25 +40,26 @@ export function MobileMenu({ links }: { links: MenuLink[] }) {
                 ref={dialogRef}
                 onClose={close}
                 className="m-0 h-dvh max-h-none w-full max-w-none bg-night p-0 text-ink backdrop:bg-night/80"
-                aria-label="Menu"
+                aria-label={t.menu}
             >
                 <div className="beam flex min-h-full flex-col px-5 py-4">
                     <div className="flex items-center justify-between">
                         <span className="display text-2xl">EMSI</span>
                         <span className="flex items-center gap-2">
+                            <LanguageSwitcher />
                             <ThemeToggle />
                             <button
                                 type="button"
                                 onClick={close}
                                 className="grid size-11 place-items-center rounded-full border border-line"
-                                aria-label="Fermer le menu"
+                                aria-label={t.closeMenu}
                             >
                                 <X className="size-5" aria-hidden />
                             </button>
                         </span>
                     </div>
 
-                    <nav aria-label="Navigation principale" className="mt-8">
+                    <nav aria-label={t.mainNav} className="mt-8">
                         <ul>
                             {navLinks.map((link, index) => {
                                 const key = link.url + link.label;
@@ -86,18 +90,18 @@ export function MobileMenu({ links }: { links: MenuLink[] }) {
                                                 <ul id={`mobile-sub-${index}`} hidden={!isOpen} className="pb-3">
                                                     {children.map((child) => (
                                                         <li key={child.url}>
-                                                            <Link href={child.url} onClick={close} className="flex min-h-11 items-center pl-3 text-lg text-ink/85">
+                                                            <LocaleLink href={child.url} onClick={close} className="flex min-h-11 items-center pl-3 text-lg text-ink/85">
                                                                 {child.label}
-                                                            </Link>
+                                                            </LocaleLink>
                                                         </li>
                                                     ))}
                                                 </ul>
                                             </>
                                         ) : (
-                                            <Link href={link.url} onClick={close} className="flex items-baseline justify-between py-4">
+                                            <LocaleLink href={link.url} onClick={close} className="flex items-baseline justify-between py-4">
                                                 <span className="display text-3xl">{link.label}</span>
                                                 {number}
-                                            </Link>
+                                            </LocaleLink>
                                         )}
                                     </li>
                                 );
@@ -106,14 +110,14 @@ export function MobileMenu({ links }: { links: MenuLink[] }) {
                     </nav>
 
                     {cta && (
-                        <Link
+                        <LocaleLink
                             href={cta.url}
                             onClick={close}
                             className="mt-auto flex min-h-14 items-center justify-center gap-2 rounded-full bg-brand font-semibold text-on-accent"
                         >
                             {cta.label}{" "}
                             <ArrowRight className="size-4" aria-hidden />
-                        </Link>
+                        </LocaleLink>
                     )}
                 </div>
             </dialog>

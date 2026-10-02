@@ -2,14 +2,18 @@
 
 namespace App\Http\Resources\Public;
 
+use App\Http\Resources\Public\Concerns\TranslatesFields;
 use App\Models\Artwork;
 use App\Support\Media;
+use App\Support\Translation\Localized;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
 
 /** @mixin Artwork */
 class ArtworkResource extends JsonResource
 {
+    use TranslatesFields;
+
     /** Version complète (fiche œuvre) ou résumée (listes). */
     public bool $full = false;
 
@@ -24,18 +28,18 @@ class ArtworkResource extends JsonResource
     {
         $summary = [
             'id' => $this->id,
-            'title' => $this->title,
+            'title' => $this->t('title'),
             'slug' => $this->slug,
             'year' => $this->year,
             'kind' => $this->kind?->value,
-            'kindLabel' => $this->kind?->getLabel(),
-            'summary' => $this->summary,
-            'cover' => Media::image($this->cover_image, $this->cover_alt),
+            'kindLabel' => $this->kind?->labelFor(Localized::locale()),
+            'summary' => $this->t('summary'),
+            'cover' => Media::image($this->cover_image, $this->t('cover_alt')),
             'isFeatured' => $this->is_featured,
             'hasAudio' => filled($this->audio_file),
             'hasVideo' => filled($this->video_url),
-            'room' => $this->whenLoaded('room', fn () => $this->room ? ['name' => $this->room->name, 'slug' => $this->room->slug, 'accentColor' => $this->room->accent_color] : null),
-            'track' => $this->whenLoaded('track', fn () => $this->track ? ['name' => $this->track->name, 'slug' => $this->track->slug] : null),
+            'room' => $this->whenLoaded('room', fn () => $this->room ? ['name' => Localized::value($this->room, 'name'), 'slug' => $this->room->slug, 'accentColor' => $this->room->accent_color] : null),
+            'track' => $this->whenLoaded('track', fn () => $this->track ? ['name' => Localized::value($this->track, 'name'), 'slug' => $this->track->slug] : null),
             'origin' => $this->origin,
         ];
 
@@ -49,13 +53,13 @@ class ArtworkResource extends JsonResource
         }
 
         return $summary + [
-            'creationStory' => $this->creation_story,
-            'transcript' => $this->transcript,
-            'equipment' => $this->equipment ?? [],
+            'creationStory' => $this->t('creation_story'),
+            'transcript' => $this->t('transcript'),
+            'equipment' => $this->t('equipment') ?? [],
             'audio' => $this->audio_file ? ['url' => Media::url($this->audio_file), 'peaks' => $this->audio_peaks, 'durationSeconds' => $this->duration_seconds] : null,
             'videoUrl' => $this->video_url,
             'durationSeconds' => $this->duration_seconds,
-            'gallery' => collect($this->gallery ?? [])->map(fn (string $path) => Media::image($path, $this->title))->values(),
+            'gallery' => collect($this->gallery ?? [])->map(fn (string $path) => Media::image($path, $this->t('title')))->values(),
             'cohort' => $this->whenLoaded('cohort', fn () => $this->cohort?->name),
             'credits' => $this->whenLoaded('credits', fn () => $this->credits->map(fn ($credit) => ['name' => $credit->person_name, 'role' => $credit->role])->values()),
             'exhibitions' => $this->whenLoaded('exhibitions', fn () => $this->exhibitions->map(fn ($e) => ['title' => $e->title, 'slug' => $e->slug])->values()),

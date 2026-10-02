@@ -5,6 +5,7 @@ namespace App\Models;
 use App\Enums\ArtworkKind;
 use App\Jobs\ComputeArtworkAudioPeaks;
 use App\Models\Concerns\HasPublication;
+use App\Models\Concerns\HasTranslations;
 use App\Models\Concerns\HasUniqueSlug;
 use App\Models\Concerns\RevalidatesFrontend;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
@@ -17,7 +18,9 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 /** Œuvre d'apprenant ou de l'école exposée dans le musée. */
 class Artwork extends Model
 {
-    use HasFactory, HasPublication, HasUniqueSlug, RevalidatesFrontend, SoftDeletes;
+    use HasFactory, HasPublication, HasTranslations, HasUniqueSlug, RevalidatesFrontend, SoftDeletes;
+
+    protected array $translatable = ['title', 'summary', 'creation_story', 'equipment', 'transcript', 'cover_alt'];
 
     protected $fillable = [
         'title', 'slug', 'year', 'room_id', 'track_id', 'cohort_id', 'kind', 'origin', 'summary', 'creation_story', 'equipment',

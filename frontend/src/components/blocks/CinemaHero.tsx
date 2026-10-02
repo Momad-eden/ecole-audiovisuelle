@@ -1,7 +1,8 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
-import Link from "next/link";
+import { LocaleLink } from "@/components/i18n/LocaleLink";
+import { useT } from "@/components/i18n/LocaleProvider";
 import { ArrowRight, Pause, Play } from "lucide-react";
 import { ButtonLink } from "@/components/ui/ButtonLink";
 import { MediaImage } from "@/components/ui/MediaImage";
@@ -20,6 +21,7 @@ const DURATION = 6000;
  */
 export function CinemaHero({ data, first }: { data: HeroData; first: boolean }) {
   const reducedMotion = useReducedMotion();
+  const { cinema: t, common } = useT();
   const slides = data.slides ?? [];
   const count = slides.length;
   const [index, setIndex] = useState(0);
@@ -68,7 +70,7 @@ export function CinemaHero({ data, first }: { data: HeroData; first: boolean }) 
       data-testid="cinema-hero"
       data-first={first ? "" : undefined}
       tabIndex={count > 1 ? 0 : undefined}
-      aria-roledescription={count > 1 ? "diaporama" : undefined}
+      aria-roledescription={count > 1 ? t.slideshow : undefined}
       aria-label={data.title}
       onKeyDown={onKeyDown}
       // Pause au focus seulement au clavier : un clic sur la photo ne doit pas figer le diaporama.
@@ -90,7 +92,7 @@ export function CinemaHero({ data, first }: { data: HeroData; first: boolean }) 
         {count > 1 && (
           <div className="flex items-center gap-2" {...hoverPause}>
             {slides.map((slide, i) => (
-              <button key={slide.image.url + i} type="button" onClick={() => go(i)} aria-label={`Diapositive ${i + 1} sur ${count}`} aria-current={i === index ? "true" : undefined}
+              <button key={slide.image.url + i} type="button" onClick={() => go(i)} aria-label={t.slide(i + 1, count)} aria-current={i === index ? "true" : undefined}
                 className="group h-6 flex-1 py-2.5">
                 <span className="block h-0.5 overflow-hidden rounded-full bg-ink/25">
                   <span className={cn("block h-full bg-[var(--accent-ink)]", i < index && "w-full", i > index && "w-0", i === index && (reducedMotion ? "w-full" : "cinema-progress"))}
@@ -98,7 +100,7 @@ export function CinemaHero({ data, first }: { data: HeroData; first: boolean }) 
                 </span>
               </button>
             ))}
-            <button type="button" onClick={() => setPaused((p) => !p)} aria-label={paused ? "Reprendre le diaporama" : "Mettre le diaporama en pause"}
+            <button type="button" onClick={() => setPaused((p) => !p)} aria-label={paused ? t.resume : t.pause}
               className="ml-2 grid size-9 place-items-center rounded-full border border-ink/25 text-ink transition hover:border-[var(--accent-ink)]">
               {paused ? <Play className="size-4" aria-hidden /> : <Pause className="size-4" aria-hidden />}
             </button>
@@ -123,9 +125,9 @@ export function CinemaHero({ data, first }: { data: HeroData; first: boolean }) 
                     {frenchSpacing(slide.title || (i === 0 ? data.title : ""))}
                   </SlideHeading>
                   {slide.link && (
-                    <Link href={slide.link.url} tabIndex={i === index ? undefined : -1} className="mt-6 inline-flex items-center gap-2 font-semibold text-ink underline-offset-4 hover:underline">
-                      {slide.link.label || "Découvrir"} <ArrowRight className="size-4" aria-hidden />
-                    </Link>
+                    <LocaleLink href={slide.link.url} tabIndex={i === index ? undefined : -1} className="mt-6 inline-flex items-center gap-2 font-semibold text-ink underline-offset-4 hover:underline">
+                      {slide.link.label || common.discover} <ArrowRight className="size-4" aria-hidden />
+                    </LocaleLink>
                   )}
                 </div>
               );

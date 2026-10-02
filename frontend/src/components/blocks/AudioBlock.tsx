@@ -1,8 +1,8 @@
 import { PlayButton } from "@/components/audio/PlayButton";
 import { Section, SectionTitle } from "@/components/ui/Section";
-import type { AudioData } from "./types";
+import type { AudioData, BlockProps } from "./types";
 
-export function AudioBlock({ data }: { data: AudioData }) {
+export function AudioBlock({ data }: BlockProps<AudioData>) {
   const tracks = (data.tracks ?? []).filter((track) => track.url);
   if (tracks.length === 0) return null;
   return (

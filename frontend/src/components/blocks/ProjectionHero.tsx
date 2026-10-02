@@ -2,6 +2,7 @@
 
 import { useRef } from "react";
 import { Volume2, VolumeX } from "lucide-react";
+import { useT } from "@/components/i18n/LocaleProvider";
 import { ButtonLink } from "@/components/ui/ButtonLink";
 import { MediaImage } from "@/components/ui/MediaImage";
 import { accentVars } from "@/lib/contrast";
@@ -24,6 +25,7 @@ export function ProjectionHero({ data, first }: { data: HeroData; first: boolean
   const { pointer, follow: trace } = useLightRibbons(sectionRef, canvasRef);
   const { listening, loading, toggle, steer } = useArtSound(data.sound);
   const Heading = first ? "h1" : "h2";
+  const t = useT().hero;
   const title = frenchSpacing(data.title);
   const parts = splitHighlight(title, data.highlight);
 
@@ -90,14 +92,14 @@ export function ProjectionHero({ data, first }: { data: HeroData; first: boolean
               <button type="button" onClick={() => void toggle()} aria-pressed={listening} disabled={loading} aria-busy={loading}
                 className="inline-flex min-h-14 items-center gap-2 rounded-full border border-ink/25 bg-night/40 px-6 text-sm font-semibold text-ink backdrop-blur-sm transition hover:border-brand hover:text-brand">
                 {listening ? <VolumeX className="size-5" aria-hidden /> : <Volume2 className="size-5" aria-hidden />}
-                {loading ? "Chargement du son…" : listening ? "Couper le son" : "Écouter l'œuvre"}
+                {loading ? t.loadingSound : listening ? t.mute : t.listen}
               </button>
             </div>
           </div>
 
-          <aside className="w-full max-w-xs border-l-2 border-brand bg-night/60 px-5 py-4 backdrop-blur-sm" aria-label="Cartel de l'œuvre">
-            <p className="display text-base">{data.caption || "Ondes lumineuses"}</p>
-            <p className="mt-1 text-sm text-ink-muted">Son, lumière et image · EMSI</p>
+          <aside className="w-full max-w-xs border-l-2 border-brand bg-night/60 px-5 py-4 backdrop-blur-sm" aria-label={t.cartel}>
+            <p className="display text-base">{data.caption || t.defaultCaption}</p>
+            <p className="mt-1 text-sm text-ink-muted">{t.credit}</p>
             <p className="cartel mt-3 tabular-nums" aria-hidden><span ref={readoutRef}>220 Hz · x 0.62 · y 0.55</span></p>
           </aside>
         </div>

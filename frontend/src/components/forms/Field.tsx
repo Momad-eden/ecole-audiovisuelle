@@ -17,10 +17,10 @@ export function Field({ id, label, error, hint, required, children, className }:
 }
 
 /** Champ piège anti-robots : invisible pour les humains et les lecteurs d'écran. */
-export function Honeypot({ register }: { register: object }) {
+export function Honeypot({ register, label }: { register: object; label: string }) {
   return (
     <div className="absolute -left-[9999px] h-px w-px overflow-hidden" aria-hidden="true">
-      <label htmlFor="website">Ne pas remplir</label>
+      <label htmlFor="website">{label}</label>
       <input id="website" tabIndex={-1} autoComplete="off" {...register} />
     </div>
   );

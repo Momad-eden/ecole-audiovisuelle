@@ -5,6 +5,7 @@ namespace App\Models;
 use App\Enums\PublicationStatus;
 use App\Enums\SiteDomain;
 use App\Models\Concerns\HasPublication;
+use App\Models\Concerns\HasTranslations;
 use App\Models\Concerns\HasUniqueSlug;
 use App\Models\Concerns\RevalidatesFrontend;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
@@ -17,7 +18,9 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
  */
 class Page extends Model
 {
-    use HasFactory, HasPublication, HasUniqueSlug, RevalidatesFrontend;
+    use HasFactory, HasPublication, HasTranslations, HasUniqueSlug, RevalidatesFrontend;
+
+    protected array $translatable = ['title', 'blocks', 'seo'];
 
     protected $fillable = ['title', 'slug', 'type', 'domain', 'blocks', 'draft_blocks', 'seo', 'is_locked', 'status', 'published_at'];
 
@@ -34,6 +37,13 @@ class Page extends Model
     public function revisions(): HasMany
     {
         return $this->hasMany(PageRevision::class)->latest('created_at')->latest('id');
+    }
+
+    /** Traduction seulement à la publication (ou au changement du titre / du SEO), jamais pour le brouillon. */
+    public function shouldQueueTranslation(): bool
+    {
+        return $this->wasChanged(['blocks', 'title', 'seo'])
+            || ($this->wasRecentlyCreated && filled($this->blocks));
     }
 
     public function hasUnpublishedChanges(): bool

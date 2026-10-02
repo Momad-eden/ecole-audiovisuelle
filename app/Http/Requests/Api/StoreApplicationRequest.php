@@ -25,7 +25,7 @@ class StoreApplicationRequest extends FormRequest
                 Rule::exists('places', 'id')->where('kind', 'campus')->where('status', 'published')],
             'offeringId' => ['required', 'integer', function (string $attribute, mixed $value, Closure $fail) {
                 if (! Offering::openForApplications()->whereKey($value)->exists()) {
-                    $fail('Cette formation n\'accepte pas de candidature pour le moment.');
+                    $fail(__('Cette formation n\'accepte pas de candidature pour le moment.'));
 
                     return;
                 }
@@ -42,7 +42,7 @@ class StoreApplicationRequest extends FormRequest
                     $place = null;
                 }
                 if (! Offering::find($value)?->isAvailableAt($place)) {
-                    $fail('Cette formation n\'est pas proposée dans ce campus.');
+                    $fail(__('Cette formation n\'est pas proposée dans ce campus.'));
                 }
             }],
             'firstName' => ['required', 'string', 'max:100'],
@@ -77,8 +77,19 @@ class StoreApplicationRequest extends FormRequest
         ];
     }
 
+    /** Noms des champs dans les messages, dans la langue de la requête (?locale=en : anglais). */
     public function attributes(): array
     {
+        if (app()->getLocale() === 'en') {
+            return [
+                'placeId' => 'campus', 'offeringId' => 'programme', 'firstName' => 'first name', 'lastName' => 'last name',
+                'birthDate' => 'date of birth', 'birthPlace' => 'place of birth', 'gender' => 'gender', 'nationality' => 'nationality',
+                'phone' => 'phone', 'whatsapp' => 'WhatsApp', 'email' => 'email address', 'address' => 'address', 'motivation' => 'motivation',
+                'portfolioUrl' => 'portfolio link', 'education.year' => 'year of graduation', 'documents.*.file' => 'attachment',
+                'documents.*.type' => 'document type', 'consent' => 'consent',
+            ];
+        }
+
         return [
             'offeringId' => 'formation', 'firstName' => 'prénom', 'lastName' => 'nom', 'birthDate' => 'date de naissance',
             'birthPlace' => 'lieu de naissance', 'gender' => 'genre', 'nationality' => 'nationalité', 'phone' => 'téléphone',
@@ -91,8 +102,8 @@ class StoreApplicationRequest extends FormRequest
     public function messages(): array
     {
         return [
-            'consent.accepted' => 'Vous devez accepter le traitement de vos données pour envoyer votre candidature.',
-            'phone.regex' => 'Le numéro de téléphone n\'est pas valide (ex. +221 77 123 45 67).',
+            'consent.accepted' => __('Vous devez accepter le traitement de vos données pour envoyer votre candidature.'),
+            'phone.regex' => __('Le numéro de téléphone n\'est pas valide (ex. +221 77 123 45 67).'),
         ];
     }
 }

@@ -14,6 +14,7 @@ use App\Models\EquipmentItem;
 use App\Models\Place;
 use App\Models\RentalPack;
 use App\Models\Service;
+use App\Support\Translation\Localized;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
@@ -24,7 +25,7 @@ class ImpactLiveController extends Controller
 {
     public function services(Request $request): AnonymousResourceCollection
     {
-        return ServiceResource::collection(Service::published()
+        return ServiceResource::collection(Service::published()->with(Localized::eager())
             ->when($request->query('activity'), fn (Builder $q, $activity) => $q->where('activity', $activity))
             ->orderBy('position')->orderBy('id')->get());
     }
@@ -59,7 +60,7 @@ class ImpactLiveController extends Controller
 
     public function agenda(Request $request): AnonymousResourceCollection
     {
-        $query = AgendaEvent::published()->with('place')
+        $query = AgendaEvent::published()->with(['place', ...Localized::eager()])
             ->when($request->query('activity'), fn (Builder $q, $activity) => $q->where('activity', $activity));
 
         $events = $request->query('scope') === 'references'
@@ -71,12 +72,12 @@ class ImpactLiveController extends Controller
 
     public function agendaEvent(string $slug): AgendaEventResource
     {
-        return new AgendaEventResource(AgendaEvent::published()->with('place')->where('slug', $slug)->firstOrFail());
+        return new AgendaEventResource(AgendaEvent::published()->with(['place', ...Localized::eager()])->where('slug', $slug)->firstOrFail());
     }
 
     public function places(Request $request): AnonymousResourceCollection
     {
-        return PlaceResource::collection(Place::published()
+        return PlaceResource::collection(Place::published()->with(Localized::eager())
             ->when($request->query('kind'), fn (Builder $q, $kind) => $q->where('kind', $kind))
             ->orderBy('position')->get());
     }

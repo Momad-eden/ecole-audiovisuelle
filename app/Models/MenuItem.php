@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Models\Concerns\HasTranslations;
 use App\Models\Concerns\RevalidatesFrontend;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -9,13 +10,15 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class MenuItem extends Model
 {
-    use RevalidatesFrontend;
+    use HasTranslations, RevalidatesFrontend;
 
     public const LOCATIONS = [
         'main' => 'Menu principal',
         'footer' => 'Pied de page',
         'legal' => 'Liens légaux',
     ];
+
+    protected array $translatable = ['label'];
 
     protected $fillable = ['location', 'parent_id', 'label', 'url', 'is_button', 'position', 'is_visible'];
 

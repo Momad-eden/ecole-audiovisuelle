@@ -1,4 +1,5 @@
 import type { MetadataRoute } from "next";
+import { localizedPath } from "./i18n/locales";
 
 type Entry = { path: string; updatedAt: string | null };
 
@@ -14,4 +15,19 @@ export function sitemapEntries(fixed: string[], entries: Entry[], siteUrl: strin
     byPath.set(entry.path, { url: `${siteUrl}${entry.path}`, lastModified: entry.updatedAt ?? undefined });
   }
   return [...byPath.values()];
+}
+
+/**
+ * Plan du site bilingue : chaque adresse française suivie de son équivalent anglais (/en…),
+ * les deux reliés par leurs liens de langue.
+ */
+export function bilingualSitemapEntries(fixed: string[], entries: Entry[], siteUrl: string): MetadataRoute.Sitemap {
+  return sitemapEntries(fixed, entries, siteUrl).flatMap((entry) => {
+    const path = entry.url.slice(siteUrl.length);
+    const languages = { fr: `${siteUrl}${path}`, en: `${siteUrl}${localizedPath(path, "en")}` };
+    return [
+      { ...entry, alternates: { languages } },
+      { ...entry, url: languages.en, alternates: { languages } },
+    ];
+  });
 }

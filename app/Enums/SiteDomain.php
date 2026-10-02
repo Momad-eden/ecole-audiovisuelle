@@ -22,6 +22,21 @@ enum SiteDomain: string implements HasLabel
         };
     }
 
+    /** Libellé dans la langue demandée (API publique) ; noms propres identiques dans les deux langues. */
+    public function labelFor(string $locale): string
+    {
+        if ($locale !== 'en') {
+            return $this->label();
+        }
+
+        return match ($this) {
+            self::GENERAL => 'General',
+            self::MAISON => 'Maison Habib Faye',
+            self::EMSI => 'EMSI',
+            self::STUDIO => 'Impact Live Studio',
+        };
+    }
+
     /** Domaine déduit de l'adresse d'une page (maison-habib-faye/studio…, maison-habib-faye…, emsi…), sinon null. */
     public static function forPath(?string $path): ?self
     {

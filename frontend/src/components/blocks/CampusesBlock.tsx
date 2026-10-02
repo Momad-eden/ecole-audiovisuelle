@@ -5,7 +5,9 @@ import { ButtonLink } from "@/components/ui/ButtonLink";
 import { MediaImage } from "@/components/ui/MediaImage";
 import { Section, SectionTitle } from "@/components/ui/Section";
 import { UniverseVisual } from "@/components/universe/UniverseVisual";
+import { getDictionary } from "@/lib/i18n";
 import type { Place, UniverseVisualKind } from "@/lib/types";
+import type { BlockProps } from "./types";
 
 /** Une lumière et une signature par campus, dans l'ordre de l'admin. */
 const LOOKS: { accent: string; visual: UniverseVisualKind }[] = [
@@ -15,7 +17,8 @@ const LOOKS: { accent: string; visual: UniverseVisualKind }[] = [
 ];
 
 /** Les campus de l'EMSI côte à côte : mêmes formations, chacun avec son lieu et ses atouts. */
-export function CampusesBlock({ data }: { data: { eyebrow?: string; title?: string; text?: string; items?: Place[] } }) {
+export function CampusesBlock({ data, locale }: BlockProps<{ eyebrow?: string; title?: string; text?: string; items?: Place[] }>) {
+  const { campus: t, common } = getDictionary(locale);
   const campuses = data.items ?? [];
   if (campuses.length === 0) return null;
 
@@ -56,9 +59,9 @@ export function CampusesBlock({ data }: { data: { eyebrow?: string; title?: stri
                     </ul>
                   )}
                   <div className="mt-auto flex flex-wrap gap-3 pt-8">
-                    <ButtonLink href={`/candidater?campus=${campus.slug}`}>Candidater à {campus.city ?? campus.name}</ButtonLink>
-                    {campus.pageUrl && <ButtonLink href={campus.pageUrl} variant="secondary">Découvrir le campus</ButtonLink>}
-                    {campus.mapUrl && <ButtonLink href={campus.mapUrl} variant="secondary">Itinéraire</ButtonLink>}
+                    <ButtonLink href={`/candidater?campus=${campus.slug}`}>{t.apply(campus.city ?? campus.name)}</ButtonLink>
+                    {campus.pageUrl && <ButtonLink href={campus.pageUrl} variant="secondary">{t.discover}</ButtonLink>}
+                    {campus.mapUrl && <ButtonLink href={campus.mapUrl} variant="secondary">{common.directions}</ButtonLink>}
                   </div>
                 </div>
               </article>

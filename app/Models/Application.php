@@ -26,7 +26,7 @@ class Application extends Model
         'uuid', 'offering_id', 'place_id', 'audience', 'first_name', 'last_name', 'birth_date', 'birth_place', 'gender', 'nationality',
         'phone', 'whatsapp', 'email', 'address', 'guardian', 'education', 'experience', 'documents', 'motivation',
         'portfolio_url', 'status', 'source', 'interview_at', 'interview_location', 'consent_at', 'consent_version',
-        'submitted_at', 'decided_at', 'decided_by', 'student_id', 'ip_hash',
+        'submitted_at', 'decided_at', 'decided_by', 'student_id', 'ip_hash', 'locale',
     ];
 
     protected $casts = [

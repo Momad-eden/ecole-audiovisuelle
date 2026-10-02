@@ -1,11 +1,12 @@
 import type { MetadataRoute } from "next";
 import { api } from "@/lib/api";
-import { sitemapEntries } from "@/lib/sitemap";
+import { bilingualSitemapEntries } from "@/lib/sitemap";
 import { siteUrl } from "@/lib/utils";
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
-  const entries = await api.sitemap();
+  // Chaque adresse en français et en anglais (/en…), reliées par leurs liens de langue.
+  const entries = await api.sitemap("fr");
   const fixed = ["/emsi", "/emsi/formations", "/emsi/realisations", "/maison-habib-faye", "/maison-habib-faye/agenda", "/actualites", "/candidater"];
 
-  return sitemapEntries(fixed, entries, siteUrl);
+  return bilingualSitemapEntries(fixed, entries, siteUrl);
 }

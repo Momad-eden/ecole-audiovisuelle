@@ -21,6 +21,21 @@ enum FundingMode: string implements HasLabel
         };
     }
 
+    /** Libellé dans la langue de l'API publique (`en` : anglais) ; en français, identique à getLabel() (admin). */
+    public function labelFor(string $locale): string
+    {
+        if ($locale !== 'en') {
+            return $this->getLabel();
+        }
+
+        return match ($this) {
+            self::PAID => 'Fee-paying',
+            self::SPONSORED => 'Funded',
+            self::SCHOLARSHIP => 'Scholarship',
+            self::MIXED => 'Mixed',
+        };
+    }
+
     public function label(): string
     {
         return $this->getLabel();

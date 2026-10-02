@@ -1,3 +1,4 @@
+import { LocaleLink } from "@/components/i18n/LocaleLink";
 import { ButtonLink } from "@/components/ui/ButtonLink";
 import { MediaImage } from "@/components/ui/MediaImage";
 import { InView } from "@/components/motion/InView";
@@ -5,6 +6,8 @@ import { UniverseVisual } from "@/components/universe/UniverseVisual";
 import { accentVars } from "@/lib/contrast";
 import { cn, frenchSpacing } from "@/lib/utils";
 import { HeroVideo } from "./HeroVideo";
+import { getDictionary } from "@/lib/i18n";
+import type { Locale } from "@/lib/i18n/locales";
 import type { HeroData } from "./types";
 
 type Props = { data: HeroData; first: boolean };
@@ -87,7 +90,7 @@ export function EditorialHero({ data, first }: Props) {
 }
 
 /** Affiche de concert : titre géant en capitales sur aplat de couleur, photo en bichromie. */
-export function PosterHero({ data, first }: Props) {
+export function PosterHero({ data, first, locale }: Props & { locale: Locale }) {
   const Heading = first ? "h1" : "h2";
   return (
     <section data-first={first || undefined} className="poster-hero relative isolate overflow-hidden bg-[var(--accent-ink)] pb-12 pt-32 text-on-accent sm:pt-36" style={accentStyle(data)}>
@@ -99,7 +102,7 @@ export function PosterHero({ data, first }: Props) {
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
         <div className="flex flex-wrap items-center justify-between gap-4 border-b border-current/25 pb-5 font-mono text-xs uppercase tracking-[0.2em]">
           <span>{data.eyebrow ?? "EMSI"}</span>
-          <span aria-hidden>Son · Image · Lumière · Scène</span>
+          <span aria-hidden>{getDictionary(locale).hero.posterTagline}</span>
         </div>
         <Heading className={cn("display-condensed mt-8 uppercase leading-[0.86] text-balance", data.title.length <= 30 ? "text-[clamp(3.4rem,13vw,12rem)]" : "text-[clamp(2.8rem,8.5vw,8rem)]")}>
           {frenchSpacing(data.title)}
@@ -109,7 +112,7 @@ export function PosterHero({ data, first }: Props) {
           {data.buttons?.length ? (
             <div className="flex flex-wrap gap-3">
               {data.buttons.map((button, i) => (
-                <a key={button.url + button.label} href={button.url} className={cn("inline-flex min-h-14 items-center rounded-full px-7 font-semibold transition", i === 0 ? "bg-current hover:opacity-90" : "border border-current/50 hover:bg-current/10")}>{i === 0 ? <span className="text-[var(--accent-ink)]">{button.label}</span> : button.label}</a>
+                <LocaleLink key={button.url + button.label} href={button.url} className={cn("inline-flex min-h-14 items-center rounded-full px-7 font-semibold transition", i === 0 ? "bg-current hover:opacity-90" : "border border-current/50 hover:bg-current/10")}>{i === 0 ? <span className="text-[var(--accent-ink)]">{button.label}</span> : button.label}</LocaleLink>
               ))}
             </div>
           ) : null}

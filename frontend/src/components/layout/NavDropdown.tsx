@@ -1,6 +1,6 @@
 "use client";
 
-import Link from "next/link";
+import { LocaleLink } from "@/components/i18n/LocaleLink";
 import { useEffect, useId, useRef, useState, type FocusEvent, type KeyboardEvent, type PointerEvent } from "react";
 import { ChevronDown } from "lucide-react";
 import type { MenuLink } from "@/lib/types";
@@ -94,9 +94,9 @@ export function NavDropdown({ link }: { link: MenuLink }) {
         <ul className="rounded-2xl border border-line bg-night-2/95 p-2 shadow-2xl backdrop-blur-xl">
           {items.map((item) => (
             <li key={item.url}>
-              <Link href={item.url} data-nav-item onClick={() => setOpen(false)} className="block rounded-xl px-4 py-2.5 text-sm text-ink/85 transition hover:bg-ink/5 hover:text-ink">
+              <LocaleLink href={item.url} data-nav-item onClick={() => setOpen(false)} className="block rounded-xl px-4 py-2.5 text-sm text-ink/85 transition hover:bg-ink/5 hover:text-ink">
                 {item.label}
-              </Link>
+              </LocaleLink>
             </li>
           ))}
         </ul>

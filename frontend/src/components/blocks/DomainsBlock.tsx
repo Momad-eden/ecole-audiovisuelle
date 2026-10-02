@@ -1,8 +1,10 @@
-import Link from "next/link";
+import { LocaleLink } from "@/components/i18n/LocaleLink";
 import { ArrowRight } from "lucide-react";
 import { MediaImage } from "@/components/ui/MediaImage";
 import { accentVars } from "@/lib/contrast";
 import { cn, frenchSpacing, isExternal } from "@/lib/utils";
+import { getDictionary } from "@/lib/i18n";
+import type { Locale } from "@/lib/i18n/locales";
 import type { DomainPanel, DomainsData } from "./types";
 
 /**
@@ -11,7 +13,7 @@ import type { DomainPanel, DomainsData } from "./types";
  * Chaque panneau est un seul lien, dont le nom accessible est son titre.
  * La phrase d'intention est lue en premier (h1 si le bloc ouvre la page) mais affichée sous les panneaux.
  */
-export function DomainsBlock({ data, first, pageTitle }: { data: DomainsData; first: boolean; pageTitle?: string }) {
+export function DomainsBlock({ data, first, pageTitle, locale }: { data: DomainsData; first: boolean; pageTitle?: string; locale: Locale }) {
   const panels = (data.panels ?? []).slice(0, 3);
   if (panels.length === 0) return null;
   const intro = data.intro?.trim();
@@ -21,7 +23,7 @@ export function DomainsBlock({ data, first, pageTitle }: { data: DomainsData; fi
     <section
       data-testid="domains-block"
       data-first={first || undefined}
-      aria-label={intro ? undefined : "Nos trois maisons"}
+      aria-label={intro ? undefined : getDictionary(locale).domains.label}
       className="scene-dark relative isolate flex flex-col overflow-hidden bg-night lg:h-[100svh] lg:min-h-[40rem]"
     >
       {intro ? (
@@ -71,7 +73,7 @@ function Panel({ panel, index, priority }: { panel: DomainPanel; index: number; 
           {external ? (
             <a href={panel.url} target="_blank" rel="noopener noreferrer" className={linkClass}>{title}</a>
           ) : (
-            <Link href={panel.url} className={linkClass}>{title}</Link>
+            <LocaleLink href={panel.url} className={linkClass}>{title}</LocaleLink>
           )}
         </h2>
         {panel.text && <p className="mt-5 max-w-sm text-base text-ink/85 sm:text-lg">{frenchSpacing(panel.text)}</p>}

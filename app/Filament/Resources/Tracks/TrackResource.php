@@ -7,6 +7,7 @@ use App\Filament\Resources\Tracks\Pages\EditTrack;
 use App\Filament\Resources\Tracks\Pages\ListTracks;
 use App\Filament\Support\FrenchLabels;
 use App\Filament\Support\RichText\TypographyPlugin;
+use App\Filament\Support\TranslationTab;
 use App\Models\Track;
 use BackedEnum;
 use Filament\Actions\EditAction;
@@ -17,6 +18,8 @@ use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Toggle;
 use Filament\Resources\Resource;
 use Filament\Schemas\Components\Section;
+use Filament\Schemas\Components\Tabs;
+use Filament\Schemas\Components\Tabs\Tab;
 use Filament\Schemas\Schema;
 use Filament\Support\Icons\Heroicon;
 use Filament\Tables\Columns\IconColumn;
@@ -44,16 +47,21 @@ class TrackResource extends Resource
     public static function form(Schema $schema): Schema
     {
         return $schema->columns(1)->components([
-            Section::make()->columns(2)->schema([
-                TextInput::make('name')->label('Nom de la filière')->required()->maxLength(120),
-                TextInput::make('short_name')->label('Nom court')->placeholder('Ex. Son'),
-                Select::make('room_id')->label('Univers')->relationship('room', 'name')->preload(),
-                Toggle::make('is_active')->label('Active')->default(true)->inline(false),
-                Textarea::make('summary')->label('Résumé')->rows(2)->maxLength(300)->columnSpanFull(),
-                TypographyPlugin::editor('description', 'Description')
-                    ->columnSpanFull(),
-                TagsInput::make('skills')->label('Compétences')->columnSpanFull(),
-                TagsInput::make('outcomes')->label('Débouchés')->columnSpanFull(),
+            Tabs::make()->columnSpanFull()->persistTabInQueryString()->tabs([
+                Tab::make('Français')->schema([
+                    Section::make()->columns(2)->schema([
+                        TextInput::make('name')->label('Nom de la filière')->required()->maxLength(120),
+                        TextInput::make('short_name')->label('Nom court')->placeholder('Ex. Son'),
+                        Select::make('room_id')->label('Univers')->relationship('room', 'name')->preload(),
+                        Toggle::make('is_active')->label('Active')->default(true)->inline(false),
+                        Textarea::make('summary')->label('Résumé')->rows(2)->maxLength(300)->columnSpanFull(),
+                        TypographyPlugin::editor('description', 'Description')
+                            ->columnSpanFull(),
+                        TagsInput::make('skills')->label('Compétences')->columnSpanFull(),
+                        TagsInput::make('outcomes')->label('Débouchés')->columnSpanFull(),
+                    ]),
+                ]),
+                TranslationTab::make(),
             ]),
         ]);
     }

@@ -11,7 +11,7 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 /** Demande de devis ou de réservation (studio, matériel, prestation, salle). */
 class BookingRequest extends Model
 {
-    protected $fillable = ['reference', 'type', 'status', 'name', 'organization', 'phone', 'email', 'starts_on', 'ends_on', 'location', 'attendees', 'message', 'items', 'internal_notes', 'quoted_amount', 'ip_hash'];
+    protected $fillable = ['reference', 'type', 'status', 'name', 'organization', 'phone', 'email', 'starts_on', 'ends_on', 'location', 'attendees', 'message', 'items', 'internal_notes', 'quoted_amount', 'ip_hash', 'locale'];
 
     protected $attributes = ['status' => 'new'];
 

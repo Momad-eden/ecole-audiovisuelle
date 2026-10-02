@@ -1,12 +1,13 @@
-import Link from "next/link";
+import { LocaleLink } from "@/components/i18n/LocaleLink";
 import type { NewsItem } from "@/lib/types";
 import { MediaImage } from "@/components/ui/MediaImage";
-import { formatDate } from "@/lib/utils";
+import { formatDate } from "@/lib/i18n/format";
+import type { Locale } from "@/lib/i18n/locales";
 
-export function NewsCard({ news }: { news: NewsItem }) {
+export function NewsCard({ news, locale }: { news: NewsItem; locale: Locale }) {
   return (
     <article className="group">
-      <Link href={`/actualites/${news.slug}`} className="block">
+      <LocaleLink href={`/actualites/${news.slug}`} className="block">
         <div className="relative aspect-[16/10] overflow-hidden rounded-2xl border border-line bg-night-3">
           {news.image ? (
             <MediaImage image={news.image} sizes="(min-width: 768px) 33vw, 100vw" className="transition duration-700 group-hover:scale-105" />
@@ -16,10 +17,10 @@ export function NewsCard({ news }: { news: NewsItem }) {
             </div>
           )}
         </div>
-        {news.publishedAt && <time dateTime={news.publishedAt} className="cartel mt-4 block">{formatDate(news.publishedAt)}</time>}
+        {news.publishedAt && <time dateTime={news.publishedAt} className="cartel mt-4 block">{formatDate(news.publishedAt, locale)}</time>}
         <h3 className="display mt-2 text-xl leading-snug group-hover:text-brand">{news.title}</h3>
         {news.excerpt && <p className="mt-2 line-clamp-2 text-sm text-ink-muted">{news.excerpt}</p>}
-      </Link>
+      </LocaleLink>
     </article>
   );
 }

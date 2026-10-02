@@ -71,6 +71,7 @@ class FormController extends Controller
                 'consent_at' => now(),
                 'consent_version' => self::CONSENT_VERSION,
                 'ip_hash' => hash_hmac('sha256', (string) $request->ip(), (string) config('app.key')),
+                'locale' => app()->getLocale(),
             ]);
 
             $application->events()->create([
@@ -107,11 +108,15 @@ class FormController extends Controller
             'phone' => ['nullable', 'string', 'max:30'],
             'message' => ['required', 'string', 'max:3000'],
             'consent' => ['accepted'],
-        ], [], ['subject' => 'objet', 'name' => 'nom', 'email' => 'adresse e-mail', 'phone' => 'téléphone', 'consent' => 'consentement']);
+        ], [], $this->attributeNames(
+            ['subject' => 'objet', 'name' => 'nom', 'email' => 'adresse e-mail', 'phone' => 'téléphone', 'consent' => 'consentement'],
+            ['subject' => 'subject', 'name' => 'name', 'email' => 'email address', 'phone' => 'phone', 'consent' => 'consent'],
+        ));
 
         ContactMessage::create([
             ...collect($data)->except('consent')->all(),
             'ip_hash' => hash_hmac('sha256', (string) $request->ip(), (string) config('app.key')),
+            'locale' => app()->getLocale(),
         ]);
 
         return response()->json(['data' => ['ok' => true]], 201);
@@ -133,7 +138,10 @@ class FormController extends Controller
             'supportType' => ['required', Rule::in(array_keys($types))],
             'message' => ['required', 'string', 'max:3000'],
             'consent' => ['accepted'],
-        ], [], ['name' => 'nom', 'organization' => 'organisation', 'email' => 'adresse e-mail', 'phone' => 'téléphone', 'supportType' => 'type de soutien', 'consent' => 'consentement']);
+        ], [], $this->attributeNames(
+            ['name' => 'nom', 'organization' => 'organisation', 'email' => 'adresse e-mail', 'phone' => 'téléphone', 'supportType' => 'type de soutien', 'consent' => 'consentement'],
+            ['name' => 'name', 'organization' => 'organisation', 'email' => 'email address', 'phone' => 'phone', 'supportType' => 'type of support', 'consent' => 'consent'],
+        ));
 
         ContactMessage::create([
             'subject' => 'support',
@@ -143,9 +151,16 @@ class FormController extends Controller
             'phone' => $data['phone'] ?? null,
             'message' => 'Type de soutien : '.$types[$data['supportType']]."\n\n".$data['message'],
             'ip_hash' => hash_hmac('sha256', (string) $request->ip(), (string) config('app.key')),
+            'locale' => app()->getLocale(),
         ]);
 
         return response()->json(['data' => ['ok' => true]], 201);
+    }
+
+    /** Noms des champs dans les messages de validation, selon la langue de la requête (SetPublicLocale). */
+    private function attributeNames(array $french, array $english): array
+    {
+        return app()->getLocale() === 'en' ? $english : $french;
     }
 
     public function booking(StoreBookingRequest $request): JsonResponse
@@ -168,6 +183,7 @@ class FormController extends Controller
             'message' => $data['message'] ?? null,
             'items' => $request->items(),
             'ip_hash' => hash_hmac('sha256', (string) $request->ip(), (string) config('app.key')),
+            'locale' => app()->getLocale(),
         ]);
 
         // Alerte à l'équipe et accusé au client : un serveur de mail en panne ne fait jamais perdre la demande.

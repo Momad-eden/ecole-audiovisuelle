@@ -10,6 +10,7 @@ use App\Filament\Resources\Artworks\Pages\ListArtworks;
 use App\Filament\Support\Fields;
 use App\Filament\Support\FrenchLabels;
 use App\Filament\Support\RichText\TypographyPlugin;
+use App\Filament\Support\TranslationTab;
 use App\Models\Artwork;
 use BackedEnum;
 use Filament\Actions\EditAction;
@@ -102,6 +103,7 @@ class ArtworkResource extends Resource
                         ->helperText('Vérifiez que chaque personne a donné son accord pour la diffusion de la réalisation.'),
                 ]),
                 Tab::make('4. Publication')->icon('heroicon-o-globe-alt')->schema([Fields::publication()]),
+                TranslationTab::make(),
             ]),
         ]);
     }

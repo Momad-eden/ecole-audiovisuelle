@@ -33,7 +33,7 @@ const nextConfig: NextConfig = {
     // Le « musée » est devenu les univers (disciplines) et les réalisations des étudiants.
     const rooms: Record<string, string> = { "salle-du-son": "son", "salle-de-la-lumiere": "scene", "salle-de-limage": "image", "salle-du-visuel": "design" };
     const permanent = (source: string, destination: string) => ({ source, destination, permanent: true });
-    return [
+    const french = [
       // Les trois domaines : école (/emsi), Maison Habib Faye et Impact Live Studio (/maison-habib-faye).
       // /univers mène au bloc des univers de la page EMSI (id="univers").
       permanent("/univers", "/emsi#univers"),
@@ -58,6 +58,8 @@ const nextConfig: NextConfig = {
       ...Object.entries(rooms).map(([from, to]) => permanent(`/musee/${from}`, `/emsi/univers/${to}`)),
       permanent("/musee/:slug", "/emsi/univers/:slug"),
     ];
+    // Les mêmes anciennes adresses sous /en mènent aux pages anglaises (/en/formations/x → /en/emsi/formations/x).
+    return [...french, ...french.map((r) => ({ ...r, source: `/en${r.source}`, destination: `/en${r.destination}` }))];
   },
   async rewrites() {
     // Formulaires et API publics servis sur le même domaine que le site.

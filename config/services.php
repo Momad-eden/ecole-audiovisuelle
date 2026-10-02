@@ -35,6 +35,12 @@ return [
         ],
     ],
 
+    'deepl' => [
+        // DeepL API Free uniquement (traduction du site en anglais) ; sans clé, le site reste en français.
+        'key' => env('DEEPL_API_KEY'),
+        'url' => env('DEEPL_API_URL', 'https://api-free.deepl.com'),
+    ],
+
     'frontend' => [
         // Site public Next.js : aperçus et régénération des pages après publication.
         'url' => env('FRONTEND_URL', 'http://localhost:3000'),

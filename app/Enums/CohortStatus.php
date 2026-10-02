@@ -26,6 +26,23 @@ enum CohortStatus: string implements HasColor, HasLabel
         };
     }
 
+    /** Libellé dans la langue de l'API publique (`en` : anglais) ; en français, identique à getLabel() (admin). */
+    public function labelFor(string $locale): string
+    {
+        if ($locale !== 'en') {
+            return $this->getLabel();
+        }
+
+        return match ($this) {
+            self::PLANNED => 'Scheduled',
+            self::OPEN => 'Applications open',
+            self::CLOSED => 'Applications closed',
+            self::RUNNING => 'In progress',
+            self::COMPLETED => 'Completed',
+            self::CANCELLED => 'Cancelled',
+        };
+    }
+
     public function getColor(): string
     {
         return match ($this) {

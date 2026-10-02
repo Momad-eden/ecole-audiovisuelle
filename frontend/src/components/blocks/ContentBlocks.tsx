@@ -1,4 +1,4 @@
-import Link from "next/link";
+import { LocaleLink } from "@/components/i18n/LocaleLink";
 import { ArrowRight, Award, AudioLines, Briefcase, Calendar, Clapperboard, GraduationCap, Lightbulb, MapPin, Palette, Plus, Sparkles, Users, Video } from "lucide-react";
 import { ButtonLink } from "@/components/ui/ButtonLink";
 import { MediaImage } from "@/components/ui/MediaImage";
@@ -6,29 +6,31 @@ import { RichText } from "@/components/ui/RichText";
 import { Section, SectionTitle } from "@/components/ui/Section";
 import { VideoEmbed } from "@/components/ui/VideoEmbed";
 import { Reveal } from "@/components/motion/Reveal";
+import { getDictionary } from "@/lib/i18n";
+import type { Locale } from "@/lib/i18n/locales";
 import { cn, frenchSpacing } from "@/lib/utils";
-import type { CardsData, CtaData, FaqData, GalleryData, QuoteData, StatsData, TextData, TextImageData, TimelineData, VideoData } from "./types";
+import type { BlockProps, CardsData, CtaData, FaqData, GalleryData, QuoteData, StatsData, TextData, TextImageData, TimelineData, VideoData } from "./types";
 
 const ICONS = { "audio-lines": AudioLines, lightbulb: Lightbulb, video: Video, palette: Palette, clapperboard: Clapperboard, "graduation-cap": GraduationCap, users: Users, award: Award, calendar: Calendar, "map-pin": MapPin, briefcase: Briefcase, sparkles: Sparkles } as const;
 
-export function TextBlock({ data }: { data: TextData }) {
+export function TextBlock({ data, locale }: BlockProps<TextData>) {
   return (
     <Section>
       <Reveal className="mx-auto grid max-w-6xl gap-10 lg:grid-cols-[1fr_2fr]">
         {data.title ? <h2 className="display text-[clamp(1.9rem,3.6vw,3rem)] text-balance">{data.title}</h2> : <span />}
-        <RichText html={data.body} className="text-lg" />
+        <RichText html={data.body} locale={locale} className="text-lg" />
       </Reveal>
     </Section>
   );
 }
 
-export function TextImageBlock({ data }: { data: TextImageData }) {
+export function TextImageBlock({ data, locale }: BlockProps<TextImageData>) {
   return (
     <Section>
       <div className={cn("grid items-center gap-12 lg:grid-cols-2", data.imagePosition === "left" && "lg:[&>*:first-child]:order-2")}>
         <Reveal>
           {data.title && <h2 className="display mb-6 text-[clamp(1.9rem,3.6vw,3rem)] text-balance">{data.title}</h2>}
-          <RichText html={data.body} className="text-lg" />
+          <RichText html={data.body} locale={locale} className="text-lg" />
         </Reveal>
         <Reveal delay={120} className="relative aspect-[4/3] overflow-hidden rounded-[2rem] border border-line">
           <MediaImage image={data.image} sizes="(min-width: 1024px) 50vw, 100vw" />
@@ -38,7 +40,8 @@ export function TextImageBlock({ data }: { data: TextImageData }) {
   );
 }
 
-export function GalleryBlock({ data }: { data: GalleryData }) {
+export function GalleryBlock({ data, locale }: BlockProps<GalleryData>) {
+  const t = getDictionary(locale).blocks;
   const images = (data.images ?? []).filter((item) => item.image);
   return (
     <Section>
@@ -49,7 +52,7 @@ export function GalleryBlock({ data }: { data: GalleryData }) {
             <figure>
               <a href={item.image!.url} target="_blank" rel="noopener noreferrer" className="relative block aspect-square overflow-hidden rounded-2xl border border-line">
                 <MediaImage image={item.image} sizes="(min-width: 1024px) 33vw, 50vw" className="transition duration-700 hover:scale-105" />
-                <span className="sr-only">Agrandir l&apos;image (nouvel onglet)</span>
+                <span className="sr-only">{t.enlargeImage}</span>
               </a>
               {item.caption && <figcaption className="cartel mt-2">{item.caption}</figcaption>}
             </figure>
@@ -60,16 +63,17 @@ export function GalleryBlock({ data }: { data: GalleryData }) {
   );
 }
 
-export function VideoBlock({ data }: { data: VideoData }) {
+export function VideoBlock({ data, locale }: BlockProps<VideoData>) {
+  const t = getDictionary(locale).blocks;
   return (
     <Section>
       <div className="mx-auto max-w-5xl">
         <SectionTitle title={data.title} />
-        <VideoEmbed url={data.url} title={data.title ?? "Vidéo"} poster={data.poster?.url} />
+        <VideoEmbed url={data.url} title={data.title ?? t.video} poster={data.poster?.url} />
         {data.caption && <p className="cartel mt-3">{data.caption}</p>}
         {data.transcript && (
           <details className="mt-4 rounded-xl border border-line p-4 text-sm text-ink-muted">
-            <summary className="cursor-pointer text-ink">Transcription</summary>
+            <summary className="cursor-pointer text-ink">{t.transcript}</summary>
             <p className="mt-3 whitespace-pre-line">{data.transcript}</p>
           </details>
         )}
@@ -78,7 +82,7 @@ export function VideoBlock({ data }: { data: VideoData }) {
   );
 }
 
-export function StatsBlock({ data }: { data: StatsData }) {
+export function StatsBlock({ data }: BlockProps<StatsData>) {
   return (
     <Section>
       <SectionTitle title={data.title} />
@@ -95,11 +99,12 @@ export function StatsBlock({ data }: { data: StatsData }) {
   );
 }
 
-export function QuoteBlock({ data }: { data: QuoteData }) {
+export function QuoteBlock({ data, locale }: BlockProps<QuoteData>) {
+  const t = getDictionary(locale).blocks;
   return (
     <Section>
       <Reveal as="figure" className="mx-auto max-w-5xl">
-        <span className="display block text-8xl leading-none text-[var(--accent-ink)]" aria-hidden>«</span>
+        <span className="display block text-8xl leading-none text-[var(--accent-ink)]" aria-hidden>{t.quoteMark}</span>
         <blockquote className="display -mt-6 text-[clamp(1.8rem,4vw,3.2rem)] text-balance">{data.text}</blockquote>
         {(data.author || data.role) && (
           <figcaption className="mt-10 flex items-center gap-4">
@@ -120,7 +125,7 @@ export function QuoteBlock({ data }: { data: QuoteData }) {
 }
 
 /** Appel à l'action final : un plateau illuminé. */
-export function CtaBlock({ data }: { data: CtaData }) {
+export function CtaBlock({ data }: { data: CtaData; locale?: Locale }) {
   return (
     <section className="relative isolate overflow-hidden px-4 py-28 sm:px-6 sm:py-36 lg:px-8">
       <div className="absolute inset-0 -z-10" aria-hidden>
@@ -141,7 +146,8 @@ export function CtaBlock({ data }: { data: CtaData }) {
   );
 }
 
-export function CardsBlock({ data }: { data: CardsData }) {
+export function CardsBlock({ data, locale }: BlockProps<CardsData>) {
+  const t = getDictionary(locale).common;
   return (
     <Section>
       <SectionTitle title={data.title} />
@@ -156,13 +162,13 @@ export function CardsBlock({ data }: { data: CardsData }) {
               </div>
               <h3 className="display mt-8 text-2xl">{item.title}</h3>
               {item.text && <p className="mt-3 text-ink-muted">{item.text}</p>}
-              {item.url && <span className="mt-6 inline-flex items-center gap-2 text-sm font-semibold text-[var(--accent-ink)]">En savoir plus <ArrowRight className="size-4 transition-transform group-hover:translate-x-1" aria-hidden /></span>}
+              {item.url && <span className="mt-6 inline-flex items-center gap-2 text-sm font-semibold text-[var(--accent-ink)]">{t.learnMore} <ArrowRight className="size-4 transition-transform group-hover:translate-x-1" aria-hidden /></span>}
             </>
           );
           return (
             <Reveal as="li" key={item.title} delay={(index % 3) * 100} className="h-full">
               {item.url ? (
-                <Link href={item.url} className="group block h-full rounded-3xl border border-line bg-night-2 p-8 transition duration-500 hover:-translate-y-1 hover:border-[var(--accent)]">{body}</Link>
+                <LocaleLink href={item.url} className="group block h-full rounded-3xl border border-line bg-night-2 p-8 transition duration-500 hover:-translate-y-1 hover:border-[var(--accent)]">{body}</LocaleLink>
               ) : (
                 <div className="h-full rounded-3xl border border-line bg-night-2 p-8">{body}</div>
               )}
@@ -174,12 +180,13 @@ export function CardsBlock({ data }: { data: CardsData }) {
   );
 }
 
-export function TimelineBlock({ data }: { data: TimelineData }) {
+export function TimelineBlock({ data, locale }: BlockProps<TimelineData>) {
+  const t = getDictionary(locale).blocks;
   const steps = data.steps ?? [];
   if (data.layout === "steps") {
     return (
       <Section>
-        <SectionTitle eyebrow="Mode d'emploi" title={data.title} />
+        <SectionTitle eyebrow={t.howTo} title={data.title} />
         <ol className="relative grid gap-5 md:grid-cols-2 lg:grid-cols-4">
           <span className="absolute left-0 right-0 top-[3.4rem] hidden h-px bg-gradient-to-r from-brand via-violet to-hmi opacity-60 lg:block" aria-hidden />
           {steps.map((step, index) => (
@@ -212,13 +219,14 @@ export function TimelineBlock({ data }: { data: TimelineData }) {
   );
 }
 
-export function FaqBlock({ data }: { data: FaqData }) {
+export function FaqBlock({ data, locale }: BlockProps<FaqData>) {
+  const t = getDictionary(locale).blocks;
   const items = data.items ?? [];
   if (items.length === 0) return null;
   return (
     <Section>
       <div className="mx-auto grid max-w-6xl gap-10 lg:grid-cols-[1fr_2fr]">
-        <SectionTitle title={data.title ?? "Questions fréquentes"} className="mb-0" />
+        <SectionTitle title={data.title ?? t.faq} className="mb-0" />
         <div className="divide-y divide-line border-y border-line">
           {items.map((item) => (
             <details key={item.question} className="group py-6">

@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Models\Concerns\HasTranslations;
 use App\Models\Concerns\HasUniqueSlug;
 use App\Models\Concerns\RevalidatesFrontend;
 use Illuminate\Database\Eloquent\Builder;
@@ -10,7 +11,9 @@ use Illuminate\Database\Eloquent\Model;
 
 class News extends Model
 {
-    use HasFactory, HasUniqueSlug, RevalidatesFrontend;
+    use HasFactory, HasTranslations, HasUniqueSlug, RevalidatesFrontend;
+
+    protected array $translatable = ['title', 'excerpt', 'content'];
 
     protected $fillable = [
         'title',
